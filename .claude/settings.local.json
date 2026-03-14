@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__Desktop_Commander__list_directory",
+      "Bash(python3 -m json.tool)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(list\\(d.get\\(''mcpServers'', {}\\).keys\\(\\)\\), indent=2\\)\\)\")",
+      "Read(//Users/garrettweiss/**)",
+      "Bash(claude mcp list)",
+      "Bash(npm info @supabase/mcp-server-supabase version)",
+      "Bash(npx @supabase/mcp-server-supabase --version)",
+      "Bash(claude mcp add --help)",
+      "Read(//usr/local/bin/**)",
+      "Bash(ls ~/.local/bin/claude*)",
+      "mcp__supabase__list_organizations",
+      "mcp__supabase__list_projects",
+      "mcp__supabase__get_project_url",
+      "mcp__supabase__get_publishable_keys",
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --no-src-dir --import-alias \"@/*\" --yes)",
+      "Bash(npm install)",
+      "Bash(npx shadcn@latest init --defaults --force)"
+    ]
+  }
+}
