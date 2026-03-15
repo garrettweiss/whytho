@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Tables } from "@/types/database";
 
 type Snapshot = Pick<
@@ -9,6 +10,7 @@ interface Props {
   currentRate: number | null;
   snapshots: Snapshot[];
   weekNumber: number;
+  politicianSlug?: string; // if provided, history rows become archive links
 }
 
 function rateColor(rate: number | null): string {
@@ -85,7 +87,7 @@ function WeekLabel(weekNumber: number): string {
   return `Week ${week}, ${year}`;
 }
 
-export function ParticipationRate({ currentRate, snapshots, weekNumber }: Props) {
+export function ParticipationRate({ currentRate, snapshots, weekNumber, politicianSlug }: Props) {
   const rate = currentRate ?? 0;
 
   return (
@@ -138,11 +140,25 @@ export function ParticipationRate({ currentRate, snapshots, weekNumber }: Props)
           <div className="space-y-1.5">
             {snapshots.slice(0, 4).map((snap) => {
               const r = snap.participation_rate ?? 0;
+              const isCurrentWeek = snap.week_number === weekNumber;
+              const weekLabel = (
+                <span className="w-24 text-muted-foreground shrink-0">
+                  {WeekLabel(snap.week_number)}
+                </span>
+              );
+
               return (
                 <div key={snap.week_number} className="flex items-center gap-3 text-xs">
-                  <span className="w-24 text-muted-foreground shrink-0">
-                    {WeekLabel(snap.week_number)}
-                  </span>
+                  {politicianSlug && !isCurrentWeek ? (
+                    <Link
+                      href={`/${politicianSlug}?week=${snap.week_number}`}
+                      className="w-24 text-muted-foreground shrink-0 hover:text-foreground underline-offset-2 hover:underline"
+                    >
+                      {WeekLabel(snap.week_number)}
+                    </Link>
+                  ) : (
+                    weekLabel
+                  )}
                   <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
                     <div
                       className={`h-full rounded-full ${rateBg(r)}`}

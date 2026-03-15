@@ -33,6 +33,7 @@ interface QuestionListProps {
   questions: Question[];
   politicianId: string;
   weekNumber: number;
+  isHistorical?: boolean;
 }
 
 // ─── Answer Display ───────────────────────────────────────────────────────────
@@ -129,10 +130,12 @@ function QuestionCard({
   question,
   politicianId: _politicianId,
   weekNumber,
+  isHistorical = false,
 }: {
   question: Question;
   politicianId: string;
   weekNumber: number;
+  isHistorical?: boolean;
 }) {
   const [votes, setVotes] = useState(question.net_upvotes);
   const [userVote, setUserVote] = useState<1 | -1 | 0>(0);
@@ -187,7 +190,7 @@ function QuestionCard({
         <div className="flex flex-col items-center gap-1 shrink-0 pt-0.5">
           <button
             onClick={() => handleVote(1)}
-            disabled={isPending}
+            disabled={isPending || isHistorical}
             aria-label="Upvote"
             className={`flex h-7 w-7 items-center justify-center rounded-md text-sm transition-colors ${
               userVote === 1
@@ -202,7 +205,7 @@ function QuestionCard({
           </span>
           <button
             onClick={() => handleVote(-1)}
-            disabled={isPending}
+            disabled={isPending || isHistorical}
             aria-label="Downvote"
             className={`flex h-7 w-7 items-center justify-center rounded-md text-sm transition-colors ${
               userVote === -1
@@ -259,7 +262,7 @@ function QuestionCard({
 
 // ─── Question List ────────────────────────────────────────────────────────────
 
-export function QuestionList({ questions, politicianId, weekNumber }: QuestionListProps) {
+export function QuestionList({ questions, politicianId, weekNumber, isHistorical = false }: QuestionListProps) {
   const [localQuestions, setLocalQuestions] = useState<Question[]>(questions);
 
   // Keep in sync when server re-renders (after router.refresh())
@@ -267,8 +270,10 @@ export function QuestionList({ questions, politicianId, weekNumber }: QuestionLi
     setLocalQuestions(questions);
   }, [questions]);
 
-  // Supabase Realtime — live vote counts + new questions
+  // Supabase Realtime — live vote counts + new questions (current week only)
   useEffect(() => {
+    if (isHistorical) return; // no realtime on archive views — intentional
+
     const supabase = createClient();
 
     const channel = supabase
@@ -323,7 +328,7 @@ export function QuestionList({ questions, politicianId, weekNumber }: QuestionLi
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [politicianId, weekNumber]);
+  }, [politicianId, weekNumber, isHistorical]);
 
   if (localQuestions.length === 0) {
     return (
@@ -362,6 +367,7 @@ export function QuestionList({ questions, politicianId, weekNumber }: QuestionLi
               question={q}
               politicianId={politicianId}
               weekNumber={weekNumber}
+              isHistorical={isHistorical}
             />
           ))}
         </div>
@@ -380,6 +386,7 @@ export function QuestionList({ questions, politicianId, weekNumber }: QuestionLi
               question={q}
               politicianId={politicianId}
               weekNumber={weekNumber}
+              isHistorical={isHistorical}
             />
           ))}
         </div>
