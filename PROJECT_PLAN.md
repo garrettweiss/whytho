@@ -298,13 +298,13 @@ Politicians can claim profiles, verify identity, manage teams, and answer questi
 ### Tasks
 
 #### Verification flow
-- [ ] Build `/verify` page (multi-step wizard):
+- [x] Build `/verify` page (multi-step wizard):
   - Step 1: Find your profile (search by name)
   - Step 2: Confirm identity methods (select 2 of 5)
   - Step 3: Complete chosen methods
   - Step 4: Review + submit
   - Step 5: Confirmation screen
-- [ ] Implement Method A (government email):
+- [x] Implement Method A (government email):
   - Domain validation against CISA dotgov-data allowlist
   - Magic link flow separate from regular auth magic link
   - Mark `verification_method_a = true` on success
@@ -323,26 +323,26 @@ Politicians can claim profiles, verify identity, manage teams, and answer questi
   - Create verification session on backend
   - Handle `identity.verification_session.verified` webhook
   - Cross-reference verified name against politician record
-- [ ] Implement Method E (website meta tag):
+- [x] Implement Method E (website meta tag):
   - Generate unique meta tag code
   - Accept URL submission
   - Crawl URL (server-side), confirm meta tag present
   - Cross-reference with Ballotpedia official site
 
 #### Politician dashboard
-- [ ] Build `/dashboard` layout (authenticated + verified politician only)
-- [ ] Build `QuestionInbox` component:
+- [x] Build `/dashboard` layout (authenticated + verified politician only)
+- [x] Build `QuestionInbox` component:
   - Questions sorted by net_upvotes
   - Filter bar: topic, date, threshold status, answered/unanswered
   - Bulk select actions
-- [ ] Build `AnswerComposer` component:
+- [x] Build `AnswerComposer` component:
   - Format selector: text / video / social post / external link / approve AI draft
   - Text: markdown editor with preview
   - Video: URL input + embed preview
   - Social post: URL input + oEmbed preview (Twitter, Instagram, YouTube, TikTok)
   - External link: URL + description field
   - AI draft approval: shows AI analysis with "Confirm as accurate" button
-- [ ] Build answer submission flow:
+- [x] Build answer submission flow (text, role-gated):
   - Responder: save as draft (pending approval)
   - Editor: publish immediately
   - Admin: publish + retroactive edit
@@ -364,11 +364,11 @@ Politicians can claim profiles, verify identity, manage teams, and answer questi
 - [ ] Build AI answer dispute flow (flag + admin review)
 
 ### Acceptance criteria
-- [ ] Politician can complete Tier 2 verification using any 2 methods
-- [ ] Verified politician can access dashboard and see question inbox
+- [x] Politician can complete Tier 2 verification using any 2 methods (A + E)
+- [x] Verified politician can access dashboard and see question inbox
 - [ ] Politician can answer a question in all 5 formats
 - [ ] Team members can be invited and given appropriate role-based access
-- [ ] Answered questions display correctly on public profile with correct tier label
+- [x] Answered questions display correctly on public profile with correct tier label
 
 ---
 

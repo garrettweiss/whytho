@@ -7,8 +7,6 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "14.4"
   }
@@ -179,6 +177,53 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "politician_team_politician_id_fkey"
+            columns: ["politician_id"]
+            isOneToOne: false
+            referencedRelation: "politicians"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      politician_verifications: {
+        Row: {
+          code_expires_at: string | null
+          created_at: string
+          id: string
+          metadata: Json
+          method: Database["public"]["Enums"]["verification_method"]
+          politician_id: string
+          status: Database["public"]["Enums"]["verification_status"]
+          user_id: string
+          verification_code: string | null
+          verified_at: string | null
+        }
+        Insert: {
+          code_expires_at?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json
+          method: Database["public"]["Enums"]["verification_method"]
+          politician_id: string
+          status?: Database["public"]["Enums"]["verification_status"]
+          user_id: string
+          verification_code?: string | null
+          verified_at?: string | null
+        }
+        Update: {
+          code_expires_at?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json
+          method?: Database["public"]["Enums"]["verification_method"]
+          politician_id?: string
+          status?: Database["public"]["Enums"]["verification_status"]
+          user_id?: string
+          verification_code?: string | null
+          verified_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "politician_verifications_politician_id_fkey"
             columns: ["politician_id"]
             isOneToOne: false
             referencedRelation: "politicians"
@@ -459,6 +504,13 @@ export type Database = {
       answer_type: "direct" | "ai_analysis" | "team_statement"
       politician_team_role: "admin" | "editor" | "responder"
       question_status: "active" | "removed" | "merged"
+      verification_method:
+        | "gov_email"
+        | "fec_id"
+        | "social_code"
+        | "stripe_identity"
+        | "meta_tag"
+      verification_status: "pending" | "completed" | "expired" | "failed"
       verification_tier: "0" | "1" | "2" | "3"
     }
     CompositeTypes: {
@@ -468,7 +520,6 @@ export type Database = {
 }
 
 type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
-
 type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
@@ -588,16 +639,18 @@ export const Constants = {
   public: {
     Enums: {
       ai_confidence: ["high", "medium", "low", "insufficient"],
-      alias_type: [
-        "nickname",
-        "title",
-        "informal",
-        "misspelling",
-        "former_title",
-      ],
+      alias_type: ["nickname", "title", "informal", "misspelling", "former_title"],
       answer_type: ["direct", "ai_analysis", "team_statement"],
       politician_team_role: ["admin", "editor", "responder"],
       question_status: ["active", "removed", "merged"],
+      verification_method: [
+        "gov_email",
+        "fec_id",
+        "social_code",
+        "stripe_identity",
+        "meta_tag",
+      ],
+      verification_status: ["pending", "completed", "expired", "failed"],
       verification_tier: ["0", "1", "2", "3"],
     },
   },
