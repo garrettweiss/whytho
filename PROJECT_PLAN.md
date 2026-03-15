@@ -425,22 +425,22 @@ Platform ready for pilot launch in one congressional district. Moderation, notif
 - [ ] Accessibility audit (axe-core)
 
 #### Launch
-- [ ] Choose pilot congressional district (swing district, active local media)
+- [x] Choose pilot congressional district — CO-08, Rep. Gabe Evans (R). Cook: EVEN. 11 seeded questions live.
 - [ ] Reach out to 3-5 local journalists with the "unanswered questions" story pitch
-- [ ] Prepare press kit (screenshots, one-pager, founder quote)
+- [x] Prepare press kit (press-kit/one-pager.md, press-kit/journalist-pitch-co08.md, press-kit/talking-points.md)
 - [x] Set up error monitoring (Sentry)
 - [x] Set up analytics (Vercel Analytics + PostHog for events)
-- [ ] Configure uptime monitoring
-- [ ] Create support email + response templates
+- [ ] Configure uptime monitoring (uptimerobot.com — 5 min setup, free)
+- [ ] Create support email + response templates (support@whytho.us forwarding)
 - [ ] Soft launch: share with 50-100 beta users for 1 week
 - [ ] Full launch
 
 ### Acceptance criteria
 - [ ] Platform passes Lighthouse score 90+ (Performance, Accessibility, SEO)
-- [ ] Moderation queue functional with admin review capability
+- [x] Moderation queue functional with admin review capability
 - [ ] Weekly email digest sends correctly at Monday reset
 - [ ] Platform handles 100 concurrent users without degradation
-- [ ] Pilot district has 10+ seeded questions per federal representative
+- [x] Pilot district has 10+ seeded questions per federal representative (CO-08: 11 seeded)
 - [ ] Local journalist has been briefed and story is in the pipeline
 
 ---
