@@ -42,14 +42,16 @@ export type TargetState = (typeof TARGET_STATES)[number];
 
 async function fetchWithRetry(
   url: string,
-  retries = 3
+  retries = 5
 ): Promise<Response> {
   for (let i = 0; i < retries; i++) {
     const res = await fetch(url, {
       headers: { "X-API-KEY": API_KEY ?? "" },
     });
-    if (res.status === 429) {
-      await new Promise((r) => setTimeout(r, 1000 * Math.pow(2, i)));
+    if (res.status === 429 || res.status >= 500) {
+      const wait = 2000 * Math.pow(2, i); // 2s, 4s, 8s, 16s, 32s
+      console.log(`  ⏳ Rate limited (${res.status}), waiting ${wait / 1000}s...`);
+      await new Promise((r) => setTimeout(r, wait));
       continue;
     }
     return res;
@@ -64,10 +66,12 @@ export async function fetchStateLegislators(
 
   const people: OpenStatesPerson[] = [];
   let page = 1;
-  const perPage = 100;
+  const perPage = 50; // OpenStates free tier max
 
   while (true) {
-    const url = `${BASE_URL}/people?jurisdiction=${state}&page=${page}&per_page=${perPage}&org_classification=legislature`;
+    // org_classification not filtered here — we get upper/lower chamber members naturally
+    // by filtering to state jurisdiction (returns only state legislators, not federal)
+    const url = `${BASE_URL}/people?jurisdiction=${state}&page=${page}&per_page=${perPage}`;
     const res = await fetchWithRetry(url);
 
     if (!res.ok) {
@@ -76,31 +80,34 @@ export async function fetchStateLegislators(
 
     const data = (await res.json()) as {
       results: OpenStatesPerson[];
-      pagination: { total_pages: number };
+      pagination: { max_page: number; total_items: number };
     };
 
     people.push(...data.results);
 
-    if (page >= data.pagination.total_pages) break;
+    if (page >= data.pagination.max_page) break;
     page++;
-    await new Promise((r) => setTimeout(r, 200));
+    await new Promise((r) => setTimeout(r, 500)); // polite paging delay
   }
 
   return people;
 }
 
-export async function fetchAllTargetStateLegislators(): Promise<
-  Map<TargetState, OpenStatesPerson[]>
-> {
+export async function fetchAllTargetStateLegislators(
+  only?: string[]
+): Promise<Map<TargetState, OpenStatesPerson[]>> {
   const results = new Map<TargetState, OpenStatesPerson[]>();
+  const states = only
+    ? TARGET_STATES.filter((s) => only.includes(s))
+    : TARGET_STATES;
 
-  for (const state of TARGET_STATES) {
+  for (const state of states) {
     console.log(`Fetching legislators for ${state}...`);
     const legislators = await fetchStateLegislators(state);
     results.set(state, legislators);
     console.log(`  → ${legislators.length} legislators`);
-    // Respect rate limit: 1000 req/day on free tier
-    await new Promise((r) => setTimeout(r, 500));
+    // Respect rate limit: 500 req/day on free tier — 2s between states
+    await new Promise((r) => setTimeout(r, 2000));
   }
 
   return results;

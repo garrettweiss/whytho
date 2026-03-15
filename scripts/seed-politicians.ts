@@ -11,7 +11,7 @@
 import { createClient } from "@supabase/supabase-js";
 import type { Database, Enums } from "../types/database";
 import { fetchAllMembers } from "../lib/civic/congress";
-import { fetchAllTargetStateLegislators } from "../lib/civic/openstates";
+import { fetchStateLegislators } from "../lib/civic/openstates";
 import {
   normalizeCongressMember,
   normalizeOpenStatesPerson,
@@ -120,37 +120,54 @@ async function seedFederal() {
   console.log(`  ✅ Federal: ${result.inserted} inserted, ${result.updated} updated, ${result.errors} errors`);
 }
 
-async function seedStates() {
-  console.log("\n🗺️  Fetching state legislators from OpenStates...");
-  const stateData = await fetchAllTargetStateLegislators();
+async function seedStates(only?: string[]) {
+  console.log("\n🗺️  Fetching + upserting state legislators (one state at a time)...");
+  const states = only
+    ? (["ca","tx","fl","ny","pa","oh","ga","nc","mi","az"] as const).filter((s) => only.includes(s))
+    : (["ca","tx","fl","ny","pa","oh","ga","nc","mi","az"] as const);
 
-  let totalFetched = 0;
-  const allNormalized = [];
+  let totalInserted = 0;
+  let totalUpdated = 0;
+  let totalErrors = 0;
 
-  for (const [state, legislators] of stateData) {
-    const normalized = legislators.map(normalizeOpenStatesPerson);
-    allNormalized.push(...normalized);
-    totalFetched += legislators.length;
-    console.log(`  → ${state}: ${legislators.length} legislators`);
+  for (const state of states) {
+    console.log(`\n  📍 ${state.toUpperCase()}...`);
+    try {
+      const legislators = await fetchStateLegislators(state);
+      console.log(`    → ${legislators.length} fetched`);
+
+      const normalized = legislators.map(normalizeOpenStatesPerson);
+      const deduped = deduplicatePoliticians(normalized);
+      const result = await upsertPoliticians(deduped);
+      console.log(`    ✅ ${result.inserted} inserted, ${result.updated} updated, ${result.errors} errors`);
+      totalInserted += result.inserted;
+      totalUpdated += result.updated;
+      totalErrors += result.errors;
+    } catch (err) {
+      console.error(`    ❌ Failed for ${state}:`, err instanceof Error ? err.message : err);
+      totalErrors++;
+    }
+    // Wait between states to respect rate limits
+    await new Promise((r) => setTimeout(r, 3000));
   }
 
-  const deduped = deduplicatePoliticians(allNormalized);
-  console.log(`  → ${totalFetched} total, ${deduped.length} after deduplication`);
-
-  console.log("  → Upserting to database...");
-  const result = await upsertPoliticians(deduped);
-  console.log(`  ✅ States: ${result.inserted} inserted, ${result.updated} updated, ${result.errors} errors`);
+  console.log(`\n  ✅ States total: ${totalInserted} inserted, ${totalUpdated} updated, ${totalErrors} errors`);
 }
 
 async function main() {
   const args = process.argv.slice(2);
   const federalOnly = args.includes("--federal-only");
   const statesOnly = args.includes("--states-only");
+  // --state=pa,oh,ga — run specific states only
+  const stateArg = args.find((a) => a.startsWith("--state="));
+  const specificStates = stateArg ? stateArg.replace("--state=", "").split(",") : null;
 
   console.log("🌱 WhyTho politician seed script");
   console.log("=================================");
 
-  if (!federalOnly && !statesOnly) {
+  if (specificStates) {
+    await seedStates(specificStates);
+  } else if (!federalOnly && !statesOnly) {
     await seedFederal();
     await seedStates();
   } else if (federalOnly) {
