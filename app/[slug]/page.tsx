@@ -153,8 +153,8 @@ export default async function PoliticianProfilePage({ params }: Props) {
 
 // Static generation for top politicians — rest are dynamic
 export async function generateStaticParams() {
-  const { createClient: createAdminClient } = await import("@/lib/supabase/server");
-  const supabase = await createAdminClient();
+  const { createAdminClient } = await import("@/lib/supabase/server");
+  const supabase = createAdminClient();
 
   const { data } = await supabase
     .from("politicians")

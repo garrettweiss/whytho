@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -41,7 +42,7 @@ export function SignInForm() {
   return (
     <div className="space-y-4">
       {/* Google OAuth — uses GET route handler to avoid server action redirect issues */}
-      <a href="/auth/login/google" className="block">
+      <Link href="/auth/login/google" className="block">
         <Button type="button" variant="outline" className="w-full">
           <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24" aria-hidden="true">
             <path
@@ -63,7 +64,7 @@ export function SignInForm() {
           </svg>
           Continue with Google
         </Button>
-      </a>
+      </Link>
 
       <div className="relative">
         <div className="absolute inset-0 flex items-center">

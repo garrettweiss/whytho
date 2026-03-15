@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Tables, Enums } from "@/types/database";
-import { Button } from "@/components/ui/button";
+import { Enums } from "@/types/database";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -127,7 +126,7 @@ function AnswerBlock({ answer }: { answer: Answer }) {
 
 function QuestionCard({
   question,
-  politicianId,
+  politicianId: _politicianId,
   weekNumber,
 }: {
   question: Question;

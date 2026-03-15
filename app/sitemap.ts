@@ -1,5 +1,5 @@
 import { MetadataRoute } from "next";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/server";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://whytho-alpha.vercel.app";
 
@@ -33,7 +33,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   // Politician profile pages
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data: politicians } = await supabase
     .from("politicians")
     .select("slug, updated_at")
