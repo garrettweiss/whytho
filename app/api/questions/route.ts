@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/server";
+import {
+  containsProfanity,
+  exceedsSpamThreshold,
+  SPAM_SAME_POLITICIAN_LIMIT,
+  SPAM_WINDOW_HOURS,
+} from "@/lib/moderation/filter";
 
 const MIN_LENGTH = 10;
 const MAX_LENGTH = 500;
@@ -51,6 +57,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // ── Profanity filter ─────────────────────────────────────────────────────
+    if (containsProfanity(trimmed)) {
+      return NextResponse.json(
+        { error: "Question contains inappropriate language. Please revise and try again." },
+        { status: 422 }
+      );
+    }
+
     // ── Turnstile verification ───────────────────────────────────────────────
     const valid = await verifyTurnstile(turnstile_token);
     if (!valid) {
@@ -67,18 +81,40 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // ── Rate limit: 5 questions / user / 24h ─────────────────────────────────
     const admin = createAdminClient();
-    const { count } = await admin
+
+    // ── Rate limit: 5 questions / user / 24h (global) ────────────────────────
+    const { count: dailyCount } = await admin
       .from("questions")
       .select("*", { count: "exact", head: true })
       .eq("submitted_by", user.id)
       .eq("is_seeded", false)
       .gte("created_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
 
-    if ((count ?? 0) >= DAILY_LIMIT) {
+    if ((dailyCount ?? 0) >= DAILY_LIMIT) {
       return NextResponse.json(
         { error: `You can submit up to ${DAILY_LIMIT} questions per day` },
+        { status: 429 }
+      );
+    }
+
+    // ── Spam detection: max 3 questions per user per politician per 24h ───────
+    const { count: politicianCount } = await admin
+      .from("questions")
+      .select("*", { count: "exact", head: true })
+      .eq("submitted_by", user.id)
+      .eq("politician_id", politician_id)
+      .eq("is_seeded", false)
+      .gte(
+        "created_at",
+        new Date(Date.now() - SPAM_WINDOW_HOURS * 60 * 60 * 1000).toISOString()
+      );
+
+    if (exceedsSpamThreshold(politicianCount ?? 0)) {
+      return NextResponse.json(
+        {
+          error: `You can submit up to ${SPAM_SAME_POLITICIAN_LIMIT} questions per representative per day`,
+        },
         { status: 429 }
       );
     }

@@ -23,6 +23,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
 import type { Json } from "@/types/database";
+import { getResend, FROM_EMAIL } from "@/lib/email/resend";
+import { answerNotificationEmail } from "@/lib/email/templates";
 
 const MIN_BODY = 10;
 const MAX_BODY = 5000;
@@ -68,10 +70,10 @@ export async function POST(request: NextRequest) {
 
   const admin = createAdminClient();
 
-  // Fetch question to get politician_id and week_number
+  // Fetch question to get politician_id, week_number, and submitter for notification
   const { data: question, error: qErr } = await admin
     .from("questions")
-    .select("id, politician_id, week_number, net_upvotes, status")
+    .select("id, politician_id, week_number, net_upvotes, status, submitted_by")
     .eq("id", body.question_id)
     .single();
 
@@ -162,6 +164,52 @@ export async function POST(request: NextRequest) {
   if (insertErr) {
     return NextResponse.json({ error: insertErr.message }, { status: 500 });
   }
+
+  // Fire-and-forget: notify the question submitter via email
+  void (async () => {
+    try {
+      if (!question.submitted_by) return;
+
+      // Fetch question submitter's email + politician name
+      const [{ data: submitterData }, { data: politician }] = await Promise.all([
+        admin.auth.admin.getUserById(question.submitted_by),
+        admin
+          .from("politicians")
+          .select("full_name, slug")
+          .eq("id", question.politician_id)
+          .single(),
+      ]);
+
+      const email = submitterData?.user?.email;
+      if (!email || !politician) return;
+
+      // Fetch question body
+      const { data: q } = await admin
+        .from("questions")
+        .select("body")
+        .eq("id", question.id)
+        .single();
+      if (!q) return;
+
+      const { subject, html, text } = answerNotificationEmail({
+        questionBody: q.body,
+        answerBody: answerText,
+        answerType,
+        politicianName: politician.full_name,
+        politicianSlug: politician.slug,
+      });
+
+      await getResend().emails.send({
+        from: FROM_EMAIL,
+        to: email,
+        subject,
+        html,
+        text,
+      });
+    } catch {
+      // Never let email errors affect the API response
+    }
+  })();
 
   return NextResponse.json({
     success: true,

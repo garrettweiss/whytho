@@ -7,6 +7,8 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "14.4"
   }
@@ -303,6 +305,38 @@ export type Database = {
         }
         Relationships: []
       }
+      question_reports: {
+        Row: {
+          created_at: string
+          id: string
+          question_id: string
+          reason: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          question_id: string
+          reason: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          question_id?: string
+          reason?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "question_reports_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       questions: {
         Row: {
           body: string
@@ -520,6 +554,7 @@ export type Database = {
 }
 
 type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
 type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
@@ -643,13 +678,7 @@ export const Constants = {
       answer_type: ["direct", "ai_analysis", "team_statement"],
       politician_team_role: ["admin", "editor", "responder"],
       question_status: ["active", "removed", "merged"],
-      verification_method: [
-        "gov_email",
-        "fec_id",
-        "social_code",
-        "stripe_identity",
-        "meta_tag",
-      ],
+      verification_method: ["gov_email", "fec_id", "social_code", "stripe_identity", "meta_tag"],
       verification_status: ["pending", "completed", "expired", "failed"],
       verification_tier: ["0", "1", "2", "3"],
     },
