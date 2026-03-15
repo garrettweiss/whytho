@@ -37,7 +37,7 @@ export function generateSlug(fullName: string, state: string, suffix?: string): 
     .replace(/-+/g, "-")
     .trim();
 
-  const stateSlug = state.toLowerCase();
+  const stateSlug = state.toLowerCase().replace(/\s+/g, "-");
   const slug = `${base}-${stateSlug}`;
 
   return suffix ? `${slug}-${suffix}` : slug;
