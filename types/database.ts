@@ -390,6 +390,8 @@ export type Database = {
           display_name: string | null
           id: string
           is_anonymous: boolean
+          notify_answer: boolean
+          notify_digest: boolean
           updated_at: string
         }
         Insert: {
@@ -397,6 +399,8 @@ export type Database = {
           display_name?: string | null
           id: string
           is_anonymous?: boolean
+          notify_answer?: boolean
+          notify_digest?: boolean
           updated_at?: string
         }
         Update: {
@@ -404,6 +408,8 @@ export type Database = {
           display_name?: string | null
           id?: string
           is_anonymous?: boolean
+          notify_answer?: boolean
+          notify_digest?: boolean
           updated_at?: string
         }
         Relationships: []
@@ -674,11 +680,23 @@ export const Constants = {
   public: {
     Enums: {
       ai_confidence: ["high", "medium", "low", "insufficient"],
-      alias_type: ["nickname", "title", "informal", "misspelling", "former_title"],
+      alias_type: [
+        "nickname",
+        "title",
+        "informal",
+        "misspelling",
+        "former_title",
+      ],
       answer_type: ["direct", "ai_analysis", "team_statement"],
       politician_team_role: ["admin", "editor", "responder"],
       question_status: ["active", "removed", "merged"],
-      verification_method: ["gov_email", "fec_id", "social_code", "stripe_identity", "meta_tag"],
+      verification_method: [
+        "gov_email",
+        "fec_id",
+        "social_code",
+        "stripe_identity",
+        "meta_tag",
+      ],
       verification_status: ["pending", "completed", "expired", "failed"],
       verification_tier: ["0", "1", "2", "3"],
     },

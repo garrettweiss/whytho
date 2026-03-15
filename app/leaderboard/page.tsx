@@ -108,7 +108,7 @@ export default async function LeaderboardPage() {
   const week = weekNumber % 100;
 
   return (
-    <div className="min-h-screen bg-background">
+    <main className="min-h-screen bg-background">
       <div className="mx-auto max-w-3xl px-4 py-8 space-y-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Response Leaderboard</h1>
@@ -197,6 +197,6 @@ export default async function LeaderboardPage() {
           Silence is its own answer.
         </p>
       </div>
-    </div>
+    </main>
   );
 }

@@ -18,31 +18,39 @@ export function SiteNav() {
     href === "/" ? pathname === "/" : pathname.startsWith(href);
 
   return (
-    <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40">
+    <nav
+      aria-label="Main navigation"
+      className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40"
+    >
       <div className="mx-auto max-w-5xl px-4 h-14 flex items-center justify-between gap-4">
         {/* Logo */}
         <Link
           href="/"
+          aria-label="WhyTho — home"
           className="font-bold text-sm tracking-tight hover:text-muted-foreground transition-colors"
         >
           WhyTho
         </Link>
 
         {/* Nav links */}
-        <div className="flex items-center gap-1">
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                isActive(link.href)
-                  ? "bg-muted text-foreground"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-              }`}
-            >
-              {link.label}
-            </Link>
-          ))}
+        <div className="flex items-center gap-1" role="list">
+          {NAV_LINKS.map((link) => {
+            const active = isActive(link.href);
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                aria-current={active ? "page" : undefined}
+                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                  active
+                    ? "bg-muted text-foreground"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
         </div>
 
         {/* Auth links */}
@@ -52,6 +60,7 @@ export function SiteNav() {
               <>
                 <Link
                   href="/dashboard"
+                  aria-current={isActive("/dashboard") ? "page" : undefined}
                   className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                     isActive("/dashboard")
                       ? "bg-muted text-foreground"
@@ -61,7 +70,7 @@ export function SiteNav() {
                   Dashboard
                 </Link>
                 <Link
-                  href="/sign-in"
+                  href="/auth/sign-out"
                   className="text-xs text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Sign out

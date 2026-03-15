@@ -380,46 +380,46 @@ Platform ready for pilot launch in one congressional district. Moderation, notif
 ### Tasks
 
 #### Moderation
-- [ ] Build report button + report modal on all question cards
-- [ ] Implement 3-report threshold → auto-hide pending moderation
-- [ ] Build `/admin/moderation` queue:
+- [x] Build report button + report modal on all question cards
+- [x] Implement 3-report threshold → auto-hide pending moderation
+- [x] Build `/admin/moderation` queue:
   - List of flagged questions with report reasons
   - Approve (restore) / Remove / Escalate actions
   - One-click bulk actions
-- [ ] Implement profanity filter (use `bad-words` npm package + custom list)
-- [ ] Build spam detection: same user, same politician, >3 near-identical questions in 24h
-- [ ] Build `/admin` dashboard:
+- [x] Implement profanity filter (use `bad-words` npm package + custom list)
+- [x] Build spam detection: same user, same politician, >3 near-identical questions in 24h
+- [x] Build `/admin` dashboard:
   - Platform stats (users, questions, votes, participation rates)
   - Politician verification queue
   - Seeded question review queue
   - User management
 
 #### Notifications
-- [ ] Set up Resend email templates:
-  - Weekly digest template
-  - Answer notification template
-  - Threshold alert template
-  - Politician welcome email template
-- [ ] Build email preference center (`/settings/notifications`)
-- [ ] Wire weekly digest to pg_cron weekly_reset event
-- [ ] Wire answer notifications to answer INSERT trigger
+- [x] Set up Resend email templates:
+  - Weekly digest template ✓
+  - Answer notification template ✓
+  - Threshold alert template (deferred)
+  - Politician welcome email template (deferred)
+- [x] Build email preference center (`/settings/notifications`)
+- [x] Wire weekly digest to pg_cron weekly_reset event (`/api/admin/weekly-digest`)
+- [x] Wire answer notifications to answer INSERT trigger
 
 #### Homepage
-- [ ] Build full homepage:
+- [x] Build full homepage:
   - Hero with search + "Ask your representative" CTA
   - Top 5 most-upvoted questions this week
   - Trending politicians (most question activity)
   - Leaderboard preview (top 3 + bottom 3)
   - "How it works" explainer (3 steps)
-- [ ] Build `/about` page
-- [ ] Build `/how-it-works` page
-- [ ] Build `/faq` page
+- [x] Build `/about` page
+- [x] Build `/how-it-works` page
+- [x] Build `/faq` page
 
 #### Performance + polish
 - [ ] Lighthouse audit: target 90+ score on all metrics
-- [ ] Optimize politician profile page (image optimization, lazy loading)
-- [ ] Add loading skeletons for all async components
-- [ ] Add error boundaries and fallback UI
+- [x] Optimize politician profile page (image optimization, lazy loading)
+- [x] Add loading skeletons for all async components
+- [x] Add error boundaries and fallback UI
 - [ ] Test on mobile (responsive design audit)
 - [ ] Cross-browser test (Chrome, Firefox, Safari)
 - [ ] Accessibility audit (axe-core)
@@ -428,8 +428,8 @@ Platform ready for pilot launch in one congressional district. Moderation, notif
 - [ ] Choose pilot congressional district (swing district, active local media)
 - [ ] Reach out to 3-5 local journalists with the "unanswered questions" story pitch
 - [ ] Prepare press kit (screenshots, one-pager, founder quote)
-- [ ] Set up error monitoring (Sentry)
-- [ ] Set up analytics (Vercel Analytics + PostHog for events)
+- [x] Set up error monitoring (Sentry)
+- [x] Set up analytics (Vercel Analytics + PostHog for events)
 - [ ] Configure uptime monitoring
 - [ ] Create support email + response templates
 - [ ] Soft launch: share with 50-100 beta users for 1 week
