@@ -13,7 +13,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
-import { getResend, FROM_EMAIL, SITE_URL } from "@/lib/email/resend";
+import { getResend, FROM_EMAIL } from "@/lib/email/resend";
 import { weeklyDigestEmail } from "@/lib/email/templates";
 
 const ADMIN_SECRET = process.env.ADMIN_SECRET;
