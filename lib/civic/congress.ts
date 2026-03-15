@@ -113,12 +113,6 @@ export function getBioguidePhotoUrl(bioguideId: string): string {
   return `https://bioguide.congress.gov/bioguide/photo/${letter}/${bioguideId}.jpg`;
 }
 
-export function mapChamberToOffice(
-  chamber: string,
-  state: string,
-  district?: number
-): string {
-  if (chamber === "Senate") return `U.S. Senator — ${state}`;
-  if (district) return `U.S. Representative — ${state}-${String(district).padStart(2, "0")}`;
-  return `U.S. Representative — ${state}`;
+export function mapChamberToOffice(chamber: string): string {
+  return chamber === "Senate" ? "U.S. Senator" : "U.S. Representative";
 }

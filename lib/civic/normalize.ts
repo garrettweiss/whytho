@@ -12,6 +12,14 @@ import {
 } from "./congress";
 import { mapPartyName, mapChamberTitle } from "./openstates";
 
+/** Extract 2-letter state code from OCD jurisdiction ID.
+ *  e.g. "ocd-jurisdiction/country:us/state:ca/legislature" → "CA"
+ */
+function extractStateFromJurisdiction(jurisdictionId: string): string {
+  const match = /\/state:([a-z]{2})\//.exec(jurisdictionId);
+  return match?.[1]?.toUpperCase() ?? "";
+}
+
 type PoliticianInsert = TablesInsert<"politicians">;
 type AliasInsert = TablesInsert<"politician_aliases">;
 
@@ -47,10 +55,16 @@ export function normalizeCongressMember(
 
   const slug = generateSlug(displayName, member.state);
 
+  // Congress.gov list endpoint doesn't include top-level chamber — derive from most recent term
+  const sortedTerms = [...(member.terms?.item ?? [])].sort(
+    (a, b) => b.startYear - a.startYear
+  );
+  const currentChamber = sortedTerms[0]?.chamber ?? member.chamber ?? "House of Representatives";
+  const titlePrefix = currentChamber === "Senate" ? "Sen." : "Rep.";
+
   const aliases: Omit<AliasInsert, "politician_id">[] = [];
 
   // Add "Rep." / "Sen." title aliases
-  const titlePrefix = member.chamber === "Senate" ? "Sen." : "Rep.";
   aliases.push({
     alias: `${titlePrefix} ${displayName}`,
     alias_type: "title",
@@ -69,7 +83,7 @@ export function normalizeCongressMember(
     slug,
     full_name: displayName,
     aliases: [displayName, `${titlePrefix} ${displayName}`, lastName].filter(Boolean),
-    office: mapChamberToOffice(member.chamber, member.state, member.district),
+    office: mapChamberToOffice(currentChamber),
     state: member.state,
     district: member.district ? String(member.district) : null,
     party: member.party === "D" ? "Democrat" : member.party === "R" ? "Republican" : member.party,
@@ -88,7 +102,13 @@ export function normalizeOpenStatesPerson(
   person: OpenStatesPerson
 ): NormalizedPolitician {
   const fullName = person.name;
-  const state = person.current_role?.state?.toLowerCase() ?? "";
+  // current_role.state is often absent in OpenStates API responses;
+  // fall back to jurisdiction.id which reliably contains the state code
+  const stateFromRole = person.current_role?.state?.toLowerCase() ?? "";
+  const stateFromJurisdiction = person.jurisdiction?.id
+    ? extractStateFromJurisdiction(person.jurisdiction.id)
+    : "";
+  const state = (stateFromRole || stateFromJurisdiction).toLowerCase();
   const slug = generateSlug(fullName, state);
 
   const aliases: Omit<AliasInsert, "politician_id">[] = [];
@@ -113,7 +133,7 @@ export function normalizeOpenStatesPerson(
     full_name: fullName,
     aliases: [fullName, ...(person.other_names?.map((n) => n.name) ?? [])],
     office: role
-      ? mapChamberTitle(role.org_classification, role.title, state)
+      ? mapChamberTitle(role.org_classification, role.title)
       : null,
     state: state.toUpperCase(),
     district: role?.district ?? null,

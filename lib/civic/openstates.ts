@@ -125,10 +125,9 @@ export function mapPartyName(party: string): string {
 
 export function mapChamberTitle(
   classification: string,
-  title: string,
-  state: string
+  title: string
 ): string {
-  if (classification === "upper") return `State Senator — ${state.toUpperCase()}`;
-  if (classification === "lower") return `State Representative — ${state.toUpperCase()}`;
-  return `${title} — ${state.toUpperCase()}`;
+  if (classification === "upper") return "State Senator";
+  if (classification === "lower") return "State Representative";
+  return title;
 }
