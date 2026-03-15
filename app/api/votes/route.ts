@@ -45,6 +45,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid vote value" }, { status: 400 });
     }
 
+    // Rate limit: 30 votes per user per 10 minutes (new votes only — not toggles)
+    const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+    const { count: recentVoteCount } = await supabase
+      .from("votes")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .gte("created_at", tenMinutesAgo);
+
+    if ((recentVoteCount ?? 0) >= 30) {
+      return NextResponse.json(
+        { error: "Too many votes. Please slow down and try again in a few minutes." },
+        { status: 429 }
+      );
+    }
+
     // Upsert vote — UNIQUE(user_id, question_id, week_number)
     const { error } = await supabase.from("votes").upsert(
       {

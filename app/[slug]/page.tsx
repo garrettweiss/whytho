@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { PoliticianHeader } from "@/components/politician/politician-header";
 import { ParticipationRate } from "@/components/politician/participation-rate";
 import { QuestionList } from "@/components/politician/question-list";
+import { AskQuestionForm } from "@/components/questions/ask-question-form";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -138,6 +139,11 @@ export default async function PoliticianProfilePage({ params }: Props) {
             currentRate={participationRate as number | null}
             snapshots={snapshots ?? []}
             weekNumber={weekNumber}
+          />
+
+          <AskQuestionForm
+            politicianId={politician.id}
+            politicianName={politician.full_name}
           />
 
           <QuestionList

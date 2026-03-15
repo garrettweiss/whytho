@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { Enums } from "@/types/database";
+import { createClient } from "@/lib/supabase/client";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -138,6 +139,13 @@ function QuestionCard({
   const [isPending, startTransition] = useTransition();
   const [expanded, setExpanded] = useState(question.answers.length > 0);
 
+  // Sync realtime net_upvotes into local state (skip while optimistic update in flight)
+  useEffect(() => {
+    if (!isPending) {
+      setVotes(question.net_upvotes);
+    }
+  }, [question.net_upvotes, isPending]);
+
   const hasAnswers = question.answers.length > 0;
 
   async function handleVote(value: 1 | -1) {
@@ -252,7 +260,72 @@ function QuestionCard({
 // ─── Question List ────────────────────────────────────────────────────────────
 
 export function QuestionList({ questions, politicianId, weekNumber }: QuestionListProps) {
-  if (questions.length === 0) {
+  const [localQuestions, setLocalQuestions] = useState<Question[]>(questions);
+
+  // Keep in sync when server re-renders (after router.refresh())
+  useEffect(() => {
+    setLocalQuestions(questions);
+  }, [questions]);
+
+  // Supabase Realtime — live vote counts + new questions
+  useEffect(() => {
+    const supabase = createClient();
+
+    const channel = supabase
+      .channel(`questions:${politicianId}:${weekNumber}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "questions",
+          filter: `politician_id=eq.${politicianId}`,
+        },
+        (payload) => {
+          const updated = payload.new as {
+            id: string;
+            net_upvotes: number;
+            status: string;
+            week_number: number;
+          };
+          // Only care about the current week
+          if (updated.week_number !== weekNumber) return;
+          if (updated.status !== "active") {
+            setLocalQuestions((prev) => prev.filter((q) => q.id !== updated.id));
+            return;
+          }
+          setLocalQuestions((prev) =>
+            prev.map((q) =>
+              q.id === updated.id ? { ...q, net_upvotes: updated.net_upvotes } : q
+            )
+          );
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "questions",
+          filter: `politician_id=eq.${politicianId}`,
+        },
+        (payload) => {
+          const newQ = payload.new as Question;
+          if (newQ.week_number !== weekNumber || newQ.status !== "active") return;
+          setLocalQuestions((prev) => {
+            if (prev.find((q) => q.id === newQ.id)) return prev;
+            return [...prev, { ...newQ, answers: [] }];
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [politicianId, weekNumber]);
+
+  if (localQuestions.length === 0) {
     return (
       <div className="rounded-xl border bg-card p-8 text-center space-y-2 shadow-sm">
         <p className="font-medium">No questions yet this week</p>
@@ -263,15 +336,17 @@ export function QuestionList({ questions, politicianId, weekNumber }: QuestionLi
     );
   }
 
-  const qualifying = questions.filter((q) => q.net_upvotes >= 10);
-  const nonQualifying = questions.filter((q) => q.net_upvotes < 10);
+  // Sort by net_upvotes descending (realtime updates can change order)
+  const sorted = [...localQuestions].sort((a, b) => b.net_upvotes - a.net_upvotes);
+  const qualifying = sorted.filter((q) => q.net_upvotes >= 10);
+  const nonQualifying = sorted.filter((q) => q.net_upvotes < 10);
 
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">This Week&apos;s Questions</h2>
         <span className="text-sm text-muted-foreground">
-          {questions.length} question{questions.length !== 1 ? "s" : ""}
+          {localQuestions.length} question{localQuestions.length !== 1 ? "s" : ""}
           {qualifying.length > 0 && ` · ${qualifying.length} qualifying`}
         </span>
       </div>

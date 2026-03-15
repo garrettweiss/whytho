@@ -432,6 +432,18 @@ export type Database = {
         Args: { p_politician_id: string; p_week_number: number }
         Returns: number
       }
+      search_politicians: {
+        Args: { query: string; result_limit?: number }
+        Returns: {
+          full_name: string
+          id: string
+          office: string
+          party: string
+          photo_url: string
+          slug: string
+          state: string
+        }[]
+      }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
       weekly_reset: { Args: never; Returns: undefined }

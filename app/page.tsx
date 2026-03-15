@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { PoliticianSearch } from "@/components/politician/politician-search";
 
 export const metadata: Metadata = {
   title: "WhyTho — Hold Your Representatives Accountable",
@@ -58,6 +59,9 @@ export default async function HomePage() {
             Silence is its own answer.
           </p>
         </div>
+
+        {/* Search */}
+        <PoliticianSearch />
 
         {/* Stats */}
         {politicianCount !== null && (
