@@ -2,15 +2,8 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { useUser } from "@/lib/auth/use-user";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
 const NAV_LINKS = [
   { href: "/", label: "Home" },
@@ -23,11 +16,36 @@ export function SiteNav() {
   const router = useRouter();
   const { user, isLoading } = useUser();
 
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
 
   const isLoggedIn = user && !user.is_anonymous;
   const avatarInitial = user?.email?.[0]?.toUpperCase() ?? "U";
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    if (!menuOpen) return;
+    function handleClick(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [menuOpen]);
+
+  // Close on route change
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [pathname]);
+
+  function navigate(href: string) {
+    setMenuOpen(false);
+    router.push(href);
+  }
 
   return (
     <nav
@@ -69,51 +87,63 @@ export function SiteNav() {
         {!isLoading && (
           <div className="flex items-center gap-2">
             {isLoggedIn ? (
-              /* Logged-in: account avatar + dropdown */
-              <DropdownMenu>
-                <DropdownMenuTrigger
+              /* Logged-in: avatar + custom dropdown */
+              <div ref={menuRef} className="relative">
+                <button
                   aria-label="Account menu"
+                  aria-expanded={menuOpen}
+                  aria-haspopup="menu"
+                  onClick={() => setMenuOpen((o) => !o)}
                   className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
                 >
                   {avatarInitial}
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-52">
-                  {user?.email && (
-                    <>
-                      <DropdownMenuLabel className="text-xs font-normal truncate">
-                        {user.email}
-                      </DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                    </>
-                  )}
-                  <DropdownMenuItem
-                    className="cursor-pointer"
-                    onClick={() => router.push("/account?tab=questions")}
+                </button>
+
+                {menuOpen && (
+                  <div
+                    role="menu"
+                    className="absolute right-0 top-10 z-50 w-52 rounded-lg border bg-popover text-popover-foreground shadow-md ring-1 ring-foreground/10 py-1"
                   >
-                    My Questions
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="cursor-pointer"
-                    onClick={() => router.push("/account?tab=votes")}
-                  >
-                    My Votes
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="cursor-pointer"
-                    onClick={() => router.push("/dashboard")}
-                  >
-                    Dashboard
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    variant="destructive"
-                    className="cursor-pointer"
-                    onClick={() => router.push("/auth/sign-out")}
-                  >
-                    Sign out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                    {user?.email && (
+                      <>
+                        <div className="px-3 py-2 text-xs text-muted-foreground truncate">
+                          {user.email}
+                        </div>
+                        <div className="my-1 h-px bg-border -mx-0" />
+                      </>
+                    )}
+                    <button
+                      role="menuitem"
+                      onClick={() => navigate("/account?tab=questions")}
+                      className="w-full text-left px-3 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground transition-colors"
+                    >
+                      My Questions
+                    </button>
+                    <button
+                      role="menuitem"
+                      onClick={() => navigate("/account?tab=votes")}
+                      className="w-full text-left px-3 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground transition-colors"
+                    >
+                      My Votes
+                    </button>
+                    <button
+                      role="menuitem"
+                      onClick={() => navigate("/dashboard")}
+                      className="w-full text-left px-3 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground transition-colors"
+                    >
+                      Dashboard
+                    </button>
+                    <div className="my-1 h-px bg-border" />
+                    <button
+                      role="menuitem"
+                      onClick={() => navigate("/auth/sign-out")}
+                      className="w-full text-left px-3 py-1.5 text-sm text-destructive hover:bg-destructive/10 transition-colors"
+                    >
+                      Sign out
+                    </button>
+                  </div>
+                )}
+              </div>
             ) : (
               /* Logged out / anonymous: sign in + politician CTA */
               <>
