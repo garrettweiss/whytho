@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
+import { PoliticianAvatar } from "@/components/politician/politician-avatar";
 
 export const metadata: Metadata = {
   title: "Response Rate Leaderboard — WhyTho",
@@ -138,23 +138,11 @@ export default async function LeaderboardPage() {
                 </span>
 
                 {/* Photo */}
-                <div className="shrink-0">
-                  {row.photo_url ? (
-                    <div className="relative h-10 w-10 overflow-hidden rounded-full border border-border">
-                      <Image
-                        src={row.photo_url}
-                        alt={row.full_name}
-                        fill
-                        className="object-cover"
-                        sizes="40px"
-                      />
-                    </div>
-                  ) : (
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-muted text-sm font-bold text-muted-foreground">
-                      {row.full_name.slice(0, 1)}
-                    </div>
-                  )}
-                </div>
+                <PoliticianAvatar
+                  photoUrl={row.photo_url}
+                  fullName={row.full_name}
+                  size={40}
+                />
 
                 {/* Info */}
                 <div className="flex-1 min-w-0">

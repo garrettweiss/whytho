@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
+import { PoliticianAvatar } from "@/components/politician/politician-avatar";
 
 export const metadata: Metadata = {
   title: "Federal Representatives — WhyTho",
@@ -145,21 +145,11 @@ export default async function FederalPage({
                       href={`/${p.slug}`}
                       className="flex items-center gap-3 px-4 py-3 hover:bg-muted/50 transition-colors group"
                     >
-                      {p.photo_url ? (
-                        <div className="relative h-9 w-9 overflow-hidden rounded-full border border-border shrink-0">
-                          <Image
-                            src={p.photo_url}
-                            alt={p.full_name}
-                            fill
-                            className="object-cover"
-                            sizes="36px"
-                          />
-                        </div>
-                      ) : (
-                        <div className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-muted text-sm font-bold text-muted-foreground shrink-0">
-                          {p.full_name.slice(0, 1)}
-                        </div>
-                      )}
+                      <PoliticianAvatar
+                        photoUrl={p.photo_url}
+                        fullName={p.full_name}
+                        size={36}
+                      />
                       <div className="flex-1 min-w-0">
                         <p className="font-medium truncate group-hover:underline underline-offset-2">
                           {p.full_name}

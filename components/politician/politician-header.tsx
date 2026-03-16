@@ -1,5 +1,5 @@
-import Image from "next/image";
 import { Tables, Enums } from "@/types/database";
+import { PoliticianAvatar } from "@/components/politician/politician-avatar";
 
 interface Props {
   politician: Tables<"politicians">;
@@ -74,21 +74,12 @@ export function PoliticianHeader({ politician, currentParticipationRate }: Props
       <div className="flex gap-5 items-start">
         {/* Photo */}
         <div className="shrink-0">
-          {politician.photo_url ? (
-            <div className="relative h-20 w-20 overflow-hidden rounded-full border-2 border-border">
-              <Image
-                src={politician.photo_url}
-                alt={politician.full_name}
-                fill
-                className="object-cover"
-                sizes="80px"
-              />
-            </div>
-          ) : (
-            <div className="flex h-20 w-20 items-center justify-center rounded-full border-2 border-border bg-muted text-2xl font-bold text-muted-foreground">
-              {politician.full_name.slice(0, 1).toUpperCase()}
-            </div>
-          )}
+          <PoliticianAvatar
+            photoUrl={politician.photo_url}
+            fullName={politician.full_name}
+            size={80}
+            className="border-2"
+          />
         </div>
 
         {/* Info */}

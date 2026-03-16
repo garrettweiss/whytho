@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import { PoliticianSearch } from "@/components/politician/politician-search";
+import { PoliticianAvatar } from "@/components/politician/politician-avatar";
 
 export const metadata: Metadata = {
   title: "WhyTho — Hold Your Representatives Accountable",
@@ -299,21 +299,11 @@ export default async function HomePage() {
                     href={`/${row.slug}`}
                     className="flex items-center gap-3 rounded-lg border bg-card px-3 py-2.5 hover:bg-muted/50 transition-colors"
                   >
-                    {row.photo_url ? (
-                      <Image
-                        src={row.photo_url}
-                        alt={row.full_name}
-                        width={32}
-                        height={32}
-                        className="rounded-full object-cover shrink-0"
-                      />
-                    ) : (
-                      <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center shrink-0">
-                        <span className="text-xs font-bold text-muted-foreground">
-                          {row.full_name.charAt(0)}
-                        </span>
-                      </div>
-                    )}
+                    <PoliticianAvatar
+                      photoUrl={row.photo_url}
+                      fullName={row.full_name}
+                      size={32}
+                    />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5">
                         <PartyDot party={row.party} />
@@ -353,21 +343,11 @@ export default async function HomePage() {
                     href={`/${row.slug}`}
                     className="flex items-center gap-3 rounded-lg border bg-card px-3 py-2.5 hover:bg-muted/50 transition-colors"
                   >
-                    {row.photo_url ? (
-                      <Image
-                        src={row.photo_url}
-                        alt={row.full_name}
-                        width={32}
-                        height={32}
-                        className="rounded-full object-cover shrink-0"
-                      />
-                    ) : (
-                      <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center shrink-0">
-                        <span className="text-xs font-bold text-muted-foreground">
-                          {row.full_name.charAt(0)}
-                        </span>
-                      </div>
-                    )}
+                    <PoliticianAvatar
+                      photoUrl={row.photo_url}
+                      fullName={row.full_name}
+                      size={32}
+                    />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5">
                         <PartyDot party={row.party} />
