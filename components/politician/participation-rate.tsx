@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Tables } from "@/types/database";
+import type { Period } from "./period-tabs";
 
 type Snapshot = Pick<
   Tables<"weekly_snapshots">,
@@ -11,6 +12,8 @@ interface Props {
   snapshots: Snapshot[];
   weekNumber: number;
   politicianSlug?: string; // if provided, history rows become archive links
+  period?: Period;
+  isHistoricalView?: boolean;
 }
 
 function rateColor(rate: number | null): string {
@@ -81,13 +84,40 @@ function Sparkline({ snapshots }: { snapshots: Snapshot[] }) {
   );
 }
 
-function WeekLabel(weekNumber: number): string {
+function formatWeekLabel(weekNumber: number): string {
   const year = Math.floor(weekNumber / 100);
   const week = weekNumber % 100;
   return `Week ${week}, ${year}`;
 }
 
-export function ParticipationRate({ currentRate, snapshots, weekNumber, politicianSlug }: Props) {
+function periodRateLabel(period: Period, weekNumber: number, isHistoricalView: boolean): string {
+  if (isHistoricalView) return `Response Rate · ${formatWeekLabel(weekNumber)}`;
+  switch (period) {
+    case "week":  return `Response Rate · ${formatWeekLabel(weekNumber)}`;
+    case "month": return "Response Rate · Last 30 Days";
+    case "year":  return "Response Rate · This Year";
+    case "all":   return "Response Rate · All Time";
+  }
+}
+
+function denominatorNote(period: Period, isHistoricalView: boolean): string {
+  if (isHistoricalView) return "Qualifying questions = those with 10+ net upvotes";
+  switch (period) {
+    case "week":  return "Denominator: up to 10 questions per week";
+    case "month": return "Denominator: up to 20 questions per month";
+    case "year":  return "Denominator: up to 40 questions per year";
+    case "all":   return "Denominator: all questions ever asked";
+  }
+}
+
+export function ParticipationRate({
+  currentRate,
+  snapshots,
+  weekNumber,
+  politicianSlug,
+  period = "week",
+  isHistoricalView = false,
+}: Props) {
   const rate = currentRate ?? 0;
 
   return (
@@ -95,19 +125,19 @@ export function ParticipationRate({ currentRate, snapshots, weekNumber, politici
       <div className="flex items-start justify-between gap-4">
         <div>
           <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-            Response Rate · {WeekLabel(weekNumber)}
+            {periodRateLabel(period, weekNumber, isHistoricalView)}
           </h2>
           <div className="mt-1 flex items-baseline gap-2">
             <span className={`text-4xl font-bold tabular-nums ${rateColor(currentRate)}`}>
               {currentRate !== null ? `${Math.round(currentRate)}%` : "—"}
             </span>
             {currentRate === null && (
-              <span className="text-sm text-muted-foreground">no qualifying questions yet</span>
+              <span className="text-sm text-muted-foreground">no questions yet</span>
             )}
           </div>
         </div>
 
-        {/* Sparkline */}
+        {/* Sparkline — always shows 8-week weekly trend regardless of active tab */}
         {snapshots.length >= 2 && (
           <div className="flex flex-col items-end gap-1">
             <span className="text-xs text-muted-foreground">8-week trend</span>
@@ -126,12 +156,12 @@ export function ParticipationRate({ currentRate, snapshots, weekNumber, politici
             />
           </div>
           <p className="mt-1.5 text-xs text-muted-foreground">
-            Qualifying questions = those with 10+ net upvotes
+            {denominatorNote(period, isHistoricalView)}
           </p>
         </div>
       )}
 
-      {/* Historical snapshots mini-table */}
+      {/* Weekly history mini-table — always shows regardless of active period tab */}
       {snapshots.length > 0 && (
         <div className="border-t pt-4">
           <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
@@ -141,11 +171,7 @@ export function ParticipationRate({ currentRate, snapshots, weekNumber, politici
             {snapshots.slice(0, 4).map((snap) => {
               const r = snap.participation_rate ?? 0;
               const isCurrentWeek = snap.week_number === weekNumber;
-              const weekLabel = (
-                <span className="w-24 text-muted-foreground shrink-0">
-                  {WeekLabel(snap.week_number)}
-                </span>
-              );
+              const label = formatWeekLabel(snap.week_number);
 
               return (
                 <div key={snap.week_number} className="flex items-center gap-3 text-xs">
@@ -154,10 +180,10 @@ export function ParticipationRate({ currentRate, snapshots, weekNumber, politici
                       href={`/${politicianSlug}?week=${snap.week_number}`}
                       className="w-24 text-muted-foreground shrink-0 hover:text-foreground underline-offset-2 hover:underline"
                     >
-                      {WeekLabel(snap.week_number)}
+                      {label}
                     </Link>
                   ) : (
-                    weekLabel
+                    <span className="w-24 text-muted-foreground shrink-0">{label}</span>
                   )}
                   <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
                     <div

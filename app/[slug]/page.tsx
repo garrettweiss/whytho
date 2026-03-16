@@ -1,15 +1,17 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { PoliticianHeader } from "@/components/politician/politician-header";
 import { ParticipationRate } from "@/components/politician/participation-rate";
 import { QuestionList } from "@/components/politician/question-list";
 import { AskQuestionForm } from "@/components/questions/ask-question-form";
+import { PeriodTabs, type Period } from "@/components/politician/period-tabs";
 
 interface Props {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ week?: string }>;
+  searchParams: Promise<{ week?: string; period?: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -52,9 +54,20 @@ function formatWeekNumber(weekNum: number): string {
   return `Week ${week}, ${year}`;
 }
 
+/** ISO date cutoff string for period-based queries */
+function periodCutoff(period: Period): string | null {
+  switch (period) {
+    case "month": return new Date(Date.now() - 28  * 24 * 60 * 60 * 1000).toISOString();
+    case "year":  return new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString();
+    default:      return null; // week uses week_number; all has no filter
+  }
+}
+
+const VALID_PERIODS: Period[] = ["week", "month", "year", "all"];
+
 export default async function PoliticianProfilePage({ params, searchParams }: Props) {
   const { slug } = await params;
-  const { week: weekParam } = await searchParams;
+  const { week: weekParam, period: periodParam } = await searchParams;
   const supabase = await createClient();
 
   const { data: politician } = await supabase
@@ -69,17 +82,26 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
   const { data: weekData } = await supabase.rpc("current_week_number");
   const currentWeekNumber = weekData as number;
 
-  // Determine which week we're viewing
+  // ── Legacy archive view (?week=202611) ───────────────────────────────────
+  // Only active when ?week= is present AND no ?period= param
   const parsedWeekParam = weekParam ? parseInt(weekParam, 10) : NaN;
   const isHistoricalView =
+    !periodParam &&
     !isNaN(parsedWeekParam) &&
-    parsedWeekParam > 202000 && // sanity check: after year 2020
+    parsedWeekParam > 202000 &&
     parsedWeekParam < currentWeekNumber;
 
   const viewingWeekNumber = isHistoricalView ? parsedWeekParam : currentWeekNumber;
 
-  // Questions for the viewed week
-  const { data: questions } = await supabase
+  // ── Period tab ───────────────────────────────────────────────────────────
+  const period: Period = isHistoricalView
+    ? "week"
+    : VALID_PERIODS.includes(periodParam as Period)
+    ? (periodParam as Period)
+    : "week";
+
+  // ── Questions query ──────────────────────────────────────────────────────
+  let questionsQuery = supabase
     .from("questions")
     .select(`
       id,
@@ -102,18 +124,45 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
       )
     `)
     .eq("politician_id", politician.id)
-    .eq("week_number", viewingWeekNumber)
     .eq("status", "active")
-    .order("net_upvotes", { ascending: false })
-    .limit(50);
+    .order("net_upvotes", { ascending: false });
 
-  // Participation rate for viewed week
-  const { data: participationRate } = await supabase.rpc("participation_rate", {
-    p_politician_id: politician.id,
-    p_week_number: viewingWeekNumber,
-  });
+  if (isHistoricalView) {
+    // Legacy archive: a specific past week
+    questionsQuery = questionsQuery.eq("week_number", viewingWeekNumber).limit(50);
+  } else if (period === "week") {
+    questionsQuery = questionsQuery.eq("week_number", currentWeekNumber).limit(50);
+  } else {
+    // month / year / all — filter by created_at date range
+    const cutoff = periodCutoff(period);
+    if (cutoff) {
+      questionsQuery = questionsQuery.gte("created_at", cutoff);
+    }
+    // "all" has no additional filter
+    questionsQuery = questionsQuery.limit(200);
+  }
 
-  // Recent weekly snapshots (last 8 weeks for sparkline)
+  const { data: questions } = await questionsQuery;
+
+  // ── Participation rate ────────────────────────────────────────────────────
+  let participationRate: number | null = null;
+  if (isHistoricalView) {
+    // Legacy archive: use old per-week RPC (net_upvotes >= 10 threshold)
+    const { data } = await supabase.rpc("participation_rate", {
+      p_politician_id: politician.id,
+      p_week_number: viewingWeekNumber,
+    });
+    participationRate = data as number | null;
+  } else {
+    // New period-aware RPC: min(actual_count, N) denominator
+    const { data } = await supabase.rpc("participation_rate_period", {
+      p_politician_id: politician.id,
+      p_period: period,
+    });
+    participationRate = data as number | null;
+  }
+
+  // ── Weekly snapshots (sparkline + history mini-table) ────────────────────
   const { data: snapshots } = await supabase
     .from("weekly_snapshots")
     .select("week_number, participation_rate, answered_qualifying, qualifying_questions")
@@ -165,18 +214,27 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
 
           <PoliticianHeader
             politician={politician}
-            currentParticipationRate={participationRate as number | null}
+            currentParticipationRate={participationRate}
           />
 
           <ParticipationRate
-            currentRate={participationRate as number | null}
+            currentRate={participationRate}
             snapshots={snapshots ?? []}
             weekNumber={viewingWeekNumber}
             politicianSlug={politician.slug}
+            period={period}
+            isHistoricalView={isHistoricalView}
           />
 
-          {/* Only show ask form on the current week — can't submit to past weeks */}
+          {/* Period tabs — hidden in legacy archive view */}
           {!isHistoricalView && (
+            <Suspense>
+              <PeriodTabs slug={politician.slug} activePeriod={period} />
+            </Suspense>
+          )}
+
+          {/* Ask form — only on current week tab */}
+          {!isHistoricalView && period === "week" && (
             <AskQuestionForm
               politicianId={politician.id}
               politicianName={politician.full_name}
@@ -187,7 +245,9 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
             questions={questions ?? []}
             politicianId={politician.id}
             weekNumber={viewingWeekNumber}
+            currentWeekNumber={currentWeekNumber}
             isHistorical={isHistoricalView}
+            period={period}
           />
 
         </div>

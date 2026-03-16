@@ -33,7 +33,9 @@ interface QuestionListProps {
   questions: Question[];
   politicianId: string;
   weekNumber: number;
+  currentWeekNumber?: number;
   isHistorical?: boolean;
+  period?: "week" | "month" | "year" | "all";
 }
 
 // ─── Answer Display ───────────────────────────────────────────────────────────
@@ -198,16 +200,26 @@ function ReportButton({ questionId }: { questionId: string }) {
 
 // ─── Question Card ────────────────────────────────────────────────────────────
 
+function formatWeekBadge(weekNumber: number): string {
+  const year = Math.floor(weekNumber / 100);
+  const week = weekNumber % 100;
+  return `Week ${week}, ${year}`;
+}
+
 function QuestionCard({
   question,
   politicianId: _politicianId,
   weekNumber,
   isHistorical = false,
+  showWeekBadge = false,
+  votingDisabled = false,
 }: {
   question: Question;
   politicianId: string;
   weekNumber: number;
   isHistorical?: boolean;
+  showWeekBadge?: boolean;
+  votingDisabled?: boolean;
 }) {
   const [votes, setVotes] = useState(question.net_upvotes);
   const [userVote, setUserVote] = useState<1 | -1 | 0>(0);
@@ -245,13 +257,13 @@ function QuestionCard({
       <div className="flex gap-3 p-4">
         {/* Vote column */}
         <div className="flex flex-col items-center gap-1 shrink-0 pt-0.5">
-          <button onClick={() => handleVote(1)} disabled={isPending || isHistorical} aria-label="Upvote"
-            className={`flex h-7 w-7 items-center justify-center rounded-md text-sm transition-colors ${userVote === 1 ? "bg-primary text-primary-foreground" : "hover:bg-muted text-muted-foreground hover:text-foreground"}`}>
+          <button onClick={() => handleVote(1)} disabled={isPending || isHistorical || votingDisabled} aria-label="Upvote"
+            className={`flex h-7 w-7 items-center justify-center rounded-md text-sm transition-colors ${userVote === 1 ? "bg-primary text-primary-foreground" : "hover:bg-muted text-muted-foreground hover:text-foreground"} disabled:opacity-40 disabled:cursor-not-allowed`}>
             ▲
           </button>
           <span className="text-sm font-semibold tabular-nums w-7 text-center">{votes}</span>
-          <button onClick={() => handleVote(-1)} disabled={isPending || isHistorical} aria-label="Downvote"
-            className={`flex h-7 w-7 items-center justify-center rounded-md text-sm transition-colors ${userVote === -1 ? "bg-destructive text-destructive-foreground" : "hover:bg-muted text-muted-foreground hover:text-foreground"}`}>
+          <button onClick={() => handleVote(-1)} disabled={isPending || isHistorical || votingDisabled} aria-label="Downvote"
+            className={`flex h-7 w-7 items-center justify-center rounded-md text-sm transition-colors ${userVote === -1 ? "bg-destructive text-destructive-foreground" : "hover:bg-muted text-muted-foreground hover:text-foreground"} disabled:opacity-40 disabled:cursor-not-allowed`}>
             ▼
           </button>
         </div>
@@ -260,6 +272,9 @@ function QuestionCard({
         <div className="flex-1 min-w-0">
           {question.is_seeded && (
             <p className="text-xs text-muted-foreground mb-1">📋 Suggested Question — AI-generated from public record</p>
+          )}
+          {showWeekBadge && (
+            <p className="text-xs text-muted-foreground/70 mb-1">{formatWeekBadge(question.week_number)}</p>
           )}
           <p className="font-medium leading-snug">{question.body}</p>
           <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
@@ -292,13 +307,14 @@ function QuestionCard({
 
 // ─── Question List ────────────────────────────────────────────────────────────
 
-export function QuestionList({ questions, politicianId, weekNumber, isHistorical = false }: QuestionListProps) {
+export function QuestionList({ questions, politicianId, weekNumber, currentWeekNumber, isHistorical = false, period = "week" }: QuestionListProps) {
   const [localQuestions, setLocalQuestions] = useState<Question[]>(questions);
 
   useEffect(() => { setLocalQuestions(questions); }, [questions]);
 
+  // Realtime subscription — only active on the current Week tab
   useEffect(() => {
-    if (isHistorical) return;
+    if (isHistorical || period !== "week") return;
     const supabase = createClient();
     const channel = supabase
       .channel(`questions:${politicianId}:${weekNumber}`)
@@ -325,46 +341,91 @@ export function QuestionList({ questions, politicianId, weekNumber, isHistorical
       )
       .subscribe();
     return () => { supabase.removeChannel(channel); };
-  }, [politicianId, weekNumber, isHistorical]);
+  }, [politicianId, weekNumber, isHistorical, period]);
+
+  const periodLabel: Record<string, string> = {
+    week:  "This Week's Questions",
+    month: "Questions This Month",
+    year:  "Questions This Year",
+    all:   "All Questions",
+  };
+
+  const emptyMessage: Record<string, string> = {
+    week:  "No questions yet this week",
+    month: "No questions in the last 30 days",
+    year:  "No questions this year",
+    all:   "No questions yet",
+  };
 
   if (localQuestions.length === 0) {
     return (
       <div className="rounded-xl border bg-card p-8 text-center space-y-2 shadow-sm">
-        <p className="font-medium">No questions yet this week</p>
+        <p className="font-medium">{emptyMessage[period] ?? emptyMessage.week}</p>
         <p className="text-sm text-muted-foreground">Be the first to ask something. Silence is its own answer.</p>
       </div>
     );
   }
 
   const sorted = [...localQuestions].sort((a, b) => b.net_upvotes - a.net_upvotes);
-  const qualifying = sorted.filter((q) => q.net_upvotes >= 10);
-  const nonQualifying = sorted.filter((q) => q.net_upvotes < 10);
+  const showWeekBadge = period !== "week" && !isHistorical;
+  const effectiveCurrentWeek = currentWeekNumber ?? weekNumber;
 
+  // For week view: split into qualifying / non-qualifying sections
+  if (period === "week" || isHistorical) {
+    const qualifying = sorted.filter((q) => q.net_upvotes >= 10);
+    const nonQualifying = sorted.filter((q) => q.net_upvotes < 10);
+
+    return (
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold">{periodLabel[period] ?? periodLabel.week}</h2>
+          <span className="text-sm text-muted-foreground">
+            {localQuestions.length} question{localQuestions.length !== 1 ? "s" : ""}
+            {qualifying.length > 0 && ` · ${qualifying.length} qualifying`}
+          </span>
+        </div>
+        {qualifying.length > 0 && (
+          <div className="space-y-2">
+            <p className="text-xs font-medium uppercase tracking-wide text-amber-600">⚡ Qualifying (10+ votes)</p>
+            {qualifying.map((q) => (
+              <QuestionCard key={q.id} question={q} politicianId={politicianId} weekNumber={weekNumber} isHistorical={isHistorical} />
+            ))}
+          </div>
+        )}
+        {nonQualifying.length > 0 && (
+          <div className="space-y-2">
+            {qualifying.length > 0 && <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Other Questions</p>}
+            {nonQualifying.map((q) => (
+              <QuestionCard key={q.id} question={q} politicianId={politicianId} weekNumber={weekNumber} isHistorical={isHistorical} />
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // For month / year / all — flat sorted list, week badge shown, voting only for current week
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">This Week&apos;s Questions</h2>
+        <h2 className="text-lg font-semibold">{periodLabel[period]}</h2>
         <span className="text-sm text-muted-foreground">
           {localQuestions.length} question{localQuestions.length !== 1 ? "s" : ""}
-          {qualifying.length > 0 && ` · ${qualifying.length} qualifying`}
         </span>
       </div>
-      {qualifying.length > 0 && (
-        <div className="space-y-2">
-          <p className="text-xs font-medium uppercase tracking-wide text-amber-600">⚡ Qualifying (10+ votes)</p>
-          {qualifying.map((q) => (
-            <QuestionCard key={q.id} question={q} politicianId={politicianId} weekNumber={weekNumber} isHistorical={isHistorical} />
-          ))}
-        </div>
-      )}
-      {nonQualifying.length > 0 && (
-        <div className="space-y-2">
-          {qualifying.length > 0 && <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Other Questions</p>}
-          {nonQualifying.map((q) => (
-            <QuestionCard key={q.id} question={q} politicianId={politicianId} weekNumber={weekNumber} isHistorical={isHistorical} />
-          ))}
-        </div>
-      )}
+      <div className="space-y-2">
+        {sorted.map((q) => (
+          <QuestionCard
+            key={q.id}
+            question={q}
+            politicianId={politicianId}
+            weekNumber={q.week_number}
+            isHistorical={false}
+            showWeekBadge={showWeekBadge}
+            votingDisabled={q.week_number !== effectiveCurrentWeek}
+          />
+        ))}
+      </div>
     </div>
   );
 }

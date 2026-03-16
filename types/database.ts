@@ -344,6 +344,7 @@ export type Database = {
           id: string
           is_seeded: boolean
           net_upvotes: number
+          parent_question_id: string | null
           politician_id: string
           status: Database["public"]["Enums"]["question_status"]
           submitted_by: string | null
@@ -356,6 +357,7 @@ export type Database = {
           id?: string
           is_seeded?: boolean
           net_upvotes?: number
+          parent_question_id?: string | null
           politician_id: string
           status?: Database["public"]["Enums"]["question_status"]
           submitted_by?: string | null
@@ -368,6 +370,7 @@ export type Database = {
           id?: string
           is_seeded?: boolean
           net_upvotes?: number
+          parent_question_id?: string | null
           politician_id?: string
           status?: Database["public"]["Enums"]["question_status"]
           submitted_by?: string | null
@@ -515,6 +518,10 @@ export type Database = {
       }
       participation_rate: {
         Args: { p_politician_id: string; p_week_number: number }
+        Returns: number
+      }
+      participation_rate_period: {
+        Args: { p_politician_id: string; p_period: string }
         Returns: number
       }
       search_politicians: {
