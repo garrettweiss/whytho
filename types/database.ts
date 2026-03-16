@@ -389,30 +389,42 @@ export type Database = {
       }
       user_profiles: {
         Row: {
+          city: string | null
+          county: string | null
           created_at: string
           display_name: string | null
           id: string
           is_anonymous: boolean
           notify_answer: boolean
           notify_digest: boolean
+          political_affiliation: string | null
+          state_code: string | null
           updated_at: string
         }
         Insert: {
+          city?: string | null
+          county?: string | null
           created_at?: string
           display_name?: string | null
           id: string
           is_anonymous?: boolean
           notify_answer?: boolean
           notify_digest?: boolean
+          political_affiliation?: string | null
+          state_code?: string | null
           updated_at?: string
         }
         Update: {
+          city?: string | null
+          county?: string | null
           created_at?: string
           display_name?: string | null
           id?: string
           is_anonymous?: boolean
           notify_answer?: boolean
           notify_digest?: boolean
+          political_affiliation?: string | null
+          state_code?: string | null
           updated_at?: string
         }
         Relationships: []

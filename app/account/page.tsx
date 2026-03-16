@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
+import { AccountProfileForm } from "@/components/account/account-profile-form";
 
 export const metadata: Metadata = {
   title: "My Account — WhyTho",
@@ -11,7 +12,7 @@ interface Props {
   searchParams: Promise<{ tab?: string }>;
 }
 
-type Tab = "questions" | "votes";
+type Tab = "questions" | "votes" | "profile";
 
 function formatWeekLabel(weekNumber: number): string {
   const year = Math.floor(weekNumber / 100);
@@ -29,7 +30,10 @@ function formatDate(dateStr: string): string {
 
 export default async function AccountPage({ searchParams }: Props) {
   const { tab: tabParam } = await searchParams;
-  const activeTab: Tab = tabParam === "votes" ? "votes" : "questions";
+  const activeTab: Tab =
+    tabParam === "votes" ? "votes" :
+    tabParam === "profile" ? "profile" :
+    "questions";
 
   const supabase = await createClient();
   const {
@@ -65,6 +69,13 @@ export default async function AccountPage({ searchParams }: Props) {
     .order("created_at", { ascending: false })
     .limit(100);
 
+  // ── Profile ───────────────────────────────────────────────────────────────
+  const { data: profileData } = await supabase
+    .from("user_profiles")
+    .select("city, county, state_code, political_affiliation")
+    .eq("id", user.id)
+    .maybeSingle();
+
   const questions = myQuestions ?? [];
   const votes = myVotes ?? [];
 
@@ -78,21 +89,42 @@ export default async function AccountPage({ searchParams }: Props) {
 
       {/* Tabs */}
       <div className="flex gap-1 rounded-lg border bg-muted p-1 w-fit" role="tablist">
-        {(["questions", "votes"] as Tab[]).map((tab) => (
-          <Link
-            key={tab}
-            href={`/account?tab=${tab}`}
-            role="tab"
-            aria-selected={activeTab === tab}
-            className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
-              activeTab === tab
-                ? "bg-background shadow-sm text-foreground"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            {tab === "questions" ? `My Questions (${questions.length})` : `My Votes (${votes.length})`}
-          </Link>
-        ))}
+        <Link
+          href="/account?tab=questions"
+          role="tab"
+          aria-selected={activeTab === "questions"}
+          className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
+            activeTab === "questions"
+              ? "bg-background shadow-sm text-foreground"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          My Questions ({questions.length})
+        </Link>
+        <Link
+          href="/account?tab=votes"
+          role="tab"
+          aria-selected={activeTab === "votes"}
+          className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
+            activeTab === "votes"
+              ? "bg-background shadow-sm text-foreground"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          My Votes ({votes.length})
+        </Link>
+        <Link
+          href="/account?tab=profile"
+          role="tab"
+          aria-selected={activeTab === "profile"}
+          className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
+            activeTab === "profile"
+              ? "bg-background shadow-sm text-foreground"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          Profile
+        </Link>
       </div>
 
       {/* Question History */}
@@ -150,6 +182,18 @@ export default async function AccountPage({ searchParams }: Props) {
               );
             })
           )}
+        </section>
+      )}
+
+      {/* Profile */}
+      {activeTab === "profile" && (
+        <section>
+          <AccountProfileForm
+            initialCity={profileData?.city ?? null}
+            initialCounty={profileData?.county ?? null}
+            initialStateCode={profileData?.state_code ?? null}
+            initialAffiliation={profileData?.political_affiliation ?? null}
+          />
         </section>
       )}
 

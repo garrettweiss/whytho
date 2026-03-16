@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useEffect, useRef } from "react";
+import { useState, useTransition, useEffect, useRef, useCallback } from "react";
 import { Enums } from "@/types/database";
 import { createClient } from "@/lib/supabase/client";
 
@@ -213,6 +213,7 @@ function QuestionCard({
   isHistorical = false,
   showWeekBadge = false,
   votingDisabled = false,
+  onVoteSuccess,
 }: {
   question: Question;
   politicianId: string;
@@ -220,6 +221,7 @@ function QuestionCard({
   isHistorical?: boolean;
   showWeekBadge?: boolean;
   votingDisabled?: boolean;
+  onVoteSuccess?: () => void;
 }) {
   const [votes, setVotes] = useState(question.net_upvotes);
   const [userVote, setUserVote] = useState<1 | -1 | 0>(0);
@@ -245,6 +247,7 @@ function QuestionCard({
           body: JSON.stringify({ question_id: question.id, week_number: weekNumber, value: next === 0 ? null : next }),
         });
         if (!res.ok) { setVotes((v) => v - delta); setUserVote(userVote); }
+        else { onVoteSuccess?.(); }
       } catch {
         setVotes((v) => v - delta);
         setUserVote(userVote);
@@ -271,7 +274,7 @@ function QuestionCard({
         {/* Content */}
         <div className="flex-1 min-w-0">
           {question.is_seeded && (
-            <p className="text-xs text-muted-foreground mb-1">📋 Suggested Question — AI-generated from public record</p>
+            <p className="text-xs text-muted-foreground mb-1">💡 WhyTho suggested question</p>
           )}
           {showWeekBadge && (
             <p className="text-xs text-muted-foreground/70 mb-1">{formatWeekBadge(question.week_number)}</p>
@@ -307,10 +310,28 @@ function QuestionCard({
 
 // ─── Question List ────────────────────────────────────────────────────────────
 
+const PROFILE_PROMPT_KEY = "whytho_profile_prompt_dismissed";
+
 export function QuestionList({ questions, politicianId, weekNumber, currentWeekNumber, isHistorical = false, period = "week" }: QuestionListProps) {
   const [localQuestions, setLocalQuestions] = useState<Question[]>(questions);
+  const [showProfileBanner, setShowProfileBanner] = useState(false);
+  const hasCheckedProfile = useRef(false);
 
   useEffect(() => { setLocalQuestions(questions); }, [questions]);
+
+  const handleVoteSuccess = useCallback(async () => {
+    if (hasCheckedProfile.current) return;
+    if (typeof window !== "undefined" && localStorage.getItem(PROFILE_PROMPT_KEY)) return;
+    hasCheckedProfile.current = true;
+    try {
+      const res = await fetch("/api/settings/profile");
+      if (!res.ok) return; // 401 = anonymous/not logged in
+      const profile = (await res.json()) as { state_code: string | null };
+      if (!profile.state_code) setShowProfileBanner(true);
+    } catch {
+      // silently ignore
+    }
+  }, []);
 
   // Realtime subscription — only active on the current Week tab
   useEffect(() => {
@@ -357,6 +378,31 @@ export function QuestionList({ questions, politicianId, weekNumber, currentWeekN
     all:   "No questions yet",
   };
 
+  const profileBanner = showProfileBanner ? (
+    <div className="flex items-center justify-between gap-3 rounded-xl border border-blue-200 bg-blue-50 dark:border-blue-900 dark:bg-blue-950/30 px-4 py-3">
+      <p className="text-sm text-blue-800 dark:text-blue-300">
+        📍 Add your location for personalized results →{" "}
+        <a
+          href="/account?tab=profile"
+          className="font-medium underline underline-offset-2 hover:no-underline"
+        >
+          Set up profile
+        </a>
+      </p>
+      <button
+        type="button"
+        aria-label="Dismiss"
+        onClick={() => {
+          setShowProfileBanner(false);
+          localStorage.setItem(PROFILE_PROMPT_KEY, "1");
+        }}
+        className="shrink-0 text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-200 text-sm leading-none"
+      >
+        ✕
+      </button>
+    </div>
+  ) : null;
+
   if (localQuestions.length === 0) {
     return (
       <div className="rounded-xl border bg-card p-8 text-center space-y-2 shadow-sm">
@@ -368,7 +414,6 @@ export function QuestionList({ questions, politicianId, weekNumber, currentWeekN
 
   const sorted = [...localQuestions].sort((a, b) => b.net_upvotes - a.net_upvotes);
   const showWeekBadge = period !== "week" && !isHistorical;
-  const effectiveCurrentWeek = currentWeekNumber ?? weekNumber;
 
   // For week view: split into qualifying / non-qualifying sections
   if (period === "week" || isHistorical) {
@@ -377,6 +422,7 @@ export function QuestionList({ questions, politicianId, weekNumber, currentWeekN
 
     return (
       <div className="space-y-3">
+        {profileBanner}
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold">{periodLabel[period] ?? periodLabel.week}</h2>
           <span className="text-sm text-muted-foreground">
@@ -388,7 +434,7 @@ export function QuestionList({ questions, politicianId, weekNumber, currentWeekN
           <div className="space-y-2">
             <p className="text-xs font-medium uppercase tracking-wide text-amber-600">⚡ Qualifying (10+ votes)</p>
             {qualifying.map((q) => (
-              <QuestionCard key={q.id} question={q} politicianId={politicianId} weekNumber={weekNumber} isHistorical={isHistorical} />
+              <QuestionCard key={q.id} question={q} politicianId={politicianId} weekNumber={weekNumber} isHistorical={isHistorical} onVoteSuccess={handleVoteSuccess} />
             ))}
           </div>
         )}
@@ -396,7 +442,7 @@ export function QuestionList({ questions, politicianId, weekNumber, currentWeekN
           <div className="space-y-2">
             {qualifying.length > 0 && <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Other Questions</p>}
             {nonQualifying.map((q) => (
-              <QuestionCard key={q.id} question={q} politicianId={politicianId} weekNumber={weekNumber} isHistorical={isHistorical} />
+              <QuestionCard key={q.id} question={q} politicianId={politicianId} weekNumber={weekNumber} isHistorical={isHistorical} onVoteSuccess={handleVoteSuccess} />
             ))}
           </div>
         )}
@@ -404,9 +450,10 @@ export function QuestionList({ questions, politicianId, weekNumber, currentWeekN
     );
   }
 
-  // For month / year / all — flat sorted list, week badge shown, voting only for current week
+  // For month / year / all — flat sorted list, week badge shown
   return (
     <div className="space-y-3">
+      {profileBanner}
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">{periodLabel[period]}</h2>
         <span className="text-sm text-muted-foreground">
@@ -422,7 +469,7 @@ export function QuestionList({ questions, politicianId, weekNumber, currentWeekN
             weekNumber={q.week_number}
             isHistorical={false}
             showWeekBadge={showWeekBadge}
-            votingDisabled={q.week_number !== effectiveCurrentWeek}
+            onVoteSuccess={handleVoteSuccess}
           />
         ))}
       </div>

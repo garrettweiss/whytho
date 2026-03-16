@@ -231,16 +231,26 @@ async function main() {
     page++;
   }
 
-  // Get existing seeded question counts for this week
-  const { data: existingCounts } = await supabase
-    .from("questions")
-    .select("politician_id")
-    .eq("week_number", weekNumber)
-    .eq("is_seeded", true)
-    .eq("status", "active");
+  // Get existing seeded question counts for this week.
+  // Must paginate — Supabase PostgREST caps responses at 1,000 rows by default.
+  const allExistingCounts: Array<{ politician_id: string }> = [];
+  let qPage = 0;
+  while (true) {
+    const { data: pageData } = await supabase
+      .from("questions")
+      .select("politician_id")
+      .eq("week_number", weekNumber)
+      .eq("is_seeded", true)
+      .eq("status", "active")
+      .range(qPage * 1000, (qPage + 1) * 1000 - 1);
+    if (!pageData || pageData.length === 0) break;
+    allExistingCounts.push(...pageData);
+    if (pageData.length < 1000) break;
+    qPage++;
+  }
 
   const countMap = new Map<string, number>();
-  for (const row of existingCounts ?? []) {
+  for (const row of allExistingCounts) {
     countMap.set(row.politician_id, (countMap.get(row.politician_id) ?? 0) + 1);
   }
 
