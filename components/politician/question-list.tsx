@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition, useEffect, useRef, useCallback } from "react";
+import Link from "next/link";
 import { Enums } from "@/types/database";
 import { createClient } from "@/lib/supabase/client";
 
@@ -312,7 +313,7 @@ function QuestionCard({
 
 const PROFILE_PROMPT_KEY = "whytho_profile_prompt_dismissed";
 
-export function QuestionList({ questions, politicianId, weekNumber, currentWeekNumber, isHistorical = false, period = "week" }: QuestionListProps) {
+export function QuestionList({ questions, politicianId, weekNumber, currentWeekNumber: _currentWeekNumber, isHistorical = false, period = "week" }: QuestionListProps) {
   const [localQuestions, setLocalQuestions] = useState<Question[]>(questions);
   const [showProfileBanner, setShowProfileBanner] = useState(false);
   const hasCheckedProfile = useRef(false);
@@ -382,12 +383,12 @@ export function QuestionList({ questions, politicianId, weekNumber, currentWeekN
     <div className="flex items-center justify-between gap-3 rounded-xl border border-blue-200 bg-blue-50 dark:border-blue-900 dark:bg-blue-950/30 px-4 py-3">
       <p className="text-sm text-blue-800 dark:text-blue-300">
         📍 Add your location for personalized results →{" "}
-        <a
+        <Link
           href="/account?tab=profile"
           className="font-medium underline underline-offset-2 hover:no-underline"
         >
           Set up profile
-        </a>
+        </Link>
       </p>
       <button
         type="button"
