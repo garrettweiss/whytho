@@ -21,7 +21,7 @@ import {
 
 // Load env
 import * as dotenv from "dotenv";
-dotenv.config({ path: ".env.local" });
+dotenv.config({ path: ".env.local", override: true });
 
 const supabase = createClient<Database>(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -122,9 +122,16 @@ async function seedFederal() {
 
 async function seedStates(only?: string[]) {
   console.log("\n🗺️  Fetching + upserting state legislators (one state at a time)...");
+  const ALL_STATES = [
+    "al","ak","az","ar","ca","co","ct","de","fl","ga",
+    "hi","id","il","in","ia","ks","ky","la","me","md",
+    "ma","mi","mn","ms","mo","mt","ne","nv","nh","nj",
+    "nm","ny","nc","nd","oh","ok","or","pa","ri","sc",
+    "sd","tn","tx","ut","vt","va","wa","wv","wi","wy",
+  ] as const;
   const states = only
-    ? (["ca","tx","fl","ny","pa","oh","ga","nc","mi","az"] as const).filter((s) => only.includes(s))
-    : (["ca","tx","fl","ny","pa","oh","ga","nc","mi","az"] as const);
+    ? ALL_STATES.filter((s) => only.includes(s))
+    : ALL_STATES;
 
   let totalInserted = 0;
   let totalUpdated = 0;

@@ -4,7 +4,6 @@
  */
 
 const BASE_URL = "https://v3.openstates.org";
-const API_KEY = process.env.OPENSTATES_API_KEY;
 
 export interface OpenStatesPerson {
   id: string;
@@ -32,10 +31,13 @@ export interface OpenStatesPerson {
   };
 }
 
-// Phase 1: 10 target states
+// All 50 US states
 export const TARGET_STATES = [
-  "ca", "tx", "fl", "ny", "pa",
-  "oh", "ga", "nc", "mi", "az",
+  "al", "ak", "az", "ar", "ca", "co", "ct", "de", "fl", "ga",
+  "hi", "id", "il", "in", "ia", "ks", "ky", "la", "me", "md",
+  "ma", "mi", "mn", "ms", "mo", "mt", "ne", "nv", "nh", "nj",
+  "nm", "ny", "nc", "nd", "oh", "ok", "or", "pa", "ri", "sc",
+  "sd", "tn", "tx", "ut", "vt", "va", "wa", "wv", "wi", "wy",
 ] as const;
 
 export type TargetState = (typeof TARGET_STATES)[number];
@@ -46,7 +48,7 @@ async function fetchWithRetry(
 ): Promise<Response> {
   for (let i = 0; i < retries; i++) {
     const res = await fetch(url, {
-      headers: { "X-API-KEY": API_KEY ?? "" },
+      headers: { "X-API-KEY": process.env.OPENSTATES_API_KEY ?? "" },
     });
     if (res.status === 429 || res.status >= 500) {
       const wait = 2000 * Math.pow(2, i); // 2s, 4s, 8s, 16s, 32s
@@ -62,6 +64,7 @@ async function fetchWithRetry(
 export async function fetchStateLegislators(
   state: TargetState
 ): Promise<OpenStatesPerson[]> {
+  const API_KEY = process.env.OPENSTATES_API_KEY;
   if (!API_KEY) throw new Error("OPENSTATES_API_KEY not set");
 
   const people: OpenStatesPerson[] = [];
