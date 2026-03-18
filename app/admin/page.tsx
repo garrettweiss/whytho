@@ -130,6 +130,12 @@ export default async function AdminDashboard({ searchParams }: Props) {
           </div>
           <div className="flex gap-2">
             <Link
+              href={`/admin/races${secretParam}`}
+              className="rounded-lg border px-3 py-1.5 text-sm font-medium hover:bg-muted transition-colors"
+            >
+              🗳️ Elections
+            </Link>
+            <Link
               href={`/admin/moderation${secretParam}`}
               className="rounded-lg border px-3 py-1.5 text-sm font-medium hover:bg-muted transition-colors"
             >

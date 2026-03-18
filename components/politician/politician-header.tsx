@@ -65,12 +65,46 @@ type SocialHandles = {
   youtube?: string;
 };
 
+function CandidateBadge({ politician }: { politician: Tables<"politicians"> }) {
+  if (politician.politician_type !== "candidate") return null;
+
+  const statusColor =
+    politician.candidate_status === "won" ? "bg-green-100 text-green-800" :
+    politician.candidate_status === "lost" ? "bg-muted text-muted-foreground line-through" :
+    politician.candidate_status === "withdrew" ? "bg-muted text-muted-foreground" :
+    "bg-orange-100 text-orange-800";
+
+  const statusLabel =
+    politician.candidate_status === "won" ? "Won" :
+    politician.candidate_status === "lost" ? "Did not advance" :
+    politician.candidate_status === "withdrew" ? "Withdrew" :
+    "Candidate";
+
+  return (
+    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${statusColor}`}>
+      🗳️ {statusLabel}
+    </span>
+  );
+}
+
 export function PoliticianHeader({ politician, currentParticipationRate }: Props) {
   const tier = TIER_LABELS[politician.verification_tier];
   const social = (politician.social_handles ?? {}) as SocialHandles;
+  const isCandidate = politician.politician_type === "candidate";
 
   return (
     <div className="rounded-xl border bg-card p-6 shadow-sm">
+      {isCandidate && (
+        <div className="mb-4 rounded-lg bg-orange-50 border border-orange-200 px-4 py-2.5 text-sm text-orange-800">
+          <span className="font-semibold">Primary Candidate</span>
+          {politician.election_date && (
+            <span className="ml-2 text-orange-600">
+              · Election: {new Date(politician.election_date).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+            </span>
+          )}
+        </div>
+      )}
+
       <div className="flex gap-5 items-start">
         {/* Photo */}
         <div className="shrink-0">
@@ -91,7 +125,7 @@ export function PoliticianHeader({ politician, currentParticipationRate }: Props
 
           {politician.office && (
             <p className="text-sm text-muted-foreground">
-              {politician.office}
+              {isCandidate ? `Running for: ${politician.office}` : politician.office}
               {politician.state && ` · ${politician.state}`}
               {politician.district && ` · ${politician.district}`}
             </p>
@@ -99,7 +133,8 @@ export function PoliticianHeader({ politician, currentParticipationRate }: Props
 
           <div className="flex flex-wrap gap-2">
             <PartyBadge party={politician.party} />
-            <RateBadge rate={currentParticipationRate} />
+            <CandidateBadge politician={politician} />
+            {!isCandidate && <RateBadge rate={currentParticipationRate} />}
           </div>
         </div>
       </div>

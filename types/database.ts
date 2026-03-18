@@ -238,8 +238,11 @@ export type Database = {
           aliases: string[]
           bio: string | null
           bioguide_id: string | null
+          candidate_status: string | null
           created_at: string
           district: string | null
+          election_date: string | null
+          fec_candidate_id: string | null
           fec_id: string | null
           full_name: string
           govtrack_id: string | null
@@ -249,6 +252,8 @@ export type Database = {
           openstates_id: string | null
           party: string | null
           photo_url: string | null
+          politician_type: string
+          race_id: string | null
           slug: string
           social_handles: Json
           state: string | null
@@ -261,8 +266,11 @@ export type Database = {
           aliases?: string[]
           bio?: string | null
           bioguide_id?: string | null
+          candidate_status?: string | null
           created_at?: string
           district?: string | null
+          election_date?: string | null
+          fec_candidate_id?: string | null
           fec_id?: string | null
           full_name: string
           govtrack_id?: string | null
@@ -272,6 +280,8 @@ export type Database = {
           openstates_id?: string | null
           party?: string | null
           photo_url?: string | null
+          politician_type?: string
+          race_id?: string | null
           slug: string
           social_handles?: Json
           state?: string | null
@@ -284,8 +294,11 @@ export type Database = {
           aliases?: string[]
           bio?: string | null
           bioguide_id?: string | null
+          candidate_status?: string | null
           created_at?: string
           district?: string | null
+          election_date?: string | null
+          fec_candidate_id?: string | null
           fec_id?: string | null
           full_name?: string
           govtrack_id?: string | null
@@ -295,6 +308,8 @@ export type Database = {
           openstates_id?: string | null
           party?: string | null
           photo_url?: string | null
+          politician_type?: string
+          race_id?: string | null
           slug?: string
           social_handles?: Json
           state?: string | null
@@ -304,6 +319,62 @@ export type Database = {
           website_url?: string | null
         }
         Relationships: []
+      }
+      races: {
+        Row: {
+          created_at: string
+          district: string | null
+          election_date: string
+          election_type: string
+          id: string
+          incumbent_id: string | null
+          name: string
+          office: string
+          party: string | null
+          slug: string
+          state: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          district?: string | null
+          election_date: string
+          election_type?: string
+          id?: string
+          incumbent_id?: string | null
+          name: string
+          office: string
+          party?: string | null
+          slug: string
+          state: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          district?: string | null
+          election_date?: string
+          election_type?: string
+          id?: string
+          incumbent_id?: string | null
+          name?: string
+          office?: string
+          party?: string | null
+          slug?: string
+          state?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "races_incumbent_id_fkey"
+            columns: ["incumbent_id"]
+            isOneToOne: false
+            referencedRelation: "politicians"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       question_reports: {
         Row: {

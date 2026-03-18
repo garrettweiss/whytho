@@ -9,6 +9,7 @@ const NAV_LINKS = [
   { href: "/", label: "Home" },
   { href: "/leaderboard", label: "Leaderboard" },
   { href: "/federal", label: "Federal" },
+  { href: "/races", label: "Elections" },
 ];
 
 export function SiteNav() {
