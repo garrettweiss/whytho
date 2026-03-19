@@ -71,6 +71,7 @@ export default async function AdminDashboard({ searchParams }: Props) {
     { count: removedQuestions },
     { count: pendingVerifications },
     { count: totalUsers },
+    { count: xQueueCount },
     { data: recentVerifications },
     { data: seededQsNeedingReview },
     { data: recentAnswers },
@@ -85,6 +86,7 @@ export default async function AdminDashboard({ searchParams }: Props) {
     admin.from("questions").select("*", { count: "exact", head: true }).eq("status", "removed"),
     admin.from("politician_verifications").select("*", { count: "exact", head: true }).eq("status", "pending"),
     admin.from("user_profiles").select("*", { count: "exact", head: true }),
+    admin.from("x_posts").select("*", { count: "exact", head: true }).eq("status", "review"),
 
     // Pending verifications detail
     admin
@@ -128,7 +130,7 @@ export default async function AdminDashboard({ searchParams }: Props) {
               Week {week}, {year} · WhyTho platform overview
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             <Link
               href={`/admin/races${secretParam}`}
               className="rounded-lg border px-3 py-1.5 text-sm font-medium hover:bg-muted transition-colors"
@@ -140,6 +142,12 @@ export default async function AdminDashboard({ searchParams }: Props) {
               className="rounded-lg border px-3 py-1.5 text-sm font-medium hover:bg-muted transition-colors"
             >
               Moderation Queue {removedQuestions ? `(${removedQuestions})` : ""}
+            </Link>
+            <Link
+              href={`/admin/x-queue${secretParam}`}
+              className={`rounded-lg border px-3 py-1.5 text-sm font-medium hover:bg-muted transition-colors ${(xQueueCount ?? 0) > 0 ? "border-yellow-400 text-yellow-700 dark:text-yellow-400" : ""}`}
+            >
+              🐦 X Queue {(xQueueCount ?? 0) > 0 ? `(${xQueueCount})` : ""}
             </Link>
           </div>
         </div>
@@ -326,6 +334,12 @@ export default async function AdminDashboard({ searchParams }: Props) {
               className="rounded-lg border px-4 py-2 text-sm font-medium hover:bg-muted transition-colors"
             >
               🏛️ Browse Politicians
+            </Link>
+            <Link
+              href={`/admin/x-queue${secretParam}`}
+              className="rounded-lg border px-4 py-2 text-sm font-medium hover:bg-muted transition-colors"
+            >
+              🐦 X Question Queue
             </Link>
           </div>
         </div>
