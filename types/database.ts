@@ -119,6 +119,45 @@ export type Database = {
           },
         ]
       }
+      jack_config: {
+        Row: {
+          key: string
+          updated_at: string | null
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string | null
+          value: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string | null
+          value?: Json
+        }
+        Relationships: []
+      }
+      jack_reports: {
+        Row: {
+          created_at: string | null
+          id: string
+          report: Json
+          week_number: number
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          report: Json
+          week_number: number
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          report?: Json
+          week_number?: number
+        }
+        Relationships: []
+      }
       politician_aliases: {
         Row: {
           alias: string
@@ -318,7 +357,117 @@ export type Database = {
           votesmart_id?: string | null
           website_url?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "politicians_race_id_fkey"
+            columns: ["race_id"]
+            isOneToOne: false
+            referencedRelation: "races"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      question_reports: {
+        Row: {
+          created_at: string
+          id: string
+          question_id: string
+          reason: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          question_id: string
+          reason: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          question_id?: string
+          reason?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "question_reports_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      questions: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          is_seeded: boolean
+          net_upvotes: number
+          parent_question_id: string | null
+          politician_id: string
+          source: string
+          status: Database["public"]["Enums"]["question_status"]
+          submitted_by: string | null
+          updated_at: string
+          week_number: number
+          x_post_id: string | null
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          is_seeded?: boolean
+          net_upvotes?: number
+          parent_question_id?: string | null
+          politician_id: string
+          source?: string
+          status?: Database["public"]["Enums"]["question_status"]
+          submitted_by?: string | null
+          updated_at?: string
+          week_number: number
+          x_post_id?: string | null
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          is_seeded?: boolean
+          net_upvotes?: number
+          parent_question_id?: string | null
+          politician_id?: string
+          source?: string
+          status?: Database["public"]["Enums"]["question_status"]
+          submitted_by?: string | null
+          updated_at?: string
+          week_number?: number
+          x_post_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "questions_parent_question_id_fkey"
+            columns: ["parent_question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "questions_politician_id_fkey"
+            columns: ["politician_id"]
+            isOneToOne: false
+            referencedRelation: "politicians"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "questions_x_post_id_fkey"
+            columns: ["x_post_id"]
+            isOneToOne: false
+            referencedRelation: "x_posts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       races: {
         Row: {
@@ -376,88 +525,6 @@ export type Database = {
           },
         ]
       }
-      question_reports: {
-        Row: {
-          created_at: string
-          id: string
-          question_id: string
-          reason: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          question_id: string
-          reason: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          question_id?: string
-          reason?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "question_reports_question_id_fkey"
-            columns: ["question_id"]
-            isOneToOne: false
-            referencedRelation: "questions"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      questions: {
-        Row: {
-          body: string
-          created_at: string
-          id: string
-          is_seeded: boolean
-          net_upvotes: number
-          parent_question_id: string | null
-          politician_id: string
-          status: Database["public"]["Enums"]["question_status"]
-          submitted_by: string | null
-          updated_at: string
-          week_number: number
-        }
-        Insert: {
-          body: string
-          created_at?: string
-          id?: string
-          is_seeded?: boolean
-          net_upvotes?: number
-          parent_question_id?: string | null
-          politician_id: string
-          status?: Database["public"]["Enums"]["question_status"]
-          submitted_by?: string | null
-          updated_at?: string
-          week_number: number
-        }
-        Update: {
-          body?: string
-          created_at?: string
-          id?: string
-          is_seeded?: boolean
-          net_upvotes?: number
-          parent_question_id?: string | null
-          politician_id?: string
-          status?: Database["public"]["Enums"]["question_status"]
-          submitted_by?: string | null
-          updated_at?: string
-          week_number?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "questions_politician_id_fkey"
-            columns: ["politician_id"]
-            isOneToOne: false
-            referencedRelation: "politicians"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       user_profiles: {
         Row: {
           city: string | null
@@ -465,6 +532,7 @@ export type Database = {
           created_at: string
           display_name: string | null
           id: string
+          is_admin: boolean
           is_anonymous: boolean
           notify_answer: boolean
           notify_digest: boolean
@@ -478,6 +546,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id: string
+          is_admin?: boolean
           is_anonymous?: boolean
           notify_answer?: boolean
           notify_digest?: boolean
@@ -491,6 +560,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id?: string
+          is_admin?: boolean
           is_anonymous?: boolean
           notify_answer?: boolean
           notify_digest?: boolean
@@ -589,6 +659,183 @@ export type Database = {
           },
         ]
       }
+      x_credit_log: {
+        Row: {
+          agent: string
+          created_at: string | null
+          credits_used: number | null
+          id: string
+          notes: string | null
+          politicians_covered: number | null
+          run_date: string
+          tweets_approved: number | null
+          tweets_collected: number | null
+        }
+        Insert: {
+          agent: string
+          created_at?: string | null
+          credits_used?: number | null
+          id?: string
+          notes?: string | null
+          politicians_covered?: number | null
+          run_date?: string
+          tweets_approved?: number | null
+          tweets_collected?: number | null
+        }
+        Update: {
+          agent?: string
+          created_at?: string | null
+          credits_used?: number | null
+          id?: string
+          notes?: string | null
+          politicians_covered?: number | null
+          run_date?: string
+          tweets_approved?: number | null
+          tweets_collected?: number | null
+        }
+        Relationships: []
+      }
+      x_outreach_log: {
+        Row: {
+          channel: string
+          engagement: Json | null
+          id: string
+          message: string | null
+          politician_id: string | null
+          sent_at: string | null
+          target_handle: string | null
+          target_type: string
+          x_post_id: string | null
+        }
+        Insert: {
+          channel: string
+          engagement?: Json | null
+          id?: string
+          message?: string | null
+          politician_id?: string | null
+          sent_at?: string | null
+          target_handle?: string | null
+          target_type: string
+          x_post_id?: string | null
+        }
+        Update: {
+          channel?: string
+          engagement?: Json | null
+          id?: string
+          message?: string | null
+          politician_id?: string | null
+          sent_at?: string | null
+          target_handle?: string | null
+          target_type?: string
+          x_post_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "x_outreach_log_politician_id_fkey"
+            columns: ["politician_id"]
+            isOneToOne: false
+            referencedRelation: "politicians"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "x_outreach_log_x_post_id_fkey"
+            columns: ["x_post_id"]
+            isOneToOne: false
+            referencedRelation: "x_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      x_posts: {
+        Row: {
+          author_handle: string
+          author_name: string | null
+          body: string | null
+          collected_at: string | null
+          created_at: string | null
+          curator_notes: string | null
+          curator_score: number | null
+          id: string
+          likes: number | null
+          oembed_cache: string | null
+          oembed_cached_at: string | null
+          politician_id: string | null
+          rejection_reason: string | null
+          reply_count: number | null
+          retweets: number | null
+          status: string
+          theme_tags: string[] | null
+          tweet_date: string | null
+          tweet_id: string
+          tweet_url: string
+          updated_at: string | null
+          whytho_question_id: string | null
+        }
+        Insert: {
+          author_handle: string
+          author_name?: string | null
+          body?: string | null
+          collected_at?: string | null
+          created_at?: string | null
+          curator_notes?: string | null
+          curator_score?: number | null
+          id?: string
+          likes?: number | null
+          oembed_cache?: string | null
+          oembed_cached_at?: string | null
+          politician_id?: string | null
+          rejection_reason?: string | null
+          reply_count?: number | null
+          retweets?: number | null
+          status?: string
+          theme_tags?: string[] | null
+          tweet_date?: string | null
+          tweet_id: string
+          tweet_url: string
+          updated_at?: string | null
+          whytho_question_id?: string | null
+        }
+        Update: {
+          author_handle?: string
+          author_name?: string | null
+          body?: string | null
+          collected_at?: string | null
+          created_at?: string | null
+          curator_notes?: string | null
+          curator_score?: number | null
+          id?: string
+          likes?: number | null
+          oembed_cache?: string | null
+          oembed_cached_at?: string | null
+          politician_id?: string | null
+          rejection_reason?: string | null
+          reply_count?: number | null
+          retweets?: number | null
+          status?: string
+          theme_tags?: string[] | null
+          tweet_date?: string | null
+          tweet_id?: string
+          tweet_url?: string
+          updated_at?: string | null
+          whytho_question_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "x_posts_politician_id_fkey"
+            columns: ["politician_id"]
+            isOneToOne: false
+            referencedRelation: "politicians"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "x_posts_whytho_question_id_fkey"
+            columns: ["whytho_question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -604,7 +851,7 @@ export type Database = {
         Returns: number
       }
       participation_rate_period: {
-        Args: { p_politician_id: string; p_period: string }
+        Args: { p_period: string; p_politician_id: string }
         Returns: number
       }
       search_politicians: {
