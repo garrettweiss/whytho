@@ -65,6 +65,17 @@ interface CongressMemberDetail {
   contactInfo?: Record<string, string>;
 }
 
+async function fetchWithTimeout(url: string, timeoutMs = 15000): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, { signal: controller.signal });
+    return res;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 async function fetchCongressMembers(chamber: "senate" | "house"): Promise<CongressMember[]> {
   const all: CongressMember[] = [];
   let offset = 0;
@@ -72,15 +83,15 @@ async function fetchCongressMembers(chamber: "senate" | "house"): Promise<Congre
 
   while (true) {
     const url = `${CONGRESS_BASE}/member?currentMember=true&limit=${limit}&offset=${offset}&api_key=${CONGRESS_API_KEY}`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`Congress API error: ${res.status}`);
+    console.log(`  → Fetching offset ${offset}...`);
+    const res = await fetchWithTimeout(url);
+    if (!res.ok) throw new Error(`Congress API error: ${res.status} ${await res.text()}`);
 
     const data = await res.json() as {
       members: CongressMember[];
-      pagination: { count: number; total: number };
+      pagination: { count: number; next?: string };
     };
 
-    // Filter by chamber
     const filtered = data.members.filter((m) => {
       const latestTerm = m.terms?.item?.[m.terms.item.length - 1];
       if (!latestTerm) return false;
@@ -90,8 +101,10 @@ async function fetchCongressMembers(chamber: "senate" | "house"): Promise<Congre
     });
 
     all.push(...filtered);
+    console.log(`  → Got ${data.members?.length ?? 0} total / ${filtered.length} ${chamber} (running: ${all.length})`);
 
-    if (offset + limit >= data.pagination.total) break;
+    // Congress API paginates via next URL — no total field
+    if (!data.pagination?.next) break;
     offset += limit;
     await sleep(200);
   }
@@ -99,28 +112,40 @@ async function fetchCongressMembers(chamber: "senate" | "house"): Promise<Congre
   return all;
 }
 
-async function fetchMemberSocialHandles(bioguideId: string): Promise<string | null> {
-  // Congress.gov member detail sometimes includes social links
-  // Primary method: check if officialWebsiteUrl contains twitter handle pattern
-  // Secondary: use the /member/{bioguideId} endpoint
-  try {
-    const url = `${CONGRESS_BASE}/member/${bioguideId}?api_key=${CONGRESS_API_KEY}`;
-    const res = await fetch(url);
-    if (!res.ok) return null;
+// ── unitedstates/congress-legislators social media YAML ──────────────────────
+// Free, community-maintained, bioguide ID → twitter handle mapping
+// Refreshed each Scout run — no auth needed
 
-    const data = await res.json() as { member?: CongressMemberDetail & { twitterAccount?: string; youtubeAccount?: string } };
-    const member = data.member;
-    if (!member) return null;
+interface SocialEntry {
+  id: { bioguide: string };
+  social: { twitter?: string; twitter_id?: string };
+}
 
-    // Congress.gov sometimes exposes twitter handle directly
-    if ((member as Record<string, unknown>).twitterAccount) {
-      return (member as Record<string, unknown>).twitterAccount as string;
+let _socialMap: Map<string, string> | null = null;
+
+async function loadSocialMap(): Promise<Map<string, string>> {
+  if (_socialMap) return _socialMap;
+
+  const url =
+    "https://unitedstates.github.io/congress-legislators/legislators-social-media.json";
+  console.log("  → Loading social handle map from unitedstates/congress-legislators...");
+  const res = await fetchWithTimeout(url, 20000);
+  if (!res.ok) throw new Error(`Social map fetch failed: ${res.status}`);
+
+  const entries = await res.json() as SocialEntry[];
+  _socialMap = new Map();
+  for (const entry of entries) {
+    if (entry.id?.bioguide && entry.social?.twitter) {
+      _socialMap.set(entry.id.bioguide, entry.social.twitter);
     }
-
-    return null;
-  } catch {
-    return null;
   }
+  console.log(`  → Loaded ${_socialMap.size} twitter handles`);
+  return _socialMap;
+}
+
+async function fetchMemberSocialHandles(bioguideId: string): Promise<string | null> {
+  const map = await loadSocialMap();
+  return map.get(bioguideId) ?? null;
 }
 
 // ── Database helpers ──────────────────────────────────────────────────────────
@@ -177,18 +202,18 @@ async function scoutChamber(chamber: "senate" | "house") {
   const members = await fetchCongressMembers(chamber);
   console.log(`  → ${members.length} current members fetched`);
 
+  // Load social map once for all members
+  const socialMap = await loadSocialMap();
+
   let found = 0;
   let missing = 0;
   let skipped = 0;
 
   for (const member of members) {
-    // Find in our DB
+    // Find in our DB — bioguide first (exact), name fallback
     const politician =
-      await findPoliticianByName(
-        member.name,
-        member.state,
-        officeLabel
-      );
+      (await findPoliticianByBioguide(member.bioguideId)) ??
+      (await findPoliticianByName(member.name, member.state, officeLabel));
 
     if (!politician) {
       skipped++;
@@ -202,9 +227,7 @@ async function scoutChamber(chamber: "senate" | "house") {
       continue;
     }
 
-    // Try to get handle from Congress.gov detail endpoint
-    await sleep(150); // polite pacing
-    const handle = await fetchMemberSocialHandles(member.bioguideId);
+    const handle = socialMap.get(member.bioguideId) ?? null;
 
     if (handle) {
       if (DRY_RUN) {

@@ -487,46 +487,72 @@ Seeded questions:
 
 ---
 
-## 14. Weekly Reset Mechanic
+## 14. Weekly Reset Mechanic + Persistent Questions Model
 
-### How it works
+### How the reset works
 
-Every **Monday at 12:00 AM Eastern**:
+Every **Monday at 05:00 UTC (12:00 AM Eastern)**:
 
 1. **Snapshot:** Top 10 questions per politician (with vote counts and answer status) saved to `weekly_snapshots` table as permanent historical record
-2. **Archive:** All questions from previous week move to `status = 'archived'`
-3. **Reset:** Vote counts do NOT transfer; the week starts fresh
-4. **Refresh:** New seeded questions generated for each politician
-5. **Notify:** Weekly digest emails sent to subscribers
-6. **Event:** `weekly_reset` event fires — in Phase 2, this triggers social media posting queue
+2. **Refresh:** New seeded questions generated for each politician for the new week
+3. **Notify:** Weekly digest emails sent to subscribers
+4. **Event:** `weekly_reset` event fires — in Phase 2, this triggers social media posting queue
+
+> **Changed from original design:** Questions are NOT archived/removed. They persist in the DB forever and are visible in Month/Year/All Time views. Only the Week tab refreshes with new questions.
+
+### Persistent Questions + Time Filter Views (shipped March 2026)
+
+Questions never disappear — they accumulate as a public record. Politicians are held accountable across multiple time horizons:
+
+| View | Questions shown | Response rate denominator |
+|---|---|---|
+| **Week** | This week only | `min(count, 10)` |
+| **Month** | Last 28 days | `min(count, 20)` |
+| **Year** | Last 365 days | `min(count, 40)` |
+| **All Time** | All questions ever | Actual total count |
+
+- Questions are sorted by `net_upvotes` descending within each view
+- Voting only enabled on current week questions (past questions are read-only)
+- Week badges shown on older questions in Month/Year/All Time views
+- Default view: **Week**
 
 ### What persists across resets
 
-- The questions themselves (archived, browsable)
-- All answers (permanently attached to the question they answered)
-- Participation rate history (cumulative, per-week breakdown)
-- Upvote counts in historical snapshots (read-only)
+- All questions (visible in Month/Year/All Time views)
+- All answers (permanently attached to the question)
+- Participation rate history (weekly sparkline in profile)
+- Upvote counts from all time
 
-### What resets
+### What resets weekly
 
-- Active vote counts (each week starts at zero)
-- The "current week" leaderboard
-- User's upvote allocation (can vote on questions again each week, including re-upvoting same questions)
+- The **Week tab** refreshes with new questions each Monday
+- Vote eligibility resets (users can vote on new week's questions)
+- The current-week leaderboard ranking
 
-### Why weekly (not daily or monthly)
+### Future: AI Question Clustering (not yet built)
 
-- **Daily** would be too chaotic; politicians couldn't realistically keep up; media can't cover it
-- **Monthly** is too slow; current events become stale; engagement drops
-- **Weekly** matches the natural news cycle, congressional schedule, and constituent communication cadence; creates a Monday ritual
+Questions submitted in different weeks about the same topic will be merged into parent topics:
+- AI (claude-haiku-4-5) runs weekly to detect similar questions
+- Similar questions get grouped under a canonical parent topic
+- Month/Year/All Time views show merged topics; click to see individual weekly sub-questions
+- Parent score = sum of child question scores
+- DB already supports this: `questions.parent_question_id UUID` column added
 
 ### The participation rate formula
 
+**Current (as of March 2026):**
 ```
-weekly_participation_rate = 
-  (questions_answered WHERE net_upvotes >= 10) / 
-  (total_questions WHERE net_upvotes >= 10)
+participation_rate_period(politician_id, period) =
+  questions_with_direct_answer / LEAST(total_questions_in_period, N)
 
-Threshold: net_upvotes >= 10 (configurable in admin; subject to change)
+N per period: week=10, month=20, year=40, all=actual_count
+```
+
+**Legacy weekly formula (still used for archive views):**
+```
+weekly_participation_rate =
+  (questions_answered WHERE net_upvotes >= 10) /
+  (total_questions WHERE net_upvotes >= 10)
 ```
 
 ---

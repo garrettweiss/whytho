@@ -57,20 +57,31 @@
 
 ### R2.2 Profile page layout
 - **Header:** Photo, name, office, district, verified badge (if applicable), response rate badge
-- **This Week:** Top questions by net upvotes, participation rate prominently displayed
-- **Ask a Question:** Inline question submission form
-- **All Questions:** Tabbed view — This Week / Past Weeks / All Time
+- **Week / Month / Year / All Time tabs:** Questions persist forever; filterable by time period (default: Week)
+- **Ask a Question:** Inline question submission form (Week tab only)
 - **Answers:** Politician's responses attached to each answered question
 - **AI Analysis section** (if answers exist): Clearly labeled 🤖 AI Analysis panel
+- **Week badges:** Older questions in Month/Year/All Time views show which week they were submitted
 
 ### R2.3 Participation rate display
+
 ```
-This week: 2 of 14 qualifying questions answered (14%)
-──────────────────────────────────────────────
-Lifetime: 7 of 203 qualifying questions answered (3.4%)
+Response Rate · Week 12, 2026: 0% (0 of 3 answered)
+Response Rate · Last 30 Days:  0% (0 of 12 answered)
+Response Rate · This Year:     0% (0 of 40 answered)
+Response Rate · All Time:      0% (0 of N answered)
 ```
-- "Qualifying" = questions with net upvotes ≥ 10
+
+**Denominator formula (as of March 2026):**
+```
+denominator = min(questions_in_period, N)
+N: week=10, month=20, year=40, all=actual_total
+```
+- No minimum vote threshold — all submitted questions count
+- Voting disabled on questions from previous weeks
 - Display even if politician has never claimed profile
+
+**Future (AI clustering):** Similar questions across weeks will be merged into topic groups. Month/Year/All Time views will show merged topics as single entries with aggregate vote counts.
 
 ### R2.4 Slug format
 - URL-safe, lowercase, hyphenated full name: `donald-trump`, `nancy-pelosi`

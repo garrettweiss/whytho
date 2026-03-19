@@ -72,9 +72,17 @@ async function testBearerToken() {
 
 async function testSearchAccess() {
   console.log("\n🔍 Testing search access (read credits)...");
-  // Search for exactly 1 tweet mentioning a well-known politician — minimal credit use
+  // Search for tweets mentioning a well-known politician — minimal credit use
+  // Use URLSearchParams to properly encode the query
+  // Note: X API v2 query language doesn't support raw '?' — filter for questions client-side
+  // Search for replies directed at a politician; we detect questions by checking tweet text
+  const params = new URLSearchParams({
+    query: "@SenSchumer -is:retweet lang:en",
+    max_results: "10",
+    "tweet.fields": "public_metrics,created_at,text",
+  });
   const res = await fetch(
-    `https://api.twitter.com/2/tweets/search/recent?query=%40SenSchumer+%3F&max_results=10&tweet.fields=public_metrics,created_at`,
+    `https://api.twitter.com/2/tweets/search/recent?${params}`,
     {
       headers: {
         Authorization: `Bearer ${process.env.X_API_BEARER_TOKEN}`,
