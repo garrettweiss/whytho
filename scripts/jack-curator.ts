@@ -216,7 +216,7 @@ Rules:
   inputTokensTotal += usage.input_tokens;
   outputTokensTotal += usage.output_tokens;
 
-  const raw = response.content[0].type === "text" ? response.content[0].text.trim() : "{}";
+  const raw = response.content[0]?.type === "text" ? (response.content[0] as { type: "text"; text: string }).text.trim() : "{}";
 
   // Strip markdown code fences if present
   const cleaned = raw.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "").trim();

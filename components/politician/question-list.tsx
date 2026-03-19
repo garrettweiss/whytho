@@ -18,15 +18,23 @@ type Answer = {
   created_at: string;
 };
 
+type XAttribution = {
+  author_handle: string;
+  author_name: string | null;
+  tweet_url: string;
+} | null;
+
 type Question = {
   id: string;
   body: string;
   net_upvotes: number;
   is_seeded: boolean;
+  source: string | null;
   status: Enums<"question_status">;
   submitted_by: string | null;
   created_at: string;
   week_number: number;
+  x_posts: XAttribution;
   answers: Answer[];
 };
 
@@ -276,6 +284,28 @@ function QuestionCard({
         <div className="flex-1 min-w-0">
           {question.is_seeded && (
             <p className="text-xs text-muted-foreground mb-1">💡 WhyTho suggested question</p>
+          )}
+          {question.source === "x" && question.x_posts && (
+            <p className="text-xs text-muted-foreground mb-1">
+              Asked by{" "}
+              <a
+                href={`https://x.com/${question.x_posts.author_handle}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium hover:underline underline-offset-2"
+              >
+                @{question.x_posts.author_handle}
+              </a>
+              {" "}on X ·{" "}
+              <a
+                href={question.x_posts.tweet_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:underline underline-offset-2"
+              >
+                view original
+              </a>
+            </p>
           )}
           {showWeekBadge && (
             <p className="text-xs text-muted-foreground/70 mb-1">{formatWeekBadge(question.week_number)}</p>

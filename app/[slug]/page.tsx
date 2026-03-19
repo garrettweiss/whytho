@@ -108,10 +108,16 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
       body,
       net_upvotes,
       is_seeded,
+      source,
       status,
       submitted_by,
       created_at,
       week_number,
+      x_posts:x_post_id (
+        author_handle,
+        author_name,
+        tweet_url
+      ),
       answers (
         id,
         answer_type,
