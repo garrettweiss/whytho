@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { AnswerComposer } from "@/components/answers/answer-composer";
+import { TeamManager } from "@/components/dashboard/team-manager";
 
 export const metadata: Metadata = {
   title: "Politician Dashboard — WhyTho",
@@ -197,6 +198,11 @@ export default async function DashboardPage() {
     };
     role: string;
     questions: QuestionRow[];
+    stats: {
+      totalQuestions: number;
+      totalAnswers: number;
+      thisWeekQuestions: number;
+    };
   };
 
   const politiciansData: PoliticianWithQuestions[] = [];
@@ -229,10 +235,26 @@ export default async function DashboardPage() {
       .order("net_upvotes", { ascending: false })
       .limit(25);
 
+    // Analytics: total questions and answers all-time
+    const [{ count: totalQuestions }, { count: totalAnswers }, { count: thisWeekQuestions }] =
+      await Promise.all([
+        supabase.from("questions").select("*", { count: "exact", head: true })
+          .eq("politician_id", politician.id).eq("status", "active"),
+        supabase.from("answers").select("*", { count: "exact", head: true })
+          .eq("politician_id", politician.id).eq("is_ai_generated", false),
+        supabase.from("questions").select("*", { count: "exact", head: true })
+          .eq("politician_id", politician.id).eq("week_number", currentWeekNumber).eq("status", "active"),
+      ]);
+
     politiciansData.push({
       politician,
       role: membership.role,
       questions: (questions ?? []) as QuestionRow[],
+      stats: {
+        totalQuestions: totalQuestions ?? 0,
+        totalAnswers: totalAnswers ?? 0,
+        thisWeekQuestions: thisWeekQuestions ?? 0,
+      },
     });
   }
 
@@ -257,7 +279,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* One section per politician */}
-        {politiciansData.map(({ politician, role, questions }) => {
+        {politiciansData.map(({ politician, role, questions, stats }) => {
           const unansweredCount = questions.filter(
             (q) =>
               !q.answers.some(
@@ -301,7 +323,23 @@ export default async function DashboardPage() {
                   </p>
                 </div>
 
-                {/* Verification prompt for tier < 2 */}
+                {/* Analytics strip */}
+              <div className="flex gap-4 shrink-0 text-center">
+                <div>
+                  <p className="text-lg font-bold tabular-nums">{stats.thisWeekQuestions}</p>
+                  <p className="text-xs text-muted-foreground">this week</p>
+                </div>
+                <div className="border-l pl-4">
+                  <p className="text-lg font-bold tabular-nums">{stats.totalQuestions}</p>
+                  <p className="text-xs text-muted-foreground">all time</p>
+                </div>
+                <div className="border-l pl-4">
+                  <p className="text-lg font-bold tabular-nums">{stats.totalAnswers}</p>
+                  <p className="text-xs text-muted-foreground">answered</p>
+                </div>
+              </div>
+
+              {/* Verification prompt for tier < 2 */}
                 {parseInt(politician.verification_tier) < 2 && (
                   <Link
                     href="/verify"
@@ -366,6 +404,9 @@ export default async function DashboardPage() {
                   })}
                 </div>
               )}
+
+              {/* Team Management */}
+              <TeamManager politicianId={politician.id} callerRole={role} />
             </div>
           );
         })}
