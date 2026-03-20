@@ -1,17 +1,20 @@
 /**
  * Jack — Herald Agent
  *
- * Replies to constituent tweets from @WhyTho_official to notify them
- * that their question is now live on WhyTho.
+ * Notifies constituents from @WhyTho_official that their question is live.
+ *
+ * Posts a standalone mention tweet (NOT a reply) to avoid X's restriction
+ * that blocks replies from accounts not previously engaged with by the author.
+ * A mention tweet lands in the user's notifications identically to a reply.
  *
  * For each published x_post with no outreach log entry:
- *   1. Build reply: "Your question is now live on WhyTho → [link]"
- *   2. POST /2/tweets with in_reply_to_tweet_id (OAuth 1.0a)
+ *   1. Build tweet: "@handle Your question is now live on WhyTho → [link]"
+ *   2. POST /2/tweets (no in_reply_to_tweet_id — standalone mention)
  *   3. Log to x_outreach_log
  *   4. Update x_posts.status = 'notified'
  *
  * Uses OAuth 1.0a User Context (required for write operations).
- * Rate limit: 1 reply per post, 2s delay between posts.
+ * Rate limit: 1 tweet per post, 2s delay between posts.
  *
  * Usage:
  *   npx tsx scripts/jack-herald.ts                 # All published, unnotified
@@ -96,18 +99,20 @@ function buildOAuthHeader(method: string, url: string, extraParams: Record<strin
   return headerValue;
 }
 
-// ── Post tweet (reply) ────────────────────────────────────────────────────────
+// ── Post tweet (standalone mention — NOT a reply) ─────────────────────────────
+// X blocks replies from accounts not previously engaged with by the author.
+// A standalone @mention delivers to their notifications identically.
 
 interface TweetResponse {
   data?: { id: string; text: string };
   errors?: Array<{ message: string }>;
 }
 
-async function postReply(replyText: string, inReplyToTweetId: string): Promise<string> {
+async function postMention(mentionText: string): Promise<string> {
   const url  = "https://api.twitter.com/2/tweets";
   const body = JSON.stringify({
-    text:  replyText,
-    reply: { in_reply_to_tweet_id: inReplyToTweetId },
+    text: mentionText,
+    // No `reply` field — standalone tweet, not a reply thread
   });
 
   const auth = buildOAuthHeader("POST", url);
@@ -231,13 +236,13 @@ async function main() {
     console.log(`     Reply: "${replyText}"`);
 
     if (DRY_RUN) {
-      console.log(`     [dry run — would reply to tweet ${post.tweet_id}]`);
+      console.log(`     [dry run — would mention @${post.author_handle}]`);
       sent++;
       continue;
     }
 
     try {
-      const replyTweetId = await postReply(replyText, post.tweet_id!);
+      const mentionTweetId = await postMention(replyText);
 
       // Log to x_outreach_log
       await supabase.from("x_outreach_log").insert({
@@ -245,10 +250,10 @@ async function main() {
         target_handle: post.author_handle,
         politician_id: post.politician_id,
         x_post_id:    post.id,
-        channel:      "x_reply",
+        channel:      "x_mention",
         message:      replyText,
         sent_at:      new Date().toISOString(),
-        engagement:   { reply_tweet_id: replyTweetId },
+        engagement:   { mention_tweet_id: mentionTweetId },
       });
 
       // Mark notified
@@ -257,7 +262,7 @@ async function main() {
         .update({ status: "notified", updated_at: new Date().toISOString() })
         .eq("id", post.id);
 
-      console.log(`     ✅ Replied (tweet ID: ${replyTweetId})`);
+      console.log(`     ✅ Mentioned (tweet ID: ${mentionTweetId})`);
       sent++;
     } catch (err) {
       console.log(`     ❌ Error: ${err instanceof Error ? err.message : String(err)}`);
