@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { PoliticianSearch } from "@/components/politician/politician-search";
 import { PoliticianAvatar } from "@/components/politician/politician-avatar";
+import {
+  HomePoliticianSearch,
+  type FeaturedPolitician,
+} from "@/components/politician/home-politician-search";
 
 export const metadata: Metadata = {
   title: "WhyTho — Hold Your Representatives Accountable",
@@ -56,6 +59,21 @@ function PartyDot({ party }: { party: string | null }) {
   );
 }
 
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-2.5 mb-4">
+      <span
+        className="h-4 w-1 rounded-full shrink-0"
+        style={{ background: "var(--civic)" }}
+        aria-hidden
+      />
+      <h2 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+        {children}
+      </h2>
+    </div>
+  );
+}
+
 export default async function HomePage() {
   const supabase = await createClient();
 
@@ -69,6 +87,7 @@ export default async function HomePage() {
     { count: answerCount },
     { data: topQuestionsRaw },
     { data: leaderboardRaw },
+    { data: featuredSnaps },
   ] = await Promise.all([
     supabase
       .from("politicians")
@@ -109,6 +128,17 @@ export default async function HomePage() {
       .order("week_number", { ascending: false })
       .order("participation_rate", { ascending: false, nullsFirst: false })
       .limit(50),
+
+    // Featured politicians for homepage search — most active by qualifying questions
+    supabase
+      .from("weekly_snapshots")
+      .select(
+        "politician_id, qualifying_questions, politicians!politician_id(id, slug, full_name, office, state, party, photo_url)"
+      )
+      .not("politicians", "is", null)
+      .gt("qualifying_questions", 0)
+      .order("qualifying_questions", { ascending: false })
+      .limit(48),
   ]);
 
   // Top questions with politician context
@@ -168,98 +198,127 @@ export default async function HomePage() {
       };
     });
 
-  // Get most recent week's data
   const latestWeek = allLeaderboard[0]?.week_number ?? null;
   const weekLeaderboard = latestWeek
     ? allLeaderboard.filter((r) => r.week_number === latestWeek)
     : [];
   const top3 = weekLeaderboard.slice(0, 3);
-  const bottom3 = [...weekLeaderboard].sort(
-    (a, b) => (a.participation_rate ?? 0) - (b.participation_rate ?? 0)
-  ).slice(0, 3);
+  const bottom3 = [...weekLeaderboard]
+    .sort((a, b) => (a.participation_rate ?? 0) - (b.participation_rate ?? 0))
+    .slice(0, 3);
 
   const previewYear = latestWeek ? Math.floor(latestWeek / 100) : null;
   const previewWeek = latestWeek ? latestWeek % 100 : null;
 
+  // Build featured politicians list (deduplicated, top 12)
+  const seenIds = new Set<string>();
+  const featuredPoliticians: FeaturedPolitician[] = [];
+  for (const row of featuredSnaps ?? []) {
+    if (seenIds.has(row.politician_id)) continue;
+    seenIds.add(row.politician_id);
+    const p = (
+      Array.isArray(row.politicians) ? row.politicians[0] : row.politicians
+    ) as FeaturedPolitician | null;
+    if (p) featuredPoliticians.push(p);
+    if (featuredPoliticians.length >= 12) break;
+  }
+
   return (
     <main className="min-h-screen bg-background">
-      <div className="mx-auto max-w-3xl px-4 py-16 space-y-14">
+      <div className="mx-auto max-w-3xl px-4 pt-14 pb-20 space-y-16">
 
-        {/* Hero */}
-        <div className="space-y-4 text-center">
-          <h1 className="text-5xl font-bold tracking-tight">WhyTho</h1>
-          <p className="text-xl text-muted-foreground max-w-lg mx-auto">
-            Hold your representatives accountable. Ask questions. Track who answers.
+        {/* ── Hero ── */}
+        <div className="space-y-6">
+          <p
+            className="text-xs font-semibold uppercase tracking-widest"
+            style={{ color: "var(--civic)" }}
+          >
+            Civic Accountability Platform
           </p>
-          <p className="text-muted-foreground font-medium italic">
-            Silence is its own answer.
+          <h1 className="text-5xl sm:text-6xl font-bold tracking-tight leading-[1.05]">
+            Your representatives<br />
+            have questions<br />
+            to answer.
+          </h1>
+          <p className="text-lg text-muted-foreground max-w-xl leading-relaxed">
+            Ask questions. Upvote what matters. WhyTho tracks which politicians
+            engage with their constituents — and which ones go silent. Their
+            response rate is public, forever.
+          </p>
+          <p className="text-sm text-muted-foreground italic">
+            &ldquo;Silence is its own answer.&rdquo;
           </p>
         </div>
 
-        {/* Search */}
-        <PoliticianSearch />
-
-        {/* Stats */}
-        <div className="flex flex-wrap justify-center gap-8 text-center">
-          {politicianCount !== null && (
-            <div>
-              <p className="text-3xl font-bold">{politicianCount.toLocaleString()}</p>
-              <p className="text-sm text-muted-foreground">Politicians tracked</p>
-            </div>
-          )}
-          {questionCount !== null && (
-            <div>
-              <p className="text-3xl font-bold">{questionCount.toLocaleString()}</p>
-              <p className="text-sm text-muted-foreground">Questions this week</p>
-            </div>
-          )}
-          {answerCount !== null && answerCount > 0 && (
-            <div>
-              <p className="text-3xl font-bold">{answerCount.toLocaleString()}</p>
-              <p className="text-sm text-muted-foreground">Questions answered</p>
-            </div>
-          )}
+        {/* ── Find Your Representative ── */}
+        <div>
+          <SectionLabel>Find your representative</SectionLabel>
+          <HomePoliticianSearch
+            featured={featuredPoliticians}
+            totalCount={politicianCount ?? 0}
+          />
         </div>
 
-        {/* Primary CTAs */}
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+        {/* ── Stats ── */}
+        {(politicianCount !== null || questionCount !== null) && (
+          <div className="flex flex-wrap gap-10">
+            {politicianCount !== null && (
+              <div>
+                <p className="text-3xl font-bold tabular-nums">{politicianCount.toLocaleString()}</p>
+                <p className="text-sm text-muted-foreground mt-0.5">Politicians tracked</p>
+              </div>
+            )}
+            {questionCount !== null && (
+              <div>
+                <p className="text-3xl font-bold tabular-nums">{questionCount.toLocaleString()}</p>
+                <p className="text-sm text-muted-foreground mt-0.5">Questions this week</p>
+              </div>
+            )}
+            {answerCount !== null && answerCount > 0 && (
+              <div>
+                <p className="text-3xl font-bold tabular-nums">{answerCount.toLocaleString()}</p>
+                <p className="text-sm text-muted-foreground mt-0.5">Questions answered</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── CTAs ── */}
+        <div className="flex flex-col sm:flex-row gap-3">
           <Link
             href="/leaderboard"
-            className="inline-flex items-center justify-center rounded-lg bg-foreground text-background px-6 py-3 font-semibold hover:opacity-90 transition-opacity"
+            className="inline-flex items-center justify-center rounded-xl bg-foreground text-background px-6 py-3 font-semibold hover:opacity-90 transition-opacity"
           >
             See the Leaderboard
           </Link>
           <Link
             href="/federal"
-            className="inline-flex items-center justify-center rounded-lg border px-6 py-3 font-semibold hover:bg-muted transition-colors"
+            className="inline-flex items-center justify-center rounded-xl border-2 px-6 py-3 font-semibold hover:bg-muted transition-colors"
           >
             Browse Federal Reps
           </Link>
         </div>
 
-        {/* Top questions this week */}
+        {/* ── Top Questions ── */}
         {topQuestions.length > 0 && (
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold">🔥 Top Questions This Week</h2>
-              <span className="text-xs text-muted-foreground">by upvotes</span>
-            </div>
+          <div>
+            <SectionLabel>Top questions this week</SectionLabel>
             <div className="space-y-2">
               {topQuestions.map((q, i) => (
                 <Link
                   key={q.id}
                   href={q.politician ? `/${q.politician.slug}` : "/leaderboard"}
-                  className="block rounded-lg border bg-card px-4 py-3 hover:bg-muted/50 transition-colors"
+                  className="block rounded-xl border bg-card px-4 py-3.5 hover:bg-muted/50 transition-colors"
                 >
                   <div className="flex gap-3 items-start">
-                    <span className="text-xl font-bold text-muted-foreground/40 tabular-nums w-6 shrink-0 pt-0.5">
+                    <span className="text-lg font-bold text-muted-foreground/30 tabular-nums w-6 shrink-0 pt-0.5">
                       {i + 1}
                     </span>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium line-clamp-2">{q.body}</p>
+                      <p className="text-sm font-medium leading-snug line-clamp-2">{q.body}</p>
                       {q.politician && (
-                        <p className="text-xs text-muted-foreground mt-1">
-                          → {q.politician.full_name}
+                        <p className="text-xs text-muted-foreground mt-1.5">
+                          {q.politician.full_name}
                           {q.politician.office && ` · ${q.politician.office}`}
                           {q.politician.state && `, ${q.politician.state}`}
                         </p>
@@ -275,11 +334,20 @@ export default async function HomePage() {
           </div>
         )}
 
-        {/* Leaderboard preview */}
+        {/* ── Leaderboard Preview ── */}
         {weekLeaderboard.length > 0 && latestWeek && (
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold">📊 Response Rate Snapshot</h2>
+          <div>
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center gap-2.5">
+                <span
+                  className="h-4 w-1 rounded-full shrink-0"
+                  style={{ background: "var(--civic)" }}
+                  aria-hidden
+                />
+                <h2 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                  Response rate snapshot
+                </h2>
+              </div>
               {previewYear && previewWeek && (
                 <span className="text-xs text-muted-foreground">
                   Week {previewWeek}, {previewYear}
@@ -287,152 +355,139 @@ export default async function HomePage() {
               )}
             </div>
 
-            {/* Top responders */}
-            {top3.length > 0 && (
-              <div className="space-y-1.5">
-                <p className="text-xs font-medium text-green-600 dark:text-green-400 uppercase tracking-wide">
-                  Most Responsive
-                </p>
-                {top3.map((row, i) => (
-                  <Link
-                    key={row.politician_id}
-                    href={`/${row.slug}`}
-                    className="flex items-center gap-3 rounded-lg border bg-card px-3 py-2.5 hover:bg-muted/50 transition-colors"
-                  >
-                    <PoliticianAvatar
-                      photoUrl={row.photo_url}
-                      fullName={row.full_name}
-                      size={32}
-                    />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5">
-                        <PartyDot party={row.party} />
-                        <p className="text-sm font-medium truncate">{row.full_name}</p>
+            <div className="space-y-4">
+              {top3.length > 0 && (
+                <div className="space-y-1.5">
+                  <p className="text-xs font-medium text-green-600 dark:text-green-400 uppercase tracking-wide pl-0.5">
+                    Most Responsive
+                  </p>
+                  {top3.map((row, i) => (
+                    <Link
+                      key={row.politician_id}
+                      href={`/${row.slug}`}
+                      className="flex items-center gap-3 rounded-xl border bg-card px-3.5 py-3 hover:bg-muted/50 transition-colors"
+                    >
+                      <PoliticianAvatar photoUrl={row.photo_url} fullName={row.full_name} size={32} />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <PartyDot party={row.party} />
+                          <p className="text-sm font-medium truncate">{row.full_name}</p>
+                        </div>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {row.office}{row.state ? `, ${row.state}` : ""}
+                        </p>
                       </div>
-                      <p className="text-xs text-muted-foreground truncate">
-                        {row.office}{row.state ? `, ${row.state}` : ""}
-                      </p>
-                    </div>
-                    <div className="shrink-0 text-right">
-                      <p className={`text-sm font-bold ${rateColor(row.participation_rate)}`}>
-                        {row.participation_rate !== null
-                          ? `${Math.round(row.participation_rate)}%`
-                          : "—"}
-                      </p>
-                      <p className="text-xs text-muted-foreground tabular-nums">
-                        {row.answered_qualifying}/{row.qualifying_questions} answered
-                      </p>
-                    </div>
-                    <span className="text-muted-foreground/40 font-bold text-sm shrink-0">
-                      #{i + 1}
-                    </span>
-                  </Link>
-                ))}
-              </div>
-            )}
+                      <div className="shrink-0 text-right">
+                        <p className={`text-sm font-bold ${rateColor(row.participation_rate)}`}>
+                          {row.participation_rate !== null
+                            ? `${Math.round(row.participation_rate)}%`
+                            : "—"}
+                        </p>
+                        <p className="text-xs text-muted-foreground tabular-nums">
+                          {row.answered_qualifying}/{row.qualifying_questions}
+                        </p>
+                      </div>
+                      <span className="text-muted-foreground/30 font-bold text-sm shrink-0 w-5 text-right">
+                        #{i + 1}
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              )}
 
-            {/* Least responsive */}
-            {bottom3.length > 0 && (
-              <div className="space-y-1.5 mt-3">
-                <p className="text-xs font-medium text-red-600 dark:text-red-400 uppercase tracking-wide">
-                  Least Responsive
-                </p>
-                {bottom3.map((row) => (
-                  <Link
-                    key={row.politician_id}
-                    href={`/${row.slug}`}
-                    className="flex items-center gap-3 rounded-lg border bg-card px-3 py-2.5 hover:bg-muted/50 transition-colors"
-                  >
-                    <PoliticianAvatar
-                      photoUrl={row.photo_url}
-                      fullName={row.full_name}
-                      size={32}
-                    />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5">
-                        <PartyDot party={row.party} />
-                        <p className="text-sm font-medium truncate">{row.full_name}</p>
+              {bottom3.length > 0 && (
+                <div className="space-y-1.5">
+                  <p className="text-xs font-medium text-red-600 dark:text-red-400 uppercase tracking-wide pl-0.5">
+                    Least Responsive
+                  </p>
+                  {bottom3.map((row) => (
+                    <Link
+                      key={row.politician_id}
+                      href={`/${row.slug}`}
+                      className="flex items-center gap-3 rounded-xl border bg-card px-3.5 py-3 hover:bg-muted/50 transition-colors"
+                    >
+                      <PoliticianAvatar photoUrl={row.photo_url} fullName={row.full_name} size={32} />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <PartyDot party={row.party} />
+                          <p className="text-sm font-medium truncate">{row.full_name}</p>
+                        </div>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {row.office}{row.state ? `, ${row.state}` : ""}
+                        </p>
                       </div>
-                      <p className="text-xs text-muted-foreground truncate">
-                        {row.office}{row.state ? `, ${row.state}` : ""}
-                      </p>
-                    </div>
-                    <div className="shrink-0 text-right">
-                      <p className={`text-sm font-bold ${rateColor(row.participation_rate)}`}>
-                        {row.participation_rate !== null
-                          ? `${Math.round(row.participation_rate)}%`
-                          : "0%"}
-                      </p>
-                      <p className="text-xs text-muted-foreground tabular-nums">
-                        {row.answered_qualifying}/{row.qualifying_questions} answered
-                      </p>
-                    </div>
-                    <span className="text-muted-foreground/40 font-bold text-sm shrink-0">
-                      💤
-                    </span>
-                  </Link>
-                ))}
-              </div>
-            )}
+                      <div className="shrink-0 text-right">
+                        <p className={`text-sm font-bold ${rateColor(row.participation_rate)}`}>
+                          {row.participation_rate !== null
+                            ? `${Math.round(row.participation_rate)}%`
+                            : "0%"}
+                        </p>
+                        <p className="text-xs text-muted-foreground tabular-nums">
+                          {row.answered_qualifying}/{row.qualifying_questions}
+                        </p>
+                      </div>
+                      <span className="text-muted-foreground/30 text-base shrink-0">💤</span>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
 
             <Link
               href="/leaderboard"
-              className="block text-center text-sm text-muted-foreground hover:text-foreground transition-colors py-1"
+              className="inline-block mt-4 text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               View full leaderboard →
             </Link>
           </div>
         )}
 
-        {/* How it works */}
-        <div className="rounded-xl border bg-card p-6 space-y-5">
-          <h2 className="text-lg font-semibold">How it works</h2>
-          <div className="grid sm:grid-cols-3 gap-4">
-            <div className="space-y-1.5">
-              <div className="flex items-center gap-2">
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-foreground text-background text-sm font-bold shrink-0">
-                  1
-                </span>
-                <p className="font-medium text-sm">Ask a question</p>
+        {/* ── How it works ── */}
+        <div>
+          <SectionLabel>How it works</SectionLabel>
+          <div className="grid sm:grid-cols-3 gap-6">
+            {[
+              {
+                n: "1",
+                title: "Ask a question",
+                body: "Find your representative and submit a question. Others upvote the ones that matter most.",
+              },
+              {
+                n: "2",
+                title: "Watch the clock",
+                body: "Questions with 10+ upvotes become \u201cqualifying\u201d \u2014 ones politicians are publicly expected to answer.",
+              },
+              {
+                n: "3",
+                title: "Silence is recorded",
+                body: "Every Monday, the week resets. Their response rate is permanently public — whether they answered or not.",
+              },
+            ].map(({ n, title, body }) => (
+              <div key={n} className="space-y-2">
+                <div className="flex items-center gap-2.5">
+                  <span
+                    className="flex h-7 w-7 items-center justify-center rounded-full text-background text-sm font-bold shrink-0"
+                    style={{ background: "var(--civic)" }}
+                  >
+                    {n}
+                  </span>
+                  <p className="font-semibold text-sm">{title}</p>
+                </div>
+                <p className="text-sm text-muted-foreground leading-relaxed pl-9">{body}</p>
               </div>
-              <p className="text-sm text-muted-foreground pl-9">
-                Find your representative and submit a question. Others upvote the ones that matter most.
-              </p>
-            </div>
-            <div className="space-y-1.5">
-              <div className="flex items-center gap-2">
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-foreground text-background text-sm font-bold shrink-0">
-                  2
-                </span>
-                <p className="font-medium text-sm">Watch the clock</p>
-              </div>
-              <p className="text-sm text-muted-foreground pl-9">
-                Questions with 10+ upvotes become &ldquo;qualifying&rdquo; — ones politicians are publicly expected to answer.
-              </p>
-            </div>
-            <div className="space-y-1.5">
-              <div className="flex items-center gap-2">
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-foreground text-background text-sm font-bold shrink-0">
-                  3
-                </span>
-                <p className="font-medium text-sm">Silence is recorded</p>
-              </div>
-              <p className="text-sm text-muted-foreground pl-9">
-                Every Monday, the week resets. Their response rate is permanently public — whether they answered or not.
-              </p>
-            </div>
+            ))}
           </div>
         </div>
 
-        {/* Browse by state */}
+        {/* ── Browse by State ── */}
         <div>
-          <h2 className="text-lg font-semibold mb-3">Browse by State</h2>
+          <SectionLabel>Browse by state</SectionLabel>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
             {TARGET_STATES.map(({ code, name }) => (
               <Link
                 key={code}
                 href={`/state/${code}`}
-                className="rounded-lg border bg-card px-3 py-2 text-sm font-medium text-center hover:bg-muted transition-colors"
+                className="rounded-xl border bg-card px-3 py-2.5 text-sm font-medium text-center hover:bg-muted hover:border-foreground/20 transition-all"
               >
                 {name}
               </Link>
@@ -440,8 +495,8 @@ export default async function HomePage() {
           </div>
         </div>
 
-        {/* Footer links */}
-        <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground border-t pt-8">
+        {/* ── Footer ── */}
+        <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground border-t pt-8">
           <Link href="/about" className="hover:text-foreground transition-colors">About</Link>
           <Link href="/how-it-works" className="hover:text-foreground transition-colors">How It Works</Link>
           <Link href="/faq" className="hover:text-foreground transition-colors">FAQ</Link>
