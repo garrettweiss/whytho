@@ -132,7 +132,7 @@ export function HomePoliticianSearch({
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate leading-tight">{r.full_name}</p>
                 <p className="text-xs text-muted-foreground truncate">
-                  {r.state ?? r.office ?? "—"}
+                  {r.state ?? r.office ?? "-"}
                 </p>
               </div>
             </Link>

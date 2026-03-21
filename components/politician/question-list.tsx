@@ -90,7 +90,7 @@ function AnswerBlock({ answer }: { answer: Answer }) {
         )}
         {answer.is_disputed && (
           <span className="text-xs font-medium text-orange-600">
-            ⚠️ Disputed — under review
+            ⚠️ Disputed - under review
           </span>
         )}
         {isAI && answer.ai_confidence && answer.ai_confidence !== "insufficient" && (
@@ -281,7 +281,7 @@ function QuestionCard({
   }
 
   return (
-    <div className="rounded-xl border bg-card shadow-sm overflow-hidden">
+    <div id={`question-${question.id}`} className="rounded-xl border bg-card shadow-sm overflow-hidden">
       <div className="flex gap-3 p-4">
         {/* Vote column */}
         <div className="flex flex-col items-center gap-1 shrink-0 pt-0.5">

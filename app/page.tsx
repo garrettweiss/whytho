@@ -6,20 +6,24 @@ import {
   HomePoliticianSearch,
   type FeaturedPolitician,
 } from "@/components/politician/home-politician-search";
+import {
+  PoliticianRain,
+  type RainItem,
+} from "@/components/politician/politician-rain";
 
 export const metadata: Metadata = {
-  title: "WhyTho — Hold Your Representatives Accountable",
+  title: "WhyTho: Hold Your Representatives Accountable",
   description:
     "Ask your politicians questions. See who answers and who stays silent. Silence is its own answer.",
   openGraph: {
-    title: "WhyTho — Hold Your Representatives Accountable",
+    title: "WhyTho: Hold Your Representatives Accountable",
     description:
       "Ask your politicians questions. See who answers and who stays silent. Silence is its own answer.",
     type: "website",
   },
 };
 
-// Revalidate every 15 minutes — live question data
+// Revalidate every 15 minutes - live question data
 export const revalidate = 900;
 
 const TARGET_STATES = [
@@ -128,6 +132,7 @@ export default async function HomePage() {
     { data: topQuestionsRaw },
     { data: leaderboardRaw },
     { data: featuredSnaps },
+    { data: rainQuestionsRaw },
   ] = await Promise.all([
     supabase
       .from("politicians")
@@ -157,7 +162,7 @@ export default async function HomePage() {
       .order("net_upvotes", { ascending: false })
       .limit(5),
 
-    // Leaderboard preview — most recent completed week's snapshots
+    // Leaderboard preview - most recent completed week's snapshots
     supabase
       .from("weekly_snapshots")
       .select(
@@ -169,7 +174,7 @@ export default async function HomePage() {
       .order("participation_rate", { ascending: false, nullsFirst: false })
       .limit(50),
 
-    // Featured politicians for homepage search — most active by qualifying questions
+    // Featured politicians for homepage search - most active by qualifying questions
     supabase
       .from("weekly_snapshots")
       .select(
@@ -179,6 +184,19 @@ export default async function HomePage() {
       .gt("qualifying_questions", 0)
       .order("qualifying_questions", { ascending: false })
       .limit(48),
+
+    // Rain data - top questions this week with politician photo
+    supabase
+      .from("questions")
+      .select(
+        "id, body, politicians!politician_id(slug, full_name, photo_url)"
+      )
+      .eq("week_number", weekNumber)
+      .eq("status", "active")
+      .eq("is_seeded", false)
+      .gte("net_upvotes", 1)
+      .order("net_upvotes", { ascending: false })
+      .limit(20),
   ]);
 
   // Top questions with politician context
@@ -197,7 +215,7 @@ export default async function HomePage() {
       : (q.politicians as TopQuestion["politician"]) ?? null,
   }));
 
-  // Leaderboard preview — get most recent week, top 3 + bottom 3
+  // Leaderboard preview - get most recent week, top 3 + bottom 3
   interface LeaderboardRow {
     politician_id: string;
     slug: string;
@@ -263,6 +281,13 @@ export default async function HomePage() {
     if (featuredPoliticians.length >= 12) break;
   }
 
+  const rainItems: RainItem[] = (rainQuestionsRaw ?? []).flatMap((q) => {
+    const p = Array.isArray(q.politicians) ? q.politicians[0] : q.politicians;
+    if (!p || typeof p !== "object" || !("slug" in p)) return [];
+    const pol = p as { slug: string; full_name: string; photo_url: string | null };
+    return [{ questionId: q.id, body: q.body, slug: pol.slug, fullName: pol.full_name, photoUrl: pol.photo_url }];
+  });
+
   return (
     <main className="min-h-screen bg-background">
       <div className="mx-auto max-w-3xl px-4 pt-14 pb-20 space-y-16">
@@ -282,7 +307,7 @@ export default async function HomePage() {
           </h1>
           <p className="text-lg text-muted-foreground max-w-xl leading-relaxed">
             Ask questions. Upvote what matters. WhyTho tracks which politicians
-            engage with their constituents — and which ones go silent. Their
+            engage with their constituents, and which ones go silent. Their
             response rate is public, forever.
           </p>
           <p className="text-sm text-muted-foreground italic">
@@ -421,7 +446,7 @@ export default async function HomePage() {
                         <p className={`text-sm font-bold ${rateColor(row.participation_rate)}`}>
                           {row.participation_rate !== null
                             ? `${Math.round(row.participation_rate)}%`
-                            : "—"}
+                            : "-"}
                         </p>
                         <p className="text-xs text-muted-foreground tabular-nums">
                           {row.answered_qualifying}/{row.qualifying_questions}
@@ -500,7 +525,7 @@ export default async function HomePage() {
               {
                 n: "3",
                 title: "Silence is recorded",
-                body: "Every Monday, the week resets. Their response rate is permanently public — whether they answered or not.",
+                body: "Every Monday, the week resets. Their response rate is permanently public, whether they answered or not.",
               },
             ].map(({ n, title, body }) => (
               <div key={n} className="space-y-2">
@@ -546,6 +571,8 @@ export default async function HomePage() {
         </div>
 
       </div>
+
+      <PoliticianRain items={rainItems} />
     </main>
   );
 }

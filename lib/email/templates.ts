@@ -1,7 +1,7 @@
 import { SITE_URL } from "./resend";
 
 /**
- * Answer notification — sent to the question submitter when their question
+ * Answer notification - sent to the question submitter when their question
  * receives an official answer from a politician's team.
  */
 export function answerNotificationEmail({
@@ -63,7 +63,7 @@ export function answerNotificationEmail({
   <div class="container">
     <div class="header">
       <p class="header-title">WhyTho</p>
-      <p class="header-sub">Civic accountability — silence is its own answer.</p>
+      <p class="header-sub">Civic accountability: silence is its own answer.</p>
     </div>
     <div class="body">
       <p style="margin: 0 0 20px; font-size: 15px; color: #374151;">
@@ -91,13 +91,13 @@ export function answerNotificationEmail({
 </body>
 </html>`;
 
-  const text = `WhyTho — ${politicianName} answered your question\n\nYour question:\n"${questionPreview}"\n\nTheir response (${typeLabel}):\n${answerPreview}\n\nView the full answer:\n${profileUrl}\n\n---\nYou're receiving this because you submitted a question on WhyTho.\nhttps://whytho.us`;
+  const text = `WhyTho: ${politicianName} answered your question\n\nYour question:\n"${questionPreview}"\n\nTheir response (${typeLabel}):\n${answerPreview}\n\nView the full answer:\n${profileUrl}\n\n---\nYou're receiving this because you submitted a question on WhyTho.\nhttps://whytho.us`;
 
   return { subject, html, text };
 }
 
 /**
- * Weekly digest — sent every Monday after the weekly reset.
+ * Weekly digest - sent every Monday after the weekly reset.
  * Recaps the previous week's top questions, answer highlights, and platform stats.
  */
 export function weeklyDigestEmail({
@@ -126,7 +126,7 @@ export function weeklyDigestEmail({
     politicianSlug: string;
   }>;
 }): { subject: string; html: string; text: string } {
-  const subject = `Week ${week} recap — WhyTho`;
+  const subject = `Week ${week} recap | WhyTho`;
   const leaderboardUrl = `${SITE_URL}/leaderboard`;
   const settingsUrl = `${SITE_URL}/settings/notifications`;
 
@@ -184,7 +184,7 @@ export function weeklyDigestEmail({
   <div class="container">
     <div class="header">
       <p class="header-title">WhyTho</p>
-      <p class="header-sub">Week ${week}, ${year} recap — civic accountability, every Monday.</p>
+      <p class="header-sub">Week ${week}, ${year} recap: civic accountability, every Monday.</p>
     </div>
     <div class="body">
       <div class="stat-row">
@@ -230,7 +230,7 @@ export function weeklyDigestEmail({
 </html>`;
 
   const textLines = [
-    `WhyTho — Week ${week}, ${year} Recap`,
+    `WhyTho: Week ${week}, ${year} Recap`,
     "",
     `${totalQuestions} questions asked · ${totalAnswers} official answers`,
     "",
@@ -239,7 +239,7 @@ export function weeklyDigestEmail({
     textLines.push("Most responsive this week:");
     topPoliticians.forEach((p, i) => {
       textLines.push(
-        `  ${i + 1}. ${p.name} — ${rateLabel(p.participationRate)} (${p.answeredQualifying}/${p.qualifyingQuestions} answered)`
+        `  ${i + 1}. ${p.name}: ${rateLabel(p.participationRate)} (${p.answeredQualifying}/${p.qualifyingQuestions} answered)`
       );
     });
     textLines.push("");

@@ -162,7 +162,7 @@ function Combobox({
         } else if (!inputValue.trim()) {
           onChange("");
         } else {
-          // Partial / invalid — reset to whatever was committed
+          // Partial / invalid - reset to whatever was committed
           setInputValue(value);
         }
       } else {
@@ -352,7 +352,7 @@ export function AccountProfileForm({
             onChange={(e) => setAffiliation(e.target.value)}
             className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
           >
-            <option value="">— Prefer not to say —</option>
+            <option value="">Prefer not to say</option>
             {AFFILIATIONS.map((a) => (
               <option key={a} value={a}>{a}</option>
             ))}

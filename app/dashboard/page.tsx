@@ -6,7 +6,7 @@ import { AnswerComposer } from "@/components/answers/answer-composer";
 import { TeamManager } from "@/components/dashboard/team-manager";
 
 export const metadata: Metadata = {
-  title: "Politician Dashboard — WhyTho",
+  title: "Politician Dashboard | WhyTho",
   description: "Manage your WhyTho profile and respond to constituent questions.",
 };
 
@@ -111,7 +111,7 @@ function QuestionCard({
         {/* AI analysis note */}
         {aiAnswer && !officialAnswer && (
           <p className="text-xs text-muted-foreground italic">
-            🤖 AI analysis available — add an official response above it.
+            🤖 AI analysis available. Add an official response above it.
           </p>
         )}
 
@@ -163,7 +163,7 @@ export default async function DashboardPage() {
     .eq("user_id", user.id);
 
   if (!memberships || memberships.length === 0) {
-    // Not on any team — prompt to claim a profile
+    // Not on any team - prompt to claim a profile
     return (
       <div className="min-h-screen bg-background">
         <div className="mx-auto max-w-3xl px-4 py-12">

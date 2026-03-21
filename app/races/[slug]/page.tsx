@@ -49,9 +49,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     .eq("slug", slug)
     .maybeSingle();
 
-  if (!race) return { title: "Race — WhyTho" };
+  if (!race) return { title: "Race | WhyTho" };
   return {
-    title: `${race.name} — WhyTho`,
+    title: `${race.name} | WhyTho`,
     description: `${race.office} race in ${STATE_NAMES[race.state ?? ""] ?? race.state}. Ask candidates where they stand.`,
   };
 }
@@ -182,7 +182,7 @@ export default async function RaceDetailPage({ params }: Props) {
           )}
 
           <p className="text-sm text-muted-foreground">
-            Ask any candidate a question — their response rate is always public.
+            Ask any candidate a question. Their response rate is always public.
           </p>
         </div>
 

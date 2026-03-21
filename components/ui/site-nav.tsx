@@ -57,7 +57,7 @@ export function SiteNav() {
         {/* Logo */}
         <Link
           href="/"
-          aria-label="WhyTho — home"
+          aria-label="WhyTho home"
           className="font-bold text-sm tracking-tight hover:text-muted-foreground transition-colors"
         >
           WhyTho

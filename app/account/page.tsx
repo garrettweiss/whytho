@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { AccountProfileForm } from "@/components/account/account-profile-form";
 
 export const metadata: Metadata = {
-  title: "My Account — WhyTho",
+  title: "My Account | WhyTho",
 };
 
 interface Props {

@@ -144,7 +144,7 @@ export function AnswerComposer({ questionId, questionBody, isAdmin, onAnswered }
           </button>
         </div>
 
-        {/* Answer type: direct vs team — admin only */}
+        {/* Answer type: direct vs team - admin only */}
         {isAdmin && (
           <div className="flex gap-2">
             <button
@@ -193,7 +193,7 @@ export function AnswerComposer({ questionId, questionBody, isAdmin, onAnswered }
           </div>
           <div>
             <label className="text-xs text-muted-foreground mb-1 block">
-              Sources (optional — one per line or comma-separated URLs)
+              Sources (optional, one per line or comma-separated URLs)
             </label>
             <textarea
               value={sources}
@@ -225,7 +225,7 @@ export function AnswerComposer({ questionId, questionBody, isAdmin, onAnswered }
           </div>
           <div>
             <label className="text-xs text-muted-foreground mb-1 block">
-              Brief summary (optional — shown before the link)
+              Brief summary (optional, shown before the link)
             </label>
             <textarea
               value={linkDescription}

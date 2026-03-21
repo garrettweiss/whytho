@@ -1,5 +1,5 @@
 /**
- * /admin/x-queue — X Post Review Queue
+ * /admin/x-queue: X Post Review Queue
  *
  * Shows x_posts with status='review' (curator score 5–7).
  * Admin can Approve or Reject each post.
@@ -79,7 +79,7 @@ export default async function XQueuePage({ searchParams }: Props) {
             </div>
             <h1 className="text-2xl font-bold">🐦 X Question Queue</h1>
             <p className="text-sm text-muted-foreground mt-0.5">
-              Real constituent questions harvested from X — scored by Claude
+              Real constituent questions harvested from X, scored by Claude
             </p>
           </div>
         </div>
@@ -232,7 +232,7 @@ export default async function XQueuePage({ searchParams }: Props) {
                     )}
                     {activeStatus === "approved" && (
                       <span className="text-xs text-green-600 dark:text-green-400 font-medium">
-                        ✅ Approved — run jack-publisher.ts to promote
+                        ✅ Approved: run jack-publisher.ts to promote
                       </span>
                     )}
                     {activeStatus === "rejected" && (

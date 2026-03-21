@@ -13,7 +13,7 @@ type TeamMember = {
 };
 
 const ROLE_LABELS: Record<string, { label: string; description: string }> = {
-  admin:     { label: "Admin",     description: "Full access — can answer, edit, and manage team" },
+  admin:     { label: "Admin",     description: "Full access: can answer, edit, and manage team" },
   editor:    { label: "Editor",    description: "Can publish answers directly" },
   responder: { label: "Responder", description: "Can draft answers (requires editor approval)" },
 };
@@ -53,7 +53,7 @@ export function TeamManager({ politicianId, callerRole }: Props) {
       const data = await res.json() as { members?: TeamMember[] };
       setMembers(data.members ?? []);
     } catch {
-      // silently fail — team section is non-critical
+      // silently fail - team section is non-critical
     } finally {
       setLoading(false);
     }
@@ -178,7 +178,7 @@ export function TeamManager({ politicianId, callerRole }: Props) {
             ))}
           </div>
 
-          {/* Invite form — admin only */}
+          {/* Invite form - admin only */}
           {isAdmin && (
             <div className="rounded-lg border bg-card p-3 space-y-2">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Add Team Member</p>

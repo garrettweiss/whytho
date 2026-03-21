@@ -112,7 +112,7 @@ export default function NotificationSettingsPage() {
             />
             <ToggleRow
               label="Weekly digest"
-              description="Every Monday — a recap of the top questions, most responsive politicians, and platform highlights from the past week."
+              description="Every Monday: a recap of the top questions, most responsive politicians, and platform highlights from the past week."
               enabled={prefs?.notify_digest ?? true}
               onToggle={() => handleToggle("notify_digest")}
               isPending={isPending}

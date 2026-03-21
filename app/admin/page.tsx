@@ -1,5 +1,5 @@
 /**
- * /admin — Platform admin dashboard
+ * /admin: Platform admin dashboard
  *
  * Auth: ?secret=ADMIN_SECRET query param
  * Shows: platform stats, verification queue, seeded question queue, quick links
@@ -204,7 +204,7 @@ export default async function AdminDashboard({ searchParams }: Props) {
                     const p = v.politicians as { full_name: string; slug: string; verification_tier: "0" | "1" | "2" | "3" } | null;
                     return (
                       <tr key={v.id} className="bg-card hover:bg-muted/30 transition-colors">
-                        <td className="px-4 py-2.5 font-medium">{p?.full_name ?? "—"}</td>
+                        <td className="px-4 py-2.5 font-medium">{p?.full_name ?? "-"}</td>
                         <td className="px-4 py-2.5 text-muted-foreground font-mono text-xs">{v.method}</td>
                         <td className="px-4 py-2.5 text-muted-foreground">T{p?.verification_tier ?? 0}</td>
                         <td className="px-4 py-2.5 text-muted-foreground text-xs">
@@ -229,11 +229,11 @@ export default async function AdminDashboard({ searchParams }: Props) {
           </div>
         )}
 
-        {/* Seeded questions with 0 votes — may need replacement */}
+        {/* Seeded questions with 0 votes - may need replacement */}
         {seededQsNeedingReview && seededQsNeedingReview.length > 0 && (
           <div>
             <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-1">
-              Seeded Questions — No Votes This Week
+              Seeded Questions: No Votes This Week
             </h2>
             <p className="text-xs text-muted-foreground mb-3">
               These AI-generated questions have 0 or negative votes. Consider re-seeding better questions.
@@ -284,7 +284,7 @@ export default async function AdminDashboard({ searchParams }: Props) {
                 return (
                   <div key={a.id} className="flex items-center gap-3 rounded-lg border bg-card px-4 py-2.5">
                     <div className="flex-1">
-                      <p className="text-sm font-medium">{p?.full_name ?? "—"}</p>
+                      <p className="text-sm font-medium">{p?.full_name ?? "-"}</p>
                       <p className="text-xs text-muted-foreground">
                         {a.answer_type === "direct" ? "🏛️ Direct answer" : "👥 Team statement"} ·{" "}
                         {new Date(a.created_at).toLocaleDateString()}

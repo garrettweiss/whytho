@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
   if (question.net_upvotes < QUALIFYING_THRESHOLD) {
     return NextResponse.json(
       {
-        error: `Question has ${question.net_upvotes} votes — needs ${QUALIFYING_THRESHOLD} to qualify for AI analysis`,
+        error: `Question has ${question.net_upvotes} votes; needs ${QUALIFYING_THRESHOLD} to qualify for AI analysis`,
       },
       { status: 422 }
     );

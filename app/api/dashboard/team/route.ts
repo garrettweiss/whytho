@@ -199,7 +199,7 @@ export async function DELETE(req: NextRequest) {
       .eq("role", "admin");
 
     if ((count ?? 0) <= 1) {
-      return NextResponse.json({ error: "Cannot remove yourself — you are the only admin" }, { status: 400 });
+      return NextResponse.json({ error: "Cannot remove yourself: you are the only admin" }, { status: 400 });
     }
   }
 

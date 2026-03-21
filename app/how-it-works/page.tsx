@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "How It Works — WhyTho",
+  title: "How It Works | WhyTho",
   description:
-    "Learn how WhyTho's question cycle works — from submission to weekly reset to permanent response records.",
+    "Learn how WhyTho's question cycle works: from submission to weekly reset to permanent response records.",
 };
 
 const steps = [
@@ -12,15 +12,15 @@ const steps = [
     number: "01",
     title: "Find your representative",
     description:
-      "Search by name, state, or office. Every US elected federal official and most state legislators have a profile. Profiles are auto-generated from public data — they exist whether or not the politician has joined.",
+      "Search by name, state, or office. Every US elected federal official and most state legislators have a profile. Profiles are auto-generated from public data; they exist whether or not the politician has joined.",
     detail:
-      "We track 537 federal officials (535 Congress + President + VP), all 50 governors, and state legislators across 10 priority states — with more being added.",
+      "We track 537 federal officials (535 Congress + President + VP), all 50 governors, and state legislators across 10 priority states, with more being added.",
   },
   {
     number: "02",
     title: "Submit or upvote a question",
     description:
-      "Ask anything that's relevant to their public duties. Be specific and civil. The community votes on questions — upvoting the ones they also want answered.",
+      "Ask anything that's relevant to their public duties. Be specific and civil. The community votes on questions, upvoting the ones they also want answered.",
     detail:
       "Each week you can submit up to 5 questions and vote freely. Questions reset each week, but questions you've asked are always in the archive.",
   },
@@ -28,7 +28,7 @@ const steps = [
     number: "03",
     title: "Questions qualify at 10+ votes",
     description:
-      "When a question reaches 10 net upvotes, it becomes a \"qualifying question\" — one that the politician is publicly expected to answer before the week ends.",
+      "When a question reaches 10 net upvotes, it becomes a \"qualifying question\": one that the politician is publicly expected to answer before the week ends.",
     detail:
       "The qualifying threshold filters out noise. Only questions with real community support count toward a politician's response rate.",
   },
@@ -38,11 +38,11 @@ const steps = [
     description:
       "Verified officials can log in and answer qualifying questions directly. Answers appear on their profile and are labeled as either a direct response or a team statement.",
     detail:
-      "If a politician's staff finds a public statement or interview where the question was addressed, they can link it as a source. AI summaries of public record are also shown — clearly labeled as NOT a statement from the politician.",
+      "If a politician's staff finds a public statement or interview where the question was addressed, they can link it as a source. AI summaries of public record are also shown, clearly labeled as NOT a statement from the politician.",
   },
   {
     number: "05",
-    title: "Monday reset — scores are locked in",
+    title: "Monday reset: scores are locked in",
     description:
       "Every Monday at midnight Eastern, the week ends. The count of qualifying questions vs. answered questions is permanently recorded on each politician's profile.",
     detail:
@@ -52,7 +52,7 @@ const steps = [
     number: "06",
     title: "Silence is always visible",
     description:
-      "A politician's lifetime response rate is displayed on their profile — publicly, permanently. It rises when they engage and falls when they go silent.",
+      "A politician's lifetime response rate is displayed on their profile, publicly and permanently. It rises when they engage and falls when they go silent.",
     detail:
       "This is the core mechanic: non-response is never hidden. Every week that passes without an answer is another week of silence on the record.",
   },

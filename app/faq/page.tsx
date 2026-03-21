@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "FAQ — WhyTho",
+  title: "FAQ | WhyTho",
   description: "Frequently asked questions about WhyTho's civic accountability platform.",
 };
 
@@ -16,11 +16,11 @@ const faqs = [
       },
       {
         q: "Are the politicians on here real?",
-        a: "Yes. All profiles are generated from public government data sources — Congress.gov, OpenStates, and official state records. Politicians don't need to \"sign up\" to have a profile.",
+        a: "Yes. All profiles are generated from public government data sources: Congress.gov, OpenStates, and official state records. Politicians don't need to \"sign up\" to have a profile.",
       },
       {
         q: "What does \"silence is its own answer\" mean?",
-        a: "It means that when a politician doesn't respond to qualifying questions, that non-response is recorded and displayed permanently. There's no neutral option — ignoring questions is a choice that shows on their public record.",
+        a: "It means that when a politician doesn't respond to qualifying questions, that non-response is recorded and displayed permanently. There's no neutral option; ignoring questions is a choice that shows on their public record.",
       },
     ],
   },
@@ -61,8 +61,8 @@ const faqs = [
         a: "No. Once a week's scores are locked in at Monday reset, they're permanent. A politician cannot go back and answer archived questions to change their historical record.",
       },
       {
-        q: "What if a politician answered the question somewhere else — a press conference, tweet, etc.?",
-        a: "Verified politicians and their teams can link public statements as answer sources. Alternatively, our AI analysis scans public record and may note if a related statement exists — but this is clearly labeled as AI analysis, not a direct answer.",
+        q: "What if a politician answered the question somewhere else (a press conference, tweet, etc.)?",
+        a: "Verified politicians and their teams can link public statements as answer sources. Alternatively, our AI analysis scans public record and may note if a related statement exists, but this is clearly labeled as AI analysis, not a direct answer.",
       },
     ],
   },
@@ -79,7 +79,7 @@ const faqs = [
       },
       {
         q: "Does participating in WhyTho endorse it?",
-        a: "No. Claiming your profile and answering questions means you're engaging with your constituents — it doesn't imply endorsement of the platform or any political position.",
+        a: "No. Claiming your profile and answering questions means you're engaging with your constituents. It doesn't imply endorsement of the platform or any political position.",
       },
       {
         q: "Can I dispute an AI-generated analysis?",
@@ -96,11 +96,11 @@ const faqs = [
       },
       {
         q: "Can I report a question?",
-        a: "Yes — there's a report button on every question card. Select the reason (spam, offensive, off-topic, duplicate, or other) and we'll review it.",
+        a: "Yes, there's a report button on every question card. Select the reason (spam, offensive, off-topic, duplicate, or other) and we'll review it.",
       },
       {
         q: "What are the AI-generated questions I see?",
-        a: "Some questions are pre-seeded by our system from public record to ensure each politician has at least a few relevant questions on their profile. These are always labeled \"📋 Suggested Question — AI-generated from public record\" and treated like any other question.",
+        a: "Some questions are pre-seeded by our system from public record to ensure each politician has at least a few relevant questions on their profile. These are always labeled \"💡 WhyTho suggested question\" and treated like any other question.",
       },
     ],
   },

@@ -129,7 +129,7 @@ export function ParticipationRate({
           </h2>
           <div className="mt-1 flex items-baseline gap-2">
             <span className={`text-4xl font-bold tabular-nums ${rateColor(currentRate)}`}>
-              {currentRate !== null ? `${Math.round(currentRate)}%` : "—"}
+              {currentRate !== null ? `${Math.round(currentRate)}%` : "-"}
             </span>
             {currentRate === null && (
               <span className="text-sm text-muted-foreground">no questions yet</span>
@@ -137,7 +137,7 @@ export function ParticipationRate({
           </div>
         </div>
 
-        {/* Sparkline — always shows 8-week weekly trend regardless of active tab */}
+        {/* Sparkline - always shows 8-week weekly trend regardless of active tab */}
         {snapshots.length >= 2 && (
           <div className="flex flex-col items-end gap-1">
             <span className="text-xs text-muted-foreground">8-week trend</span>
@@ -161,7 +161,7 @@ export function ParticipationRate({
         </div>
       )}
 
-      {/* Weekly history mini-table — always shows regardless of active period tab */}
+      {/* Weekly history mini-table - always shows regardless of active period tab */}
       {snapshots.length > 0 && (
         <div className="border-t pt-4">
           <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
@@ -192,7 +192,7 @@ export function ParticipationRate({
                     />
                   </div>
                   <span className={`w-10 text-right font-medium tabular-nums ${rateColor(snap.participation_rate)}`}>
-                    {snap.participation_rate !== null ? `${Math.round(r)}%` : "—"}
+                    {snap.participation_rate !== null ? `${Math.round(r)}%` : "-"}
                   </span>
                   <span className="text-muted-foreground w-20 shrink-0">
                     {snap.answered_qualifying}/{snap.qualifying_questions} answered

@@ -1,5 +1,5 @@
 /**
- * /admin/races — Race & Candidate lifecycle management
+ * /admin/races: Race & Candidate lifecycle management
  *
  * Auth: ?secret=ADMIN_SECRET query param
  * Actions:
@@ -102,7 +102,7 @@ export default async function AdminRacesPage({ searchParams }: Props) {
               !showCompleted ? "bg-background shadow-sm" : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            Active ({!showCompleted ? allRaces.length : "—"})
+            Active ({!showCompleted ? allRaces.length : "-"})
           </Link>
           <Link
             href={`/admin/races?secret=${secret}&status=completed`}

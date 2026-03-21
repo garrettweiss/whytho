@@ -42,7 +42,7 @@ export function XQueueActions({ postId, adminSecret, showRestore = false }: Prop
   if (status === "done") {
     return (
       <span className="text-xs font-medium text-muted-foreground">
-        {action === "approved" ? "✅ Approved" : "❌ Rejected"} — refresh to update queue
+        {action === "approved" ? "✅ Approved" : "❌ Rejected"}. Refresh to update queue
       </span>
     );
   }
@@ -50,7 +50,7 @@ export function XQueueActions({ postId, adminSecret, showRestore = false }: Prop
   if (status === "error") {
     return (
       <span className="text-xs text-destructive font-medium">
-        Error — try again
+        Error. Try again
       </span>
     );
   }

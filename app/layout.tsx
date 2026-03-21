@@ -15,9 +15,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "WhyTho — Ask Your Representatives",
+  title: "WhyTho: Ask Your Representatives",
   description:
-    "The civic accountability platform where silence is its own answer. Submit and upvote questions for US politicians — their response rate is always public.",
+    "The civic accountability platform where silence is its own answer. Submit and upvote questions for US politicians. Their response rate is always public.",
 };
 
 export default function RootLayout({

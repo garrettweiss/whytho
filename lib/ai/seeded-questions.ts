@@ -3,7 +3,7 @@
  *
  * Generates 10-15 AI-drafted questions for a politician based on their
  * public record. Uses Claude Sonnet. All output labeled:
- * "📋 Suggested Question — AI-generated from public record"
+ * "📋 Suggested Question - AI-generated from public record"
  *
  * Never generates opinion questions or partisan framing.
  * Focuses on: voting record, sponsored bills, committee activity, stated positions.

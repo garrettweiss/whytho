@@ -3,7 +3,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
-  title: "2026 Elections — WhyTho",
+  title: "2026 Elections | WhyTho",
   description:
     "Track 2026 primary and general election candidates. Submit questions and hold candidates accountable before Election Day.",
 };
@@ -137,8 +137,8 @@ export default async function RacesPage({
           <h1 className="text-3xl font-bold tracking-tight">2026 Elections</h1>
           <p className="mt-1 text-muted-foreground">
             {total > 0
-              ? `${total} active race${total !== 1 ? "s" : ""} — ask candidates where they stand`
-              : "No races added yet — check back soon"}
+              ? `${total} active race${total !== 1 ? "s" : ""}, ask candidates where they stand`
+              : "No races added yet. Check back soon"}
           </p>
         </div>
 
