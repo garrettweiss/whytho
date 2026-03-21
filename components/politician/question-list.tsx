@@ -257,11 +257,12 @@ function QuestionCard({
           body: payload,
         });
 
-        // Not signed in — silently create an anonymous session then retry
+        // Not signed in — create a rate-limited anonymous session then retry.
+        // Goes through /api/auth/anonymous (server-side IP rate limit: 10/hour)
+        // rather than calling Supabase directly, to prevent session farming.
         if (res.status === 401) {
-          const supabase = createClient();
-          const { error: anonError } = await supabase.auth.signInAnonymously();
-          if (!anonError) {
+          const anonRes = await fetch("/api/auth/anonymous", { method: "POST" });
+          if (anonRes.ok) {
             res = await fetch(`/api/votes`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },

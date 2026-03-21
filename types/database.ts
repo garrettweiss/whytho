@@ -53,6 +53,27 @@ export type Database = {
         }
         Relationships: []
       }
+      anon_session_log: {
+        Row: {
+          created_at: string | null
+          id: string
+          ip_address: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          ip_address: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          ip_address?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       answers: {
         Row: {
           ai_confidence: Database["public"]["Enums"]["ai_confidence"] | null

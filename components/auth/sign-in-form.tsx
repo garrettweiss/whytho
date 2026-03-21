@@ -1,56 +1,161 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { signInWithMagicLink, signInAnonymously } from "@/lib/auth/actions";
 import { createClient } from "@/lib/supabase/client";
 
+/**
+ * Sign-in form with anonymous → real account upgrade support.
+ *
+ * If the current visitor already has an anonymous session (created silently
+ * when they voted), we use linkIdentity() / updateUser() to UPGRADE that
+ * session rather than creating a new account. This preserves their vote
+ * history and prevents re-voting on the same questions (the UNIQUE constraint
+ * on votes remains intact since user_id doesn't change).
+ *
+ * Security notes:
+ * - linkIdentity() conflict (Google account already exists) → fall back to
+ *   regular sign-in with a clear message. Anonymous votes are not preserved
+ *   in this case, but the user gets into their existing account.
+ * - Email already registered → same "check your inbox" message to prevent
+ *   enumeration. Supabase sends appropriate email either way.
+ * - After upgrade, user_id is unchanged. UNIQUE(user_id, question_id,
+ *   week_number) prevents double-voting.
+ */
+
 export function SignInForm() {
+  const [isAnonymous, setIsAnonymous] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [info, setInfo] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  // Detect if visitor already has an anonymous session
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setIsAnonymous(!!user?.is_anonymous);
+    });
+  }, []);
+
+  // ── Google ────────────────────────────────────────────────────────────────
 
   async function handleGoogleSignIn() {
     setLoading(true);
     setError(null);
+    setInfo(null);
     const supabase = createClient();
-    const { error } = await supabase.auth.signInWithOAuth({
+    const redirectTo = `${window.location.origin}/auth/callback`;
+
+    if (isAnonymous) {
+      // Upgrade path: link Google identity to the existing anonymous account.
+      // Same user_id → all votes preserved, can't re-vote (UNIQUE constraint).
+      const { error: linkError } = await supabase.auth.linkIdentity({
+        provider: "google",
+        options: { redirectTo },
+      });
+
+      if (!linkError) {
+        // linkIdentity redirects the browser — nothing more to do here
+        return;
+      }
+
+      // Conflict: this Google account is already tied to another WhyTho user.
+      // Fall back to regular sign-in. Anonymous votes won't be merged but the
+      // user gets into their existing account.
+      if (
+        linkError.message.toLowerCase().includes("already") ||
+        linkError.message.toLowerCase().includes("conflict") ||
+        linkError.status === 422
+      ) {
+        setInfo(
+          "This Google account is already linked to a WhyTho account. Signing you in now…"
+        );
+        // Brief pause so user sees the message
+        await new Promise((r) => setTimeout(r, 1500));
+      }
+    }
+
+    // Standard sign-in (non-anonymous, or conflict fallback)
+    const { error: oauthError } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
+      options: { redirectTo },
     });
-    if (error) {
+
+    if (oauthError) {
       setError("Google sign-in failed. Please try again.");
       setLoading(false);
     }
-    // On success, browser is redirected — no need to setLoading(false)
+    // On success the browser redirects — no need to setLoading(false)
   }
+
+  // ── Email / Magic link ────────────────────────────────────────────────────
 
   async function handleMagicLink(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setInfo(null);
 
     const formData = new FormData(e.currentTarget);
-    const result = await signInWithMagicLink(formData);
+    const email = formData.get("email") as string;
+    if (!email) {
+      setError("Email is required");
+      setLoading(false);
+      return;
+    }
 
-    if ("error" in result) {
-      setError(result.error);
+    const supabase = createClient();
+
+    if (isAnonymous) {
+      // Upgrade path: link email to the existing anonymous account.
+      // supabase.auth.updateUser sends a confirmation email. On click the
+      // anonymous account gets the email attached (user_id unchanged).
+      const { error: updateError } = await supabase.auth.updateUser(
+        { email },
+        { emailRedirectTo: `${window.location.origin}/auth/callback` }
+      );
+
+      if (!updateError || updateError.message.toLowerCase().includes("already registered")) {
+        // Show same message regardless of whether email was free or taken.
+        // If free: confirmation email sent → clicking it upgrades the account.
+        // If taken: Supabase sends a sign-in link to the existing account.
+        // Either way: "check your inbox" is correct and prevents enumeration.
+        setEmailSent(true);
+        setLoading(false);
+        return;
+      }
+
+      // Unexpected error — fall through to standard magic link
+    }
+
+    // Standard magic link (non-anonymous, or fallback)
+    const { error: otpError } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+
+    if (otpError) {
+      setError("Failed to send sign-in link. Please try again.");
     } else {
       setEmailSent(true);
     }
     setLoading(false);
   }
 
+  // ── Render ────────────────────────────────────────────────────────────────
+
   if (emailSent) {
     return (
       <div className="rounded-lg border bg-card p-6 text-center space-y-2">
         <p className="font-medium">Check your email</p>
         <p className="text-sm text-muted-foreground">
-          We sent you a sign-in link. Click it to continue.
+          We sent you a link. Click it to{" "}
+          {isAnonymous ? "finish setting up your account" : "sign in"}.
         </p>
       </div>
     );
@@ -58,7 +163,21 @@ export function SignInForm() {
 
   return (
     <div className="space-y-4">
-      {/* Google OAuth — client-side to ensure PKCE code_verifier cookie works correctly */}
+      {/* Context banner for anonymous upgrade */}
+      {isAnonymous && (
+        <div className="rounded-md border border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/30 px-3 py-2">
+          <p className="text-xs text-blue-800 dark:text-blue-300">
+            Your votes are saved. Create an account to submit questions and
+            keep your history permanently.
+          </p>
+        </div>
+      )}
+
+      {info && (
+        <p className="text-sm text-muted-foreground text-center">{info}</p>
+      )}
+
+      {/* Google */}
       <Button
         type="button"
         variant="outline"
@@ -84,7 +203,7 @@ export function SignInForm() {
             fill="#EA4335"
           />
         </svg>
-        Continue with Google
+        {isAnonymous ? "Continue with Google" : "Continue with Google"}
       </Button>
 
       <div className="relative">
@@ -96,7 +215,7 @@ export function SignInForm() {
         </div>
       </div>
 
-      {/* Magic Link */}
+      {/* Magic link */}
       <form onSubmit={handleMagicLink} className="space-y-3">
         <div className="space-y-1">
           <Label htmlFor="email">Email</Label>
@@ -109,37 +228,20 @@ export function SignInForm() {
             disabled={loading}
           />
         </div>
-        {error && (
-          <p className="text-sm text-destructive">{error}</p>
-        )}
+        {error && <p className="text-sm text-destructive">{error}</p>}
         <Button type="submit" className="w-full" disabled={loading}>
-          {loading ? "Sending..." : "Send magic link"}
-        </Button>
-      </form>
-
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t" />
-        </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-background px-2 text-muted-foreground">or</span>
-        </div>
-      </div>
-
-      {/* Anonymous */}
-      <form action={signInAnonymously}>
-        <Button
-          type="submit"
-          variant="ghost"
-          className="w-full text-muted-foreground"
-          disabled={loading}
-        >
-          Continue without account
+          {loading
+            ? "Sending…"
+            : isAnonymous
+            ? "Continue with email"
+            : "Send magic link"}
         </Button>
       </form>
 
       <p className="text-center text-xs text-muted-foreground">
-        Anonymous users can vote. Create an account to submit questions.
+        {isAnonymous
+          ? "Your existing votes will be saved to your new account."
+          : "Anonymous users can vote. Create an account to submit questions."}
       </p>
     </div>
   );
