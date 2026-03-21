@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { PoliticianAvatar } from "@/components/politician/politician-avatar";
 
 export const metadata: Metadata = {
-  title: "U.S. Officials — WhyTho",
+  title: "U.S. Officials | WhyTho",
   description:
     "Browse the President, Cabinet, Governors, U.S. Senators, and Representatives. See their question response rates and hold them accountable.",
 };
@@ -134,12 +134,12 @@ export default async function FederalPage({
   const supabase = await createClient();
   const sel = "id, slug, full_name, office, state, party, photo_url";
 
-  // Always fetch all four groups — filter in UI based on `chamber`
+  // Always fetch all four groups - filter in UI based on `chamber`
   const [execRes, govRes, senRes, houseRes] = await Promise.all([
-    supabase.from("politicians").select(sel).eq("is_active", true).in("office", EXECUTIVE_OFFICES).order("full_name"),
-    supabase.from("politicians").select(sel).eq("is_active", true).eq("office", "Governor").order("state").order("full_name"),
-    supabase.from("politicians").select(sel).eq("is_active", true).eq("office", "U.S. Senator").order("state").order("full_name").limit(110),
-    supabase.from("politicians").select(sel).eq("is_active", true).eq("office", "U.S. Representative").order("state").order("full_name").limit(450),
+    supabase.from("politicians").select(sel).eq("is_active", true).eq("is_test", false).in("office", EXECUTIVE_OFFICES).order("full_name"),
+    supabase.from("politicians").select(sel).eq("is_active", true).eq("is_test", false).eq("office", "Governor").order("state").order("full_name"),
+    supabase.from("politicians").select(sel).eq("is_active", true).eq("is_test", false).eq("office", "U.S. Senator").order("state").order("full_name").limit(110),
+    supabase.from("politicians").select(sel).eq("is_active", true).eq("is_test", false).eq("office", "U.S. Representative").order("state").order("full_name").limit(450),
   ]);
 
   const executive = [...(execRes.data ?? [])].sort(

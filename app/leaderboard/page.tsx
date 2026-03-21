@@ -4,12 +4,12 @@ import { createClient } from "@/lib/supabase/server";
 import { PoliticianAvatar } from "@/components/politician/politician-avatar";
 
 export const metadata: Metadata = {
-  title: "Response Rate Leaderboard — WhyTho",
+  title: "Response Rate Leaderboard | WhyTho",
   description:
     "See which politicians answer their constituents' questions and which ones stay silent. Updated weekly.",
 };
 
-// Revalidate every hour — leaderboard is not real-time
+// Revalidate every hour - leaderboard is not real-time
 export const revalidate = 3600;
 
 interface LeaderboardRow {
@@ -69,7 +69,8 @@ export default async function LeaderboardPage() {
         office,
         state,
         party,
-        photo_url
+        photo_url,
+        is_test
       )
     `)
     .eq("week_number", weekNumber)
@@ -77,9 +78,9 @@ export default async function LeaderboardPage() {
     .order("participation_rate", { ascending: false, nullsFirst: false })
     .limit(200);
 
-  // Flatten the join
+  // Flatten the join — exclude test politicians
   const leaderboard: LeaderboardRow[] = (rows ?? [])
-    .filter((r) => r.politicians !== null)
+    .filter((r) => r.politicians !== null && !(r.politicians as { is_test?: boolean }).is_test)
     .map((r) => {
       const p = r.politicians as {
         slug: string;
@@ -88,6 +89,7 @@ export default async function LeaderboardPage() {
         state: string | null;
         party: string | null;
         photo_url: string | null;
+        is_test: boolean;
       };
       return {
         politician_id: r.politician_id,
@@ -160,7 +162,7 @@ export default async function LeaderboardPage() {
                 {/* Rate */}
                 <div className="shrink-0 text-right space-y-1">
                   <p className={`text-lg font-bold tabular-nums ${rateColor(row.participation_rate)}`}>
-                    {row.participation_rate !== null ? `${Math.round(row.participation_rate)}%` : "—"}
+                    {row.participation_rate !== null ? `${Math.round(row.participation_rate)}%` : "-"}
                   </p>
                   <p className="text-xs text-muted-foreground">
                     {row.answered_qualifying}/{row.qualifying_questions}

@@ -16,6 +16,7 @@ export async function GET(request: NextRequest) {
     .from("politicians")
     .select("id, slug, full_name, office, state, party, photo_url")
     .eq("is_active", true)
+    .eq("is_test", false)
     .ilike("full_name", `%${q}%`)
     .order("state", { ascending: true })
     .limit(8);
@@ -31,11 +32,11 @@ export async function GET(request: NextRequest) {
     result_limit: 8,
   });
 
-  // Merge, deduplicate by id, prefix match first
+  // Merge, deduplicate by id, prefix match first — exclude test politicians
   const seen = new Set((prefixResults ?? []).map((p) => p.id));
   const merged = [
     ...(prefixResults ?? []),
-    ...(trgmResults ?? []).filter((p: { id: string }) => !seen.has(p.id)),
+    ...(trgmResults ?? []).filter((p: { id: string; is_test?: boolean }) => !seen.has(p.id) && !p.is_test),
   ].slice(0, 8);
 
   return NextResponse.json({ politicians: merged });

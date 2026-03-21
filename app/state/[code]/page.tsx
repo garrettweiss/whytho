@@ -17,7 +17,7 @@ const TARGET_STATES: Record<string, string> = {
   az: "Arizona",
 };
 
-// Exclude federal offices — state page shows state-level only
+// Exclude federal offices - state page shows state-level only
 const FEDERAL_OFFICES = ["U.S. Senator", "U.S. Representative", "President", "Vice President"];
 
 interface Props {
@@ -27,10 +27,10 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { code } = await params;
   const stateName = TARGET_STATES[code.toLowerCase()];
-  if (!stateName) return { title: "State Not Found — WhyTho" };
+  if (!stateName) return { title: "State Not Found | WhyTho" };
 
   return {
-    title: `${stateName} State Politicians — WhyTho`,
+    title: `${stateName} State Politicians | WhyTho`,
     description: `Browse ${stateName} state legislators and governors. See their question response rates.`,
   };
 }
@@ -70,6 +70,7 @@ export default async function StatePage({ params }: Props) {
     .from("politicians")
     .select("id, slug, full_name, office, state, party, photo_url")
     .eq("is_active", true)
+    .eq("is_test", false)
     .eq("state", stateCode.toUpperCase())
     .not("office", "in", `(${FEDERAL_OFFICES.map((o) => `"${o}"`).join(",")})`)
     .order("office", { ascending: true })

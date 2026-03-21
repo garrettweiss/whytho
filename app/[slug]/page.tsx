@@ -24,9 +24,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     .eq("slug", slug)
     .single();
 
-  if (!politician) return { title: "Politician Not Found — WhyTho" };
+  if (!politician) return { title: "Politician Not Found | WhyTho" };
 
-  const title = `${politician.full_name} — WhyTho`;
+  const title = `${politician.full_name} | WhyTho`;
   const description = `Ask ${politician.full_name} (${politician.office}) a question. See their response rate and track whether they answer. Silence is its own answer.`;
 
   return {
@@ -77,6 +77,12 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
     .single();
 
   if (!politician) notFound();
+
+  // Test politicians are only visible to admins
+  if (politician.is_test) {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user || user.app_metadata?.is_admin !== true) notFound();
+  }
 
   // Current week number
   const { data: weekData } = await supabase.rpc("current_week_number");
@@ -139,7 +145,7 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
   } else if (period === "week") {
     questionsQuery = questionsQuery.eq("week_number", currentWeekNumber).limit(50);
   } else {
-    // month / year / all — filter by created_at date range
+    // month / year / all - filter by created_at date range
     const cutoff = periodCutoff(period);
     if (cutoff) {
       questionsQuery = questionsQuery.gte("created_at", cutoff);
@@ -207,7 +213,7 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
           {isHistoricalView && (
             <div className="rounded-lg border border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30 px-4 py-3 flex items-center justify-between gap-3">
               <p className="text-sm text-amber-800 dark:text-amber-300 font-medium">
-                📅 Viewing archive — {formatWeekNumber(viewingWeekNumber)}
+                📅 Viewing archive: {formatWeekNumber(viewingWeekNumber)}
               </p>
               <Link
                 href={`/${politician.slug}`}
@@ -232,14 +238,14 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
             isHistoricalView={isHistoricalView}
           />
 
-          {/* Period tabs — hidden in legacy archive view */}
+          {/* Period tabs - hidden in legacy archive view */}
           {!isHistoricalView && (
             <Suspense>
               <PeriodTabs slug={politician.slug} activePeriod={period} />
             </Suspense>
           )}
 
-          {/* Ask form — only on current week tab */}
+          {/* Ask form - only on current week tab */}
           {!isHistoricalView && period === "week" && (
             <AskQuestionForm
               politicianId={politician.id}
@@ -262,7 +268,7 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
   );
 }
 
-// Static generation for top politicians — rest are dynamic
+// Static generation for top politicians - rest are dynamic
 export async function generateStaticParams() {
   const { createAdminClient } = await import("@/lib/supabase/server");
   const supabase = createAdminClient();
@@ -271,6 +277,7 @@ export async function generateStaticParams() {
     .from("politicians")
     .select("slug")
     .eq("is_active", true)
+    .eq("is_test", false)
     .limit(1000);
 
   return (data ?? []).map((p) => ({ slug: p.slug }));

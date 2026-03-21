@@ -657,7 +657,7 @@ function StepMethods({
 
       {completedCount >= 2 && (
         <p className="mt-4 text-sm text-green-600 dark:text-green-400 font-medium text-center animate-pulse">
-          ✓ All methods complete — upgrading to Verified ✓…
+          ✓ All methods complete. Upgrading to Verified ✓…
         </p>
       )}
     </div>
@@ -696,12 +696,27 @@ function StepDone({ politicianSlug }: { politicianSlug: string }) {
 
 // ── Main Wizard ───────────────────────────────────────────────────────────────
 
-export function VerifyWizard() {
+export function VerifyWizard({ prefillId }: { prefillId?: string }) {
   const { user, isLoading } = useUser();
   const [step, setStep] = useState<WizardStep>("find");
   const [selectedPolitician, setSelectedPolitician] =
     useState<PoliticianResult | null>(null);
   const [claimedPoliticianId, setClaimedPoliticianId] = useState<string | null>(null);
+
+  // If prefillId is provided (from admin test-accounts page), fetch the politician
+  // and jump directly to the claim step — bypassing the search.
+  useEffect(() => {
+    if (!prefillId || isLoading || !user || user.is_anonymous) return;
+    fetch(`/api/politicians/prefill?id=${prefillId}`)
+      .then((r) => r.json())
+      .then((data: { politician?: PoliticianResult }) => {
+        if (data.politician) {
+          setSelectedPolitician(data.politician);
+          setStep("claim");
+        }
+      })
+      .catch(() => {/* fall through to normal find step */});
+  }, [prefillId, isLoading, user]);
 
   // Map step → index (1-based) for the indicator
   const stepIndex: Record<WizardStep, number> = {

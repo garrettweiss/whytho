@@ -2,12 +2,18 @@ import type { Metadata } from "next";
 import { VerifyWizard } from "@/components/verify/verify-wizard";
 
 export const metadata: Metadata = {
-  title: "Claim & Verify Your Profile — WhyTho",
+  title: "Claim & Verify Your Profile | WhyTho",
   description:
     "Are you an elected official? Claim your WhyTho profile and verify your identity to start answering constituent questions.",
 };
 
-export default function VerifyPage() {
+interface Props {
+  searchParams: Promise<{ prefill?: string }>;
+}
+
+export default async function VerifyPage({ searchParams }: Props) {
+  const { prefill } = await searchParams;
+
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-2xl px-4 py-12">
@@ -38,7 +44,7 @@ export default function VerifyPage() {
         </div>
 
         {/* Wizard */}
-        <VerifyWizard />
+        <VerifyWizard prefillId={prefill} />
 
         {/* Footer note */}
         <p className="mt-8 text-center text-xs text-muted-foreground">
