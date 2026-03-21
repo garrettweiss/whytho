@@ -250,11 +250,26 @@ function QuestionCard({
     setUserVote(next);
     startTransition(async () => {
       try {
-        const res = await fetch(`/api/votes`, {
+        const payload = JSON.stringify({ question_id: question.id, week_number: weekNumber, value: next === 0 ? null : next });
+        let res = await fetch(`/api/votes`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ question_id: question.id, week_number: weekNumber, value: next === 0 ? null : next }),
+          body: payload,
         });
+
+        // Not signed in — silently create an anonymous session then retry
+        if (res.status === 401) {
+          const supabase = createClient();
+          const { error: anonError } = await supabase.auth.signInAnonymously();
+          if (!anonError) {
+            res = await fetch(`/api/votes`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: payload,
+            });
+          }
+        }
+
         if (!res.ok) { setVotes((v) => v - delta); setUserVote(userVote); }
         else { onVoteSuccess?.(); }
       } catch {
