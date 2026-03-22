@@ -8,6 +8,12 @@
 
 ---
 
+## Writing Style Rules
+
+- **No em dashes (—) anywhere.** This applies to all output: UI copy, emails, X posts, code comments, docs, everything. Use a comma, colon, or rewrite the sentence instead.
+
+---
+
 ## Non-Negotiable Product Rules
 
 1. Platform works without politician participation — non-response IS the product
@@ -145,6 +151,32 @@ CLOUDFLARE_TURNSTILE_SECRET_KEY   RESEND_API_KEY
 FEC_API_KEY                       OPENSTATES_API_KEY
 VOTESMART_API_KEY                 CONGRESS_API_KEY
 ```
+
+---
+
+## Bypass Permissions Mode Rules
+
+These rules apply at all times but are critical when bypass/dangerouslySkipPermissions mode is active (no confirmation prompts). They are non-negotiable.
+
+**Hard stops — require explicit instruction in the same message:**
+
+- `git push --force` to `main` or `staging`
+- `git reset --hard`, `git checkout .`, `git restore .`, `git clean -f`
+- `--no-verify` on any commit or push
+- `DROP TABLE`, `DROP COLUMN`, `TRUNCATE` on any production table
+- Any migration that removes or renames production data
+- `vercel --prod` deploy or merging to `main`
+- Overwriting `.env.local` or any `.env*` file
+- Deleting files outside the project directory
+
+**External communication — always show draft + recipient and wait for approval:**
+
+- iMessages, emails, Slack messages to anyone other than Garrett
+- X posts via jack-herald.ts or jack-diplomat.ts: always `--dry-run` first, then explicit "go live" instruction before real send
+
+**Scope rule:** Vague instructions ("clean things up", "do all next steps") do NOT authorize any action in the hard-stops list. When in doubt, stop and ask.
+
+**Risk explanations:** When flagging an action for review, explain the risk in one plain-English sentence: what gets destroyed or who gets affected. No jargon. Example: "This deletes the column and all its data — can't be undone without a restore."
 
 ---
 

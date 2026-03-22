@@ -25,7 +25,7 @@ import { createClient } from "@/lib/supabase/client";
  *   week_number) prevents double-voting.
  */
 
-export function SignInForm() {
+export function SignInForm({ redirectAfter = "/" }: { redirectAfter?: string }) {
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -47,7 +47,8 @@ export function SignInForm() {
     setError(null);
     setInfo(null);
     const supabase = createClient();
-    const redirectTo = `${window.location.origin}/auth/callback`;
+    const next = redirectAfter !== "/" ? `?next=${encodeURIComponent(redirectAfter)}` : "";
+    const redirectTo = `${window.location.origin}/auth/callback${next}`;
 
     if (isAnonymous) {
       // Upgrade path: link Google identity to the existing anonymous account.
@@ -108,6 +109,8 @@ export function SignInForm() {
     }
 
     const supabase = createClient();
+    const next = redirectAfter !== "/" ? `?next=${encodeURIComponent(redirectAfter)}` : "";
+    const callbackUrl = `${window.location.origin}/auth/callback${next}`;
 
     if (isAnonymous) {
       // Upgrade path: link email to the existing anonymous account.
@@ -115,7 +118,7 @@ export function SignInForm() {
       // anonymous account gets the email attached (user_id unchanged).
       const { error: updateError } = await supabase.auth.updateUser(
         { email },
-        { emailRedirectTo: `${window.location.origin}/auth/callback` }
+        { emailRedirectTo: callbackUrl }
       );
 
       if (!updateError || updateError.message.toLowerCase().includes("already registered")) {
@@ -135,7 +138,7 @@ export function SignInForm() {
     const { error: otpError } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo: callbackUrl,
       },
     });
 

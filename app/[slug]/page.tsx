@@ -78,10 +78,24 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
 
   if (!politician) notFound();
 
+  // Get current user for access control + owner detection
+  const { data: { user } } = await supabase.auth.getUser();
+
   // Test politicians are only visible to admins
   if (politician.is_test) {
-    const { data: { user } } = await supabase.auth.getUser();
     if (!user || user.app_metadata?.is_admin !== true) notFound();
+  }
+
+  // Check if the current logged-in user is a team member for this politician (owner view)
+  let isOwner = false;
+  if (user && !user.is_anonymous) {
+    const { data: membership } = await supabase
+      .from("politician_team")
+      .select("id")
+      .eq("politician_id", politician.id)
+      .eq("user_id", user.id)
+      .maybeSingle();
+    isOwner = !!membership;
   }
 
   // Current week number
@@ -182,7 +196,7 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
     .order("week_number", { ascending: false })
     .limit(8);
 
-  const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://whytho-alpha.vercel.app";
+  const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://whytho.us";
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Person",
@@ -220,6 +234,36 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
                 className="text-xs text-amber-700 dark:text-amber-400 underline underline-offset-2 hover:no-underline shrink-0"
               >
                 → Current week
+              </Link>
+            </div>
+          )}
+
+          {/* Owner banner — shown when the logged-in user manages this profile */}
+          {isOwner && (
+            <div className="rounded-lg border border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/30 px-4 py-3 flex items-center justify-between gap-3">
+              <p className="text-sm text-blue-800 dark:text-blue-300 font-medium">
+                You are viewing your public profile.
+              </p>
+              <Link
+                href="/dashboard"
+                className="shrink-0 text-sm font-medium text-blue-700 dark:text-blue-400 underline underline-offset-2 hover:no-underline"
+              >
+                Go to Dashboard →
+              </Link>
+            </div>
+          )}
+
+          {/* Unclaimed prompt — shown only when not the owner */}
+          {!isOwner && politician.verification_tier === "0" && (
+            <div className="rounded-lg border bg-card px-4 py-3 flex items-center justify-between gap-3">
+              <p className="text-sm text-muted-foreground">
+                This profile is unclaimed. Are you {politician.full_name}?
+              </p>
+              <Link
+                href={`/verify?prefill=${politician.id}`}
+                className="shrink-0 text-sm font-medium underline underline-offset-2 hover:no-underline"
+              >
+                Claim this profile →
               </Link>
             </div>
           )}

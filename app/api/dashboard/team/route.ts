@@ -9,8 +9,9 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/server";
+import { createClient, createAdminClient } from "@/lib/supabase/server";
+import { getResend, FROM_EMAIL } from "@/lib/email/resend";
+import { teamInviteEmail } from "@/lib/email/templates";
 
 // ── GET /api/dashboard/team?politician_id=xxx ─────────────────────────────────
 
@@ -149,6 +150,29 @@ export async function POST(req: NextRequest) {
     .single();
 
   if (insertError) return NextResponse.json({ error: insertError.message }, { status: 500 });
+
+  // Fire-and-forget: notify the new team member
+  void (async () => {
+    try {
+      const inviteeEmail = invitee.email;
+      if (!inviteeEmail) return;
+      const [{ data: pol }, { data: inviterProfile }] = await Promise.all([
+        admin.from("politicians").select("full_name, slug").eq("id", politician_id).single(),
+        admin.from("user_profiles").select("display_name").eq("id", user.id).maybeSingle(),
+      ]);
+      if (!pol) return;
+      const inviterName = inviterProfile?.display_name ?? user.email ?? "A team admin";
+      const { subject, html, text } = teamInviteEmail({
+        politicianName: pol.full_name,
+        politicianSlug: pol.slug,
+        role,
+        inviterName,
+      });
+      await getResend().emails.send({ from: FROM_EMAIL, to: inviteeEmail, subject, html, text });
+    } catch {
+      // Never let email errors affect the API response
+    }
+  })();
 
   return NextResponse.json({ member: newMember, email: invitee.email }, { status: 201 });
 }

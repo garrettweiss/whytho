@@ -2,6 +2,13 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+@keyframes politician-rain-fall {
+  0%   { transform: translateY(0);      opacity: 0; }
+  8%   { opacity: 1; }
+  88%  { opacity: 1; }
+  100% { transform: translateY(110vh);  opacity: 0; }
+}
+
 @custom-variant dark (&:is(.dark *));
 
 :root {

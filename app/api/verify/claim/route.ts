@@ -13,6 +13,8 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
+import { getResend, FROM_EMAIL } from "@/lib/email/resend";
+import { claimWelcomeEmail } from "@/lib/email/templates";
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
@@ -87,6 +89,27 @@ export async function POST(request: NextRequest) {
   if (tierErr) {
     return NextResponse.json({ error: tierErr.message }, { status: 500 });
   }
+
+  // Fire-and-forget: send welcome email to the claimer
+  void (async () => {
+    try {
+      const email = user.email;
+      if (!email) return;
+      const { data: pol } = await admin
+        .from("politicians")
+        .select("slug")
+        .eq("id", body.politician_id!)
+        .single();
+      if (!pol) return;
+      const { subject, html, text } = claimWelcomeEmail({
+        politicianName: politician.full_name,
+        politicianSlug: pol.slug,
+      });
+      await getResend().emails.send({ from: FROM_EMAIL, to: email, subject, html, text });
+    } catch {
+      // Never let email errors affect the API response
+    }
+  })();
 
   return NextResponse.json({
     success: true,

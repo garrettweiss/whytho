@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createAdminClient } from "@/lib/supabase/server";
+import { getResend, FROM_EMAIL } from "@/lib/email/resend";
+import { qualifyingQuestionAlertEmail } from "@/lib/email/templates";
 
 interface VoteBody {
   question_id: string;
@@ -76,6 +78,49 @@ export async function POST(request: NextRequest) {
       const status = error.code === "23505" ? 409 : 500;
       return NextResponse.json({ error: error.message }, { status });
     }
+
+    // Fire-and-forget: notify politician team if this vote just crossed the qualifying threshold
+    void (async () => {
+      try {
+        if (value !== 1) return; // Only upvotes can cross the threshold
+        const admin = createAdminClient();
+        const { data: q } = await admin
+          .from("questions")
+          .select("id, body, net_upvotes, politician_id")
+          .eq("id", question_id)
+          .single();
+        // Exactly 10 means this vote just crossed the threshold
+        if (!q || q.net_upvotes !== 10) return;
+
+        const [{ data: pol }, { data: teamMembers }] = await Promise.all([
+          admin.from("politicians").select("full_name, slug").eq("id", q.politician_id).single(),
+          admin.from("politician_team").select("user_id").eq("politician_id", q.politician_id),
+        ]);
+        if (!pol || !teamMembers?.length) return;
+
+        // Fetch team member emails
+        const emailPromises = teamMembers.map(async (m) => {
+          const { data } = await admin.auth.admin.getUserById(m.user_id);
+          return data?.user?.email ?? null;
+        });
+        const emails = (await Promise.all(emailPromises)).filter(Boolean) as string[];
+        if (!emails.length) return;
+
+        const { subject, html, text } = qualifyingQuestionAlertEmail({
+          politicianName: pol.full_name,
+          politicianSlug: pol.slug,
+          questionBody: q.body,
+          netUpvotes: q.net_upvotes,
+        });
+        await Promise.all(
+          emails.map((to) =>
+            getResend().emails.send({ from: FROM_EMAIL, to, subject, html, text })
+          )
+        );
+      } catch {
+        // Never let notification errors affect the vote response
+      }
+    })();
 
     return NextResponse.json({ success: true });
   } catch {

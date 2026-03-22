@@ -299,7 +299,7 @@ function QuestionCard({
         {/* Content */}
         <div className="flex-1 min-w-0">
           {question.is_seeded && (
-            <p className="text-xs text-muted-foreground mb-1">💡 WhyTho suggested question</p>
+            <p className="text-xs text-muted-foreground mb-1">📋 Suggested Question — AI-generated from public record</p>
           )}
           {question.source === "x" && question.x_posts && (
             <p className="text-xs text-muted-foreground mb-1">

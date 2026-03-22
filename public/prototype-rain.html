@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WhyTho — Politician Rain Prototype</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #09090b;
+      color: #fafafa;
+      min-height: 100vh;
+    }
+
+    /* Simulated page content */
+    .page-content {
+      max-width: 48rem;
+      margin: 0 auto;
+      padding: 3.5rem 1rem 5rem;
+    }
+
+    .hero-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #71717a;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-title {
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      font-weight: 800;
+      line-height: 1.05;
+      margin-bottom: 1.5rem;
+      letter-spacing: -0.03em;
+    }
+
+    .hero-title em {
+      font-style: normal;
+      color: #71717a;
+    }
+
+    .hero-desc {
+      font-size: 1.125rem;
+      color: #a1a1aa;
+      max-width: 36rem;
+      line-height: 1.7;
+      margin-bottom: 2.5rem;
+    }
+
+    .search-box {
+      background: #18181b;
+      border: 1px solid #27272a;
+      border-radius: 0.75rem;
+      padding: 1rem 1.25rem;
+      font-size: 1rem;
+      color: #52525b;
+      width: 100%;
+      max-width: 28rem;
+      cursor: text;
+    }
+
+    .stats {
+      display: flex;
+      gap: 2.5rem;
+      margin-top: 3rem;
+      padding-top: 3rem;
+      border-top: 1px solid #27272a;
+    }
+
+    .stat-label { font-size: 0.8rem; color: #52525b; margin-top: 0.25rem; }
+    .stat-number { font-size: 1.75rem; font-weight: 700; }
+
+    /* ---- RAIN LAYER ---- */
+    /* Content is max-w-3xl (768px) + rain column (280px) + breathing room = ~1100px min */
+    @media (max-width: 1099px) {
+      .rain-column { display: none; }
+    }
+
+    .rain-column {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 280px;
+      height: 100vh;
+      overflow: hidden;
+      pointer-events: none;
+      /* subtle right-edge fade */
+      -webkit-mask-image: linear-gradient(to left, transparent 0%, black 30%);
+      mask-image: linear-gradient(to left, transparent 0%, black 30%);
+    }
+
+    /* Top + bottom fade so drops appear/disappear gracefully */
+    .rain-column::before, .rain-column::after {
+      content: '';
+      position: absolute;
+      left: 0; right: 0;
+      height: 120px;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .rain-column::before {
+      top: 0;
+      background: linear-gradient(to bottom, #09090b 0%, transparent 100%);
+    }
+    .rain-column::after {
+      bottom: 0;
+      background: linear-gradient(to top, #09090b 0%, transparent 100%);
+    }
+
+    /* Each raindrop card */
+    .drop {
+      position: absolute;
+      top: -140px;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      background: #18181b;
+      border: 1px solid #27272a;
+      border-radius: 0.625rem;
+      padding: 0.5rem 0.625rem;
+      width: 220px;
+      pointer-events: auto;
+      cursor: pointer;
+      text-decoration: none;
+      animation: fall linear forwards;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .drop:hover {
+      border-color: #3f3f46;
+      background: #1f1f23;
+      animation-play-state: paused;
+    }
+
+    .drop-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: #27272a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.625rem;
+      font-weight: 700;
+      color: #a1a1aa;
+      overflow: hidden;
+    }
+
+    .drop-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .drop-text {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .drop-name {
+      font-size: 0.625rem;
+      font-weight: 600;
+      color: #71717a;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 0.2rem;
+    }
+
+    .drop-question {
+      font-size: 0.7rem;
+      color: #a1a1aa;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    @keyframes fall {
+      0%   { transform: translateY(0);      opacity: 0; }
+      8%   { opacity: 1; }
+      88%  { opacity: 1; }
+      100% { transform: translateY(110vh);  opacity: 0; }
+    }
+
+    /* Prototype controls */
+    .controls {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #18181b;
+      border: 1px solid #27272a;
+      border-radius: 0.75rem;
+      padding: 0.75rem 1.25rem;
+      font-size: 0.75rem;
+      color: #71717a;
+      text-align: center;
+      z-index: 100;
+    }
+
+    .controls strong { color: #fafafa; }
+  </style>
+</head>
+<body>
+
+  <!-- Simulated homepage content -->
+  <div class="page-content">
+    <p class="hero-label">Civic Accountability</p>
+    <h1 class="hero-title">
+      Ask your rep.<br>
+      <em>Their silence speaks<br>for itself.</em>
+    </h1>
+    <p class="hero-desc">
+      The public submits and upvotes questions for US politicians every week.
+      Questions reset Monday. Participation rate is always public.
+    </p>
+    <div class="search-box">🔍 &nbsp; Search a politician...</div>
+    <div class="stats">
+      <div>
+        <div class="stat-number">6,400+</div>
+        <div class="stat-label">Politicians tracked</div>
+      </div>
+      <div>
+        <div class="stat-number">102,841</div>
+        <div class="stat-label">Questions this week</div>
+      </div>
+      <div>
+        <div class="stat-number">4%</div>
+        <div class="stat-label">Average response rate</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rain layer -->
+  <div class="rain-column" id="rainColumn"></div>
+
+  <div class="controls">
+    <strong>Prototype</strong> — right-side politician rain · hover to pause a card
+  </div>
+
+<script>
+  // Sample data — slug + questionId let us build a deep link to the exact question
+  const politicians = [
+    { name: "Gabe Evans", initials: "GE", slug: "gabe-evans-colorado",
+      question: "Why did you vote against the Infrastructure Bill after campaigning on roads?", questionId: "q-001" },
+    { name: "Alexandria Ocasio-Cortez", initials: "AO", slug: "alexandria-ocasio-cortez-new-york",
+      question: "What is your plan for reducing student loan debt beyond forgiveness?", questionId: "q-002" },
+    { name: "Marco Rubio", initials: "MR", slug: "marco-rubio-florida",
+      question: "Do you support term limits for members of Congress?", questionId: "q-003" },
+    { name: "Katie Porter", initials: "KP", slug: "katie-porter-california",
+      question: "How do you plan to address the housing affordability crisis in CA?", questionId: "q-004" },
+    { name: "Josh Hawley", initials: "JH", slug: "josh-hawley-missouri",
+      question: "Will you commit to not accepting PAC money in your next campaign?", questionId: "q-005" },
+    { name: "Ilhan Omar", initials: "IO", slug: "ilhan-omar-minnesota",
+      question: "What concrete steps have you taken on criminal justice reform this term?", questionId: "q-006" },
+    { name: "Ted Cruz", initials: "TC", slug: "ted-cruz-texas",
+      question: "Can you explain your position on expanding Social Security benefits?", questionId: "q-007" },
+    { name: "Mike Johnson", initials: "MJ", slug: "mike-johnson-louisiana",
+      question: "What is your timeline for addressing the national debt ceiling?", questionId: "q-008" },
+    { name: "Rand Paul", initials: "RP", slug: "rand-paul-kentucky",
+      question: "Would you support an audit of Pentagon spending programs?", questionId: "q-009" },
+    { name: "Hakeem Jeffries", initials: "HJ", slug: "hakeem-jeffries-new-york",
+      question: "What is your priority legislation if Democrats retake the House?", questionId: "q-010" },
+  ];
+
+  // 3 lanes with enough horizontal separation to avoid overlap
+  const LANES = [0, 28, 56]; // px from left of rain column
+  const CARD_HEIGHT = 80;    // approximate px height of a card
+  const MIN_GAP_MS = 3800;   // minimum ms between spawns in the same lane
+
+  // Track the last spawn time per lane
+  const laneLastSpawn = LANES.map(() => -Infinity);
+  // Track active drop count
+  let activeDrops = 0;
+  const MAX_DROPS = 5;
+
+  const column = document.getElementById('rainColumn');
+
+  function randomFrom(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  function shuffle(arr) {
+    return [...arr].sort(() => Math.random() - 0.5);
+  }
+
+  // Deck: cycle through all politicians in shuffled order before repeating
+  let deck = shuffle(politicians);
+  let deckIdx = 0;
+  function nextPolitician() {
+    if (deckIdx >= deck.length) { deck = shuffle(politicians); deckIdx = 0; }
+    return deck[deckIdx++];
+  }
+
+  function spawnDrop(laneIdx, delayOffset = 0) {
+    const pol = nextPolitician();
+    const speed = 14 + Math.random() * 8; // 14–22s
+    const href = `/${pol.slug}#${pol.questionId}`;
+
+    const drop = document.createElement('a');
+    drop.className = 'drop';
+    drop.href = href;
+    drop.style.left = LANES[laneIdx] + 'px';
+    drop.style.animationDuration = speed + 's';
+    drop.style.animationDelay = delayOffset ? `-${delayOffset}s` : '0s';
+
+    drop.innerHTML = `
+      <div class="drop-avatar">${pol.initials}</div>
+      <div class="drop-text">
+        <div class="drop-name">${pol.name}</div>
+        <div class="drop-question">${pol.question}</div>
+      </div>
+    `;
+
+    laneLastSpawn[laneIdx] = Date.now();
+    activeDrops++;
+    column.appendChild(drop);
+
+    // Remove when animation completes and schedule next in this lane
+    drop.addEventListener('animationend', () => {
+      drop.remove();
+      activeDrops--;
+      scheduleNextInLane(laneIdx);
+    });
+  }
+
+  function scheduleNextInLane(laneIdx) {
+    if (activeDrops >= MAX_DROPS) return;
+    // Random wait between 2.5–6s before next card in this lane
+    const wait = 2500 + Math.random() * 3500;
+    setTimeout(() => spawnDrop(laneIdx), wait);
+  }
+
+  // Stagger initial spawns across lanes so they don't all start at top together
+  LANES.forEach((_, i) => {
+    const initialDelay = i * 2200 + Math.random() * 1500;
+    // Start partway through the screen so page feels alive immediately
+    const offsetIntoAnimation = 2 + i * 3;
+    setTimeout(() => spawnDrop(i, offsetIntoAnimation), initialDelay);
+  });
+</script>
+
+</body>
+</html>
