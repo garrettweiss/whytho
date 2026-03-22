@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useUser } from "@/lib/auth/use-user";
+import { useIsPolitician } from "@/lib/auth/use-is-politician";
 
 const NAV_LINKS = [
   { href: "/", label: "Home" },
@@ -25,6 +26,7 @@ export function SiteNav() {
 
   const isLoggedIn = user && !user.is_anonymous;
   const avatarInitial = user?.email?.[0]?.toUpperCase() ?? "U";
+  const isPolitician = useIsPolitician(isLoggedIn ? user : null);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -127,13 +129,24 @@ export function SiteNav() {
                     >
                       My Votes
                     </button>
-                    <button
-                      role="menuitem"
-                      onClick={() => navigate("/dashboard")}
-                      className="w-full text-left px-3 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground transition-colors"
-                    >
-                      Dashboard
-                    </button>
+                    {isPolitician && (
+                      <button
+                        role="menuitem"
+                        onClick={() => navigate("/dashboard")}
+                        className="w-full text-left px-3 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground transition-colors"
+                      >
+                        Dashboard
+                      </button>
+                    )}
+                    {!isPolitician && (
+                      <button
+                        role="menuitem"
+                        onClick={() => navigate("/verify")}
+                        className="w-full text-left px-3 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground transition-colors"
+                      >
+                        Claim your profile
+                      </button>
+                    )}
                     <div className="my-1 h-px bg-border" />
                     <button
                       role="menuitem"
