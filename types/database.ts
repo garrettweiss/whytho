@@ -84,6 +84,7 @@ export type Database = {
           id: string
           is_ai_generated: boolean
           is_disputed: boolean
+          is_draft: boolean
           politician_id: string
           published_by: string | null
           question_id: string
@@ -100,6 +101,7 @@ export type Database = {
           id?: string
           is_ai_generated?: boolean
           is_disputed?: boolean
+          is_draft?: boolean
           politician_id: string
           published_by?: string | null
           question_id: string
@@ -116,6 +118,7 @@ export type Database = {
           id?: string
           is_ai_generated?: boolean
           is_disputed?: boolean
+          is_draft?: boolean
           politician_id?: string
           published_by?: string | null
           question_id?: string

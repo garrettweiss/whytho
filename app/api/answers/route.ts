@@ -24,7 +24,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
 import type { Json } from "@/types/database";
 import { getResend, FROM_EMAIL } from "@/lib/email/resend";
-import { answerNotificationEmail } from "@/lib/email/templates";
+import { answerNotificationEmail, draftAnswerNotificationEmail } from "@/lib/email/templates";
 
 const MIN_BODY = 10;
 const MAX_BODY = 5000;
@@ -127,13 +127,17 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  // Idempotency: check if this politician already answered this question
+  // Responders submit drafts; admins/editors go live immediately
+  const isDraft = role === "responder";
+
+  // Idempotency: check if this politician already has a live answer for this question
   const { data: existing } = await admin
     .from("answers")
     .select("id")
     .eq("question_id", question.id)
     .in("answer_type", ["direct", "team_statement"])
     .eq("is_ai_generated", false)
+    .eq("is_draft", false)
     .maybeSingle();
 
   if (existing) {
@@ -153,6 +157,7 @@ export async function POST(request: NextRequest) {
       answer_type: answerType,
       is_ai_generated: false,
       is_disputed: false,
+      is_draft: isDraft,
       ai_confidence: null,
       body: answerText,
       sources: (sources.length > 0 ? sources : []) as unknown as Json,
@@ -165,9 +170,42 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: insertErr.message }, { status: 500 });
   }
 
-  // Fire-and-forget: notify the question submitter via email
+  // Fire-and-forget: notify team admins/editors when a responder submits a draft
+  if (isDraft) {
+    void (async () => {
+      try {
+        const [{ data: politician }, { data: teamMembers }, { data: submitterData }, { data: q }] = await Promise.all([
+          admin.from("politicians").select("full_name, slug").eq("id", question.politician_id).single(),
+          admin.from("politician_team").select("user_id, role").eq("politician_id", question.politician_id).in("role", ["admin", "editor"]),
+          admin.auth.admin.getUserById(user.id),
+          admin.from("questions").select("body").eq("id", question.id).single(),
+        ]);
+        if (!politician || !q || !teamMembers?.length) return;
+        const submitterName = submitterData?.user?.email ?? "A team responder";
+
+        await Promise.all(
+          teamMembers.map(async (member) => {
+            const { data: memberData } = await admin.auth.admin.getUserById(member.user_id);
+            const memberEmail = memberData?.user?.email;
+            if (!memberEmail) return;
+            const { subject, html, text } = draftAnswerNotificationEmail({
+              politicianName: politician.full_name,
+              politicianSlug: politician.slug,
+              questionBody: q.body,
+              draftBody: answerText,
+              submitterName,
+            });
+            await getResend().emails.send({ from: FROM_EMAIL, to: memberEmail, subject, html, text });
+          })
+        );
+      } catch { }
+    })();
+  }
+
+  // Fire-and-forget: notify the question submitter via email (live answers only)
   void (async () => {
     try {
+      if (isDraft) return; // don't notify constituent until answer is approved
       if (!question.submitted_by) return;
 
       // Fetch question submitter's email + politician name
@@ -182,6 +220,14 @@ export async function POST(request: NextRequest) {
 
       const email = submitterData?.user?.email;
       if (!email || !politician) return;
+
+      // Respect the submitter's notification preference
+      const { data: profile } = await admin
+        .from("user_profiles")
+        .select("notify_answer")
+        .eq("id", question.submitted_by!)
+        .maybeSingle();
+      if (profile && profile.notify_answer === false) return;
 
       // Fetch question body
       const { data: q } = await admin
@@ -215,5 +261,6 @@ export async function POST(request: NextRequest) {
     success: true,
     answer_id: answer?.id,
     answer_type: answerType,
+    is_draft: isDraft,
   });
 }

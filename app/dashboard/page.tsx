@@ -7,6 +7,7 @@ import { TeamManager } from "@/components/dashboard/team-manager";
 import { ProfileEditor } from "@/components/dashboard/profile-editor";
 import { DisputeClientButton } from "@/components/dashboard/dispute-button";
 import { AnswerEditButton } from "@/components/dashboard/answer-edit-button";
+import { DraftApproveButton } from "@/components/dashboard/draft-approve-button";
 
 export const metadata: Metadata = {
   title: "Politician Dashboard | WhyTho",
@@ -18,6 +19,7 @@ type AnswerRow = {
   answer_type: string;
   body: string;
   is_ai_generated: boolean;
+  is_draft: boolean;
   created_at: string;
 };
 
@@ -28,6 +30,14 @@ type QuestionRow = {
   week_number: number;
   created_at: string;
   answers: AnswerRow[];
+};
+
+type DraftRow = {
+  id: string;
+  body: string;
+  created_at: string;
+  question_id: string;
+  question_body: string;
 };
 
 const QUALIFYING_THRESHOLD = 10;
@@ -64,7 +74,7 @@ function QuestionCard({
   isNew: boolean;
 }) {
   const officialAnswer = question.answers.find((a) =>
-    ["direct", "team_statement"].includes(a.answer_type) && !a.is_ai_generated
+    ["direct", "team_statement"].includes(a.answer_type) && !a.is_ai_generated && !a.is_draft
   );
   const aiAnswer = question.answers.find(
     (a) => a.answer_type === "ai_analysis" && a.is_ai_generated
@@ -219,6 +229,7 @@ export default async function DashboardPage() {
     };
     role: string;
     questions: QuestionRow[];
+    drafts: DraftRow[];
     participationRate: number | null;
     stats: { totalQuestions: number; totalAnswers: number; thisWeekQuestions: number };
   };
@@ -237,10 +248,11 @@ export default async function DashboardPage() {
       { count: totalQuestions },
       { count: totalAnswers },
       { count: thisWeekQuestions },
+      { data: rawDrafts },
     ] = await Promise.all([
       supabase
         .from("questions")
-        .select(`id, body, net_upvotes, week_number, created_at, answers ( id, answer_type, body, is_ai_generated, created_at )`)
+        .select(`id, body, net_upvotes, week_number, created_at, answers ( id, answer_type, body, is_ai_generated, is_draft, created_at )`)
         .eq("politician_id", politician.id)
         .eq("week_number", currentWeekNumber)
         .eq("status", "active")
@@ -254,15 +266,38 @@ export default async function DashboardPage() {
       supabase.from("questions").select("*", { count: "exact", head: true })
         .eq("politician_id", politician.id).eq("status", "active"),
       supabase.from("answers").select("*", { count: "exact", head: true })
-        .eq("politician_id", politician.id).eq("is_ai_generated", false),
+        .eq("politician_id", politician.id).eq("is_ai_generated", false).eq("is_draft", false),
       supabase.from("questions").select("*", { count: "exact", head: true })
         .eq("politician_id", politician.id).eq("week_number", currentWeekNumber).eq("status", "active"),
+      // Fetch pending drafts (only relevant for admin/editor roles)
+      ["admin", "editor"].includes(membership.role)
+        ? supabase
+            .from("answers")
+            .select(`id, body, created_at, question_id, questions ( body )`)
+            .eq("politician_id", politician.id)
+            .eq("is_draft", true)
+            .eq("is_ai_generated", false)
+            .order("created_at", { ascending: true })
+        : Promise.resolve({ data: [] }),
     ]);
+
+    // Normalize rawDrafts (questions is a joined object)
+    const drafts: DraftRow[] = (rawDrafts ?? []).map((d) => {
+      const q = Array.isArray(d.questions) ? d.questions[0] : d.questions;
+      return {
+        id: d.id,
+        body: d.body,
+        created_at: d.created_at,
+        question_id: d.question_id,
+        question_body: (q as { body: string } | null)?.body ?? "",
+      };
+    });
 
     politiciansData.push({
       politician,
       role: membership.role,
       questions: (questions ?? []) as QuestionRow[],
+      drafts,
       participationRate: rateData as number | null,
       stats: {
         totalQuestions: totalQuestions ?? 0,
@@ -291,10 +326,10 @@ export default async function DashboardPage() {
           </Link>
         </div>
 
-        {politiciansData.map(({ politician, role, questions, participationRate, stats }) => {
+        {politiciansData.map(({ politician, role, questions, drafts, participationRate, stats }) => {
           const unansweredCount = questions.filter(
             (q) => !q.answers.some(
-              (a) => ["direct", "team_statement"].includes(a.answer_type) && !a.is_ai_generated
+              (a) => ["direct", "team_statement"].includes(a.answer_type) && !a.is_ai_generated && !a.is_draft
             )
           ).length;
 
@@ -364,6 +399,33 @@ export default async function DashboardPage() {
                 )}
               </div>
 
+              {/* Draft queue (admin/editor only) */}
+              {["admin", "editor"].includes(role) && drafts.length > 0 && (
+                <div className="rounded-xl border border-amber-200 bg-amber-50/50 dark:border-amber-800 dark:bg-amber-950/20 overflow-hidden">
+                  <div className="px-4 py-3 border-b border-amber-200 dark:border-amber-800">
+                    <p className="text-sm font-medium text-amber-800 dark:text-amber-300">
+                      {drafts.length} draft response{drafts.length !== 1 ? "s" : ""} awaiting approval
+                    </p>
+                    <p className="text-xs text-amber-700 dark:text-amber-400 mt-0.5">
+                      Submitted by a responder. Review and approve to publish.
+                    </p>
+                  </div>
+                  <div className="divide-y divide-amber-200 dark:divide-amber-800">
+                    {drafts.map((draft) => (
+                      <div key={draft.id} className="px-4 py-4 space-y-2">
+                        <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Question</p>
+                        <p className="text-sm text-muted-foreground">{draft.question_body}</p>
+                        <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide mt-2">Draft Response</p>
+                        <p className="text-sm">{draft.body}</p>
+                        <div className="pt-1">
+                          <DraftApproveButton answerId={draft.id} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Question inbox */}
               {questions.length === 0 ? (
                 <div className="rounded-xl border bg-card p-8 text-center">
@@ -397,7 +459,7 @@ export default async function DashboardPage() {
 
                   {questions.map((question) => {
                     const hasOfficialAnswer = question.answers.some(
-                      (a) => ["direct", "team_statement"].includes(a.answer_type) && !a.is_ai_generated
+                      (a) => ["direct", "team_statement"].includes(a.answer_type) && !a.is_ai_generated && !a.is_draft
                     );
                     const isNew = question.created_at > cutoff48h;
                     return (
