@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { AnswerComposer } from "@/components/answers/answer-composer";
 import { TeamManager } from "@/components/dashboard/team-manager";
@@ -167,6 +168,13 @@ export default async function DashboardPage() {
 
   if (!user || user.is_anonymous) {
     redirect("/sign-in?redirect=/dashboard");
+  }
+
+  // Respect the view mode toggle — citizens (or politicians in citizen mode) cannot access dashboard
+  const cookieStore = await cookies();
+  const viewMode = cookieStore.get("whytho-view-mode")?.value;
+  if (viewMode === "citizen") {
+    redirect("/");
   }
 
   const { data: weekData } = await supabase.rpc("current_week_number");

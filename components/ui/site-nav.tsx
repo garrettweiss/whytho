@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useUser } from "@/lib/auth/use-user";
 import { useIsPolitician } from "@/lib/auth/use-is-politician";
+import { useViewMode } from "@/lib/auth/use-view-mode";
 
 const NAV_LINKS = [
   { href: "/", label: "Home" },
@@ -27,6 +28,8 @@ export function SiteNav() {
   const isLoggedIn = user && !user.is_anonymous;
   const avatarInitial = user?.email?.[0]?.toUpperCase() ?? "U";
   const isPolitician = useIsPolitician(isLoggedIn ? user : null);
+  const { mode, toggle, ready: modeReady } = useViewMode(isPolitician);
+  const inPoliticianMode = isPolitician && modeReady && mode === "politician";
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -97,7 +100,7 @@ export function SiteNav() {
                   aria-expanded={menuOpen}
                   aria-haspopup="menu"
                   onClick={() => setMenuOpen((o) => !o)}
-                  className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
+                  className={`flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer ${inPoliticianMode ? "ring-2 ring-red-500 ring-offset-1 ring-offset-background" : ""}`}
                 >
                   {avatarInitial}
                 </button>
@@ -129,7 +132,7 @@ export function SiteNav() {
                     >
                       My Votes
                     </button>
-                    {isPolitician && (
+                    {inPoliticianMode && (
                       <button
                         role="menuitem"
                         onClick={() => navigate("/dashboard")}
@@ -146,6 +149,21 @@ export function SiteNav() {
                       >
                         Claim your profile
                       </button>
+                    )}
+                    {isPolitician && modeReady && (
+                      <>
+                        <div className="my-1 h-px bg-border" />
+                        <button
+                          role="menuitem"
+                          onClick={() => { toggle(); setMenuOpen(false); }}
+                          className="w-full text-left px-3 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground transition-colors flex items-center justify-between gap-2"
+                        >
+                          <span>{mode === "politician" ? "Switch to Citizen View" : "Switch to Politician Mode"}</span>
+                          <span className={`text-xs font-medium px-1.5 py-0.5 rounded-full ${mode === "politician" ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" : "bg-muted text-muted-foreground"}`}>
+                            {mode === "politician" ? "Politician" : "Citizen"}
+                          </span>
+                        </button>
+                      </>
                     )}
                     <div className="my-1 h-px bg-border" />
                     <button
