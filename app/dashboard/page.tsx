@@ -4,6 +4,9 @@ import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { AnswerComposer } from "@/components/answers/answer-composer";
 import { TeamManager } from "@/components/dashboard/team-manager";
+import { ProfileEditor } from "@/components/dashboard/profile-editor";
+import { DisputeClientButton } from "@/components/dashboard/dispute-button";
+import { AnswerEditButton } from "@/components/dashboard/answer-edit-button";
 
 export const metadata: Metadata = {
   title: "Politician Dashboard | WhyTho",
@@ -15,6 +18,7 @@ type AnswerRow = {
   answer_type: string;
   body: string;
   is_ai_generated: boolean;
+  created_at: string;
 };
 
 type QuestionRow = {
@@ -22,51 +26,42 @@ type QuestionRow = {
   body: string;
   net_upvotes: number;
   week_number: number;
+  created_at: string;
   answers: AnswerRow[];
 };
 
 const QUALIFYING_THRESHOLD = 10;
+const NEW_QUESTION_HOURS = 48; // Questions added in last 48h get a "New" badge
 
 /** Friendly verification tier badge */
 function TierBadge({ tier }: { tier: string }) {
   const badges: Record<string, { label: string; className: string }> = {
-    "0": {
-      label: "Unclaimed",
-      className: "bg-muted text-muted-foreground",
-    },
-    "1": {
-      label: "Self-Claimed",
-      className: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
-    },
-    "2": {
-      label: "Verified ✓",
-      className: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300",
-    },
-    "3": {
-      label: "Fully Verified ✓✓",
-      className:
-        "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300",
-    },
+    "0": { label: "Unclaimed", className: "bg-muted text-muted-foreground" },
+    "1": { label: "Self-Claimed", className: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300" },
+    "2": { label: "Verified ✓", className: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300" },
+    "3": { label: "Fully Verified ✓✓", className: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300" },
   };
   const badge = badges[tier] ?? badges["0"]!;
   return (
-    <span
-      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${badge.className}`}
-    >
+    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${badge.className}`}>
       {badge.label}
     </span>
   );
 }
 
-/** Single question card with optional answer display and composer */
+/** Single question card with answer display, dispute, and composer */
 function QuestionCard({
   question,
   isAdmin,
   hasOfficialAnswer,
+  politicianSlug,
+  isNew,
 }: {
   question: QuestionRow;
   isAdmin: boolean;
   hasOfficialAnswer: boolean;
+  politicianSlug: string;
+  isNew: boolean;
 }) {
   const officialAnswer = question.answers.find((a) =>
     ["direct", "team_statement"].includes(a.answer_type) && !a.is_ai_generated
@@ -80,16 +75,32 @@ function QuestionCard({
       {/* Question header */}
       <div className="p-4 border-b bg-muted/30">
         <div className="flex items-start justify-between gap-3">
-          <p className="text-sm font-medium leading-snug">{question.body}</p>
-          <div className="shrink-0 flex flex-col items-end gap-1">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
+              {isNew && (
+                <span className="inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-900/40 px-2 py-0.5 text-xs font-semibold text-blue-700 dark:text-blue-300">
+                  New
+                </span>
+              )}
+              {question.net_upvotes >= QUALIFYING_THRESHOLD && (
+                <span className="text-xs text-amber-600 dark:text-amber-400 font-medium">
+                  Qualifying
+                </span>
+              )}
+            </div>
+            <p className="text-sm font-medium leading-snug">{question.body}</p>
+          </div>
+          <div className="shrink-0 flex flex-col items-end gap-2">
             <span className="text-xs font-semibold tabular-nums text-muted-foreground">
               ▲ {question.net_upvotes}
             </span>
-            {question.net_upvotes >= QUALIFYING_THRESHOLD && (
-              <span className="text-xs text-amber-600 dark:text-amber-400 font-medium">
-                Qualifying
-              </span>
-            )}
+            <Link
+              href={`/${politicianSlug}#question-${question.id}`}
+              className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2 whitespace-nowrap"
+              target="_blank"
+            >
+              View on profile →
+            </Link>
           </div>
         </div>
       </div>
@@ -105,14 +116,25 @@ function QuestionCard({
                 : "👥 Team Statement"}
             </p>
             <p className="text-sm leading-relaxed">{officialAnswer.body}</p>
+            <AnswerEditButton
+              answerId={officialAnswer.id}
+              initialBody={officialAnswer.body}
+              createdAt={officialAnswer.created_at}
+            />
           </div>
         )}
 
-        {/* AI analysis note */}
-        {aiAnswer && !officialAnswer && (
-          <p className="text-xs text-muted-foreground italic">
-            🤖 AI analysis available. Add an official response above it.
-          </p>
+        {/* AI analysis — with dispute option */}
+        {aiAnswer && (
+          <div className="rounded-lg border border-muted bg-muted/20 px-3 py-3 space-y-2">
+            <p className="text-xs font-medium text-muted-foreground">
+              🤖 AI Analysis of Public Record
+            </p>
+            <p className="text-xs text-muted-foreground leading-relaxed line-clamp-3">
+              {aiAnswer.body}
+            </p>
+            <DisputeClientButton answerId={aiAnswer.id} />
+          </div>
         )}
 
         {/* Compose answer (unanswered questions) */}
@@ -131,20 +153,15 @@ function QuestionCard({
 export default async function DashboardPage() {
   const supabase = await createClient();
 
-  // Auth check
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
 
   if (!user || user.is_anonymous) {
     redirect("/sign-in?redirect=/dashboard");
   }
 
-  // Fetch current week number
   const { data: weekData } = await supabase.rpc("current_week_number");
   const currentWeekNumber = weekData as number;
 
-  // Fetch politician_team memberships for this user
   const { data: memberships } = await supabase
     .from("politician_team")
     .select(`
@@ -157,13 +174,14 @@ export default async function DashboardPage() {
         state,
         party,
         photo_url,
+        website_url,
+        bio,
         verification_tier
       )
     `)
     .eq("user_id", user.id);
 
   if (!memberships || memberships.length === 0) {
-    // Not on any team - prompt to claim a profile
     return (
       <div className="min-h-screen bg-background">
         <div className="mx-auto max-w-3xl px-4 py-12">
@@ -184,8 +202,9 @@ export default async function DashboardPage() {
     );
   }
 
-  // Fetch qualifying questions + answers for each politician
-  type PoliticianWithQuestions = {
+  const cutoff48h = new Date(Date.now() - NEW_QUESTION_HOURS * 60 * 60 * 1000).toISOString();
+
+  type PoliticianWithData = {
     politician: {
       id: string;
       slug: string;
@@ -194,62 +213,57 @@ export default async function DashboardPage() {
       state: string | null;
       party: string | null;
       photo_url: string | null;
+      website_url: string | null;
+      bio: string | null;
       verification_tier: string;
     };
     role: string;
     questions: QuestionRow[];
-    stats: {
-      totalQuestions: number;
-      totalAnswers: number;
-      thisWeekQuestions: number;
-    };
+    participationRate: number | null;
+    stats: { totalQuestions: number; totalAnswers: number; thisWeekQuestions: number };
   };
 
-  const politiciansData: PoliticianWithQuestions[] = [];
+  const politiciansData: PoliticianWithData[] = [];
 
   for (const membership of memberships) {
     const politician = Array.isArray(membership.politicians)
       ? membership.politicians[0]
       : membership.politicians;
-
     if (!politician) continue;
 
-    const { data: questions } = await supabase
-      .from("questions")
-      .select(`
-        id,
-        body,
-        net_upvotes,
-        week_number,
-        answers (
-          id,
-          answer_type,
-          body,
-          is_ai_generated
-        )
-      `)
-      .eq("politician_id", politician.id)
-      .eq("week_number", currentWeekNumber)
-      .eq("status", "active")
-      .gte("net_upvotes", QUALIFYING_THRESHOLD)
-      .order("net_upvotes", { ascending: false })
-      .limit(25);
-
-    // Analytics: total questions and answers all-time
-    const [{ count: totalQuestions }, { count: totalAnswers }, { count: thisWeekQuestions }] =
-      await Promise.all([
-        supabase.from("questions").select("*", { count: "exact", head: true })
-          .eq("politician_id", politician.id).eq("status", "active"),
-        supabase.from("answers").select("*", { count: "exact", head: true })
-          .eq("politician_id", politician.id).eq("is_ai_generated", false),
-        supabase.from("questions").select("*", { count: "exact", head: true })
-          .eq("politician_id", politician.id).eq("week_number", currentWeekNumber).eq("status", "active"),
-      ]);
+    const [
+      { data: questions },
+      { data: rateData },
+      { count: totalQuestions },
+      { count: totalAnswers },
+      { count: thisWeekQuestions },
+    ] = await Promise.all([
+      supabase
+        .from("questions")
+        .select(`id, body, net_upvotes, week_number, created_at, answers ( id, answer_type, body, is_ai_generated, created_at )`)
+        .eq("politician_id", politician.id)
+        .eq("week_number", currentWeekNumber)
+        .eq("status", "active")
+        .gte("net_upvotes", QUALIFYING_THRESHOLD)
+        .order("net_upvotes", { ascending: false })
+        .limit(25),
+      supabase.rpc("participation_rate_period", {
+        p_politician_id: politician.id,
+        p_period: "week",
+      }),
+      supabase.from("questions").select("*", { count: "exact", head: true })
+        .eq("politician_id", politician.id).eq("status", "active"),
+      supabase.from("answers").select("*", { count: "exact", head: true })
+        .eq("politician_id", politician.id).eq("is_ai_generated", false),
+      supabase.from("questions").select("*", { count: "exact", head: true })
+        .eq("politician_id", politician.id).eq("week_number", currentWeekNumber).eq("status", "active"),
+    ]);
 
     politiciansData.push({
       politician,
       role: membership.role,
       questions: (questions ?? []) as QuestionRow[],
+      participationRate: rateData as number | null,
       stats: {
         totalQuestions: totalQuestions ?? 0,
         totalAnswers: totalAnswers ?? 0,
@@ -262,12 +276,11 @@ export default async function DashboardPage() {
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-3xl px-4 py-8 space-y-8">
 
-        {/* Header */}
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold">Politician Dashboard</h1>
             <p className="text-sm text-muted-foreground mt-1">
-              Qualifying questions have 10+ net upvotes and are visible to the public.
+              Qualifying questions have 10+ net upvotes and count toward your public response rate.
             </p>
           </div>
           <Link
@@ -278,16 +291,23 @@ export default async function DashboardPage() {
           </Link>
         </div>
 
-        {/* One section per politician */}
-        {politiciansData.map(({ politician, role, questions, stats }) => {
+        {politiciansData.map(({ politician, role, questions, participationRate, stats }) => {
           const unansweredCount = questions.filter(
-            (q) =>
-              !q.answers.some(
-                (a) =>
-                  ["direct", "team_statement"].includes(a.answer_type) &&
-                  !a.is_ai_generated
-              )
+            (q) => !q.answers.some(
+              (a) => ["direct", "team_statement"].includes(a.answer_type) && !a.is_ai_generated
+            )
           ).length;
+
+          const rateDisplay =
+            participationRate !== null ? `${Math.round(participationRate)}%` : "—";
+          const rateColor =
+            participationRate === null
+              ? "text-muted-foreground"
+              : participationRate >= 75
+              ? "text-green-600 dark:text-green-400"
+              : participationRate >= 40
+              ? "text-amber-600 dark:text-amber-400"
+              : "text-red-600 dark:text-red-400";
 
           return (
             <div key={politician.id} className="space-y-4">
@@ -296,11 +316,7 @@ export default async function DashboardPage() {
                 <div className="shrink-0 flex h-12 w-12 items-center justify-center rounded-full border bg-muted text-sm font-bold text-muted-foreground overflow-hidden">
                   {politician.photo_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={politician.photo_url}
-                      alt={politician.full_name}
-                      className="h-full w-full object-cover"
-                    />
+                    <img src={politician.photo_url} alt={politician.full_name} className="h-full w-full object-cover" />
                   ) : (
                     politician.full_name.slice(0, 1).toUpperCase()
                   )}
@@ -314,9 +330,7 @@ export default async function DashboardPage() {
                       {politician.full_name}
                     </Link>
                     <TierBadge tier={politician.verification_tier} />
-                    <span className="text-xs text-muted-foreground capitalize">
-                      {role}
-                    </span>
+                    <span className="text-xs text-muted-foreground capitalize">{role}</span>
                   </div>
                   <p className="text-sm text-muted-foreground truncate">
                     {[politician.office, politician.state].filter(Boolean).join(" · ")}
@@ -324,22 +338,22 @@ export default async function DashboardPage() {
                 </div>
 
                 {/* Analytics strip */}
-              <div className="flex gap-4 shrink-0 text-center">
-                <div>
-                  <p className="text-lg font-bold tabular-nums">{stats.thisWeekQuestions}</p>
-                  <p className="text-xs text-muted-foreground">this week</p>
+                <div className="flex gap-4 shrink-0 text-center">
+                  <div>
+                    <p className={`text-lg font-bold tabular-nums ${rateColor}`}>{rateDisplay}</p>
+                    <p className="text-xs text-muted-foreground">response rate</p>
+                  </div>
+                  <div className="border-l pl-4">
+                    <p className="text-lg font-bold tabular-nums">{stats.thisWeekQuestions}</p>
+                    <p className="text-xs text-muted-foreground">this week</p>
+                  </div>
+                  <div className="border-l pl-4">
+                    <p className="text-lg font-bold tabular-nums">{stats.totalAnswers}</p>
+                    <p className="text-xs text-muted-foreground">answered</p>
+                  </div>
                 </div>
-                <div className="border-l pl-4">
-                  <p className="text-lg font-bold tabular-nums">{stats.totalQuestions}</p>
-                  <p className="text-xs text-muted-foreground">all time</p>
-                </div>
-                <div className="border-l pl-4">
-                  <p className="text-lg font-bold tabular-nums">{stats.totalAnswers}</p>
-                  <p className="text-xs text-muted-foreground">answered</p>
-                </div>
-              </div>
 
-              {/* Verification prompt for tier < 2 */}
+                {/* Verification prompt for tier < 2 */}
                 {parseInt(politician.verification_tier) < 2 && (
                   <Link
                     href="/verify"
@@ -353,9 +367,7 @@ export default async function DashboardPage() {
               {/* Question inbox */}
               {questions.length === 0 ? (
                 <div className="rounded-xl border bg-card p-8 text-center">
-                  <p className="text-muted-foreground text-sm">
-                    No qualifying questions this week yet.
-                  </p>
+                  <p className="text-muted-foreground text-sm">No qualifying questions this week yet.</p>
                   <p className="text-xs text-muted-foreground mt-1">
                     Questions reach qualifying status when they get 10+ net upvotes.
                   </p>
@@ -368,41 +380,47 @@ export default async function DashboardPage() {
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {/* Inbox summary */}
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">
-                      {questions.length} qualifying question
-                      {questions.length !== 1 ? "s" : ""} this week
+                      {questions.length} qualifying question{questions.length !== 1 ? "s" : ""} this week
                     </span>
-                    {unansweredCount > 0 && (
+                    {unansweredCount > 0 ? (
                       <span className="font-medium text-amber-600 dark:text-amber-400">
                         {unansweredCount} awaiting response
                       </span>
-                    )}
-                    {unansweredCount === 0 && (
+                    ) : (
                       <span className="font-medium text-green-600 dark:text-green-400">
                         ✓ All answered
                       </span>
                     )}
                   </div>
 
-                  {/* Question cards */}
                   {questions.map((question) => {
                     const hasOfficialAnswer = question.answers.some(
-                      (a) =>
-                        ["direct", "team_statement"].includes(a.answer_type) &&
-                        !a.is_ai_generated
+                      (a) => ["direct", "team_statement"].includes(a.answer_type) && !a.is_ai_generated
                     );
+                    const isNew = question.created_at > cutoff48h;
                     return (
                       <QuestionCard
                         key={question.id}
                         question={question}
                         isAdmin={role === "admin"}
                         hasOfficialAnswer={hasOfficialAnswer}
+                        politicianSlug={politician.slug}
+                        isNew={isNew}
                       />
                     );
                   })}
                 </div>
+              )}
+
+              {/* Profile editing (admin only) */}
+              {role === "admin" && (
+                <ProfileEditor
+                  politicianId={politician.id}
+                  currentWebsiteUrl={politician.website_url}
+                  currentBio={politician.bio}
+                />
               )}
 
               {/* Team Management */}
