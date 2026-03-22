@@ -65,6 +65,37 @@ function StepFind({
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
+  // Request form state
+  const [showRequestForm, setShowRequestForm] = useState(false);
+  const [reqName, setReqName] = useState("");
+  const [reqOffice, setReqOffice] = useState("");
+  const [reqState, setReqState] = useState("");
+  const [reqEmail, setReqEmail] = useState("");
+  const [reqSubmitted, setReqSubmitted] = useState(false);
+  const [reqError, setReqError] = useState<string | null>(null);
+  const [reqPending, startReqTransition] = useTransition();
+
+  function handleRequestSubmit() {
+    setReqError(null);
+    startReqTransition(async () => {
+      try {
+        const res = await fetch("/api/verify/request-profile", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: reqName.trim(), office: reqOffice.trim(), state: reqState.trim(), email: reqEmail.trim() }),
+        });
+        const data = (await res.json()) as { error?: string };
+        if (!res.ok) {
+          setReqError(data.error ?? "Failed to submit. Please try again.");
+          return;
+        }
+        setReqSubmitted(true);
+      } catch {
+        setReqError("Network error. Please try again.");
+      }
+    });
+  }
+
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
 
@@ -176,12 +207,111 @@ function StepFind({
 
         {isOpen && !isLoading && results.length === 0 && query.trim().length >= 2 && (
           <div className="absolute z-10 mt-1 w-full rounded-lg border bg-popover px-4 py-3 shadow-lg">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground mb-1">
               No profiles found for &quot;{query}&quot;
             </p>
+            <button
+              type="button"
+              onClick={() => {
+                setIsOpen(false);
+                setReqName(query);
+                setShowRequestForm(true);
+              }}
+              className="text-xs text-primary underline underline-offset-2 hover:text-primary/80"
+            >
+              Don&apos;t see yourself? Request your profile →
+            </button>
           </div>
         )}
       </div>
+
+      {/* Profile request form */}
+      {showRequestForm && !reqSubmitted && (
+        <div className="mt-6 rounded-xl border bg-muted/20 p-4 space-y-4">
+          <div>
+            <p className="text-sm font-medium mb-1">Request your profile</p>
+            <p className="text-xs text-muted-foreground">
+              We&apos;ll create a profile for you and notify you when it&apos;s ready to claim.
+            </p>
+          </div>
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide" htmlFor="req-name">Full Name</label>
+              <input
+                id="req-name"
+                type="text"
+                value={reqName}
+                onChange={(e) => setReqName(e.target.value)}
+                placeholder="Your full name"
+                className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide" htmlFor="req-office">Office / Title</label>
+              <input
+                id="req-office"
+                type="text"
+                value={reqOffice}
+                onChange={(e) => setReqOffice(e.target.value)}
+                placeholder="e.g. State Senator, City Council Member"
+                className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide" htmlFor="req-state">State</label>
+              <input
+                id="req-state"
+                type="text"
+                value={reqState}
+                onChange={(e) => setReqState(e.target.value)}
+                placeholder="e.g. Colorado"
+                className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide" htmlFor="req-email">Contact Email</label>
+              <input
+                id="req-email"
+                type="email"
+                value={reqEmail}
+                onChange={(e) => setReqEmail(e.target.value)}
+                placeholder="your@email.gov"
+                className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              />
+            </div>
+          </div>
+          {reqError && <p className="text-xs text-destructive">{reqError}</p>}
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={handleRequestSubmit}
+              disabled={reqPending || !reqName || !reqEmail}
+              className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50"
+            >
+              {reqPending ? "Submitting…" : "Submit Request"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowRequestForm(false)}
+              disabled={reqPending}
+              className="rounded-md border px-4 py-2 text-sm font-medium hover:bg-muted transition-colors disabled:opacity-50"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {reqSubmitted && (
+        <div className="mt-6 rounded-xl border border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/30 p-4">
+          <p className="text-sm font-medium text-green-800 dark:text-green-300">
+            ✓ Request submitted
+          </p>
+          <p className="text-xs text-green-700 dark:text-green-400 mt-1">
+            We&apos;ll review your request and reach out to {reqEmail} when your profile is ready to claim.
+          </p>
+        </div>
+      )}
     </div>
   );
 }
