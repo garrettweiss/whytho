@@ -7,6 +7,7 @@ import { AnswerComposer } from "@/components/answers/answer-composer";
 import { TeamManager } from "@/components/dashboard/team-manager";
 import { ProfileEditor } from "@/components/dashboard/profile-editor";
 import { DisputeClientButton } from "@/components/dashboard/dispute-button";
+import { DisconnectButton } from "@/components/dashboard/disconnect-button";
 import { AnswerEditButton } from "@/components/dashboard/answer-edit-button";
 import { DraftApproveButton } from "@/components/dashboard/draft-approve-button";
 
@@ -236,6 +237,7 @@ export default async function DashboardPage() {
       verification_tier: string;
     };
     role: string;
+    isOnlyAdmin: boolean;
     questions: QuestionRow[];
     drafts: DraftRow[];
     participationRate: number | null;
@@ -257,6 +259,7 @@ export default async function DashboardPage() {
       { count: totalAnswers },
       { count: thisWeekQuestions },
       { data: rawDrafts },
+      { count: adminCount },
     ] = await Promise.all([
       supabase
         .from("questions")
@@ -287,6 +290,12 @@ export default async function DashboardPage() {
             .eq("is_ai_generated", false)
             .order("created_at", { ascending: true })
         : Promise.resolve({ data: [] }),
+      // Count admins to determine if caller is the only one
+      supabase
+        .from("politician_team")
+        .select("*", { count: "exact", head: true })
+        .eq("politician_id", politician.id)
+        .eq("role", "admin"),
     ]);
 
     // Normalize rawDrafts (questions is a joined object)
@@ -304,6 +313,7 @@ export default async function DashboardPage() {
     politiciansData.push({
       politician,
       role: membership.role,
+      isOnlyAdmin: membership.role === "admin" && (adminCount ?? 0) <= 1,
       questions: (questions ?? []) as QuestionRow[],
       drafts,
       participationRate: rateData as number | null,
@@ -334,7 +344,7 @@ export default async function DashboardPage() {
           </Link>
         </div>
 
-        {politiciansData.map(({ politician, role, questions, drafts, participationRate, stats }) => {
+        {politiciansData.map(({ politician, role, isOnlyAdmin, questions, drafts, participationRate, stats }) => {
           const unansweredCount = questions.filter(
             (q) => !q.answers.some(
               (a) => ["direct", "team_statement"].includes(a.answer_type) && !a.is_ai_generated && !a.is_draft
@@ -495,6 +505,17 @@ export default async function DashboardPage() {
 
               {/* Team Management */}
               <TeamManager politicianId={politician.id} callerRole={role} />
+
+              {/* Disconnect from this profile */}
+              {role === "admin" && (
+                <div className="pt-2 border-t">
+                  <DisconnectButton
+                    politicianId={politician.id}
+                    politicianName={politician.full_name}
+                    isOnlyAdmin={isOnlyAdmin}
+                  />
+                </div>
+              )}
             </div>
           );
         })}
