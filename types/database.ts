@@ -311,6 +311,7 @@ export type Database = {
           govtrack_id: string | null
           id: string
           is_active: boolean
+          is_test: boolean
           office: string | null
           openstates_id: string | null
           party: string | null
@@ -339,6 +340,7 @@ export type Database = {
           govtrack_id?: string | null
           id?: string
           is_active?: boolean
+          is_test?: boolean
           office?: string | null
           openstates_id?: string | null
           party?: string | null
@@ -367,6 +369,7 @@ export type Database = {
           govtrack_id?: string | null
           id?: string
           is_active?: boolean
+          is_test?: boolean
           office?: string | null
           openstates_id?: string | null
           party?: string | null
