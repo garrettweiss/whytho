@@ -10,6 +10,21 @@
 
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
+import { STATES } from "@/lib/search/states";
+
+// Build a full-name → 2-letter-code lookup once at module level.
+// Federal politicians have state stored as full name ("California"),
+// state-level politicians have the 2-letter code ("CA").
+// Normalize everything to codes so search and region pages work uniformly.
+const STATE_NAME_TO_CODE: Record<string, string> = {};
+for (const s of STATES) {
+  STATE_NAME_TO_CODE[s.name.toLowerCase()] = s.code;
+}
+function normalizeState(raw: string | null): string | null {
+  if (!raw) return null;
+  if (raw.length === 2) return raw.toUpperCase(); // already a code
+  return STATE_NAME_TO_CODE[raw.toLowerCase()] ?? raw;
+}
 
 export const revalidate = 3600;
 
@@ -38,7 +53,7 @@ export async function GET() {
   const index: SearchIndexEntry[] = (data ?? []).map((p) => ({
     n: p.full_name,
     s: p.slug,
-    st: p.state,
+    st: normalizeState(p.state),
     o: p.office,
     p: p.party,
   }));

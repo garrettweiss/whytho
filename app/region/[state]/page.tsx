@@ -71,12 +71,15 @@ export default async function RegionPage({ params }: Props) {
 
   const supabase = await createClient();
 
+  // Federal politicians store state as full name ("California"),
+  // state-level politicians store it as a 2-letter code ("CA").
+  // Query both so all politicians for a state appear together.
   const { data: politicians } = await supabase
     .from("politicians")
     .select("id, slug, full_name, office, state, party, photo_url")
     .eq("is_active", true)
     .eq("is_test", false)
-    .eq("state", stateEntry.code)
+    .or(`state.eq.${stateEntry.code},state.eq.${stateEntry.name}`)
     .order("office", { ascending: true })
     .order("full_name", { ascending: true })
     .limit(500);
