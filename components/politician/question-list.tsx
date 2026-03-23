@@ -72,7 +72,6 @@ const CONFIDENCE_LABELS: Record<Enums<"ai_confidence">, string> = {
 
 function AnswerBlock({ answer }: { answer: Answer }) {
   const isAI = answer.is_ai_generated;
-  const isDirect = answer.answer_type === "direct";
 
   if (answer.answer_type === "ai_analysis" && answer.ai_confidence === "insufficient") {
     return (

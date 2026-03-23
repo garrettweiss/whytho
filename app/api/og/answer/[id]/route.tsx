@@ -153,7 +153,7 @@ export async function GET(
                   lineHeight: 1.4,
                 }}
               >
-                "{truncate(questionBody, 120)}"
+                &quot;{truncate(questionBody, 120)}&quot;
               </p>
             </div>
           )}

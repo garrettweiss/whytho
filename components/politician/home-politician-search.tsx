@@ -2,7 +2,6 @@
 
 import { useState, useRef } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { PoliticianAvatar } from "./politician-avatar";
 import { usePoliticianSearch } from "@/lib/search/use-politician-search";
 import { matchingStates } from "@/lib/search/states";
@@ -24,7 +23,6 @@ export function HomePoliticianSearch({
   featured: FeaturedPolitician[];
   totalCount: number;
 }) {
-  const router = useRouter();
   const { search } = usePoliticianSearch();
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);

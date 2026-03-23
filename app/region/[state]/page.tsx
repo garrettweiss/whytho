@@ -38,14 +38,6 @@ function PartyBadge({ party }: { party: string | null }) {
   );
 }
 
-const OFFICE_ORDER = [
-  "U.S. Senator",
-  "U.S. Representative",
-  "Governor",
-  "State Senate",
-  "State House",
-  "Other",
-];
 
 function groupLabel(office: string | null): string {
   if (!office) return "Other";
