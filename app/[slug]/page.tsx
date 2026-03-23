@@ -276,6 +276,24 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
             </div>
           )}
 
+          {/* Candidate badge - shown when running in an upcoming election */}
+          {politician.is_candidate && politician.candidate_election_year && (
+            <div className="rounded-lg border border-emerald-200 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-950/30 px-4 py-3 flex items-center gap-3">
+              <span className="text-base">🗳️</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-emerald-800 dark:text-emerald-300">
+                  Running for {politician.candidate_office ?? "office"} · {politician.candidate_election_year}
+                  {politician.incumbent_challenge === "I" && (
+                    <span className="ml-2 text-xs font-normal opacity-75">(Incumbent)</span>
+                  )}
+                  {politician.incumbent_challenge === "O" && (
+                    <span className="ml-2 text-xs font-normal opacity-75">(Open seat)</span>
+                  )}
+                </p>
+              </div>
+            </div>
+          )}
+
           <PoliticianHeader
             politician={politician}
             currentParticipationRate={participationRate}

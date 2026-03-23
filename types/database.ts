@@ -362,6 +362,9 @@ export type Database = {
           aliases: string[]
           bio: string | null
           bioguide_id: string | null
+          candidate_election_year: number | null
+          candidate_fec_id: string | null
+          candidate_office: string | null
           candidate_status: string | null
           created_at: string
           district: string | null
@@ -371,7 +374,9 @@ export type Database = {
           full_name: string
           govtrack_id: string | null
           id: string
+          incumbent_challenge: "I" | "C" | "O" | null
           is_active: boolean
+          is_candidate: boolean
           is_test: boolean
           office: string | null
           openstates_id: string | null
@@ -391,6 +396,9 @@ export type Database = {
           aliases?: string[]
           bio?: string | null
           bioguide_id?: string | null
+          candidate_election_year?: number | null
+          candidate_fec_id?: string | null
+          candidate_office?: string | null
           candidate_status?: string | null
           created_at?: string
           district?: string | null
@@ -400,7 +408,9 @@ export type Database = {
           full_name: string
           govtrack_id?: string | null
           id?: string
+          incumbent_challenge?: "I" | "C" | "O" | null
           is_active?: boolean
+          is_candidate?: boolean
           is_test?: boolean
           office?: string | null
           openstates_id?: string | null
@@ -420,6 +430,9 @@ export type Database = {
           aliases?: string[]
           bio?: string | null
           bioguide_id?: string | null
+          candidate_election_year?: number | null
+          candidate_fec_id?: string | null
+          candidate_office?: string | null
           candidate_status?: string | null
           created_at?: string
           district?: string | null
@@ -429,7 +442,9 @@ export type Database = {
           full_name?: string
           govtrack_id?: string | null
           id?: string
+          incumbent_challenge?: "I" | "C" | "O" | null
           is_active?: boolean
+          is_candidate?: boolean
           is_test?: boolean
           office?: string | null
           openstates_id?: string | null
