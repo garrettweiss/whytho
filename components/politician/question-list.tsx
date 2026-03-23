@@ -73,7 +73,7 @@ function AnswerBlock({ answer }: { answer: Answer }) {
 
   return (
     <div className={`mt-3 rounded-lg border px-4 py-3 text-sm space-y-2 ${
-      isDirect
+      !isAI
         ? "border-green-200 bg-green-50 dark:border-green-900 dark:bg-green-950/30"
         : "border-muted bg-muted/30"
     }`}>
@@ -82,13 +82,9 @@ function AnswerBlock({ answer }: { answer: Answer }) {
           <span className="text-xs font-medium text-muted-foreground">
             🤖 AI Analysis of Public Record. This is NOT a statement from the politician.
           </span>
-        ) : isDirect ? (
+        ) : (
           <span className="text-xs font-semibold text-green-700 dark:text-green-400">
             ✓ Official Response
-          </span>
-        ) : (
-          <span className="text-xs font-medium text-muted-foreground">
-            Team Statement
           </span>
         )}
         {answer.is_disputed && (

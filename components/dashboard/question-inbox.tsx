@@ -93,7 +93,7 @@ function QuestionCard({
         {officialAnswer && (
           <div className="space-y-1">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-              {officialAnswer.answer_type === "direct" ? "🏛️ Official Response" : "👥 Team Statement"}
+              ✓ Official Response
             </p>
             <p className="text-sm leading-relaxed">{officialAnswer.body}</p>
             <AnswerEditButton

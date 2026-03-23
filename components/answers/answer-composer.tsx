@@ -15,16 +15,13 @@ interface Props {
   onAnswered?: () => void;
 }
 
-export function AnswerComposer({ questionId, questionBody, isAdmin, onAnswered }: Props) {
+export function AnswerComposer({ questionId, questionBody, isAdmin: _isAdmin, onAnswered }: Props) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [mode, setMode] = useState<AnswerMode>("text");
   const [text, setText] = useState("");
   const [linkUrl, setLinkUrl] = useState("");
   const [linkDescription, setLinkDescription] = useState("");
-  const [answerType, setAnswerType] = useState<"direct" | "team_statement">(
-    isAdmin ? "direct" : "team_statement"
-  );
   const [sources, setSources] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -65,7 +62,7 @@ export function AnswerComposer({ questionId, questionBody, isAdmin, onAnswered }
           body: JSON.stringify({
             question_id: questionId,
             body: buildBody(),
-            answer_type: answerType,
+            answer_type: "direct",
             sources: buildSources(),
           }),
         });
@@ -120,57 +117,26 @@ export function AnswerComposer({ questionId, questionBody, isAdmin, onAnswered }
         <p className="text-sm font-medium line-clamp-2">{questionBody}</p>
       </div>
 
-      {/* Answer type + mode selectors */}
-      <div className="space-y-2">
-        {/* Mode: text vs link */}
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={() => setMode("text")}
-            className={`flex-1 rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ${
-              mode === "text" ? "bg-primary text-primary-foreground border-primary" : "hover:bg-muted"
-            }`}
-          >
-            ✍️ Written Answer
-          </button>
-          <button
-            type="button"
-            onClick={() => setMode("link")}
-            className={`flex-1 rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ${
-              mode === "link" ? "bg-primary text-primary-foreground border-primary" : "hover:bg-muted"
-            }`}
-          >
-            🔗 Link to Statement
-          </button>
-        </div>
-
-        {/* Answer type: direct vs team - admin only */}
-        {isAdmin && (
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => setAnswerType("direct")}
-              className={`flex-1 rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ${
-                answerType === "direct"
-                  ? "bg-primary text-primary-foreground border-primary"
-                  : "hover:bg-muted"
-              }`}
-            >
-              🏛️ From Politician
-            </button>
-            <button
-              type="button"
-              onClick={() => setAnswerType("team_statement")}
-              className={`flex-1 rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ${
-                answerType === "team_statement"
-                  ? "bg-primary text-primary-foreground border-primary"
-                  : "hover:bg-muted"
-              }`}
-            >
-              👥 Team Statement
-            </button>
-          </div>
-        )}
+      {/* Mode: text vs link */}
+      <div className="flex gap-2">
+        <button
+          type="button"
+          onClick={() => setMode("text")}
+          className={`flex-1 rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ${
+            mode === "text" ? "bg-primary text-primary-foreground border-primary" : "hover:bg-muted"
+          }`}
+        >
+          ✍️ Written Answer
+        </button>
+        <button
+          type="button"
+          onClick={() => setMode("link")}
+          className={`flex-1 rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ${
+            mode === "link" ? "bg-primary text-primary-foreground border-primary" : "hover:bg-muted"
+          }`}
+        >
+          🔗 Link to Statement
+        </button>
       </div>
 
       {/* Written answer */}

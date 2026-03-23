@@ -100,21 +100,22 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // Determine answer_type based on requested type + role
+  // Determine answer_type — direct and team_statement are treated identically.
+  // Responders always go to draft; admins and editors publish live as "direct".
   const role = membership.role;
   let answerType: "direct" | "team_statement";
 
   if (body.answer_type === "direct") {
-    if (role !== "admin") {
+    if (role === "responder") {
       return NextResponse.json(
-        { error: "Only admin role can submit direct answers from the politician" },
+        { error: "Responders must submit drafts for review" },
         { status: 403 }
       );
     }
     answerType = "direct";
   } else {
-    // Default: admin → direct, editor/responder → team_statement
-    answerType = role === "admin" ? "direct" : "team_statement";
+    // Default: admins + editors → direct, responders → team_statement (draft)
+    answerType = role !== "responder" ? "direct" : "team_statement";
   }
 
   // Validate sources if provided
