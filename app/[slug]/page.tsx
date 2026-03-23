@@ -8,6 +8,7 @@ import { ParticipationRate } from "@/components/politician/participation-rate";
 import { QuestionList } from "@/components/politician/question-list";
 import { AskQuestionForm } from "@/components/questions/ask-question-form";
 import { PeriodTabs, type Period } from "@/components/politician/period-tabs";
+import { ProfileViewTracker } from "@/components/analytics/profile-view-tracker";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -224,6 +225,13 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
 
   return (
     <>
+      <ProfileViewTracker
+        slug={politician.slug}
+        politicianId={politician.id}
+        office={politician.office ?? null}
+        state={politician.state ?? null}
+        verificationTier={politician.verification_tier}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

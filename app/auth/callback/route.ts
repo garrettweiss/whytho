@@ -8,9 +8,19 @@ export async function GET(request: Request) {
 
   if (code) {
     const supabase = await createClient();
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
-      return NextResponse.redirect(`${origin}${next}`);
+      // Detect new user: created_at within last 30s
+      const isNewUser =
+        data.user?.created_at != null &&
+        Date.now() - new Date(data.user.created_at).getTime() < 30_000;
+
+      const redirectUrl = new URL(`${origin}${next}`);
+      if (isNewUser) {
+        redirectUrl.searchParams.set("new_user", "1");
+      }
+
+      return NextResponse.redirect(redirectUrl.toString());
     }
   }
 

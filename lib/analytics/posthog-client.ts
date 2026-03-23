@@ -42,3 +42,7 @@ export function trackProfileClaimed(politicianId: string) {
 export function trackAnswerPublished(politicianId: string, answerType: string) {
   posthog.capture("answer_published", { politician_id: politicianId, answer_type: answerType });
 }
+
+export function trackUserRegistered(method: "google" | "magic_link" | "anonymous") {
+  posthog.capture("user_registered", { method });
+}

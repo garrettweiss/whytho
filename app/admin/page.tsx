@@ -132,6 +132,12 @@ export default async function AdminDashboard({ searchParams }: Props) {
           </div>
           <div className="flex gap-2 flex-wrap">
             <Link
+              href={`/admin/metrics${secretParam}`}
+              className="rounded-lg border px-3 py-1.5 text-sm font-medium hover:bg-muted transition-colors"
+            >
+              📈 Metrics
+            </Link>
+            <Link
               href={`/admin/races${secretParam}`}
               className="rounded-lg border px-3 py-1.5 text-sm font-medium hover:bg-muted transition-colors"
             >
