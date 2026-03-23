@@ -6,11 +6,10 @@ import { useEffect, useRef, useState } from "react";
 import { useUser } from "@/lib/auth/use-user";
 import { useIsPolitician } from "@/lib/auth/use-is-politician";
 import { useViewMode } from "@/lib/auth/use-view-mode";
+import { SearchBar } from "@/components/search/search-bar";
 
-const NAV_LINKS = [
-  { href: "/", label: "Home" },
+const RIGHT_NAV_LINKS = [
   { href: "/leaderboard", label: "Leaderboard" },
-  { href: "/federal", label: "Federal" },
   { href: "/races", label: "Elections" },
 ];
 
@@ -20,10 +19,11 @@ export function SiteNav() {
   const { user, isLoading } = useUser();
 
   const [menuOpen, setMenuOpen] = useState(false);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  const isActive = (href: string) =>
-    href === "/" ? pathname === "/" : pathname.startsWith(href);
+  const isHome = pathname === "/";
+  const isActive = (href: string) => pathname.startsWith(href);
 
   const isLoggedIn = user && !user.is_anonymous;
   const avatarInitial = user?.email?.[0]?.toUpperCase() ?? "U";
@@ -46,6 +46,7 @@ export function SiteNav() {
   // Close on route change
   useEffect(() => {
     setMenuOpen(false);
+    setMobileSearchOpen(false);
   }, [pathname]);
 
   function navigate(href: string) {
@@ -58,19 +59,30 @@ export function SiteNav() {
       aria-label="Main navigation"
       className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40"
     >
-      <div className="mx-auto max-w-5xl px-4 h-14 flex items-center justify-between gap-4">
+      <div className="mx-auto max-w-5xl px-4 h-14 flex items-center gap-3">
+
         {/* Logo */}
         <Link
           href="/"
           aria-label="WhyTho home"
-          className="font-bold text-sm tracking-tight hover:text-muted-foreground transition-colors"
+          className="font-bold text-sm tracking-tight hover:text-muted-foreground transition-colors shrink-0"
         >
           WhyTho
         </Link>
 
-        {/* Nav links */}
-        <div className="flex items-center gap-1" role="list">
-          {NAV_LINKS.map((link) => {
+        {/* Search — hidden on home (hero IS the search), hidden on mobile */}
+        {!isHome && (
+          <div className="hidden md:flex flex-1 max-w-sm">
+            <SearchBar />
+          </div>
+        )}
+
+        {/* Spacer when on home or mobile — pushes right nav to edge */}
+        <div className="flex-1" />
+
+        {/* Right nav links — hidden on mobile */}
+        <div className="hidden md:flex items-center gap-1" role="list">
+          {RIGHT_NAV_LINKS.map((link) => {
             const active = isActive(link.href);
             return (
               <Link
@@ -89,9 +101,22 @@ export function SiteNav() {
           })}
         </div>
 
+        {/* Mobile search icon (not shown on home — hero handles it) */}
+        {!isHome && (
+          <button
+            className="md:hidden p-2 text-muted-foreground hover:text-foreground transition-colors"
+            aria-label="Open search"
+            onClick={() => setMobileSearchOpen((o) => !o)}
+          >
+            <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
+              <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+            </svg>
+          </button>
+        )}
+
         {/* Auth area */}
         {!isLoading && (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             {isLoggedIn ? (
               /* Logged-in: avatar + custom dropdown */
               <div ref={menuRef} className="relative">
@@ -187,7 +212,7 @@ export function SiteNav() {
                 </Link>
                 <Link
                   href="/verify"
-                  className="inline-flex items-center justify-center rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+                  className="hidden sm:inline-flex items-center justify-center rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
                 >
                   Are you a politician?
                 </Link>
@@ -196,6 +221,13 @@ export function SiteNav() {
           </div>
         )}
       </div>
+
+      {/* Mobile search bar — slides in below nav when icon clicked */}
+      {mobileSearchOpen && !isHome && (
+        <div className="md:hidden border-t px-4 py-2">
+          <SearchBar placeholder="Search politicians, states..." />
+        </div>
+      )}
     </nav>
   );
 }

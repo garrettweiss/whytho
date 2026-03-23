@@ -357,10 +357,10 @@ export default async function HomePage() {
             See the Leaderboard
           </Link>
           <Link
-            href="/federal"
+            href="/races"
             className="inline-flex items-center justify-center rounded-xl border-2 px-6 py-3 font-semibold hover:bg-muted transition-colors"
           >
-            Browse Federal Reps
+            Upcoming Elections
           </Link>
         </div>
 
@@ -551,7 +551,7 @@ export default async function HomePage() {
             {TARGET_STATES.map(({ code, name }) => (
               <Link
                 key={code}
-                href={`/state/${code}`}
+                href={`/region/${name.toLowerCase().replace(/\s+/g, "-")}`}
                 className="rounded-xl border bg-card px-3 py-2 text-sm font-medium text-center hover:bg-muted hover:border-foreground/20 transition-all"
               >
                 {name}
@@ -566,7 +566,7 @@ export default async function HomePage() {
           <Link href="/how-it-works" className="hover:text-foreground transition-colors">How It Works</Link>
           <Link href="/faq" className="hover:text-foreground transition-colors">FAQ</Link>
           <Link href="/leaderboard" className="hover:text-foreground transition-colors">Leaderboard</Link>
-          <Link href="/federal" className="hover:text-foreground transition-colors">Federal Reps</Link>
+          <Link href="/races" className="hover:text-foreground transition-colors">Elections</Link>
           <Link href="/verify" className="hover:text-foreground transition-colors">Verify Your Profile</Link>
         </div>
 
