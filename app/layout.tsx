@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { SiteNav } from "@/components/ui/site-nav";
 import { PostHogProvider } from "@/components/analytics/posthog-provider";
+import { ChatWidget } from "@/components/chatbot/chat-widget";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -31,6 +32,7 @@ export default function RootLayout({
         <PostHogProvider>
           <SiteNav />
           {children}
+          <ChatWidget />
         </PostHogProvider>
       </body>
     </html>

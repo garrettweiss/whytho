@@ -53,60 +53,6 @@ export type Database = {
         }
         Relationships: []
       }
-      answer_media: {
-        Row: {
-          id: string
-          answer_id: string
-          politician_id: string
-          media_type: string
-          storage_path: string
-          public_url: string
-          file_name: string | null
-          file_size_bytes: number | null
-          mime_type: string | null
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          answer_id: string
-          politician_id: string
-          media_type: string
-          storage_path: string
-          public_url: string
-          file_name?: string | null
-          file_size_bytes?: number | null
-          mime_type?: string | null
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          answer_id?: string
-          politician_id?: string
-          media_type?: string
-          storage_path?: string
-          public_url?: string
-          file_name?: string | null
-          file_size_bytes?: number | null
-          mime_type?: string | null
-          created_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "answer_media_answer_id_fkey"
-            columns: ["answer_id"]
-            isOneToOne: false
-            referencedRelation: "answers"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "answer_media_politician_id_fkey"
-            columns: ["politician_id"]
-            isOneToOne: false
-            referencedRelation: "politicians"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
       anon_session_log: {
         Row: {
           created_at: string | null
@@ -127,6 +73,60 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      answer_media: {
+        Row: {
+          answer_id: string
+          created_at: string | null
+          file_name: string | null
+          file_size_bytes: number | null
+          id: string
+          media_type: string
+          mime_type: string | null
+          politician_id: string
+          public_url: string
+          storage_path: string
+        }
+        Insert: {
+          answer_id: string
+          created_at?: string | null
+          file_name?: string | null
+          file_size_bytes?: number | null
+          id?: string
+          media_type: string
+          mime_type?: string | null
+          politician_id: string
+          public_url: string
+          storage_path: string
+        }
+        Update: {
+          answer_id?: string
+          created_at?: string | null
+          file_name?: string | null
+          file_size_bytes?: number | null
+          id?: string
+          media_type?: string
+          mime_type?: string | null
+          politician_id?: string
+          public_url?: string
+          storage_path?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "answer_media_answer_id_fkey"
+            columns: ["answer_id"]
+            isOneToOne: false
+            referencedRelation: "answers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "answer_media_politician_id_fkey"
+            columns: ["politician_id"]
+            isOneToOne: false
+            referencedRelation: "politicians"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       answers: {
         Row: {
@@ -195,14 +195,130 @@ export type Database = {
             referencedRelation: "questions"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "answer_media_answer_id_fkey"
-            columns: ["id"]
-            isOneToOne: false
-            referencedRelation: "answer_media"
-            referencedColumns: ["answer_id"]
-          },
         ]
+      }
+      chatbot_feedback: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          id: string
+          priority: number | null
+          raw_message: string
+          recommendation: string | null
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          id?: string
+          priority?: number | null
+          raw_message: string
+          recommendation?: string | null
+          status?: string
+          user_id?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          id?: string
+          priority?: number | null
+          raw_message?: string
+          recommendation?: string | null
+          status?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      chatbot_forwarded: {
+        Row: {
+          created_at: string | null
+          id: string
+          published: boolean
+          question: string
+          team_answer: string | null
+          user_email: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          published?: boolean
+          question: string
+          team_answer?: string | null
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          published?: boolean
+          question?: string
+          team_answer?: string | null
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      chatbot_knowledge: {
+        Row: {
+          answer: string
+          category: string
+          created_at: string | null
+          id: string
+          question: string
+          source: string
+          updated_at: string | null
+        }
+        Insert: {
+          answer: string
+          category?: string
+          created_at?: string | null
+          id?: string
+          question: string
+          source?: string
+          updated_at?: string | null
+        }
+        Update: {
+          answer?: string
+          category?: string
+          created_at?: string | null
+          id?: string
+          question?: string
+          source?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      chatbot_question_posts: {
+        Row: {
+          created_at: string | null
+          id: string
+          politician_count: number | null
+          politician_ids: string[]
+          question_ids: string[] | null
+          question_text: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          politician_count?: number | null
+          politician_ids: string[]
+          question_ids?: string[] | null
+          question_text: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          politician_count?: number | null
+          politician_ids?: string[]
+          question_ids?: string[] | null
+          question_text?: string
+          user_id?: string | null
+        }
+        Relationships: []
       }
       jack_config: {
         Row: {
@@ -374,7 +490,7 @@ export type Database = {
           full_name: string
           govtrack_id: string | null
           id: string
-          incumbent_challenge: "I" | "C" | "O" | null
+          incumbent_challenge: string | null
           is_active: boolean
           is_candidate: boolean
           is_test: boolean
@@ -408,7 +524,7 @@ export type Database = {
           full_name: string
           govtrack_id?: string | null
           id?: string
-          incumbent_challenge?: "I" | "C" | "O" | null
+          incumbent_challenge?: string | null
           is_active?: boolean
           is_candidate?: boolean
           is_test?: boolean
@@ -442,7 +558,7 @@ export type Database = {
           full_name?: string
           govtrack_id?: string | null
           id?: string
-          incumbent_challenge?: "I" | "C" | "O" | null
+          incumbent_challenge?: string | null
           is_active?: boolean
           is_candidate?: boolean
           is_test?: boolean
@@ -568,6 +684,48 @@ export type Database = {
             columns: ["x_post_id"]
             isOneToOne: false
             referencedRelation: "x_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      race_candidates: {
+        Row: {
+          created_at: string
+          id: string
+          incumbent_challenge: string | null
+          party: string | null
+          politician_id: string
+          race_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          incumbent_challenge?: string | null
+          party?: string | null
+          politician_id: string
+          race_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          incumbent_challenge?: string | null
+          party?: string | null
+          politician_id?: string
+          race_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "race_candidates_politician_id_fkey"
+            columns: ["politician_id"]
+            isOneToOne: false
+            referencedRelation: "politicians"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "race_candidates_race_id_fkey"
+            columns: ["race_id"]
+            isOneToOne: false
+            referencedRelation: "races"
             referencedColumns: ["id"]
           },
         ]
@@ -731,7 +889,7 @@ export type Database = {
           snapshot_data?: Json
           top_question_id?: string | null
           total_questions?: number
-          week_number: number
+          week_number?: number
         }
         Update: {
           answered_qualifying?: number
@@ -1024,13 +1182,13 @@ export type Tables<
     : never
   : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
         DefaultSchema["Views"])
-  ? (DefaultSchema["Tables"] &
-      DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
-      Row: infer R
-    }
-    ? R
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
     : never
-  : never
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
@@ -1050,12 +1208,12 @@ export type TablesInsert<
     ? I
     : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-  ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-      Insert: infer I
-    }
-    ? I
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
     : never
-  : never
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
@@ -1075,12 +1233,12 @@ export type TablesUpdate<
     ? U
     : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-  ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-      Update: infer U
-    }
-    ? U
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
     : never
-  : never
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
@@ -1096,8 +1254,8 @@ export type Enums<
 }
   ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
-  ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
-  : never
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
@@ -1113,8 +1271,8 @@ export type CompositeTypes<
 }
   ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
-  ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
-  : never
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
 
 export const Constants = {
   public: {

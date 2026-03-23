@@ -155,6 +155,18 @@ export default async function AdminDashboard({ searchParams }: Props) {
             >
               🐦 X Queue {(xQueueCount ?? 0) > 0 ? `(${xQueueCount})` : ""}
             </Link>
+            <Link
+              href={`/admin/feedback${secretParam}`}
+              className="rounded-lg border px-3 py-1.5 text-sm font-medium hover:bg-muted transition-colors"
+            >
+              💬 Chatbot Feedback
+            </Link>
+            <Link
+              href={`/admin/forwarded${secretParam}`}
+              className="rounded-lg border px-3 py-1.5 text-sm font-medium hover:bg-muted transition-colors"
+            >
+              📩 Forwarded Questions
+            </Link>
           </div>
         </div>
 
@@ -346,6 +358,18 @@ export default async function AdminDashboard({ searchParams }: Props) {
               className="rounded-lg border px-4 py-2 text-sm font-medium hover:bg-muted transition-colors"
             >
               🐦 X Question Queue
+            </Link>
+            <Link
+              href={`/admin/feedback${secretParam}`}
+              className="rounded-lg border px-4 py-2 text-sm font-medium hover:bg-muted transition-colors"
+            >
+              💬 Chatbot Feedback
+            </Link>
+            <Link
+              href={`/admin/forwarded${secretParam}`}
+              className="rounded-lg border px-4 py-2 text-sm font-medium hover:bg-muted transition-colors"
+            >
+              📩 Forwarded Questions
             </Link>
           </div>
         </div>

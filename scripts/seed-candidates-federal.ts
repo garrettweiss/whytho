@@ -49,11 +49,11 @@ const ELECTION_YEAR = 2026;
 
 interface FecCandidate {
   candidate_id: string;       // "H0CO08040"
-  name: string;               // "EVANS, GABE"
+  name: string | null;        // "EVANS, GABE" — null possible from FEC
   office: "H" | "S" | "P";   // House / Senate / President
   state: string;              // "CO"
   district: string | null;    // "08" for House, null for Senate/President
-  party: string;              // "REP", "DEM", "IND", etc.
+  party: string | null;       // "REP", "DEM", "IND", etc. — null possible from FEC
   incumbent_challenge: "I" | "C" | "O" | null;
   election_years: number[];
 }
@@ -101,7 +101,8 @@ const PARTY_MAP: Record<string, string> = {
   UNK: "Unknown",
 };
 
-function normalizeParty(raw: string): string {
+function normalizeParty(raw: string | null): string | null {
+  if (!raw) return null;
   return PARTY_MAP[raw.toUpperCase()] ?? raw;
 }
 
@@ -176,6 +177,7 @@ interface UpsertResult {
 }
 
 async function upsertCandidate(fec: FecCandidate): Promise<"inserted" | "updated" | "skipped"> {
+  if (!fec.name) return "skipped"; // FEC occasionally returns null names
   const name = normalizeFecName(fec.name);
   const party = normalizeParty(fec.party);
   const office = officeLabel(fec);
