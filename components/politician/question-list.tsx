@@ -4,6 +4,7 @@ import { useState, useTransition, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { Enums } from "@/types/database";
 import { createClient } from "@/lib/supabase/client";
+import { AnswerComposer } from "@/components/answers/answer-composer";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -45,6 +46,8 @@ interface QuestionListProps {
   currentWeekNumber?: number;
   isHistorical?: boolean;
   period?: "week" | "month" | "year" | "all";
+  isOwner?: boolean;
+  ownerRole?: string;
 }
 
 // ─── Answer Display ───────────────────────────────────────────────────────────
@@ -223,6 +226,8 @@ function QuestionCard({
   showWeekBadge = false,
   votingDisabled = false,
   onVoteSuccess,
+  isOwner = false,
+  ownerRole,
 }: {
   question: Question;
   politicianId: string;
@@ -231,6 +236,8 @@ function QuestionCard({
   showWeekBadge?: boolean;
   votingDisabled?: boolean;
   onVoteSuccess?: () => void;
+  isOwner?: boolean;
+  ownerRole?: string;
 }) {
   const [votes, setVotes] = useState(question.net_upvotes);
   const [userVote, setUserVote] = useState<1 | -1 | 0>(0);
@@ -342,10 +349,27 @@ function QuestionCard({
               {question.answers.map((answer) => <AnswerBlock key={answer.id} answer={answer} />)}
             </div>
           )}
+
+          {/* Owner answer composer — shown on public profile when logged in as team member */}
+          {isOwner && !isHistorical && (() => {
+            const hasOfficialAnswer = question.answers.some(
+              (a) => !a.is_ai_generated && ["direct", "team_statement"].includes(a.answer_type)
+            );
+            if (hasOfficialAnswer) return null;
+            return (
+              <div className="mt-3 pt-3 border-t">
+                <AnswerComposer
+                  questionId={question.id}
+                  questionBody={question.body}
+                  isAdmin={ownerRole === "admin"}
+                />
+              </div>
+            );
+          })()}
         </div>
 
         {/* Report button */}
-        {!isHistorical && (
+        {!isHistorical && !isOwner && (
           <div className="shrink-0">
             <ReportButton questionId={question.id} />
           </div>
@@ -359,7 +383,7 @@ function QuestionCard({
 
 const PROFILE_PROMPT_KEY = "whytho_profile_prompt_dismissed";
 
-export function QuestionList({ questions, politicianId, weekNumber, currentWeekNumber: _currentWeekNumber, isHistorical = false, period = "week" }: QuestionListProps) {
+export function QuestionList({ questions, politicianId, weekNumber, currentWeekNumber: _currentWeekNumber, isHistorical = false, period = "week", isOwner = false, ownerRole }: QuestionListProps) {
   const [localQuestions, setLocalQuestions] = useState<Question[]>(questions);
   const [showProfileBanner, setShowProfileBanner] = useState(false);
   const hasCheckedProfile = useRef(false);
@@ -481,7 +505,7 @@ export function QuestionList({ questions, politicianId, weekNumber, currentWeekN
           <div className="space-y-2">
             <p className="text-xs font-medium uppercase tracking-wide text-amber-600">⚡ Qualifying (10+ votes)</p>
             {qualifying.map((q) => (
-              <QuestionCard key={q.id} question={q} politicianId={politicianId} weekNumber={weekNumber} isHistorical={isHistorical} onVoteSuccess={handleVoteSuccess} />
+              <QuestionCard key={q.id} question={q} politicianId={politicianId} weekNumber={weekNumber} isHistorical={isHistorical} onVoteSuccess={handleVoteSuccess} isOwner={isOwner} ownerRole={ownerRole} />
             ))}
           </div>
         )}
@@ -489,7 +513,7 @@ export function QuestionList({ questions, politicianId, weekNumber, currentWeekN
           <div className="space-y-2">
             {qualifying.length > 0 && <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Other Questions</p>}
             {nonQualifying.map((q) => (
-              <QuestionCard key={q.id} question={q} politicianId={politicianId} weekNumber={weekNumber} isHistorical={isHistorical} onVoteSuccess={handleVoteSuccess} />
+              <QuestionCard key={q.id} question={q} politicianId={politicianId} weekNumber={weekNumber} isHistorical={isHistorical} onVoteSuccess={handleVoteSuccess} isOwner={isOwner} ownerRole={ownerRole} />
             ))}
           </div>
         )}
@@ -517,6 +541,8 @@ export function QuestionList({ questions, politicianId, weekNumber, currentWeekN
             isHistorical={false}
             showWeekBadge={showWeekBadge}
             onVoteSuccess={handleVoteSuccess}
+            isOwner={isOwner}
+            ownerRole={ownerRole}
           />
         ))}
       </div>

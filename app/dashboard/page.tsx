@@ -3,26 +3,15 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
-import { AnswerComposer } from "@/components/answers/answer-composer";
 import { TeamManager } from "@/components/dashboard/team-manager";
 import { ProfileEditor } from "@/components/dashboard/profile-editor";
-import { DisputeClientButton } from "@/components/dashboard/dispute-button";
 import { DisconnectButton } from "@/components/dashboard/disconnect-button";
-import { AnswerEditButton } from "@/components/dashboard/answer-edit-button";
 import { DraftApproveButton } from "@/components/dashboard/draft-approve-button";
+import { DashboardQuestionInbox } from "@/components/dashboard/question-inbox";
 
 export const metadata: Metadata = {
   title: "Politician Dashboard | WhyTho",
   description: "Manage your WhyTho profile and respond to constituent questions.",
-};
-
-type AnswerRow = {
-  id: string;
-  answer_type: string;
-  body: string;
-  is_ai_generated: boolean;
-  is_draft: boolean;
-  created_at: string;
 };
 
 type QuestionRow = {
@@ -31,7 +20,14 @@ type QuestionRow = {
   net_upvotes: number;
   week_number: number;
   created_at: string;
-  answers: AnswerRow[];
+  answers: {
+    id: string;
+    answer_type: string;
+    body: string;
+    is_ai_generated: boolean;
+    is_draft: boolean;
+    created_at: string;
+  }[];
 };
 
 type DraftRow = {
@@ -42,8 +38,7 @@ type DraftRow = {
   question_body: string;
 };
 
-const QUALIFYING_THRESHOLD = 10;
-const NEW_QUESTION_HOURS = 48; // Questions added in last 48h get a "New" badge
+const NEW_QUESTION_HOURS = 48;
 
 /** Friendly verification tier badge */
 function TierBadge({ tier }: { tier: string }) {
@@ -61,106 +56,6 @@ function TierBadge({ tier }: { tier: string }) {
   );
 }
 
-/** Single question card with answer display, dispute, and composer */
-function QuestionCard({
-  question,
-  isAdmin,
-  hasOfficialAnswer,
-  politicianSlug,
-  isNew,
-}: {
-  question: QuestionRow;
-  isAdmin: boolean;
-  hasOfficialAnswer: boolean;
-  politicianSlug: string;
-  isNew: boolean;
-}) {
-  const officialAnswer = question.answers.find((a) =>
-    ["direct", "team_statement"].includes(a.answer_type) && !a.is_ai_generated && !a.is_draft
-  );
-  const aiAnswer = question.answers.find(
-    (a) => a.answer_type === "ai_analysis" && a.is_ai_generated
-  );
-
-  return (
-    <div className="rounded-xl border bg-card shadow-sm overflow-hidden">
-      {/* Question header */}
-      <div className="p-4 border-b bg-muted/30">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1 flex-wrap">
-              {isNew && (
-                <span className="inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-900/40 px-2 py-0.5 text-xs font-semibold text-blue-700 dark:text-blue-300">
-                  New
-                </span>
-              )}
-              {question.net_upvotes >= QUALIFYING_THRESHOLD && (
-                <span className="text-xs text-amber-600 dark:text-amber-400 font-medium">
-                  Qualifying
-                </span>
-              )}
-            </div>
-            <p className="text-sm font-medium leading-snug">{question.body}</p>
-          </div>
-          <div className="shrink-0 flex flex-col items-end gap-2">
-            <span className="text-xs font-semibold tabular-nums text-muted-foreground">
-              ▲ {question.net_upvotes}
-            </span>
-            <Link
-              href={`/${politicianSlug}#question-${question.id}`}
-              className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2 whitespace-nowrap"
-              target="_blank"
-            >
-              View on profile →
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="p-4 space-y-3">
-        {/* Official answer (already answered) */}
-        {officialAnswer && (
-          <div className="space-y-1">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-              {officialAnswer.answer_type === "direct"
-                ? "🏛️ Official Response"
-                : "👥 Team Statement"}
-            </p>
-            <p className="text-sm leading-relaxed">{officialAnswer.body}</p>
-            <AnswerEditButton
-              answerId={officialAnswer.id}
-              initialBody={officialAnswer.body}
-              createdAt={officialAnswer.created_at}
-            />
-          </div>
-        )}
-
-        {/* AI analysis — with dispute option */}
-        {aiAnswer && (
-          <div className="rounded-lg border border-muted bg-muted/20 px-3 py-3 space-y-2">
-            <p className="text-xs font-medium text-muted-foreground">
-              🤖 AI Analysis of Public Record
-            </p>
-            <p className="text-xs text-muted-foreground leading-relaxed line-clamp-3">
-              {aiAnswer.body}
-            </p>
-            <DisputeClientButton answerId={aiAnswer.id} />
-          </div>
-        )}
-
-        {/* Compose answer (unanswered questions) */}
-        {!hasOfficialAnswer && (
-          <AnswerComposer
-            questionId={question.id}
-            questionBody={question.body}
-            isAdmin={isAdmin}
-          />
-        )}
-      </div>
-    </div>
-  );
-}
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -267,9 +162,8 @@ export default async function DashboardPage() {
         .eq("politician_id", politician.id)
         .eq("week_number", currentWeekNumber)
         .eq("status", "active")
-        .gte("net_upvotes", QUALIFYING_THRESHOLD)
         .order("net_upvotes", { ascending: false })
-        .limit(25),
+        .limit(100),
       supabase.rpc("participation_rate_period", {
         p_politician_id: politician.id,
         p_period: "week",
@@ -345,12 +239,6 @@ export default async function DashboardPage() {
         </div>
 
         {politiciansData.map(({ politician, role, isOnlyAdmin, questions, drafts, participationRate, stats }) => {
-          const unansweredCount = questions.filter(
-            (q) => !q.answers.some(
-              (a) => ["direct", "team_statement"].includes(a.answer_type) && !a.is_ai_generated && !a.is_draft
-            )
-          ).length;
-
           const rateDisplay =
             participationRate !== null ? `${Math.round(participationRate)}%` : "—";
           const rateColor =
@@ -445,54 +333,12 @@ export default async function DashboardPage() {
               )}
 
               {/* Question inbox */}
-              {questions.length === 0 ? (
-                <div className="rounded-xl border bg-card p-8 text-center">
-                  <p className="text-muted-foreground text-sm">No qualifying questions this week yet.</p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Questions reach qualifying status when they get 10+ net upvotes.
-                  </p>
-                  <Link
-                    href={`/${politician.slug}`}
-                    className="mt-4 inline-block text-xs text-muted-foreground hover:text-foreground underline underline-offset-2"
-                  >
-                    View public profile →
-                  </Link>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">
-                      {questions.length} qualifying question{questions.length !== 1 ? "s" : ""} this week
-                    </span>
-                    {unansweredCount > 0 ? (
-                      <span className="font-medium text-amber-600 dark:text-amber-400">
-                        {unansweredCount} awaiting response
-                      </span>
-                    ) : (
-                      <span className="font-medium text-green-600 dark:text-green-400">
-                        ✓ All answered
-                      </span>
-                    )}
-                  </div>
-
-                  {questions.map((question) => {
-                    const hasOfficialAnswer = question.answers.some(
-                      (a) => ["direct", "team_statement"].includes(a.answer_type) && !a.is_ai_generated && !a.is_draft
-                    );
-                    const isNew = question.created_at > cutoff48h;
-                    return (
-                      <QuestionCard
-                        key={question.id}
-                        question={question}
-                        isAdmin={role === "admin"}
-                        hasOfficialAnswer={hasOfficialAnswer}
-                        politicianSlug={politician.slug}
-                        isNew={isNew}
-                      />
-                    );
-                  })}
-                </div>
-              )}
+              <DashboardQuestionInbox
+                questions={questions}
+                role={role}
+                politicianSlug={politician.slug}
+                cutoff48h={cutoff48h}
+              />
 
               {/* Profile editing (admin only) */}
               {role === "admin" && (

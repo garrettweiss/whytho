@@ -88,14 +88,16 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
 
   // Check if the current logged-in user is a team member for this politician (owner view)
   let isOwner = false;
+  let ownerRole: string | null = null;
   if (user && !user.is_anonymous) {
     const { data: membership } = await supabase
       .from("politician_team")
-      .select("id")
+      .select("id, role")
       .eq("politician_id", politician.id)
       .eq("user_id", user.id)
       .maybeSingle();
     isOwner = !!membership;
+    ownerRole = membership?.role ?? null;
   }
 
   // Current week number
@@ -304,6 +306,8 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
             currentWeekNumber={currentWeekNumber}
             isHistorical={isHistoricalView}
             period={period}
+            isOwner={isOwner}
+            ownerRole={ownerRole ?? undefined}
           />
 
         </div>
