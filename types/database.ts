@@ -53,6 +53,60 @@ export type Database = {
         }
         Relationships: []
       }
+      answer_media: {
+        Row: {
+          id: string
+          answer_id: string
+          politician_id: string
+          media_type: string
+          storage_path: string
+          public_url: string
+          file_name: string | null
+          file_size_bytes: number | null
+          mime_type: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          answer_id: string
+          politician_id: string
+          media_type: string
+          storage_path: string
+          public_url: string
+          file_name?: string | null
+          file_size_bytes?: number | null
+          mime_type?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          answer_id?: string
+          politician_id?: string
+          media_type?: string
+          storage_path?: string
+          public_url?: string
+          file_name?: string | null
+          file_size_bytes?: number | null
+          mime_type?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "answer_media_answer_id_fkey"
+            columns: ["answer_id"]
+            isOneToOne: false
+            referencedRelation: "answers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "answer_media_politician_id_fkey"
+            columns: ["politician_id"]
+            isOneToOne: false
+            referencedRelation: "politicians"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       anon_session_log: {
         Row: {
           created_at: string | null
@@ -140,6 +194,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "questions"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "answer_media_answer_id_fkey"
+            columns: ["id"]
+            isOneToOne: false
+            referencedRelation: "answer_media"
+            referencedColumns: ["answer_id"]
           },
         ]
       }

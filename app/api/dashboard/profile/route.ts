@@ -23,6 +23,7 @@ export async function PATCH(request: NextRequest) {
     politician_id?: string;
     website_url?: string;
     bio?: string;
+    social_handles?: Record<string, string>;
   };
 
   if (!body.politician_id) {
@@ -43,7 +44,7 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: "Only team admins can update profile fields" }, { status: 403 });
   }
 
-  const updates: Record<string, string | null> = {};
+  const updates: Record<string, string | null | Record<string, string>> = {};
 
   if (typeof body.website_url === "string") {
     const url = body.website_url.trim();
@@ -59,6 +60,23 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: "bio must be 1000 characters or fewer" }, { status: 422 });
     }
     updates.bio = bio || null;
+  }
+
+  if (body.social_handles !== undefined && typeof body.social_handles === "object") {
+    // Preserve existing social_handles and merge in the new values
+    const { data: current } = await admin
+      .from("politicians")
+      .select("social_handles")
+      .eq("id", body.politician_id)
+      .single();
+
+    const existing = (current?.social_handles ?? {}) as Record<string, string>;
+    const merged = { ...existing, ...body.social_handles };
+    // Remove empty string keys
+    for (const key of Object.keys(merged)) {
+      if (!merged[key]) delete merged[key];
+    }
+    updates.social_handles = merged;
   }
 
   if (Object.keys(updates).length === 0) {

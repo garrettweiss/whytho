@@ -59,7 +59,7 @@ export function SiteNav() {
       aria-label="Main navigation"
       className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40"
     >
-      <div className="mx-auto max-w-5xl px-4 h-14 flex items-center gap-3">
+      <div className="mx-auto max-w-5xl px-4 h-14 flex items-center gap-6">
 
         {/* Logo */}
         <Link

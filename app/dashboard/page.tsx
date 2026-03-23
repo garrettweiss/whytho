@@ -90,7 +90,8 @@ export default async function DashboardPage() {
         photo_url,
         website_url,
         bio,
-        verification_tier
+        verification_tier,
+        social_handles
       )
     `)
     .eq("user_id", user.id);
@@ -130,6 +131,7 @@ export default async function DashboardPage() {
       website_url: string | null;
       bio: string | null;
       verification_tier: string;
+      social_handles: Record<string, string> | null;
     };
     role: string;
     isOnlyAdmin: boolean;
@@ -337,6 +339,7 @@ export default async function DashboardPage() {
                 questions={questions}
                 role={role}
                 politicianSlug={politician.slug}
+                politicianName={politician.full_name}
                 cutoff48h={cutoff48h}
               />
 
@@ -346,6 +349,7 @@ export default async function DashboardPage() {
                   politicianId={politician.id}
                   currentWebsiteUrl={politician.website_url}
                   currentBio={politician.bio}
+                  currentSocialHandles={politician.social_handles as Record<string, string> | null}
                 />
               )}
 

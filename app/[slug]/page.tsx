@@ -148,7 +148,13 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
         ai_confidence,
         sources,
         is_disputed,
-        created_at
+        created_at,
+        answer_media (
+          id,
+          media_type,
+          public_url,
+          file_name
+        )
       )
     `)
     .eq("politician_id", politician.id)
@@ -275,6 +281,44 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
             currentParticipationRate={participationRate}
           />
 
+          {/* Social links */}
+          {(() => {
+            const handles = (politician.social_handles ?? {}) as Record<string, string>;
+            const links: { label: string; href: string }[] = [];
+            if (handles.x || handles.twitter) {
+              links.push({ label: "X", href: `https://x.com/${handles.x ?? handles.twitter}` });
+            }
+            if (handles.instagram) {
+              links.push({ label: "Instagram", href: `https://instagram.com/${handles.instagram}` });
+            }
+            if (handles.facebook) {
+              const fb = handles.facebook;
+              links.push({ label: "Facebook", href: fb.startsWith("http") ? fb : `https://facebook.com/${fb}` });
+            }
+            if (handles.tiktok) {
+              links.push({ label: "TikTok", href: `https://tiktok.com/@${handles.tiktok}` });
+            }
+            if (politician.website_url) {
+              links.push({ label: "Website", href: politician.website_url });
+            }
+            if (links.length === 0) return null;
+            return (
+              <div className="flex flex-wrap gap-2">
+                {links.map((l) => (
+                  <a
+                    key={l.label}
+                    href={l.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                  >
+                    {l.label} ↗
+                  </a>
+                ))}
+              </div>
+            );
+          })()}
+
           <ParticipationRate
             currentRate={participationRate}
             snapshots={snapshots ?? []}
@@ -300,8 +344,11 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
           )}
 
           <QuestionList
-            questions={questions ?? []}
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            questions={(questions ?? []) as any}
             politicianId={politician.id}
+            politicianSlug={politician.slug}
+            politicianName={politician.full_name}
             weekNumber={viewingWeekNumber}
             currentWeekNumber={currentWeekNumber}
             isHistorical={isHistoricalView}

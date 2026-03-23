@@ -36,11 +36,13 @@ function QuestionCard({
   question,
   isAdmin,
   politicianSlug,
+  politicianName,
   isNew,
 }: {
   question: InboxQuestion;
   isAdmin: boolean;
   politicianSlug: string;
+  politicianName: string;
   isNew: boolean;
 }) {
   const officialAnswer = question.answers.find(
@@ -120,6 +122,8 @@ function QuestionCard({
           <AnswerComposer
             questionId={question.id}
             questionBody={question.body}
+            politicianSlug={politicianSlug}
+            politicianName={politicianName}
             isAdmin={isAdmin}
           />
         )}
@@ -139,11 +143,13 @@ export function DashboardQuestionInbox({
   questions,
   role,
   politicianSlug,
+  politicianName,
   cutoff48h,
 }: {
   questions: InboxQuestion[];
   role: string;
   politicianSlug: string;
+  politicianName: string;
   cutoff48h: string;
 }) {
   const [filter, setFilter] = useState<Filter>("all");
@@ -242,6 +248,7 @@ export function DashboardQuestionInbox({
               question={question}
               isAdmin={isAdmin}
               politicianSlug={politicianSlug}
+              politicianName={politicianName}
               isNew={question.created_at > cutoff48h}
             />
           ))}

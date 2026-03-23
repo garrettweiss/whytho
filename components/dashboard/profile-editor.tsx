@@ -2,16 +2,28 @@
 
 import { useState, useTransition } from "react";
 
+interface SocialHandles {
+  x?: string;
+  instagram?: string;
+  facebook?: string;
+  tiktok?: string;
+}
+
 interface Props {
   politicianId: string;
   currentWebsiteUrl: string | null;
   currentBio: string | null;
+  currentSocialHandles?: SocialHandles | null;
 }
 
-export function ProfileEditor({ politicianId, currentWebsiteUrl, currentBio }: Props) {
+export function ProfileEditor({ politicianId, currentWebsiteUrl, currentBio, currentSocialHandles }: Props) {
+  const handles = currentSocialHandles ?? {};
   const [isOpen, setIsOpen] = useState(false);
   const [websiteUrl, setWebsiteUrl] = useState(currentWebsiteUrl ?? "");
   const [bio, setBio] = useState(currentBio ?? "");
+  const [instagram, setInstagram] = useState(handles.instagram ?? "");
+  const [facebook, setFacebook] = useState(handles.facebook ?? "");
+  const [tiktok, setTiktok] = useState(handles.tiktok ?? "");
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -21,6 +33,14 @@ export function ProfileEditor({ politicianId, currentWebsiteUrl, currentBio }: P
     setSaved(false);
     startTransition(async () => {
       try {
+        const socialHandles: SocialHandles = { ...handles };
+        if (instagram.trim()) socialHandles.instagram = instagram.trim().replace(/^@/, "");
+        else delete socialHandles.instagram;
+        if (facebook.trim()) socialHandles.facebook = facebook.trim();
+        else delete socialHandles.facebook;
+        if (tiktok.trim()) socialHandles.tiktok = tiktok.trim().replace(/^@/, "");
+        else delete socialHandles.tiktok;
+
         const res = await fetch("/api/dashboard/profile", {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -28,6 +48,7 @@ export function ProfileEditor({ politicianId, currentWebsiteUrl, currentBio }: P
             politician_id: politicianId,
             website_url: websiteUrl,
             bio,
+            social_handles: socialHandles,
           }),
         });
         const data = (await res.json()) as { error?: string };
@@ -87,6 +108,44 @@ export function ProfileEditor({ politicianId, currentWebsiteUrl, currentBio }: P
               className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none"
             />
             <p className="text-xs text-muted-foreground text-right">{bio.length}/1000</p>
+          </div>
+
+          {/* Social accounts */}
+          <div className="space-y-3">
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Social Accounts</p>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="text-sm w-24 shrink-0 text-muted-foreground">Instagram</span>
+                <input
+                  type="text"
+                  value={instagram}
+                  onChange={(e) => setInstagram(e.target.value)}
+                  placeholder="@yourhandle"
+                  className="flex-1 rounded-md border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm w-24 shrink-0 text-muted-foreground">Facebook</span>
+                <input
+                  type="text"
+                  value={facebook}
+                  onChange={(e) => setFacebook(e.target.value)}
+                  placeholder="facebook.com/yourpage or page name"
+                  className="flex-1 rounded-md border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm w-24 shrink-0 text-muted-foreground">TikTok</span>
+                <input
+                  type="text"
+                  value={tiktok}
+                  onChange={(e) => setTiktok(e.target.value)}
+                  placeholder="@yourhandle"
+                  className="flex-1 rounded-md border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                />
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground">Display only — links shown on your public profile.</p>
           </div>
 
           {error && <p className="text-sm text-destructive">{error}</p>}

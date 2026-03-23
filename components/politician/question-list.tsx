@@ -5,8 +5,16 @@ import Link from "next/link";
 import { Enums } from "@/types/database";
 import { createClient } from "@/lib/supabase/client";
 import { AnswerComposer } from "@/components/answers/answer-composer";
+import { AnswerMediaDisplay } from "@/components/answers/answer-media-display";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
+
+type AnswerMedia = {
+  id: string;
+  media_type: "image" | "video" | "audio";
+  public_url: string;
+  file_name: string | null;
+};
 
 type Answer = {
   id: string;
@@ -17,6 +25,7 @@ type Answer = {
   sources: unknown;
   is_disputed: boolean;
   created_at: string;
+  answer_media?: AnswerMedia[];
 };
 
 type XAttribution = {
@@ -42,6 +51,8 @@ type Question = {
 interface QuestionListProps {
   questions: Question[];
   politicianId: string;
+  politicianSlug: string;
+  politicianName: string;
   weekNumber: number;
   currentWeekNumber?: number;
   isHistorical?: boolean;
@@ -99,6 +110,9 @@ function AnswerBlock({ answer }: { answer: Answer }) {
         )}
       </div>
       <p className="leading-relaxed">{answer.body}</p>
+      {answer.answer_media && answer.answer_media.length > 0 && (
+        <AnswerMediaDisplay media={answer.answer_media} />
+      )}
       {isAI && Array.isArray(answer.sources) && answer.sources.length > 0 && (
         <div className="pt-1 border-t border-muted">
           <p className="text-xs text-muted-foreground font-medium mb-1">Sources:</p>
@@ -217,6 +231,8 @@ function formatWeekBadge(weekNumber: number): string {
 function QuestionCard({
   question,
   politicianId: _politicianId,
+  politicianSlug,
+  politicianName,
   weekNumber,
   isHistorical = false,
   showWeekBadge = false,
@@ -227,6 +243,8 @@ function QuestionCard({
 }: {
   question: Question;
   politicianId: string;
+  politicianSlug: string;
+  politicianName: string;
   weekNumber: number;
   isHistorical?: boolean;
   showWeekBadge?: boolean;
@@ -357,6 +375,8 @@ function QuestionCard({
                 <AnswerComposer
                   questionId={question.id}
                   questionBody={question.body}
+                  politicianSlug={politicianSlug}
+                  politicianName={politicianName}
                   isAdmin={ownerRole === "admin"}
                 />
               </div>
@@ -379,7 +399,7 @@ function QuestionCard({
 
 const PROFILE_PROMPT_KEY = "whytho_profile_prompt_dismissed";
 
-export function QuestionList({ questions, politicianId, weekNumber, currentWeekNumber: _currentWeekNumber, isHistorical = false, period = "week", isOwner = false, ownerRole }: QuestionListProps) {
+export function QuestionList({ questions, politicianId, politicianSlug, politicianName, weekNumber, currentWeekNumber: _currentWeekNumber, isHistorical = false, period = "week", isOwner = false, ownerRole }: QuestionListProps) {
   const [localQuestions, setLocalQuestions] = useState<Question[]>(questions);
   const [showProfileBanner, setShowProfileBanner] = useState(false);
   const hasCheckedProfile = useRef(false);
@@ -501,7 +521,7 @@ export function QuestionList({ questions, politicianId, weekNumber, currentWeekN
           <div className="space-y-2">
             <p className="text-xs font-medium uppercase tracking-wide text-amber-600">⚡ Qualifying (10+ votes)</p>
             {qualifying.map((q) => (
-              <QuestionCard key={q.id} question={q} politicianId={politicianId} weekNumber={weekNumber} isHistorical={isHistorical} onVoteSuccess={handleVoteSuccess} isOwner={isOwner} ownerRole={ownerRole} />
+              <QuestionCard key={q.id} question={q} politicianId={politicianId} politicianSlug={politicianSlug} politicianName={politicianName} weekNumber={weekNumber} isHistorical={isHistorical} onVoteSuccess={handleVoteSuccess} isOwner={isOwner} ownerRole={ownerRole} />
             ))}
           </div>
         )}
@@ -509,7 +529,7 @@ export function QuestionList({ questions, politicianId, weekNumber, currentWeekN
           <div className="space-y-2">
             {qualifying.length > 0 && <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Other Questions</p>}
             {nonQualifying.map((q) => (
-              <QuestionCard key={q.id} question={q} politicianId={politicianId} weekNumber={weekNumber} isHistorical={isHistorical} onVoteSuccess={handleVoteSuccess} isOwner={isOwner} ownerRole={ownerRole} />
+              <QuestionCard key={q.id} question={q} politicianId={politicianId} politicianSlug={politicianSlug} politicianName={politicianName} weekNumber={weekNumber} isHistorical={isHistorical} onVoteSuccess={handleVoteSuccess} isOwner={isOwner} ownerRole={ownerRole} />
             ))}
           </div>
         )}
@@ -533,6 +553,8 @@ export function QuestionList({ questions, politicianId, weekNumber, currentWeekN
             key={q.id}
             question={q}
             politicianId={politicianId}
+            politicianSlug={politicianSlug}
+            politicianName={politicianName}
             weekNumber={q.week_number}
             isHistorical={false}
             showWeekBadge={showWeekBadge}

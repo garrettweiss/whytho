@@ -1,42 +1,81 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { ShareTray } from "@/components/answers/share-tray";
 
 const TEXT_MIN = 10;
 const TEXT_MAX = 5000;
 
+const ACCEPTED_MIME = [
+  "image/jpeg", "image/png", "image/webp", "image/heic", "image/gif",
+  "video/mp4", "video/quicktime", "video/webm",
+  "audio/mpeg", "audio/wav", "audio/mp4", "audio/ogg", "audio/x-m4a",
+].join(",");
+
 type AnswerMode = "text" | "link";
+
+interface MediaFile {
+  file: File;
+  previewUrl: string;
+  mediaType: "image" | "video" | "audio";
+}
 
 interface Props {
   questionId: string;
   questionBody: string;
+  politicianSlug: string;
+  politicianName: string;
   isAdmin: boolean;
   onAnswered?: () => void;
 }
 
-export function AnswerComposer({ questionId, questionBody, isAdmin: _isAdmin, onAnswered }: Props) {
+function detectSocialPlatform(url: string): string | null {
+  if (/instagram\.com\/p\/|instagram\.com\/reel\//i.test(url)) return "instagram";
+  if (/tiktok\.com\/@.*\/video\//i.test(url)) return "tiktok";
+  if (/facebook\.com\/.*\/posts\/|fb\.watch\//i.test(url)) return "facebook";
+  if (/x\.com\/.*\/status\/|twitter\.com\/.*\/status\//i.test(url)) return "x";
+  return null;
+}
+
+const PLATFORM_LABELS: Record<string, string> = {
+  instagram: "📷 Instagram post detected",
+  tiktok: "🎵 TikTok video detected",
+  facebook: "📘 Facebook post detected",
+  x: "𝕏 X/Twitter post detected",
+};
+
+export function AnswerComposer({
+  questionId,
+  questionBody,
+  politicianSlug,
+  politicianName,
+  isAdmin: _isAdmin,
+  onAnswered,
+}: Props) {
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [isOpen, setIsOpen] = useState(false);
   const [mode, setMode] = useState<AnswerMode>("text");
   const [text, setText] = useState("");
   const [linkUrl, setLinkUrl] = useState("");
   const [linkDescription, setLinkDescription] = useState("");
   const [sources, setSources] = useState("");
+  const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
+  const [publishedAnswerId, setPublishedAnswerId] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   const charCount = text.length;
   const isTextValid = charCount >= TEXT_MIN && charCount <= TEXT_MAX;
   const isLinkValid = linkUrl.startsWith("http") && linkUrl.length > 10;
   const isValid = mode === "text" ? isTextValid : isLinkValid;
+  const detectedPlatform = mode === "link" ? detectSocialPlatform(linkUrl) : null;
 
   function parseSourceUrls(raw: string): string[] {
-    return raw
-      .split(/[\n,]+/)
-      .map((s) => s.trim())
-      .filter((s) => s.length > 0);
+    return raw.split(/[\n,]+/).map((s) => s.trim()).filter((s) => s.length > 0);
   }
 
   function buildBody(): string {
@@ -52,10 +91,60 @@ export function AnswerComposer({ questionId, questionBody, isAdmin: _isAdmin, on
     return parseSourceUrls(sources);
   }
 
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+    if (files.length === 0) return;
+
+    const newMedia: MediaFile[] = [];
+    for (const file of files) {
+      const mime = file.type;
+      let mediaType: "image" | "video" | "audio" | null = null;
+      if (mime.startsWith("image/")) mediaType = "image";
+      else if (mime.startsWith("video/")) mediaType = "video";
+      else if (mime.startsWith("audio/")) mediaType = "audio";
+      if (!mediaType) continue;
+
+      const previewUrl = URL.createObjectURL(file);
+      newMedia.push({ file, previewUrl, mediaType });
+    }
+
+    setMediaFiles((prev) => [...prev, ...newMedia].slice(0, 5)); // max 5 files
+    // reset input so same file can be re-selected
+    e.target.value = "";
+  }
+
+  function removeMedia(index: number) {
+    setMediaFiles((prev) => {
+      const next = [...prev];
+      URL.revokeObjectURL(next[index]!.previewUrl);
+      next.splice(index, 1);
+      return next;
+    });
+  }
+
+  async function uploadMediaFiles(answerId: string) {
+    for (let i = 0; i < mediaFiles.length; i++) {
+      const { file } = mediaFiles[i]!;
+      setUploadProgress(`Uploading media ${i + 1} of ${mediaFiles.length}…`);
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch(`/api/answers/${answerId}/media`, {
+        method: "POST",
+        body: fd,
+      });
+      if (!res.ok) {
+        const data = (await res.json()) as { error?: string };
+        throw new Error(data.error ?? `Failed to upload file ${i + 1}`);
+      }
+    }
+    setUploadProgress(null);
+  }
+
   function handleSubmit() {
     setError(null);
     startTransition(async () => {
       try {
+        // Step 1: publish the answer
         const res = await fetch("/api/answers", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -67,33 +156,53 @@ export function AnswerComposer({ questionId, questionBody, isAdmin: _isAdmin, on
           }),
         });
 
-        const data = (await res.json()) as { error?: string };
+        const data = (await res.json()) as { error?: string; answer?: { id: string } };
 
         if (!res.ok) {
           setError(data.error ?? "Something went wrong. Please try again.");
           return;
         }
 
-        setSuccess(true);
+        const answerId = data.answer?.id;
+
+        // Step 2: upload any attached media
+        if (answerId && mediaFiles.length > 0) {
+          try {
+            await uploadMediaFiles(answerId);
+          } catch (uploadErr) {
+            // Answer is already published — note the failure but don't block success
+            setError(`Answer published, but media upload failed: ${uploadErr instanceof Error ? uploadErr.message : "unknown error"}`);
+          }
+        }
+
+        // Cleanup previews
+        mediaFiles.forEach((m) => URL.revokeObjectURL(m.previewUrl));
+        setMediaFiles([]);
         setText("");
         setSources("");
         setLinkUrl("");
         setLinkDescription("");
         router.refresh();
         onAnswered?.();
+
+        if (answerId) {
+          setPublishedAnswerId(answerId);
+        }
       } catch {
         setError("Network error. Please try again.");
       }
     });
   }
 
-  if (success) {
+  // Share tray after publish
+  if (publishedAnswerId) {
     return (
-      <div className="rounded-lg border border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/30 px-4 py-3">
-        <p className="text-sm font-medium text-green-700 dark:text-green-400">
-          ✓ Answer published successfully.
-        </p>
-      </div>
+      <ShareTray
+        answerId={publishedAnswerId}
+        politicianName={politicianName}
+        politicianSlug={politicianSlug}
+        questionBody={questionBody}
+      />
     );
   }
 
@@ -184,10 +293,15 @@ export function AnswerComposer({ questionId, questionBody, isAdmin: _isAdmin, on
               type="url"
               value={linkUrl}
               onChange={(e) => setLinkUrl(e.target.value)}
-              placeholder="https://yourwebsite.gov/statement-on-question"
+              placeholder="https://yourwebsite.gov/statement, or paste an Instagram/TikTok/Facebook post"
               disabled={isPending}
               className="w-full rounded-md border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-60"
             />
+            {detectedPlatform && (
+              <p className="mt-1 text-xs text-muted-foreground">
+                {PLATFORM_LABELS[detectedPlatform]} — this will be shown as a link with a preview on your profile.
+              </p>
+            )}
           </div>
           <div>
             <label className="text-xs text-muted-foreground mb-1 block">
@@ -196,24 +310,86 @@ export function AnswerComposer({ questionId, questionBody, isAdmin: _isAdmin, on
             <textarea
               value={linkDescription}
               onChange={(e) => { if (e.target.value.length <= 500) setLinkDescription(e.target.value); }}
-              placeholder="I addressed this in my statement on March 15th..."
+              placeholder="I addressed this in my statement on March 15th…"
               rows={2}
               disabled={isPending}
               className="w-full resize-none rounded-md border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-60"
             />
           </div>
-          <p className="text-xs text-muted-foreground">
-            The link will be shown on your public profile with a summary of your position.
-          </p>
         </div>
       )}
 
+      {/* Media upload */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-muted-foreground font-medium">Attach media (optional)</span>
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isPending || mediaFiles.length >= 5}
+            className="rounded-md border px-2.5 py-1 text-xs font-medium hover:bg-muted transition-colors disabled:opacity-40"
+          >
+            + Add photo / video / audio
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept={ACCEPTED_MIME}
+            multiple
+            onChange={handleFileChange}
+            className="hidden"
+          />
+        </div>
+
+        {mediaFiles.length > 0 && (
+          <div className="space-y-2">
+            {mediaFiles.map((m, i) => (
+              <div key={i} className="relative rounded-lg border bg-muted/30 overflow-hidden">
+                {m.mediaType === "image" && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={m.previewUrl} alt={m.file.name} className="w-full max-h-40 object-cover" />
+                )}
+                {m.mediaType === "video" && (
+                  <video src={m.previewUrl} className="w-full max-h-40" controls preload="metadata" />
+                )}
+                {m.mediaType === "audio" && (
+                  <div className="px-3 py-2">
+                    <p className="text-xs text-muted-foreground mb-1 truncate">{m.file.name}</p>
+                    <audio src={m.previewUrl} controls className="w-full" preload="metadata" />
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={() => removeMedia(i)}
+                  className="absolute top-1.5 right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-black/60 text-white text-xs leading-none hover:bg-black/80"
+                  aria-label="Remove"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+        {mediaFiles.length > 0 && (
+          <p className="text-xs text-muted-foreground">{mediaFiles.length}/5 file{mediaFiles.length !== 1 ? "s" : ""} attached</p>
+        )}
+      </div>
+
+      {uploadProgress && <p className="text-xs text-muted-foreground">{uploadProgress}</p>}
       {error && <p className="text-xs text-destructive">{error}</p>}
 
       <div className="flex gap-2">
         <button
           type="button"
-          onClick={() => { setIsOpen(false); setError(null); setText(""); setLinkUrl(""); setLinkDescription(""); }}
+          onClick={() => {
+            setIsOpen(false);
+            setError(null);
+            setText("");
+            setLinkUrl("");
+            setLinkDescription("");
+            mediaFiles.forEach((m) => URL.revokeObjectURL(m.previewUrl));
+            setMediaFiles([]);
+          }}
           disabled={isPending}
           className="rounded-md border px-4 py-2 text-sm font-medium hover:bg-muted transition-colors disabled:opacity-50"
         >
@@ -225,7 +401,7 @@ export function AnswerComposer({ questionId, questionBody, isAdmin: _isAdmin, on
           disabled={!isValid || isPending}
           className="flex-1 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isPending ? "Publishing…" : "Publish Answer"}
+          {isPending ? (uploadProgress ?? "Publishing…") : "Publish Answer"}
         </button>
       </div>
     </div>
