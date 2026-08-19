@@ -12,6 +12,16 @@ import { z } from "zod";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { buildSystemPrompt } from "@/lib/ai/chatbot-prompt";
 import { containsProfanity } from "@/lib/moderation/filter";
+import { rateLimit, clientIp } from "@/lib/rate-limit";
+
+// Cost controls. This endpoint runs claude-sonnet-4-6 with tool calling, so an
+// unauthenticated, unmetered caller could run up an unbounded Anthropic bill.
+const CHAT_PER_USER_LIMIT = 12;
+const CHAT_PER_USER_WINDOW_MS = 5 * 60 * 1000;
+const CHAT_PER_IP_LIMIT = 30;
+const CHAT_PER_IP_WINDOW_MS = 5 * 60 * 1000;
+/** Caps the context resent on each turn, which is what actually drives token spend. */
+const MAX_MESSAGES_PER_REQUEST = 40;
 
 const MAX_QUESTION_LENGTH = 500;
 const MIN_QUESTION_LENGTH = 10;
@@ -23,12 +33,47 @@ export async function POST(req: Request) {
     pageContext?: string | null;
   };
 
-  // Get current user (anon is fine)
+  // A session is required. Anonymous accounts are fine, and /api/auth/anonymous
+  // is itself IP rate limited, so this forces callers through a metered door
+  // rather than leaving a paid model endpoint open to the internet.
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  const userId = user?.id ?? null;
+
+  if (!user) {
+    return Response.json(
+      { error: "Sign in to use the assistant." },
+      { status: 401 }
+    );
+  }
+  const userId = user.id;
+
+  const ip = clientIp(req);
+  const perIp = rateLimit(`chat:ip:${ip}`, CHAT_PER_IP_LIMIT, CHAT_PER_IP_WINDOW_MS);
+  const perUser = rateLimit(
+    `chat:user:${userId}`,
+    CHAT_PER_USER_LIMIT,
+    CHAT_PER_USER_WINDOW_MS
+  );
+
+  if (!perIp.allowed || !perUser.allowed) {
+    const retryAfter = Math.max(perIp.retryAfterSeconds, perUser.retryAfterSeconds);
+    return Response.json(
+      { error: "Too many messages. Please wait a moment and try again." },
+      { status: 429, headers: { "Retry-After": String(retryAfter) } }
+    );
+  }
+
+  if (!Array.isArray(messages) || messages.length === 0) {
+    return Response.json({ error: "No messages provided." }, { status: 400 });
+  }
+  if (messages.length > MAX_MESSAGES_PER_REQUEST) {
+    return Response.json(
+      { error: "Conversation too long. Please start a new chat." },
+      { status: 413 }
+    );
+  }
 
   const admin = createAdminClient();
 
