@@ -1,7 +1,10 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/server";
+
+// Refresh hourly. Without this the page would be built once and never update.
+export const revalidate = 3600;
 import { PoliticianAvatar } from "@/components/politician/politician-avatar";
 import { stateBySlug } from "@/lib/search/states";
 
@@ -69,7 +72,7 @@ export default async function RegionPage({ params }: Props) {
 
   if (!stateEntry) notFound();
 
-  const supabase = await createClient();
+  const supabase = createPublicClient();
 
   // Federal politicians store state as full name ("California"),
   // state-level politicians store it as a 2-letter code ("CA").

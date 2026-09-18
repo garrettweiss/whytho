@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/server";
 import { withTimeout, assertNonEmpty } from "@/lib/db/query-timeout";
 import { PoliticianAvatar } from "@/components/politician/politician-avatar";
 import {
@@ -120,7 +120,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 }
 
 export default async function HomePage() {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
 
   const { data: weekData } = await withTimeout(
     supabase.rpc("current_week_number"),
