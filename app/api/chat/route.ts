@@ -244,7 +244,7 @@ export async function POST(req: Request) {
           }
 
           if (stat_type === "most_questions") {
-            let q = admin2
+            const q = admin2
               .from("questions")
               .select("politician_id, politicians!politician_id(full_name, slug, office, state, party)")
               .eq("status", "active");
