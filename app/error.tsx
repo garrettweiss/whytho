@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
+import * as Sentry from "@sentry/nextjs";
 
 interface Props {
   error: Error & { digest?: string };
@@ -10,8 +11,10 @@ interface Props {
 
 export default function GlobalError({ error, reset }: Props) {
   useEffect(() => {
-    // Log to Sentry in production
-    if (process.env.NODE_ENV === "production") {
+    // This previously only called console.error, so the copy below promising the
+    // team had been notified was untrue and no alert ever fired.
+    Sentry.captureException(error);
+    if (process.env.NODE_ENV !== "production") {
       console.error("[WhyTho] Unhandled error:", error);
     }
   }, [error]);

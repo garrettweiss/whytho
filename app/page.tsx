@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/server";
+import { withTimeout, assertNonEmpty } from "@/lib/db/query-timeout";
 import { PoliticianAvatar } from "@/components/politician/politician-avatar";
 import {
   HomePoliticianSearch,
@@ -119,9 +120,12 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 }
 
 export default async function HomePage() {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
 
-  const { data: weekData } = await supabase.rpc("current_week_number");
+  const { data: weekData } = await withTimeout(
+    supabase.rpc("current_week_number"),
+    "current_week_number"
+  );
   const weekNumber = weekData as number;
 
   // Parallel data fetches
@@ -133,11 +137,13 @@ export default async function HomePage() {
     { data: leaderboardRaw },
     { data: featuredSnaps },
     { data: rainQuestionsRaw },
-  ] = await Promise.all([
+  ] = await withTimeout(
+    Promise.all([
     supabase
       .from("politicians")
       .select("*", { count: "exact", head: true })
-      .eq("is_active", true),
+      .eq("is_active", true)
+      .eq("is_test", false),
 
     supabase
       .from("questions")
@@ -153,7 +159,7 @@ export default async function HomePage() {
     supabase
       .from("questions")
       .select(
-        "id, body, net_upvotes, is_seeded, politicians!politician_id(slug, full_name, office, state, party)"
+        "id, body, net_upvotes, is_seeded, politicians!politician_id(slug, full_name, office, state, party, is_test)"
       )
       .eq("week_number", weekNumber)
       .eq("status", "active")
@@ -166,7 +172,7 @@ export default async function HomePage() {
     supabase
       .from("weekly_snapshots")
       .select(
-        "politician_id, participation_rate, answered_qualifying, qualifying_questions, week_number, politicians!politician_id(slug, full_name, office, state, party, photo_url)"
+        "politician_id, participation_rate, answered_qualifying, qualifying_questions, week_number, politicians!politician_id(slug, full_name, office, state, party, photo_url, is_test)"
       )
       .not("politicians", "is", null)
       .gt("qualifying_questions", 0)
@@ -178,7 +184,7 @@ export default async function HomePage() {
     supabase
       .from("weekly_snapshots")
       .select(
-        "politician_id, qualifying_questions, politicians!politician_id(id, slug, full_name, office, state, party, photo_url)"
+        "politician_id, qualifying_questions, politicians!politician_id(id, slug, full_name, office, state, party, photo_url, is_test)"
       )
       .not("politicians", "is", null)
       .gt("qualifying_questions", 0)
@@ -189,7 +195,7 @@ export default async function HomePage() {
     supabase
       .from("questions")
       .select(
-        "id, body, politicians!politician_id(slug, full_name, photo_url)"
+        "id, body, politicians!politician_id(slug, full_name, photo_url, is_test)"
       )
       .eq("week_number", weekNumber)
       .eq("status", "active")
@@ -197,7 +203,14 @@ export default async function HomePage() {
       .gte("net_upvotes", 1)
       .order("net_upvotes", { ascending: false })
       .limit(20),
-  ]);
+    ]),
+    "homepage_queries"
+  );
+
+  // A zero politician count is never legitimate against an 11k-row corpus: it
+  // means the query failed. Throwing surfaces the error boundary and reports to
+  // Sentry, instead of silently serving an empty page with HTTP 200.
+  assertNonEmpty(politicianCount, "politicians");
 
   // Top questions with politician context
   interface TopQuestion {
@@ -206,7 +219,12 @@ export default async function HomePage() {
     net_upvotes: number;
     politician: { slug: string; full_name: string; office: string | null; state: string | null; party: string | null } | null;
   }
-  const topQuestions: TopQuestion[] = (topQuestionsRaw ?? []).map((q) => ({
+  const topQuestions: TopQuestion[] = (topQuestionsRaw ?? [])
+    .filter((q) => {
+      const p = Array.isArray(q.politicians) ? q.politicians[0] : q.politicians;
+      return !(p as { is_test?: boolean } | null)?.is_test;
+    })
+    .map((q) => ({
     id: q.id,
     body: q.body,
     net_upvotes: q.net_upvotes,
@@ -231,7 +249,10 @@ export default async function HomePage() {
   }
 
   const allLeaderboard: LeaderboardRow[] = (leaderboardRaw ?? [])
-    .filter((r) => r.politicians !== null)
+    .filter(
+      (r) =>
+        r.politicians !== null && !(r.politicians as { is_test?: boolean }).is_test
+    )
     .map((r) => {
       const p = r.politicians as {
         slug: string;
@@ -276,15 +297,21 @@ export default async function HomePage() {
     seenIds.add(row.politician_id);
     const p = (
       Array.isArray(row.politicians) ? row.politicians[0] : row.politicians
-    ) as FeaturedPolitician | null;
-    if (p) featuredPoliticians.push(p);
+    ) as (FeaturedPolitician & { is_test?: boolean }) | null;
+    if (p && !p.is_test) featuredPoliticians.push(p);
     if (featuredPoliticians.length >= 12) break;
   }
 
   const rainItems: RainItem[] = (rainQuestionsRaw ?? []).flatMap((q) => {
     const p = Array.isArray(q.politicians) ? q.politicians[0] : q.politicians;
     if (!p || typeof p !== "object" || !("slug" in p)) return [];
-    const pol = p as { slug: string; full_name: string; photo_url: string | null };
+    const pol = p as {
+      slug: string;
+      full_name: string;
+      photo_url: string | null;
+      is_test?: boolean;
+    };
+    if (pol.is_test) return [];
     return [{ questionId: q.id, body: q.body, slug: pol.slug, fullName: pol.full_name, photoUrl: pol.photo_url }];
   });
 

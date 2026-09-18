@@ -2,7 +2,9 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Suspense } from "react";
 import type { Metadata } from "next";
-import { createClient } from "@/lib/supabase/server";
+import { unstable_cache } from "next/cache";
+import { createPublicClient } from "@/lib/supabase/server";
+import { OwnerBanner } from "@/components/politician/owner-banner";
 import { PoliticianHeader } from "@/components/politician/politician-header";
 import { ParticipationRate } from "@/components/politician/participation-rate";
 import { QuestionList } from "@/components/politician/question-list";
@@ -17,11 +19,11 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const supabase = await createClient();
+  const supabase = createPublicClient();
 
   const { data: politician } = await supabase
     .from("politicians")
-    .select("full_name, office, state, party, photo_url, bio")
+    .select("full_name, office, state, party, photo_url, bio, is_test")
     .eq("slug", slug)
     .single();
 
@@ -33,6 +35,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title,
     description,
+    // Test fixtures are reachable by direct URL for QA but must never be indexed.
+    robots: politician.is_test ? { index: false, follow: false } : undefined,
     openGraph: {
       title,
       description,
@@ -66,10 +70,21 @@ function periodCutoff(period: Period): string | null {
 
 const VALID_PERIODS: Period[] = ["week", "month", "year", "all"];
 
-export default async function PoliticianProfilePage({ params, searchParams }: Props) {
-  const { slug } = await params;
-  const { week: weekParam, period: periodParam } = await searchParams;
-  const supabase = await createClient();
+/**
+ * All profile data, cached per (slug, week, period).
+ *
+ * This page reads searchParams, which forces dynamic rendering in Next 15, so
+ * ISR cannot cache the HTML. Caching the data layer instead means the database
+ * answers one query set per profile per window rather than one per visitor.
+ * With 11,513 profiles crawled continuously on a nano instance, that difference
+ * is what exhausted the Disk IO budget in August 2026.
+ *
+ * Must stay free of cookies() and headers(): unstable_cache forbids them, and
+ * the point is that the result is identical for every visitor.
+ */
+const loadProfile = unstable_cache(
+  async (slug: string, weekParam: string | undefined, periodParam: string | undefined) => {
+  const supabase = createPublicClient();
 
   const { data: politician } = await supabase
     .from("politicians")
@@ -77,29 +92,8 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
     .eq("slug", slug)
     .single();
 
-  if (!politician) notFound();
+  if (!politician) return null;
 
-  // Get current user for access control + owner detection
-  const { data: { user } } = await supabase.auth.getUser();
-
-  // Test politicians are only visible to admins
-  if (politician.is_test) {
-    if (!user || user.app_metadata?.is_admin !== true) notFound();
-  }
-
-  // Check if the current logged-in user is a team member for this politician (owner view)
-  let isOwner = false;
-  let ownerRole: string | null = null;
-  if (user && !user.is_anonymous) {
-    const { data: membership } = await supabase
-      .from("politician_team")
-      .select("id, role")
-      .eq("politician_id", politician.id)
-      .eq("user_id", user.id)
-      .maybeSingle();
-    isOwner = !!membership;
-    ownerRole = membership?.role ?? null;
-  }
 
   // Current week number
   const { data: weekData } = await supabase.rpc("current_week_number");
@@ -205,6 +199,38 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
     .order("week_number", { ascending: false })
     .limit(8);
 
+  return {
+    politician,
+    currentWeekNumber,
+    isHistoricalView,
+    viewingWeekNumber,
+    period,
+    questions: questions ?? [],
+    participationRate,
+    snapshots: snapshots ?? [],
+  };
+  },
+  ["politician-profile"],
+  { revalidate: 300, tags: ["politician-profile"] }
+);
+
+export default async function PoliticianProfilePage({ params, searchParams }: Props) {
+  const { slug } = await params;
+  const { week: weekParam, period: periodParam } = await searchParams;
+
+  const data = await loadProfile(slug, weekParam, periodParam);
+  if (!data) notFound();
+  const {
+    politician,
+    currentWeekNumber,
+    isHistoricalView,
+    viewingWeekNumber,
+    period,
+    questions,
+    participationRate,
+    snapshots,
+  } = data;
+
   const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://whytho.us";
   const jsonLd = {
     "@context": "https://schema.org",
@@ -254,23 +280,11 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
             </div>
           )}
 
-          {/* Owner banner — shown when the logged-in user manages this profile */}
-          {isOwner && (
-            <div className="rounded-lg border border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/30 px-4 py-3 flex items-center justify-between gap-3">
-              <p className="text-sm text-blue-800 dark:text-blue-300 font-medium">
-                You are viewing your public profile.
-              </p>
-              <Link
-                href="/dashboard"
-                className="shrink-0 text-sm font-medium text-blue-700 dark:text-blue-400 underline underline-offset-2 hover:no-underline"
-              >
-                Go to Dashboard →
-              </Link>
-            </div>
-          )}
+          {/* Owner banner, resolved client-side so this page stays cacheable */}
+          <OwnerBanner politicianId={politician.id} />
 
-          {/* Unclaimed prompt — shown only when not the owner */}
-          {!isOwner && politician.verification_tier === "0" && (
+          {/* Unclaimed prompt. A tier-0 profile has no team yet, so no owner check is needed. */}
+          {politician.verification_tier === "0" && (
             <div className="rounded-lg border bg-card px-4 py-3 flex items-center justify-between gap-3">
               <p className="text-sm text-muted-foreground">
                 This profile is unclaimed. Are you {politician.full_name}?
@@ -379,8 +393,6 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
             currentWeekNumber={currentWeekNumber}
             isHistorical={isHistoricalView}
             period={period}
-            isOwner={isOwner}
-            ownerRole={ownerRole ?? undefined}
           />
 
         </div>

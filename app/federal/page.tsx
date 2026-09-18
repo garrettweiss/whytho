@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { unstable_cache } from "next/cache";
+import { createPublicClient } from "@/lib/supabase/server";
 import { PoliticianAvatar } from "@/components/politician/politician-avatar";
 
 export const metadata: Metadata = {
@@ -118,6 +119,36 @@ function PoliticianRow({ p }: { p: { id: string; slug: string; full_name: string
 
 type Chamber = "all" | "executive" | "senate" | "house" | "governors";
 
+/**
+ * The four federal lists, cached hourly.
+ *
+ * This page reads ?chamber=, which forces dynamic rendering, but the parameter
+ * only filters the UI: the fetch is identical for every value. Caching the data
+ * means the ~600-row query set runs once an hour instead of once per visitor.
+ */
+const loadFederalLists = unstable_cache(
+  async () => {
+    const supabase = createPublicClient();
+    const sel = "id, slug, full_name, office, state, party, photo_url";
+
+    const [execRes, govRes, senRes, houseRes] = await Promise.all([
+      supabase.from("politicians").select(sel).eq("is_active", true).eq("is_test", false).in("office", EXECUTIVE_OFFICES).order("full_name"),
+      supabase.from("politicians").select(sel).eq("is_active", true).eq("is_test", false).eq("office", "Governor").order("state").order("full_name"),
+      supabase.from("politicians").select(sel).eq("is_active", true).eq("is_test", false).eq("office", "U.S. Senator").order("state").order("full_name").limit(110),
+      supabase.from("politicians").select(sel).eq("is_active", true).eq("is_test", false).eq("office", "U.S. Representative").order("state").order("full_name").limit(450),
+    ]);
+
+    return {
+      exec: execRes.data ?? [],
+      gov: govRes.data ?? [],
+      sen: senRes.data ?? [],
+      house: houseRes.data ?? [],
+    };
+  },
+  ["federal-lists"],
+  { revalidate: 3600, tags: ["politicians"] }
+);
+
 export default async function FederalPage({
   searchParams,
 }: {
@@ -131,23 +162,14 @@ export default async function FederalPage({
     chamberParam === "governors" ? "governors" :
     "all";
 
-  const supabase = await createClient();
-  const sel = "id, slug, full_name, office, state, party, photo_url";
+  const { exec, gov, sen, house } = await loadFederalLists();
 
-  // Always fetch all four groups - filter in UI based on `chamber`
-  const [execRes, govRes, senRes, houseRes] = await Promise.all([
-    supabase.from("politicians").select(sel).eq("is_active", true).eq("is_test", false).in("office", EXECUTIVE_OFFICES).order("full_name"),
-    supabase.from("politicians").select(sel).eq("is_active", true).eq("is_test", false).eq("office", "Governor").order("state").order("full_name"),
-    supabase.from("politicians").select(sel).eq("is_active", true).eq("is_test", false).eq("office", "U.S. Senator").order("state").order("full_name").limit(110),
-    supabase.from("politicians").select(sel).eq("is_active", true).eq("is_test", false).eq("office", "U.S. Representative").order("state").order("full_name").limit(450),
-  ]);
-
-  const executive = [...(execRes.data ?? [])].sort(
+  const executive = [...exec].sort(
     (a, b) => (EXECUTIVE_ORDER[a.office ?? ""] ?? 99) - (EXECUTIVE_ORDER[b.office ?? ""] ?? 99)
   );
-  const governors = govRes.data ?? [];
-  const senators = senRes.data ?? [];
-  const representatives = houseRes.data ?? [];
+  const governors = gov;
+  const senators = sen;
+  const representatives = house;
 
   // Group senators + reps by state
   function groupByState<T extends { state: string | null }>(arr: T[]) {

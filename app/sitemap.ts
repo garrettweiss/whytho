@@ -38,6 +38,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .from("politicians")
     .select("slug, updated_at")
     .eq("is_active", true)
+    .eq("is_test", false)
     .limit(2000);
 
   const politicianPages: MetadataRoute.Sitemap = (politicians ?? []).map((p) => ({
