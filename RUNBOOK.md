@@ -84,6 +84,7 @@ Look for `wal_size_bytes` climbing, `active_connections` stacking, or
 
 | Symptom | Likely layer |
 |---|---|
+| 402 from `*.supabase.co` | **Project restricted for a quota violation.** The JSON body names it (`exceed_storage_size_quota`, etc). Postgres stays reachable via the CLI; only a plan upgrade or deleting data from the dashboard lifts it |
 | 522 or 521 from `*.supabase.co` | Database or API gateway |
 | `/api/health` 503, site loads | Database degraded, app healthy |
 | Site slow but health 200 | Caching or cold start |
@@ -150,6 +151,36 @@ curl -sI https://whytho.us/ | grep -iE "x-vercel-cache|cache-control"
 Expect `x-vercel-cache: HIT` (or `STALE`) on the second request and a
 `cache-control` with `s-maxage`. `no-store` plus `MISS` on every request means
 something has reintroduced a dynamic API into that page.
+
+---
+
+## Known incident: October 2026
+
+**Symptoms.** Every page returned HTTP 200 in under a second while rendering
+"0 politicians tracked", the same empty page as August. Supabase REST, Auth and
+Storage all returned 402 with `exceed_storage_size_quota`. Postgres itself was
+healthy (49 MB, 68 days uptime). Discovered 26 October during a routine check;
+the uptime monitor had not alerted because it still watched status codes.
+
+**Cause.** The free tier caps Storage at 1 GB. `scripts/photo-pipeline.ts`
+mirrored 5,784 politician photos into the public `politician-photos` bucket at
+their original size with no resizing, and overwrote `photo_url` without keeping
+the source URL. Official portraits run 200 KB to 2 MB each.
+
+**Why it is worse than it looks.** Deleting the bucket to get under the cap would
+strip those 5,784 profiles of their photo, because the source URLs are gone. The
+pipeline's Wikidata and Congress.gov gap-fill can re-derive many of them, but
+that is a re-run, not a restore.
+
+**Fix path.** Upgrade to Pro (100 GB Storage, lifts the restriction immediately).
+Then, regardless of plan, change the pipeline to resize to roughly 256 px JPEG
+(about 15 to 20 KB each, so 11,513 photos is around 200 MB), re-process the
+existing bucket in place, and store the source URL in a new column so the
+mirror is never the only copy again.
+
+**Pattern.** This is the second free-tier ceiling hit in three months (Disk IO
+in August, Storage in October). Both produced the same silent empty page. The
+free tier is not a viable home for a publicly indexed site with 11,513 profiles.
 
 ---
 
