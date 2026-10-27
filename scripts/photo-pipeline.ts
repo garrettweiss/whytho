@@ -3,14 +3,21 @@
  *
  * Phase 1: Create Supabase Storage bucket (if needed)
  * Phase 2: Fill gaps from Wikidata (bioguide-keyed for federal, name-keyed for others)
- * Phase 3: Mirror all external photo_urls → Supabase Storage CDN
+ * Phase 3: Mirror all external photo_urls → Supabase Storage CDN, resized
  * Phase 4: Coverage report
+ * Phase 5: Reprocess portraits already in Storage down to the bounded size
+ *
+ * Every image written to Storage is normalised to PORTRAIT_EDGE_PX square JPEG
+ * first, and the external URL it came from is kept in photo_source_url. Both
+ * rules exist because the original pipeline did neither, and the resulting
+ * 5,784 full-size uploads tipped the free tier's Storage cap in October 2026.
  *
  * Usage:
- *   npx tsx scripts/photo-pipeline.ts              # All phases
+ *   npx tsx scripts/photo-pipeline.ts              # Phases 1 to 4
  *   npx tsx scripts/photo-pipeline.ts --dry-run    # Preview only, no writes
  *   npx tsx scripts/photo-pipeline.ts --phase=3    # Mirror only
  *   npx tsx scripts/photo-pipeline.ts --limit=100  # Test with first 100
+ *   npx tsx scripts/photo-pipeline.ts --reprocess  # Phase 5 only: shrink existing bucket in place
  */
 
 import * as dotenv from "dotenv";
@@ -18,11 +25,20 @@ dotenv.config({ path: ".env.local", override: true });
 
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
+import sharp from "sharp";
 
 const BUCKET = "politician-photos";
 const CONCURRENCY = 5;
 const WIKIDATA_SPARQL = "https://query.wikidata.org/sparql";
 const WIKIDATA_UA = "WhyTho/1.0 (whytho.us; admin@whytho.us)";
+
+/**
+ * Portrait size written to Storage. Official portraits run 200 KB to 2 MB
+ * each; at 400 px square JPEG quality 80 they are roughly 30 to 40 KB, so all
+ * 11,513 profiles fit in about 400 MB, well under the 1 GB free-tier cap.
+ */
+const PORTRAIT_EDGE_PX = 400;
+const PORTRAIT_JPEG_QUALITY = 80;
 
 const supabase = createClient<Database>(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -32,7 +48,10 @@ const supabase = createClient<Database>(
 const args = process.argv.slice(2);
 const DRY_RUN = args.includes("--dry-run");
 const LIMIT = parseInt(args.find((a) => a.startsWith("--limit="))?.split("=")[1] ?? "0") || Infinity;
-const PHASES = args.find((a) => a.startsWith("--phase="))?.split("=")[1]?.split(",").map(Number) ?? [1, 2, 3, 4];
+const REPROCESS = args.includes("--reprocess");
+const PHASES = REPROCESS
+  ? [5]
+  : (args.find((a) => a.startsWith("--phase="))?.split("=")[1]?.split(",").map(Number) ?? [1, 2, 3, 4]);
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 
@@ -224,7 +243,7 @@ async function fillFromWikidata(): Promise<void> {
 
     const { error: updateError } = await supabase
       .from("politicians")
-      .update({ photo_url: newUrl })
+      .update({ photo_url: newUrl, photo_source_url: newUrl })
       .eq("id", p.id);
 
     if (updateError) {
@@ -260,6 +279,23 @@ async function downloadImage(url: string): Promise<{ buffer: Buffer; contentType
   } catch {
     return null;
   }
+}
+
+/**
+ * Resize and re-encode to a bounded JPEG so Storage growth is predictable.
+ * Auto-rotates from EXIF, crops to the most salient region for portraits, and
+ * never enlarges a source that is already smaller than the target.
+ */
+async function normalizePortrait(buffer: Buffer): Promise<Buffer> {
+  return sharp(buffer)
+    .rotate()
+    .resize(PORTRAIT_EDGE_PX, PORTRAIT_EDGE_PX, {
+      fit: "cover",
+      position: "attention",
+      withoutEnlargement: true,
+    })
+    .jpeg({ quality: PORTRAIT_JPEG_QUALITY, mozjpeg: true })
+    .toBuffer();
 }
 
 async function mirrorPhotos(): Promise<void> {
@@ -320,32 +356,28 @@ async function mirrorPhotos(): Promise<void> {
           return;
         }
 
+        let normalized: Buffer;
+        try {
+          normalized = await normalizePortrait(downloaded.buffer);
+        } catch {
+          failed++;
+          return;
+        }
+
         const path = `${p.id}.jpg`;
         const { error: uploadError } = await supabase.storage
           .from(BUCKET)
-          .upload(path, downloaded.buffer, {
-            contentType: "image/jpeg",
-            upsert: true,
-          });
+          .upload(path, normalized, { contentType: "image/jpeg", upsert: true });
 
         if (uploadError) {
-          // Bucket might enforce JPEG — try with original content type
-          const { error: uploadError2 } = await supabase.storage
-            .from(BUCKET)
-            .upload(path, downloaded.buffer, {
-              contentType: downloaded.contentType,
-              upsert: true,
-            });
-          if (uploadError2) {
-            failed++;
-            return;
-          }
+          failed++;
+          return;
         }
 
         const publicUrl = getStoragePublicUrl(p.id);
         const { error: updateError } = await supabase
           .from("politicians")
-          .update({ photo_url: publicUrl })
+          .update({ photo_url: publicUrl, photo_source_url: p.photo_url })
           .eq("id", p.id);
 
         if (updateError) {
@@ -368,6 +400,117 @@ async function mirrorPhotos(): Promise<void> {
   }
 
   console.log(`  ✓ Mirror phase: ${mirrored} mirrored, ${failed} failed, ${skipped} skipped`);
+}
+
+// ── Phase 5: Reprocess portraits already in Storage ────────────────────────
+
+/**
+ * Shrinks every portrait already in the bucket down to the bounded size, in
+ * place. Needed once after October 2026, when the bucket held 5,784 full-size
+ * uploads. Reports bytes before and after so the reclaimed space is visible.
+ */
+async function reprocessStoredPortraits(): Promise<void> {
+  console.log("\n[Phase 5] Reprocessing portraits already in Storage...");
+
+  const stored: { id: string; full_name: string; photo_url: string }[] = [];
+  const PAGE = 1000;
+  let from = 0;
+  while (true) {
+    const { data: page, error } = await supabase
+      .from("politicians")
+      .select("id, full_name, photo_url")
+      .like("photo_url", `%${supabaseUrl}%`)
+      .order("id")
+      .range(from, from + PAGE - 1);
+    if (error) throw new Error(error.message);
+    if (!page?.length) break;
+    for (const row of page) {
+      if (row.photo_url) stored.push({ id: row.id, full_name: row.full_name, photo_url: row.photo_url });
+    }
+    if (page.length < PAGE) break;
+    from += PAGE;
+  }
+
+  const toProcess = stored.slice(0, LIMIT === Infinity ? undefined : LIMIT);
+  console.log(`  ${stored.length} portraits in Storage, processing ${toProcess.length}`);
+
+  let processed = 0;
+  let skipped = 0;
+  let failed = 0;
+  let bytesBefore = 0;
+  let bytesAfter = 0;
+
+  const sampleSize = DRY_RUN ? Math.min(toProcess.length, 10) : toProcess.length;
+
+  for (let i = 0; i < sampleSize; i += CONCURRENCY) {
+    const chunk = toProcess.slice(i, i + CONCURRENCY);
+
+    await Promise.all(
+      chunk.map(async (p) => {
+        const downloaded = await downloadImage(p.photo_url);
+        if (!downloaded) {
+          failed++;
+          return;
+        }
+
+        let normalized: Buffer;
+        try {
+          normalized = await normalizePortrait(downloaded.buffer);
+        } catch {
+          failed++;
+          return;
+        }
+
+        bytesBefore += downloaded.buffer.length;
+
+        // Already within a few percent of target: nothing to reclaim.
+        if (normalized.length >= downloaded.buffer.length * 0.95) {
+          bytesAfter += downloaded.buffer.length;
+          skipped++;
+          return;
+        }
+
+        if (DRY_RUN) {
+          console.log(
+            `  [dry-run] ${p.full_name}: ${Math.round(downloaded.buffer.length / 1024)} KB -> ${Math.round(normalized.length / 1024)} KB`
+          );
+          bytesAfter += normalized.length;
+          processed++;
+          return;
+        }
+
+        const { error: uploadError } = await supabase.storage
+          .from(BUCKET)
+          .upload(`${p.id}.jpg`, normalized, { contentType: "image/jpeg", upsert: true });
+
+        if (uploadError) {
+          failed++;
+          return;
+        }
+
+        bytesAfter += normalized.length;
+        processed++;
+      })
+    );
+
+    if ((i + CONCURRENCY) % 500 === 0) {
+      console.log(`  Progress: ${Math.min(i + CONCURRENCY, sampleSize)}/${sampleSize}`);
+    }
+  }
+
+  const mb = (b: number) => (b / 1024 / 1024).toFixed(1);
+  if (DRY_RUN && toProcess.length > sampleSize && sampleSize > 0) {
+    const ratio = bytesBefore > 0 ? bytesAfter / bytesBefore : 1;
+    console.log(
+      `  [dry-run] Sample of ${sampleSize}: ${mb(bytesBefore)} MB -> ${mb(bytesAfter)} MB (${Math.round(ratio * 100)}% of original). ` +
+        `Projected across ${toProcess.length}: roughly ${Math.round((1 - ratio) * 100)}% reclaimed.`
+    );
+  } else {
+    console.log(
+      `  ✓ Reprocess: ${processed} shrunk, ${skipped} already small, ${failed} failed. ` +
+        `${mb(bytesBefore)} MB -> ${mb(bytesAfter)} MB`
+    );
+  }
 }
 
 // ── Phase 4: Coverage report ───────────────────────────────────────────────
@@ -448,6 +591,7 @@ async function main(): Promise<void> {
   if (PHASES.includes(2)) await fillFromWikidata();
   if (PHASES.includes(3)) await mirrorPhotos();
   if (PHASES.includes(4)) await reportCoverage();
+  if (PHASES.includes(5)) await reprocessStoredPortraits();
 
   console.log("\n✅ Photo pipeline complete\n");
 }

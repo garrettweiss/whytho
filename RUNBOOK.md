@@ -142,6 +142,13 @@ optimistic UI and Broadcast. Test fixtures (`is_test = true`) are excluded from
 every listing, search index and the sitemap, and their profiles carry
 `noindex`, but remain reachable by direct URL so the team can QA them.
 
+**Deploys require a healthy database.** `next build` prerenders the ISR pages.
+If the database is unreachable at build time the homepage prerender throws
+(`assertNonEmpty`) and the build fails. That is deliberate: the alternative is
+baking an empty homepage into the cache for 15 minutes. So during a Supabase
+restriction, restore the database first, then deploy. Vercel keeps the previous
+deployment live through a failed build.
+
 Verify caching is working after any deploy:
 
 ```bash
@@ -173,10 +180,17 @@ pipeline's Wikidata and Congress.gov gap-fill can re-derive many of them, but
 that is a re-run, not a restore.
 
 **Fix path.** Upgrade to Pro (100 GB Storage, lifts the restriction immediately).
-Then, regardless of plan, change the pipeline to resize to roughly 256 px JPEG
-(about 15 to 20 KB each, so 11,513 photos is around 200 MB), re-process the
-existing bucket in place, and store the source URL in a new column so the
-mirror is never the only copy again.
+Then, regardless of plan, shrink the existing bucket in place. The pipeline now
+normalises every upload to 400 px square JPEG (roughly 30 to 40 KB, so all
+11,513 profiles fit in about 400 MB) and records the source URL in
+`photo_source_url` (migration `20261027120000_photo_source_url.sql`).
+
+```bash
+npx tsx scripts/photo-pipeline.ts --reprocess --dry-run   # samples 10, projects the saving
+npx tsx scripts/photo-pipeline.ts --reprocess             # shrinks all 5,784 in place
+```
+
+Both need the Storage API reachable, so they run after the restriction lifts.
 
 **Pattern.** This is the second free-tier ceiling hit in three months (Disk IO
 in August, Storage in October). Both produced the same silent empty page. The
