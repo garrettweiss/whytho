@@ -17,15 +17,28 @@ interface Props {
   searchParams: Promise<{ week?: string; period?: string }>;
 }
 
+/**
+ * Metadata lookup, cached alongside the page data. generateMetadata runs on
+ * every request to a dynamic page, and this was the one profile query left
+ * outside the cache: on the nano instance it cost 1 to 3 seconds per view.
+ */
+const loadProfileMetadata = unstable_cache(
+  async (slug: string) => {
+    const supabase = createPublicClient();
+    const { data } = await supabase
+      .from("politicians")
+      .select("full_name, office, state, party, photo_url, bio, is_test")
+      .eq("slug", slug)
+      .single();
+    return data ?? null;
+  },
+  ["politician-profile-metadata"],
+  { revalidate: 300, tags: ["politician-profile"] }
+);
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const supabase = createPublicClient();
-
-  const { data: politician } = await supabase
-    .from("politicians")
-    .select("full_name, office, state, party, photo_url, bio, is_test")
-    .eq("slug", slug)
-    .single();
+  const politician = await loadProfileMetadata(slug);
 
   if (!politician) return { title: "Politician Not Found | WhyTho" };
 
