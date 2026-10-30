@@ -52,6 +52,15 @@ than 2s is reported as `degraded` while still returning 200.
 curl -s https://whytho.us/api/health | jq
 ```
 
+The public response carries status and checks only. The vitals block (database
+size, WAL, connections, replication lag, cron failures) is internal telemetry:
+it is captured to PostHog on every call but returned only with the admin header.
+The endpoint is rate limited to 30 requests per minute per IP.
+
+```bash
+curl -s -H "x-admin-secret: $ADMIN_SECRET" https://whytho.us/api/health | jq .vitals
+```
+
 ### Why a plain status check is not enough
 
 During the outage the site returned **HTTP 200** on every page while rendering
