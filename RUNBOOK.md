@@ -275,6 +275,16 @@ supabase db dump --linked -f supabase/schema-baseline-$(date +%Y-%m-%d).sql
 
 ---
 
+## Vitals: what the numbers mean
+
+`longest_query_seconds` counts client backends only (migration
+`20261030120000_db_vitals_client_backends_only.sql`). Before that fix it
+reported Supabase Realtime's replication stream, which runs for hours by
+design. If you see a long-running `START_REPLICATION SLOT ...` in
+`supabase inspect db long-running-queries`, that is normal.
+
+---
+
 ## Applying the vitals migration
 
 `get_db_vitals()` is defined in `supabase/migrations/20260819120000_add_db_vitals.sql`.
