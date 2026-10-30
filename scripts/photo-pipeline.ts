@@ -18,6 +18,7 @@
  *   npx tsx scripts/photo-pipeline.ts --phase=3    # Mirror only
  *   npx tsx scripts/photo-pipeline.ts --limit=100  # Test with first 100
  *   npx tsx scripts/photo-pipeline.ts --reprocess  # Phase 5 only: shrink existing bucket in place
+ *   npx tsx scripts/photo-pipeline.ts --reprocess --concurrency=2  # when Storage returns 429s
  */
 
 import * as dotenv from "dotenv";
@@ -28,7 +29,8 @@ import type { Database } from "@/types/database";
 import sharp from "sharp";
 
 const BUCKET = "politician-photos";
-const CONCURRENCY = 5;
+/** Parallel downloads/uploads. Storage returns 429 too_many_connections above ~4 on Micro; use --concurrency=2 for Storage-heavy phases. */
+const CONCURRENCY = Math.max(1, parseInt(process.argv.find((a) => a.startsWith("--concurrency="))?.split("=")[1] ?? "5", 10) || 5);
 const WIKIDATA_SPARQL = "https://query.wikidata.org/sparql";
 const WIKIDATA_UA = "WhyTho/1.0 (whytho.us; admin@whytho.us)";
 

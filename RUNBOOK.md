@@ -193,15 +193,12 @@ npx tsx scripts/photo-pipeline.ts --reprocess             # shrinks all 5,784 in
 Both need the Storage API reachable, so they run after the restriction lifts.
 
 **Outcome, 30 October 2026.** First pass: 1,225.7 MB to 57.1 MB, 5,159 shrunk,
-581 failed. Rerun with reason logging: 531 more shrunk, 340 failed, of which
-324 were stored objects that are not valid images (the original mirror saved
-error pages or placeholders as `.jpg`; those profiles render a broken photo)
-and 16 were `Too many connections issued to the database` on the nano
-instance. Pipeline `CONCURRENCY` of 5 is at the edge of what nano allows.
-
-**Invalid stored objects.** Fixing them is a data change: set `photo_url` to
-null for each, delete the object from the bucket, then run Phase 2 to
-re-derive from Wikidata or Congress.gov. Needs explicit approval first.
+581 failed. A read-only scan of all 5,784 objects afterwards found 5,740 valid
+images totalling 70.8 MB; every "failure" was an HTTP 429
+`too_many_connections` from the Storage API, not a bad object. The pipeline's
+default concurrency of 5 exceeds the Storage connection budget even on Micro,
+so the download step misreads 429 JSON as "not an image". Use
+`--concurrency=2` for Storage-heavy phases. No data fix was needed.
 
 **Compute.** Switched from nano to Micro on 30 October (included in the Pro
 compute credit). The health check's politician count went from 2,903 ms to
