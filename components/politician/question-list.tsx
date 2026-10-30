@@ -4,6 +4,8 @@ import { useState, useTransition, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { Enums } from "@/types/database";
 import { createClient } from "@/lib/supabase/client";
+import { useUser } from "@/lib/auth/use-user";
+import { useOwnerMembership } from "@/lib/auth/use-owner-membership";
 import { AnswerComposer } from "@/components/answers/answer-composer";
 import { AnswerMediaDisplay } from "@/components/answers/answer-media-display";
 
@@ -398,7 +400,14 @@ function QuestionCard({
 
 const PROFILE_PROMPT_KEY = "whytho_profile_prompt_dismissed";
 
-export function QuestionList({ questions, politicianId, politicianSlug, politicianName, weekNumber, currentWeekNumber: _currentWeekNumber, isHistorical = false, period = "week", isOwner = false, ownerRole }: QuestionListProps) {
+export function QuestionList({ questions, politicianId, politicianSlug, politicianName, weekNumber, currentWeekNumber: _currentWeekNumber, isHistorical = false, period = "week", isOwner: isOwnerProp, ownerRole: ownerRoleProp }: QuestionListProps) {
+  // Ownership is resolved here rather than on the server so the public profile
+  // page stays cacheable. Callers that already know (the dashboard) can still
+  // pass it explicitly.
+  const { user } = useUser();
+  const membership = useOwnerMembership(politicianId, user);
+  const isOwner = isOwnerProp ?? membership.isOwner;
+  const ownerRole = ownerRoleProp ?? membership.ownerRole ?? undefined;
   const [localQuestions, setLocalQuestions] = useState<Question[]>(questions);
   const [showProfileBanner, setShowProfileBanner] = useState(false);
   const hasCheckedProfile = useRef(false);

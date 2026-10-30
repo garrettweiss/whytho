@@ -498,6 +498,7 @@ export type Database = {
           openstates_id: string | null
           party: string | null
           photo_url: string | null
+          photo_source_url: string | null
           politician_type: string
           race_id: string | null
           slug: string
@@ -532,6 +533,7 @@ export type Database = {
           openstates_id?: string | null
           party?: string | null
           photo_url?: string | null
+          photo_source_url?: string | null
           politician_type?: string
           race_id?: string | null
           slug: string
@@ -566,6 +568,7 @@ export type Database = {
           openstates_id?: string | null
           party?: string | null
           photo_url?: string | null
+          photo_source_url?: string | null
           politician_type?: string
           race_id?: string | null
           slug?: string

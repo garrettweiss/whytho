@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/server";
 import { PoliticianAvatar } from "@/components/politician/politician-avatar";
 
 export const metadata: Metadata = {
@@ -49,7 +49,7 @@ function PartyDot({ party }: { party: string | null }) {
 }
 
 export default async function LeaderboardPage() {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
 
   const { data: weekData } = await supabase.rpc("current_week_number");
   const weekNumber = weekData as number;

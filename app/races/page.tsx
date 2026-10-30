@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { unstable_cache } from "next/cache";
+import { createPublicClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
   title: "2026 Elections | WhyTho",
@@ -46,6 +47,52 @@ type RaceRow = {
 
 type FilterType = "all" | "governor" | "senate" | "house";
 
+/**
+ * Active races plus candidate counts, cached hourly per (filter, state).
+ *
+ * ?filter= and ?state= shape the query, so they are cache keys. The page itself
+ * stays dynamic because it reads searchParams; only the data is cached.
+ */
+const loadRaces = unstable_cache(
+  async (filter: FilterType, stateParam: string | undefined) => {
+    const supabase = createPublicClient();
+
+    let query = supabase
+      .from("races")
+      .select("id, slug, name, office, state, district, election_date, election_type, party, status, incumbent_id")
+      .eq("status", "active")
+      .order("election_date", { ascending: true })
+      .order("state", { ascending: true });
+
+    if (filter === "governor") query = query.eq("office", "Governor");
+    if (filter === "senate") query = query.eq("office", "U.S. Senator");
+    if (filter === "house") query = query.eq("office", "U.S. Representative");
+    if (stateParam) query = query.eq("state", stateParam.toUpperCase());
+
+    const { data: races } = await query;
+    const allRaces = (races ?? []) as RaceRow[];
+
+    const raceIds = allRaces.map((r) => r.id);
+    const { data: candidateCounts } = raceIds.length > 0
+      ? await supabase
+          .from("politicians")
+          .select("race_id")
+          .in("race_id", raceIds)
+          .eq("politician_type", "candidate")
+          .eq("is_active", true)
+      : { data: [] };
+
+    const countMap: Record<string, number> = {};
+    for (const c of candidateCounts ?? []) {
+      if (c.race_id) countMap[c.race_id] = (countMap[c.race_id] ?? 0) + 1;
+    }
+
+    return { allRaces, countMap };
+  },
+  ["races-list"],
+  { revalidate: 3600, tags: ["races"] }
+);
+
 export default async function RacesPage({
   searchParams,
 }: {
@@ -58,38 +105,7 @@ export default async function RacesPage({
     filterParam === "house" ? "house" :
     "all";
 
-  const supabase = await createClient();
-
-  let query = supabase
-    .from("races")
-    .select("id, slug, name, office, state, district, election_date, election_type, party, status, incumbent_id")
-    .eq("status", "active")
-    .order("election_date", { ascending: true })
-    .order("state", { ascending: true });
-
-  if (filter === "governor") query = query.eq("office", "Governor");
-  if (filter === "senate") query = query.eq("office", "U.S. Senator");
-  if (filter === "house") query = query.eq("office", "U.S. Representative");
-  if (stateParam) query = query.eq("state", stateParam.toUpperCase());
-
-  const { data: races } = await query;
-  const allRaces = (races ?? []) as RaceRow[];
-
-  // Get candidate counts per race
-  const raceIds = allRaces.map((r) => r.id);
-  const { data: candidateCounts } = raceIds.length > 0
-    ? await supabase
-        .from("politicians")
-        .select("race_id")
-        .in("race_id", raceIds)
-        .eq("politician_type", "candidate")
-        .eq("is_active", true)
-    : { data: [] };
-
-  const countMap: Record<string, number> = {};
-  for (const c of candidateCounts ?? []) {
-    if (c.race_id) countMap[c.race_id] = (countMap[c.race_id] ?? 0) + 1;
-  }
+  const { allRaces, countMap } = await loadRaces(filter, stateParam);
 
   // Group by state
   const byState: Record<string, RaceRow[]> = {};

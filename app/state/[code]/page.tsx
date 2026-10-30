@@ -1,7 +1,10 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/server";
+
+// Refresh hourly. Without this the page would be built once and never update.
+export const revalidate = 3600;
 import { PoliticianAvatar } from "@/components/politician/politician-avatar";
 
 const TARGET_STATES: Record<string, string> = {
@@ -64,7 +67,7 @@ export default async function StatePage({ params }: Props) {
 
   if (!stateName) notFound();
 
-  const supabase = await createClient();
+  const supabase = createPublicClient();
 
   const { data: politicians } = await supabase
     .from("politicians")
