@@ -1,5 +1,5 @@
 /**
- * Photo Pipeline — scalable politician photo acquisition + CDN migration
+ * Photo Pipeline: scalable politician photo acquisition + CDN migration
  *
  * Phase 1: Create Supabase Storage bucket (if needed)
  * Phase 2: Fill gaps from Wikidata (bioguide-keyed for federal, name-keyed for others)
@@ -18,6 +18,7 @@
  *   npx tsx scripts/photo-pipeline.ts --phase=3    # Mirror only
  *   npx tsx scripts/photo-pipeline.ts --limit=100  # Test with first 100
  *   npx tsx scripts/photo-pipeline.ts --reprocess  # Phase 5 only: shrink existing bucket in place
+ *   npx tsx scripts/photo-pipeline.ts --reprocess --concurrency=2  # when Storage returns 429s
  */
 
 import * as dotenv from "dotenv";
@@ -28,7 +29,8 @@ import type { Database } from "@/types/database";
 import sharp from "sharp";
 
 const BUCKET = "politician-photos";
-const CONCURRENCY = 5;
+/** Parallel downloads/uploads. Storage returns 429 too_many_connections above ~4 on Micro; use --concurrency=2 for Storage-heavy phases. */
+const CONCURRENCY = Math.max(1, parseInt(process.argv.find((a) => a.startsWith("--concurrency="))?.split("=")[1] ?? "5", 10) || 5);
 const WIKIDATA_SPARQL = "https://query.wikidata.org/sparql";
 const WIKIDATA_UA = "WhyTho/1.0 (whytho.us; admin@whytho.us)";
 
@@ -146,7 +148,7 @@ async function fetchWikidataGovernors(): Promise<Map<string, string>> {
     console.log(`  Found ${map.size} US governors with images in Wikidata`);
     return map;
   } catch (e) {
-    console.warn(`  Warning: governor query failed (${(e as Error).message}) — skipping`);
+    console.warn(`  Warning: governor query failed (${(e as Error).message}), skipping`);
     return new Map();
   }
 }
@@ -177,7 +179,7 @@ async function fetchWikidataByNames(names: string[]): Promise<Map<string, string
         }
       }
     } catch {
-      // Partial failure ok — continue with next chunk
+      // Partial failure ok, continue with next chunk
     }
     await new Promise((r) => setTimeout(r, 500)); // throttle Wikidata
   }
@@ -196,7 +198,7 @@ async function fillFromWikidata(): Promise<void> {
 
   if (error) throw new Error(`Supabase error: ${error.message}`);
   if (!politicians?.length) {
-    console.log("  No politicians with null photo_url — skipping");
+    console.log("  No politicians with null photo_url, skipping");
     return;
   }
 
@@ -273,7 +275,7 @@ async function downloadImage(url: string): Promise<{ buffer: Buffer; contentType
     if (!contentType.startsWith("image/")) return null;
 
     const buffer = Buffer.from(await res.arrayBuffer());
-    if (buffer.length < 500) return null; // Too small — likely error page
+    if (buffer.length < 500) return null; // Too small, likely error page
 
     return { buffer, contentType };
   } catch {
@@ -322,7 +324,7 @@ async function mirrorPhotos(): Promise<void> {
   }
 
   if (!politicians.length) {
-    console.log("  All photos already in Supabase Storage — nothing to mirror");
+    console.log("  All photos already in Supabase Storage, nothing to mirror");
     return;
   }
 
@@ -391,7 +393,7 @@ async function mirrorPhotos(): Promise<void> {
     if ((i + CONCURRENCY) % 200 === 0) {
       const pct = Math.round(((i + CONCURRENCY) / toProcess.length) * 100);
       console.log(
-        `  Progress: ${Math.min(i + CONCURRENCY, toProcess.length)}/${toProcess.length} (${pct}%) — ✓${mirrored} ✗${failed}`
+        `  Progress: ${Math.min(i + CONCURRENCY, toProcess.length)}/${toProcess.length} (${pct}%): ✓${mirrored} ✗${failed}`
       );
     }
 
@@ -439,6 +441,7 @@ async function reprocessStoredPortraits(): Promise<void> {
   let failed = 0;
   let bytesBefore = 0;
   let bytesAfter = 0;
+  const failures: { name: string; reason: string }[] = [];
 
   const sampleSize = DRY_RUN ? Math.min(toProcess.length, 10) : toProcess.length;
 
@@ -450,14 +453,16 @@ async function reprocessStoredPortraits(): Promise<void> {
         const downloaded = await downloadImage(p.photo_url);
         if (!downloaded) {
           failed++;
+          failures.push({ name: p.full_name, reason: "download: not an image, too small, or unreachable" });
           return;
         }
 
         let normalized: Buffer;
         try {
           normalized = await normalizePortrait(downloaded.buffer);
-        } catch {
+        } catch (err) {
           failed++;
+          failures.push({ name: p.full_name, reason: `decode: ${err instanceof Error ? err.message.split("\n")[0] : String(err)}` });
           return;
         }
 
@@ -485,6 +490,7 @@ async function reprocessStoredPortraits(): Promise<void> {
 
         if (uploadError) {
           failed++;
+          failures.push({ name: p.full_name, reason: `upload: ${uploadError.message}` });
           return;
         }
 
@@ -510,6 +516,20 @@ async function reprocessStoredPortraits(): Promise<void> {
       `  ✓ Reprocess: ${processed} shrunk, ${skipped} already small, ${failed} failed. ` +
         `${mb(bytesBefore)} MB -> ${mb(bytesAfter)} MB`
     );
+  }
+
+  if (failures.length > 0) {
+    const byReason = new Map<string, number>();
+    for (const f of failures) {
+      const key = f.reason.replace(/:.*$/, "");
+      byReason.set(key, (byReason.get(key) ?? 0) + 1);
+    }
+    console.log("  Failure reasons:");
+    for (const [reason, n] of [...byReason.entries()].sort((x, y) => y[1] - x[1])) {
+      console.log(`    ${String(n).padStart(5)}  ${reason}`);
+    }
+    console.log("  First failures:");
+    for (const f of failures.slice(0, 12)) console.log(`    ${f.name}: ${f.reason}`);
   }
 }
 

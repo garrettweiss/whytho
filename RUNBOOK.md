@@ -192,6 +192,19 @@ npx tsx scripts/photo-pipeline.ts --reprocess             # shrinks all 5,784 in
 
 Both need the Storage API reachable, so they run after the restriction lifts.
 
+**Outcome, 30 October 2026.** First pass: 1,225.7 MB to 57.1 MB, 5,159 shrunk,
+581 failed. A read-only scan of all 5,784 objects afterwards found 5,740 valid
+images totalling 70.8 MB; every "failure" was an HTTP 429
+`too_many_connections` from the Storage API, not a bad object. The pipeline's
+default concurrency of 5 exceeds the Storage connection budget even on Micro,
+so the download step misreads 429 JSON as "not an image". Use
+`--concurrency=2` for Storage-heavy phases. No data fix was needed.
+
+**Compute.** Switched from nano to Micro on 30 October (included in the Pro
+compute credit). The health check's politician count went from 2,903 ms to
+366 ms. Resizing shows `RESIZING` for about a minute; cached pages keep
+serving throughout. Capture diagnostics before any resize, as with a restart.
+
 **Pattern.** This is the second free-tier ceiling hit in three months (Disk IO
 in August, Storage in October). Both produced the same silent empty page. The
 free tier is not a viable home for a publicly indexed site with 11,513 profiles.
@@ -259,6 +272,16 @@ Refresh the baseline with:
 ```bash
 supabase db dump --linked -f supabase/schema-baseline-$(date +%Y-%m-%d).sql
 ```
+
+---
+
+## Vitals: what the numbers mean
+
+`longest_query_seconds` counts client backends only (migration
+`20261030120000_db_vitals_client_backends_only.sql`). Before that fix it
+reported Supabase Realtime's replication stream, which runs for hours by
+design. If you see a long-running `START_REPLICATION SLOT ...` in
+`supabase inspect db long-running-queries`, that is normal.
 
 ---
 
