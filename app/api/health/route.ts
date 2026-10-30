@@ -12,12 +12,18 @@
  * monitor here and that becomes a continuous external time series, which is what
  * makes the next incident diagnosable: the trailing history survives even when
  * the database does not.
+ *
+ * The status and checks are public by design (the monitor fetches them without
+ * credentials, and the counts are already public on the site). The vitals block
+ * is internal operations telemetry and is returned only to callers presenting
+ * the ADMIN_SECRET header; it is still captured to PostHog on every call.
  */
 
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
 import { withTimeout } from "@/lib/db/query-timeout";
 import { captureServerEvent } from "@/lib/analytics/posthog-server";
+import { rateLimit, clientIp } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -25,6 +31,9 @@ export const revalidate = 0;
 const CHECK_TIMEOUT_MS = 4_000;
 /** Slow but serving still warrants attention: the last outage began as latency. */
 const LATENCY_WARN_MS = 2_000;
+/** Each call runs three queries plus the vitals RPC; keep a public endpoint from becoming load. */
+const PER_IP_LIMIT = 30;
+const PER_IP_WINDOW_MS = 60_000;
 
 interface Check {
   name: string;
@@ -33,7 +42,18 @@ interface Check {
   ms: number;
 }
 
-export async function GET() {
+export async function GET(request: Request) {
+  const limit = rateLimit(`health:ip:${clientIp(request)}`, PER_IP_LIMIT, PER_IP_WINDOW_MS);
+  if (!limit.allowed) {
+    return NextResponse.json(
+      { ok: false, status: "rate_limited" },
+      { status: 429, headers: { "Retry-After": String(limit.retryAfterSeconds) } }
+    );
+  }
+
+  const adminSecret = process.env.ADMIN_SECRET;
+  const isAdmin = !!adminSecret && request.headers.get("x-admin-secret") === adminSecret;
+
   const startedAt = Date.now();
   const supabase = createAdminClient();
   const checks: Check[] = [];
@@ -129,7 +149,8 @@ export async function GET() {
       total_ms: totalMs,
       checked_at: new Date().toISOString(),
       checks,
-      vitals,
+      // Internal telemetry: omitted from the public response, admin header only.
+      ...(isAdmin ? { vitals } : {}),
     },
     {
       status: ok ? 200 : 503,
