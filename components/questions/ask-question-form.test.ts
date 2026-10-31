@@ -113,7 +113,11 @@ function fixture(options: { siteKey?: string; signedIn?: boolean; appearance?: "
     finishSubmit: async () => { await transition; render(); },
     elapse: () => { const callbacks = [...timers.values()]; timers.clear(); callbacks.forEach((callback) => callback()); render(); },
     scriptLoaded: () => { browser.turnstile = {}; },
-    scriptErrors: () => (widget().props.scriptOptions as { onError: () => void }).onError(),
+    widgetMounted: () => {
+      browser.turnstile = {};
+      const callback = widget().props.onWidgetLoad;
+      if (typeof callback === "function") callback("fixture-widget");
+    },
     setResponse: (next: typeof response) => { response = next; },
     timers: () => timers.size,
     removedScripts: () => removedScripts,
@@ -128,6 +132,9 @@ test("verification is visible in both form layouts and gates valid questions unt
     assert.deepEqual(JSON.parse(JSON.stringify(f.widget().props.options)), {
       size: "compact", appearance: "always", theme: appearance === "face" ? "dark" : "auto", retry: "never", refreshExpired: "manual", refreshTimeout: "manual",
     });
+    // In 1.4.2, supplying a script error handler removes the loader's onload
+    // callback before Cloudflare executes it. Keep the default loader intact.
+    assert.equal((f.widget().props.scriptOptions as { onError?: unknown } | undefined)?.onError, undefined);
     assert.equal(f.submit().props.disabled, true);
     f.beginSubmit();
     assert.equal(f.requests.length, 0);
@@ -153,8 +160,26 @@ test("blocked script times out visibly and retry preserves the question while re
   assert.equal(f.timers(), 1);
 });
 
+test("a mounted but silent challenge still times out and retries without losing the question", () => {
+  const f = fixture();
+  f.write("Please explain your position on this issue.");
+  const previousKey = f.widget().key;
+  f.widgetMounted();
+  assert.equal(f.status(), "Loading verification…");
+  assert.equal(f.timers(), 1);
+  f.elapse();
+  assert.match(String(f.status()), /could not load or finish/);
+  assert.equal(f.submit().props.disabled, true);
+  f.retry();
+  assert.equal(f.removedScripts(), 0);
+  assert.notEqual(f.widget().key, previousKey);
+  assert.equal(f.textarea().props.value, "Please explain your position on this issue.");
+  assert.equal(f.status(), "Loading verification…");
+  assert.equal(f.timers(), 1);
+});
+
 test("loading watchdog never interrupts an interactive challenge or completed verification", () => {
-  for (const callback of ["onWidgetLoad", "onBeforeInteractive", "onSuccess"]) {
+  for (const callback of ["onBeforeInteractive", "onSuccess"]) {
     const f = fixture();
     f.event(callback, "fixture-value");
     const status = f.status();
@@ -164,15 +189,14 @@ test("loading watchdog never interrupts an interactive challenge or completed ve
   }
 });
 
-test("expiry, timeout, widget and script failures revoke tokens and allow a fresh challenge", () => {
-  for (const callback of ["onExpire", "onTimeout", "onError", "scriptError"]) {
+test("expiry, timeout, and widget failures revoke tokens and allow a fresh challenge", () => {
+  for (const callback of ["onExpire", "onTimeout", "onError"]) {
     const f = fixture();
     f.scriptLoaded();
     f.write("What will you do about this issue?");
     f.event("onSuccess", "old-token");
     assert.equal(f.submit().props.disabled, false);
-    if (callback === "scriptError") f.scriptErrors();
-    else f.event(callback, "fixture-error");
+    f.event(callback, "fixture-error");
     assert.equal(f.submit().props.disabled, true);
     f.beginSubmit();
     assert.equal(f.requests.length, 0);
