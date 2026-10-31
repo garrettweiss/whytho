@@ -2,9 +2,9 @@
 
 **What:** Civic accountability platform. Public submits/upvotes questions for US politicians. Questions reset weekly. Politicians can claim profiles and answer. Response rate always public.
 **Tagline:** Silence is its own answer.
-**Entity:** Quinnivations LLC | **Status:** Sprint 1 (Foundation) — pre-launch
+**Entity:** Zellon LLC | **Status:** S10 incident hardening shipped (30 Oct 2026). Live on Supabase Pro + Micro, cached, monitored via `/api/health`
 
-> Full context in: `CLAUDE_CONTEXT.md` (read this every session) | `REQUIREMENTS.md` | `PROJECT_PLAN.md` | `STRATEGY.md`
+> Full context in: `CLAUDE_CONTEXT.md` (read this every session) | `RUNBOOK.md` (incidents, caching rules, capture before restart) | `REQUIREMENTS.md` | `PROJECT_PLAN.md` | `STRATEGY.md`
 
 ---
 
@@ -168,6 +168,8 @@ These rules apply at all times but are critical when bypass/dangerouslySkipPermi
 - `vercel --prod` deploy or merging to `main`
 - Overwriting `.env.local` or any `.env*` file
 - Deleting files outside the project directory
+- Supabase billing changes via the Management API (plan, compute add-ons, spend cap)
+- Deleting Supabase Storage objects or buckets
 
 **External communication — always show draft + recipient and wait for approval:**
 
@@ -185,4 +187,4 @@ These rules apply at all times but are critical when bypass/dangerouslySkipPermi
 - **WT (WhyTho Tech Lead)** — Deep technical research, architecture decisions, spike investigations
   Spawn via: `~/.claude/assistants/WT/CLAUDE.md`
 
-*Last updated: March 2026 | Owner: Quinnivations LLC*
+*Last updated: 30 October 2026 | Owner: Zellon LLC*

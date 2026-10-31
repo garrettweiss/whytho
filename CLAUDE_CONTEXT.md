@@ -16,7 +16,7 @@ A civic accountability platform where:
 - Platform generates value whether or not politicians participate
 
 **Tagline:** Silence is its own answer.
-**Entity:** Quinnivations LLC
+**Entity:** Zellon LLC
 **Status:** Pre-launch prototype phase
 
 ---
@@ -266,4 +266,4 @@ CONGRESS_API_KEY
 
 ---
 
-*Last updated: March 2026 | Owner: Quinnivations LLC*
+*Last updated: March 2026 | Owner: Zellon LLC*
