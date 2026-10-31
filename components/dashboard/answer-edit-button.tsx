@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 
 import styles from "./dashboard.module.css";
 
@@ -10,10 +11,12 @@ interface Props {
   answerId: string;
   initialBody: string;
   createdAt: string; // ISO timestamp
+  isDraft?: boolean;
 }
 
-export function AnswerEditButton({ answerId, initialBody, createdAt }: Props) {
+export function AnswerEditButton({ answerId, initialBody, createdAt, isDraft = false }: Props) {
   const fieldId = useId();
+  const router = useRouter();
   const withinWindow = Date.now() - new Date(createdAt).getTime() < EDIT_WINDOW_MS;
 
   const [isEditing, setIsEditing] = useState(false);
@@ -23,7 +26,7 @@ export function AnswerEditButton({ answerId, initialBody, createdAt }: Props) {
   const [saved, setSaved] = useState(false);
   const [isPending, startTransition] = useTransition();
 
-  if (!withinWindow) return null;
+  if (!isDraft && !withinWindow) return null;
 
   function handleSave() {
     setError(null);
@@ -43,6 +46,7 @@ export function AnswerEditButton({ answerId, initialBody, createdAt }: Props) {
         setSavedBody(body);
         setSaved(true);
         setIsEditing(false);
+        router.refresh();
       } catch {
         setError("Network error. Please try again.");
       }
@@ -64,7 +68,7 @@ export function AnswerEditButton({ answerId, initialBody, createdAt }: Props) {
           }}
           className={styles.textButton}
         >
-          Edit (within 15 min)
+          {isDraft ? "Edit draft" : "Edit (within 15 min)"}
         </button>
       </div>
     );

@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
 
 interface Props {
@@ -15,13 +14,13 @@ interface Props {
  * the photo_url 404s, 403s, or hotlink-blocks.
  */
 export function PoliticianAvatar({ photoUrl, fullName, size = 36, className = "" }: Props) {
-  const [imgError, setImgError] = useState(false);
+  const [failedUrl, setFailedUrl] = useState<string | null>(null);
   const initial = fullName.slice(0, 1).toUpperCase();
 
   const containerClass = `relative overflow-hidden rounded-full border border-border shrink-0 ${className}`;
   const style = { width: size, height: size, minWidth: size };
 
-  if (!photoUrl || imgError) {
+  if (!photoUrl || !/^https?:\/\//i.test(photoUrl) || failedUrl === photoUrl) {
     return (
       <div
         className={`flex items-center justify-center rounded-full border border-border bg-muted text-muted-foreground font-bold shrink-0 ${className}`}
@@ -35,15 +34,11 @@ export function PoliticianAvatar({ photoUrl, fullName, size = 36, className = ""
 
   return (
     <div className={containerClass} style={style}>
-      <Image
-        src={photoUrl}
-        alt={fullName}
-        fill
-        className="object-cover"
-        sizes={`${size}px`}
-        onError={() => setImgError(true)}
-        unoptimized={photoUrl.startsWith("http://")}
-      />
+      {/* Civic sources vary; native images avoid an unbounded server proxy. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={photoUrl} alt={fullName} width={size} height={size}
+        className="h-full w-full object-cover" loading="lazy" decoding="async"
+        referrerPolicy="no-referrer" onError={() => setFailedUrl(photoUrl)} />
     </div>
   );
 }

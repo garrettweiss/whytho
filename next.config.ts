@@ -7,10 +7,20 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       // Congress.gov official photos
       { protocol: "https", hostname: "bioguide.congress.gov" },
-      // OpenStates politician photos come from many state gov / news domains
-      // Tighten this list before production launch
-      { protocol: "https", hostname: "**" },
+      { protocol: "https", hostname: "jjwdxjqsnwieksubkkkf.supabase.co", pathname: "/storage/v1/object/public/politician-photos/**" },
+      { protocol: "https", hostname: "upload.wikimedia.org" },
     ],
+    dangerouslyAllowSVG: false,
+  },
+  async headers() {
+    return [{ source: "/(.*)", headers: [
+      { key: "X-Content-Type-Options", value: "nosniff" },
+      { key: "X-Frame-Options", value: "DENY" },
+      { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+      { key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains" },
+      { key: "Content-Security-Policy", value: "base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'" },
+      { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+    ] }];
   },
 };
 

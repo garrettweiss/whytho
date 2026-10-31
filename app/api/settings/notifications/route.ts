@@ -9,6 +9,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
+import { readAccountBody } from "@/lib/accounts/request";
 
 export async function PATCH(request: NextRequest) {
   const supabase = await createClient();
@@ -21,10 +22,8 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: "Authentication required" }, { status: 401 });
   }
 
-  const body = (await request.json()) as {
-    notify_answer?: boolean;
-    notify_digest?: boolean;
-  };
+  const body = await readAccountBody(request);
+  if (!body) return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
 
   const update: { notify_answer?: boolean; notify_digest?: boolean } = {};
 
@@ -65,11 +64,13 @@ export async function GET() {
     return NextResponse.json({ error: "Authentication required" }, { status: 401 });
   }
 
-  const { data: prefs } = await supabase
+  const { data: prefs, error } = await supabase
     .from("user_profiles")
     .select("notify_answer, notify_digest")
     .eq("id", user.id)
     .maybeSingle();
+
+  if (error) return NextResponse.json({ error: "Could not load notification preferences" }, { status: 503 });
 
   return NextResponse.json({
     notify_answer: prefs?.notify_answer ?? true,

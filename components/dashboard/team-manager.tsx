@@ -1,6 +1,7 @@
 "use client";
 
-import { useId, useState, useEffect, useTransition } from "react";
+import { useId, useState, useEffect, useTransition, useCallback } from "react";
+import { useRouter } from "next/navigation";
 
 import styles from "./dashboard.module.css";
 
@@ -27,8 +28,11 @@ interface Props {
 
 export function TeamManager({ politicianId, callerRole }: Props) {
   const fieldId = useId();
+  const router = useRouter();
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [changingRole, setChangingRole] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
 
   // Invite form
@@ -44,23 +48,24 @@ export function TeamManager({ politicianId, callerRole }: Props) {
 
   const isAdmin = callerRole === "admin";
 
-  useEffect(() => {
-    if (!isOpen) return;
-    fetchMembers();
-  }, [isOpen, politicianId]);
-
-  async function fetchMembers() {
+  const fetchMembers = useCallback(async () => {
     setLoading(true);
+    setLoadError(null);
     try {
       const res = await fetch(`/api/dashboard/team?politician_id=${politicianId}`);
-      const data = await res.json() as { members?: TeamMember[] };
-      setMembers(data.members ?? []);
+      const data = await res.json() as { members?: TeamMember[]; error?: string };
+      if (!res.ok || !Array.isArray(data.members)) throw new Error(data.error ?? "Could not load your team");
+      setMembers(data.members);
     } catch {
-      // silently fail - team section is non-critical
+      setLoadError("Could not load your team. Please try again.");
     } finally {
       setLoading(false);
     }
-  }
+  }, [politicianId]);
+
+  useEffect(() => {
+    if (isOpen) void fetchMembers();
+  }, [isOpen, fetchMembers]);
 
   function handleInvite() {
     setInviteError(null);
@@ -84,10 +89,27 @@ export function TeamManager({ politicianId, callerRole }: Props) {
         setInviteSuccess(`${data.email} added as ${inviteRole}`);
         setInviteEmail("");
         await fetchMembers();
+        router.refresh();
       } catch {
         setInviteError("Network error. Please try again.");
       }
     });
+  }
+
+  async function handleRole(memberId: string, role: string) {
+    setChangingRole(memberId);
+    setRemoveError(null);
+    try {
+      const response = await fetch("/api/dashboard/team", {
+        method: "PATCH", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ politician_id: politicianId, team_member_id: memberId, role }),
+      });
+      const data = await response.json() as { error?: string };
+      if (!response.ok) { setRemoveError(data.error ?? "Could not change this role"); return; }
+      await fetchMembers();
+      router.refresh();
+    } catch { setRemoveError("Network error. Please try again."); }
+    finally { setChangingRole(null); }
   }
 
   async function handleRemove(memberId: string) {
@@ -105,6 +127,7 @@ export function TeamManager({ politicianId, callerRole }: Props) {
         return;
       }
       await fetchMembers();
+      router.refresh();
     } catch {
       setRemoveError("Network error. Please try again.");
     } finally {
@@ -117,13 +140,15 @@ export function TeamManager({ politicianId, callerRole }: Props) {
       <span>Manage your team</span><span aria-hidden="true">{isOpen ? "−" : "+"}</span>
     </button>
     {isOpen && <div id={`${fieldId}-panel`} className={styles.panelBody}>
-      {loading ? <p role="status" className={styles.meta}>Loading team…</p> : members.length === 0 ? <p className={styles.meta}>No team members yet.</p> : <ul aria-label="Team members">
+      {loading ? <p role="status" className={styles.meta}>Loading team…</p> : loadError ? <div><p role="alert" className={styles.error}>{loadError}</p><button type="button" onClick={fetchMembers} className={styles.secondaryButton}>Retry team</button></div> : members.length === 0 ? <p className={styles.meta}>No team members yet.</p> : <ul aria-label="Team members">
         {members.map(m => <li key={m.id} className={styles.teamMember}>
-          <p><strong>{m.display_name ?? m.email}</strong>{m.is_self && <span className={styles.meta}> (you)</span>}</p>
+          <p><strong>{m.display_name || m.email || "Team member"}</strong>{m.is_self && <span className={styles.meta}> (you)</span>}</p>
           {m.display_name && <p className={styles.meta}>{m.email}</p>}
           <div className={styles.memberActions}>
-            <span className={styles.badge}>{ROLE_LABELS[m.role]?.label ?? m.role}</span>
-            {isAdmin && !m.is_self && <button type="button" onClick={() => handleRemove(m.id)} disabled={removing === m.id} className={styles.textButton} aria-label={`Remove ${m.display_name ?? m.email} from the team`}>{removing === m.id ? "Removing…" : "Remove"}</button>}
+            {isAdmin ? <select aria-label={`Role for ${m.display_name || m.email || "Team member"}`} value={m.role} disabled={changingRole !== null || removing !== null} onChange={event => handleRole(m.id, event.target.value)}>
+              <option value="admin">Admin</option><option value="editor">Editor</option><option value="responder">Responder</option>
+            </select> : <span className={styles.badge}>{ROLE_LABELS[m.role]?.label ?? m.role}</span>}
+            {isAdmin && !m.is_self && <button type="button" onClick={() => handleRemove(m.id)} disabled={removing !== null || changingRole !== null} className={styles.textButton} aria-label={`Remove ${m.display_name || m.email || "Team member"} from the team`}>{removing === m.id ? "Removing…" : "Remove"}</button>}
           </div>
         </li>)}
       </ul>}

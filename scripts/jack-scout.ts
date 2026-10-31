@@ -49,7 +49,7 @@ interface CongressMember {
   officialWebsiteUrl?: string;
 }
 
-interface CongressMemberDetail {
+export interface CongressMemberDetail {
   bioguideId: string;
   directOrderName: string;
   officialWebsiteUrl?: string;
@@ -143,7 +143,7 @@ async function loadSocialMap(): Promise<Map<string, string>> {
   return _socialMap;
 }
 
-async function fetchMemberSocialHandles(bioguideId: string): Promise<string | null> {
+export async function fetchMemberSocialHandles(bioguideId: string): Promise<string | null> {
   const map = await loadSocialMap();
   return map.get(bioguideId) ?? null;
 }

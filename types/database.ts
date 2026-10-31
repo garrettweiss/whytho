@@ -141,6 +141,7 @@ export type Database = {
           is_draft: boolean
           politician_id: string
           published_by: string | null
+          published_at: string | null
           question_id: string
           sources: Json
           updated_at: string
@@ -158,6 +159,7 @@ export type Database = {
           is_draft?: boolean
           politician_id: string
           published_by?: string | null
+          published_at?: string | null
           question_id: string
           sources?: Json
           updated_at?: string
@@ -175,6 +177,7 @@ export type Database = {
           is_draft?: boolean
           politician_id?: string
           published_by?: string | null
+          published_at?: string | null
           question_id?: string
           sources?: Json
           updated_at?: string
@@ -499,6 +502,8 @@ export type Database = {
           party: string | null
           photo_url: string | null
           photo_source_url: string | null
+          photo_credit: string | null
+          photo_rights_basis: string | null
           politician_type: string
           race_id: string | null
           slug: string
@@ -534,6 +539,8 @@ export type Database = {
           party?: string | null
           photo_url?: string | null
           photo_source_url?: string | null
+          photo_credit?: string | null
+          photo_rights_basis?: string | null
           politician_type?: string
           race_id?: string | null
           slug: string
@@ -569,6 +576,8 @@ export type Database = {
           party?: string | null
           photo_url?: string | null
           photo_source_url?: string | null
+          photo_credit?: string | null
+          photo_rights_basis?: string | null
           politician_type?: string
           race_id?: string | null
           slug?: string
@@ -1105,6 +1114,26 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      update_verified_profile: {
+        Args: { p_actor: string; p_politician: string; p_fields: Json }
+        Returns: string
+      }
+      replace_verified_portrait: {
+        Args: { p_actor: string; p_politician: string; p_url: string; p_credit: string; p_rights_version: string }
+        Returns: string
+      }
+      save_politician_answer: {
+        Args: { p_actor_id: string; p_action: string; p_question_id?: string; p_answer_id?: string; p_body?: string; p_sources?: Json; p_requested_type?: string }
+        Returns: Json
+      }
+      claim_politician_profile: {
+        Args: { p_actor_id: string; p_politician_id: string }
+        Returns: Json
+      }
+      manage_politician_team: {
+        Args: { p_actor_id: string; p_politician_id: string; p_action: string; p_member_id?: string; p_email?: string; p_role?: string }
+        Returns: Json
+      }
       attach_answer_media: {
         Args: {
           p_actor_id: string

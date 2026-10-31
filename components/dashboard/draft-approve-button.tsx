@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 
 import styles from "./dashboard.module.css";
 
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export function DraftApproveButton({ answerId, onApproved }: Props) {
+  const router = useRouter();
   const [approved, setApproved] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -28,6 +30,7 @@ export function DraftApproveButton({ answerId, onApproved }: Props) {
         }
         setApproved(true);
         onApproved?.();
+        router.refresh();
       } catch {
         setError("Network error. Please try again.");
       }

@@ -1,284 +1,44 @@
-/**
- * POST /api/verify/meta-tag
- *
- * Method E — Website meta tag verification.
- * User places a <meta name="whytho-verification" content="[code]"> on their
- * official website. We crawl it server-side and confirm ownership.
- *
- * Actions:
- *   { action: "generate", politician_id } — returns a unique verification code
- *     to embed in their site's <head>
- *   { action: "check",    politician_id } — fetches politician.website_url and
- *     checks for the meta tag with the correct code
- *
- * Auth: Supabase session + politician_team membership
- *
- * On check success: DB trigger trg_verification_tier auto-upgrades politician
- * to tier 2 if 2+ distinct methods are now completed.
- */
-
 import { NextRequest, NextResponse } from "next/server";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
-import crypto from "crypto";
-import { getResend, FROM_EMAIL } from "@/lib/email/resend";
-import { verificationConfirmedEmail } from "@/lib/email/templates";
+import { randomBytes } from "node:crypto";
+import { z } from "zod";
+import { durableRateLimit, rateLimitKey } from "@/lib/security/durable-rate-limit";
+import { fetchOfficialMetaTag, reviewedSource } from "@/lib/security/verification";
 
-const CRAWL_TIMEOUT_MS = 10_000;
-
-function generateVerificationCode(): string {
-  return `wt-${crypto.randomBytes(16).toString("hex")}`;
-}
-
-async function getTeamMembership(
-  admin: ReturnType<typeof createAdminClient>,
-  politicianId: string,
-  userId: string
-): Promise<boolean> {
-  const { data } = await admin
-    .from("politician_team")
-    .select("id")
-    .eq("politician_id", politicianId)
-    .eq("user_id", userId)
-    .maybeSingle();
-  return !!data;
-}
-
-/** Fetches a URL and returns the whytho-verification meta tag content, or null. */
-async function fetchMetaTagCode(url: string): Promise<string | null> {
-  try {
-    const res = await fetch(url, {
-      headers: {
-        "User-Agent": "WhyThoBot/1.0 (+https://whytho.us/verify)",
-        Accept: "text/html",
-      },
-      signal: AbortSignal.timeout(CRAWL_TIMEOUT_MS),
-      redirect: "follow",
-    });
-
-    if (!res.ok) return null;
-
-    // Only read first 50KB — meta tags are always in <head>
-    const reader = res.body?.getReader();
-    if (!reader) return null;
-
-    let html = "";
-    while (html.length < 50_000) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      html += new TextDecoder().decode(value);
-      // Stop once we've passed </head>
-      if (html.toLowerCase().includes("</head>")) break;
-    }
-    reader.cancel();
-
-    // Match both attribute orderings
-    const nameFirst =
-      /<meta\s+name=["']whytho-verification["']\s+content=["']([^"']+)["']/i.exec(html);
-    const contentFirst =
-      /<meta\s+content=["']([^"']+)["']\s+name=["']whytho-verification["']/i.exec(html);
-
-    return nameFirst?.[1] ?? contentFirst?.[1] ?? null;
-  } catch {
-    return null;
-  }
-}
-
+const schema=z.object({action:z.enum(["generate","check"]),politician_id:z.string().uuid()});
 export async function POST(request: NextRequest) {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user || user.is_anonymous) {
-    return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+  const parsed=schema.safeParse(await request.json().catch(()=>null));
+  if (!parsed.success) return NextResponse.json({error:"Invalid verification request."},{status:400});
+  const body=parsed.data;
+  const supabase=await createClient();const {data:{user}}=await supabase.auth.getUser();
+  if (!user || user.is_anonymous) return NextResponse.json({error:"Authentication required"},{status:401});
+  const admin=createAdminClient();
+  const membership=await admin.from("politician_team").select("role").eq("politician_id",body.politician_id).eq("user_id",user.id).maybeSingle();
+  if (membership.error) return NextResponse.json({error:"Verification is temporarily unavailable."},{status:503});
+  if (membership.data?.role!=="admin") return NextResponse.json({error:"Only the profile admin can verify this profile."},{status:403});
+  const source=await reviewedSource(body.politician_id);
+  if (!source) return NextResponse.json({error:"WhyTho must review this profile's official website before verification. Contact support to continue."},{status:422});
+  const limit=await durableRateLimit(rateLimitKey("meta-verification",user.id),10,3600);
+  if (limit!=="allowed") return NextResponse.json({error:limit==="limited"?"Too many attempts. Please try later.":"Verification is temporarily unavailable."},{status:limit==="limited"?429:503});
+  const result=await admin.from("politician_verifications").select("id,verification_code,status,metadata").eq("politician_id",body.politician_id).eq("user_id",user.id).eq("method","meta_tag").order("created_at",{ascending:false}).limit(1).maybeSingle();
+  if (result.error) return NextResponse.json({error:"Verification is temporarily unavailable."},{status:503});
+  const existing=result.data;
+  const metadata=existing?.metadata as {website_url?:string;assurance?:string;source_url?:string} | null;
+  const trusted=metadata?.assurance==="reviewed_source_v1" && metadata.website_url===source.official_website_url && metadata.source_url===source.evidence_url;
+  if (trusted && existing?.status==="completed") return NextResponse.json({success:true,already_verified:true});
+  if (body.action==="generate") {
+    let code=trusted && existing?.status==="pending" ? existing.verification_code : null;
+    if (!code) {
+      code=`wt-${randomBytes(16).toString("hex")}`;
+      const inserted=await admin.from("politician_verifications").insert({politician_id:body.politician_id,user_id:user.id,method:"meta_tag",status:"pending",verification_code:code,metadata:{assurance:"reviewed_source_v1",website_url:source.official_website_url,source_url:source.evidence_url}});
+      if (inserted.error) return NextResponse.json({error:"Unable to create verification."},{status:503});
+    }
+    return NextResponse.json({success:true,code,website_url:source.official_website_url,instruction:`Add this tag to the head of ${source.official_website_url}:\n<meta name="whytho-verification" content="${code}">`});
   }
-
-  const body = (await request.json()) as {
-    action?: string;
-    politician_id?: string;
-  };
-
-  if (!body.politician_id) {
-    return NextResponse.json({ error: "politician_id is required" }, { status: 400 });
-  }
-
-  const admin = createAdminClient();
-
-  const onTeam = await getTeamMembership(admin, body.politician_id, user.id);
-  if (!onTeam) {
-    return NextResponse.json(
-      { error: "You are not authorized for this profile" },
-      { status: 403 }
-    );
-  }
-
-  // ── GENERATE ─────────────────────────────────────────────────────────────────
-  if (body.action === "generate") {
-    // Check for existing verification record
-    const { data: existing } = await admin
-      .from("politician_verifications")
-      .select("id, verification_code, status")
-      .eq("politician_id", body.politician_id)
-      .eq("user_id", user.id)
-      .eq("method", "meta_tag")
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (existing?.status === "completed") {
-      return NextResponse.json({ success: true, already_verified: true });
-    }
-
-    // Reuse existing pending code so the user doesn't need to change the tag
-    if (existing?.verification_code) {
-      const code = existing.verification_code;
-      return NextResponse.json({
-        success: true,
-        code,
-        instruction: buildInstruction(code),
-      });
-    }
-
-    // Generate and store a new code
-    const code = generateVerificationCode();
-    const { error: insertErr } = await admin.from("politician_verifications").insert({
-      politician_id: body.politician_id,
-      user_id: user.id,
-      method: "meta_tag",
-      status: "pending",
-      verification_code: code,
-      metadata: {},
-    });
-
-    if (insertErr) {
-      return NextResponse.json({ error: insertErr.message }, { status: 500 });
-    }
-
-    return NextResponse.json({
-      success: true,
-      code,
-      instruction: buildInstruction(code),
-    });
-  }
-
-  // ── CHECK ─────────────────────────────────────────────────────────────────────
-  if (body.action === "check") {
-    const { data: verification } = await admin
-      .from("politician_verifications")
-      .select("id, verification_code, status")
-      .eq("politician_id", body.politician_id)
-      .eq("user_id", user.id)
-      .eq("method", "meta_tag")
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (!verification) {
-      return NextResponse.json(
-        { error: "Generate a verification code first." },
-        { status: 404 }
-      );
-    }
-
-    if (verification.status === "completed") {
-      return NextResponse.json({ success: true, already_verified: true });
-    }
-
-    // Fetch politician website URL
-    const { data: politician } = await admin
-      .from("politicians")
-      .select("website_url")
-      .eq("id", body.politician_id)
-      .single();
-
-    if (!politician?.website_url) {
-      return NextResponse.json(
-        {
-          error:
-            "No website URL found for this politician. Please add it to your profile before verifying.",
-        },
-        { status: 422 }
-      );
-    }
-
-    const foundCode = await fetchMetaTagCode(politician.website_url);
-
-    if (!foundCode) {
-      return NextResponse.json(
-        {
-          success: false,
-          verified: false,
-          message:
-            "Verification tag not found. Ensure the meta tag is in your <head> and the site is publicly accessible.",
-          website_url: politician.website_url,
-        },
-        { status: 422 }
-      );
-    }
-
-    if (foundCode !== verification.verification_code) {
-      return NextResponse.json(
-        {
-          success: false,
-          verified: false,
-          message:
-            "Meta tag found but the code does not match. Copy the exact code from the generate step.",
-          website_url: politician.website_url,
-        },
-        { status: 422 }
-      );
-    }
-
-    // Mark completed — DB trigger trg_verification_tier handles tier upgrade
-    const { error: updateErr } = await admin
-      .from("politician_verifications")
-      .update({
-        status: "completed",
-        verified_at: new Date().toISOString(),
-        metadata: { website_url: politician.website_url },
-      })
-      .eq("id", verification.id);
-
-    if (updateErr) {
-      return NextResponse.json({ error: updateErr.message }, { status: 500 });
-    }
-
-    // Fire-and-forget: check if politician reached tier 2 and notify the team
-    void (async () => {
-      try {
-        const { data: pol } = await admin
-          .from("politicians")
-          .select("full_name, slug, verification_tier")
-          .eq("id", body.politician_id!)
-          .single();
-        if (!pol || pol.verification_tier !== "2") return;
-        const email = user.email;
-        if (!email) return;
-        const { subject, html, text } = verificationConfirmedEmail({
-          politicianName: pol.full_name,
-          politicianSlug: pol.slug,
-        });
-        await getResend().emails.send({ from: FROM_EMAIL, to: email, subject, html, text });
-      } catch {
-        // Never let email errors affect the API response
-      }
-    })();
-
-    return NextResponse.json({
-      success: true,
-      verified: true,
-      method: "meta_tag",
-      message: "Website ownership verified successfully.",
-    });
-  }
-
-  return NextResponse.json(
-    { error: "Invalid action. Use 'generate' or 'check'." },
-    { status: 400 }
-  );
-}
-
-function buildInstruction(code: string): string {
-  return `Add this tag to your website's <head>:\n\n<meta name="whytho-verification" content="${code}">\n\nOnce published, click "Check Verification" to confirm.`;
+  if (!trusted || !existing || existing.status!=="pending" || !existing.verification_code) return NextResponse.json({error:"Generate a new verification code first."},{status:422});
+  const found=await fetchOfficialMetaTag(source.official_website_url);
+  if (!found || found!==existing.verification_code) return NextResponse.json({success:false,verified:false,error:"Verification tag not found on the reviewed official website. Redirects are not followed; contact support if the official URL changed."},{status:422});
+  const completed=await admin.from("politician_verifications").update({status:"completed",verified_at:new Date().toISOString(),verification_code:null}).eq("id",existing.id).eq("status","pending").eq("verification_code",found).select("id").maybeSingle();
+  if (completed.error || !completed.data) return NextResponse.json({error:"Verification changed. Please reload and try again."},{status:409});
+  return NextResponse.json({success:true,verified:true,method:"meta_tag",message:"Official website ownership verified."});
 }

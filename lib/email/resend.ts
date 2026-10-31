@@ -17,4 +17,4 @@ export const FROM_EMAIL =
   process.env.RESEND_FROM_EMAIL ?? "onboarding@resend.dev";
 
 export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://whytho-alpha.vercel.app";
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://whytho.us";

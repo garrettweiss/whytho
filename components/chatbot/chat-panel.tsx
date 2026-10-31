@@ -1,7 +1,6 @@
 "use client";
 
-import { useChat } from "@ai-sdk/react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Send } from "lucide-react";
 import { ChatMessage, TypingIndicator } from "./chat-message";
 
@@ -19,19 +18,37 @@ const SUGGESTED_PROMPTS = [
 export function ChatPanel({ pageContext, onClose }: ChatPanelProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  const { messages, input, handleInputChange, handleSubmit, isLoading, error } = useChat({
-    api: "/api/chat",
-    body: { pageContext },
-    initialMessages: [
-      {
-        id: "welcome",
-        role: "assistant",
-        content: pageContext
-          ? `Hi! I can help you explore questions and answers on this page, or answer anything about WhyTho. What would you like to know?`
-          : "Hi! I'm the WhyTho Assistant. I can help you find politicians, explore their question records, answer questions about the platform, or post questions directly to a representative. What would you like to do?",
-      },
-    ],
-  });
+  const [messages, setMessages] = useState<{id:string;role:"assistant"|"user";content:string}[]>([{id:"welcome",role:"assistant",content:"I can help you find politicians, explore public answers, and prepare questions for you to review and submit on their profiles."}]);
+  const [input,setInput]=useState("");
+  const [isLoading,setLoading]=useState(false);
+  const [error,setError]=useState<string|null>(null);
+  const pending=useRef<AbortController|null>(null);
+  useEffect(()=>()=>pending.current?.abort(),[]);
+  const handleInputChange=(event: React.ChangeEvent<HTMLInputElement|HTMLTextAreaElement>)=>setInput(event.target.value);
+  async function submit(text:string) {
+    if (!text.trim() || pending.current) return;
+    const controller=new AbortController();pending.current=controller;
+    const next=[...messages,{id:crypto.randomUUID(),role:"user" as const,content:text.trim()}];
+    setMessages(next);setInput("");setLoading(true);setError(null);
+    try {
+      const response=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:next.map(({role,content})=>({role,content})),pageContext}),signal:controller.signal});
+      if (!response.ok || !response.body) {
+        const body=await response.json().catch(()=>null);
+        throw new Error(typeof body?.error==="string"?body.error:"The assistant is temporarily unavailable.");
+      }
+      const id=crypto.randomUUID();let content="";
+      setMessages([...next,{id,role:"assistant",content}]);
+      const reader=response.body.getReader();const decoder=new TextDecoder();
+      while (true) {
+        const {done,value}=await reader.read();if(done)break;
+        content+=decoder.decode(value,{stream:true});
+        const text=content;setMessages([...next,{id,role:"assistant",content:text}]);
+      }
+    } catch (failure) {
+      if (!controller.signal.aborted) setError(failure instanceof Error?failure.message:"The assistant is temporarily unavailable.");
+    } finally { pending.current=null;setLoading(false); }
+  }
+  const handleSubmit=(event:React.FormEvent)=>{event.preventDefault();void submit(input);};
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
@@ -73,7 +90,7 @@ export function ChatPanel({ pageContext, onClose }: ChatPanelProps) {
 
         {error && (
           <p role="alert" className="text-xs text-destructive text-center py-1">
-            Something went wrong. Please try again.
+            {error}
           </p>
         )}
 
@@ -83,18 +100,7 @@ export function ChatPanel({ pageContext, onClose }: ChatPanelProps) {
             {SUGGESTED_PROMPTS.map((prompt) => (
               <button
                 key={prompt}
-                onClick={() => {
-                  const syntheticEvent = {
-                    preventDefault: () => {},
-                    target: { value: prompt },
-                  } as unknown as React.ChangeEvent<HTMLInputElement>;
-                  handleInputChange(syntheticEvent);
-                  setTimeout(() => {
-                    document
-                      .querySelector<HTMLFormElement>("#chatbot-form")
-                      ?.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
-                  }, 0);
-                }}
+                onClick={() => {void submit(prompt);}}
                 className="w-full text-left text-xs px-3 py-2 rounded-lg border border-border hover:bg-muted transition-colors text-muted-foreground"
               >
                 {prompt}
@@ -116,6 +122,7 @@ export function ChatPanel({ pageContext, onClose }: ChatPanelProps) {
           <textarea
             aria-label="Message the WhyTho AI assistant"
             value={input}
+            maxLength={4000}
             onChange={handleInputChange}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {

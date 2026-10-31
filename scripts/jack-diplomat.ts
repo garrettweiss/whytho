@@ -1,20 +1,19 @@
 /**
- * Jack — Diplomat Agent
+ * Jack - Diplomat Agent
  *
- * Determines the best outreach channel for each politician and sends
- * a notification that constituents are asking questions on WhyTho.
+ * Previews outreach candidates only. Automatic delivery is blocked because this
+ * legacy path has no verified opt-in, suppression or durable delivery claim.
  *
- * Strategy per politician:
- *   1. If they have an X handle → reply to their most recent tweet mentioning WhyTho
- *   2. Otherwise → log "no channel" for future email / contact form expansion
+ * Preview candidates from unclaimed profiles with qualifying questions.
+ * A public handle and question count are not consent to contact the office.
  *
  * Only reaches out once per politician per campaign (tracked in x_outreach_log).
  * Target: politicians who have questions with net_upvotes >= 5 and no WhyTho account.
  *
  * Usage:
- *   npx tsx scripts/jack-diplomat.ts                  # All eligible politicians
+ *   npx tsx scripts/jack-diplomat.ts                  # Preview eligible politicians
  *   npx tsx scripts/jack-diplomat.ts --dry-run        # Preview only
- *   npx tsx scripts/jack-diplomat.ts --limit=10       # First N politicians
+ *   npx tsx scripts/jack-diplomat.ts --limit=10       # Preview first N politicians
  *   npx tsx scripts/jack-diplomat.ts --min-votes=5    # Qualifying vote threshold (default: 5)
  */
 
@@ -22,6 +21,7 @@ import * as dotenv from "dotenv";
 dotenv.config({ path: ".env.local", override: true });
 
 import * as crypto from "crypto";
+import { requireOutreachPreview, blockLegacyOutreachDelivery } from "../lib/notifications/outreach-guard";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
 
@@ -40,7 +40,7 @@ const SITE_URL        = (() => {
 })();
 
 const args      = process.argv.slice(2);
-const DRY_RUN   = args.includes("--dry-run");
+const DRY_RUN   = requireOutreachPreview(args);
 const LIMIT     = parseInt(args.find((a) => a.startsWith("--limit="))?.split("=")[1] ?? "50");
 const MIN_VOTES = parseInt(args.find((a) => a.startsWith("--min-votes="))?.split("=")[1] ?? "5");
 
@@ -86,6 +86,7 @@ function buildOAuthHeader(method: string, url: string): string {
 // ── Post tweet ────────────────────────────────────────────────────────────────
 
 async function postTweet(text: string, inReplyToId?: string): Promise<string> {
+  blockLegacyOutreachDelivery();
   const url  = "https://api.twitter.com/2/tweets";
   const body: Record<string, unknown> = { text };
   if (inReplyToId) body.reply = { in_reply_to_tweet_id: inReplyToId };
@@ -112,19 +113,18 @@ async function postTweet(text: string, inReplyToId?: string): Promise<string> {
 
 // ── Build outreach message ─────────────────────────────────────────────────────
 
-function buildOutreachMessage(handle: string, slug: string, questionCount: number): string {
+function buildOutreachMessage(handle: string, slug: string): string {
   const url = `${SITE_URL}/${slug}`;
-  const q   = questionCount === 1 ? "question" : "questions";
   // Stay under 280 chars
-  return `@${handle} Your constituents have ${questionCount} ${q} for you on WhyTho — a civic accountability platform. Your response rate is always public.\n${url}`;
+  return `@${handle} You can review the questions on your independent WhyTho profile and, after verification, publish an official response:\n${url}`;
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 async function main() {
-  console.log("🤝 Jack — Diplomat Agent");
+  console.log("🤝 Jack - Diplomat Agent");
   console.log("========================");
-  if (DRY_RUN) console.log("🔍 DRY RUN — no tweets will be sent\n");
+  if (DRY_RUN) console.log("🔍 DRY RUN - no tweets will be sent\n");
   console.log(`📦 Limit: ${LIMIT} | Min votes threshold: ${MIN_VOTES}\n`);
 
   if (!DRY_RUN && (!CONSUMER_KEY || !CONSUMER_SECRET || !ACCESS_TOKEN || !ACCESS_SECRET)) {
@@ -135,7 +135,7 @@ async function main() {
   const { data: politicians, error } = await supabase
     .from("politicians")
     .select("id, full_name, slug, social_handles, verification_tier")
-    .eq("verification_tier", "0") // UNCLAIMED only — don't outreach to politicians who already joined
+    .eq("verification_tier", "0") // UNCLAIMED only - don't outreach to politicians who already joined
     .not("social_handles", "is", null)
     .limit(500); // fetch wide, filter below
 
@@ -206,14 +206,14 @@ async function main() {
     if (!twitterHandle) { skipped++; continue; }
 
     const questionCount = qualifyingCounts.get(pol.id) ?? 0;
-    const message       = buildOutreachMessage(twitterHandle, pol.slug, questionCount);
+    const message       = buildOutreachMessage(twitterHandle, pol.slug);
 
     console.log(`  📬 @${twitterHandle} (${pol.full_name})`);
     console.log(`     ${questionCount} qualifying question${questionCount !== 1 ? "s" : ""}`);
     console.log(`     Message: "${message}"`);
 
     if (DRY_RUN) {
-      console.log(`     [dry run — would tweet]\n`);
+      console.log(`     [dry run - would tweet]\n`);
       sent++;
       continue;
     }

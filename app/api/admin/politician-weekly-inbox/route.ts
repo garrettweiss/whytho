@@ -26,6 +26,16 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  // This legacy sender does not honor explicit per-profile opt-in or durable deduplication.
+  // Keep it disabled until the reviewed notification outbox replaces direct delivery.
+  const deliveryReady = false;
+  if (!deliveryReady) {
+    return NextResponse.json({
+      error: "Politician email delivery is paused pending consent and idempotent delivery controls.",
+      sent: 0,
+    }, { status: 503 });
+  }
+
   const admin = createAdminClient();
   const body = (await request.json().catch(() => ({}))) as { week_number?: number };
 

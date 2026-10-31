@@ -2,16 +2,18 @@
  * /api/chat — WhyTho chatbot streaming endpoint
  *
  * Uses Vercel AI SDK + Anthropic provider.
- * Claude uses tools to fetch real DB data — no hallucination.
+ * Tools retrieve public database records; unsupported claims must be declined.
  * Anonymous users are supported (Supabase anon auth).
  */
 
-import { streamText, tool } from "ai";
+import { streamText, tool, stepCountIs } from "ai";
 import { anthropic } from "@ai-sdk/anthropic";
 import { z } from "zod";
-import { createClient, createAdminClient } from "@/lib/supabase/server";
+import { createClient, createAdminClient, createPublicClient } from "@/lib/supabase/server";
 import { buildSystemPrompt } from "@/lib/ai/chatbot-prompt";
-import { containsProfanity } from "@/lib/moderation/filter";
+import { boundedJson } from "@/lib/security/bounded-json";
+import { parseChatRequest } from "@/lib/security/chat-input";
+import { durableRateLimit, rateLimitKey } from "@/lib/security/durable-rate-limit";
 import { rateLimit, clientIp } from "@/lib/rate-limit";
 
 // Cost controls. This endpoint runs claude-sonnet-4-6 with tool calling, so an
@@ -23,15 +25,11 @@ const CHAT_PER_IP_WINDOW_MS = 5 * 60 * 1000;
 /** Caps the context resent on each turn, which is what actually drives token spend. */
 const MAX_MESSAGES_PER_REQUEST = 40;
 
-const MAX_QUESTION_LENGTH = 500;
-const MIN_QUESTION_LENGTH = 10;
-const MAX_POLITICIAN_TARGETS = 5;
 
 export async function POST(req: Request) {
-  const { messages, pageContext } = (await req.json()) as {
-    messages: { role: string; content: string }[];
-    pageContext?: string | null;
-  };
+  const parsed = parseChatRequest(await boundedJson(req));
+  if (!parsed) return Response.json({ error: "Invalid or oversized conversation." }, { status: 400 });
+  const { messages, pageContext } = parsed;
 
   // A session is required. Anonymous accounts are fine, and /api/auth/anonymous
   // is itself IP rate limited, so this forces callers through a metered door
@@ -75,29 +73,34 @@ export async function POST(req: Request) {
     );
   }
 
-  const admin = createAdminClient();
+  const sharedLimit = await durableRateLimit(rateLimitKey("chat-user",userId),12,300);
+  if (sharedLimit !== "allowed") return Response.json({error: sharedLimit === "limited" ? "Please wait before sending another message." : "The assistant is temporarily unavailable."}, {status: sharedLimit === "limited" ? 429 : 503});
+  const sharedIpLimit = await durableRateLimit(rateLimitKey("chat-ip",ip),30,300);
+  if (sharedIpLimit !== "allowed") return Response.json({ error: "The assistant is temporarily unavailable. Please try later." }, { status: sharedIpLimit === "limited" ? 429 : 503 });
+  const publicData = createPublicClient();
 
   const result = streamText({
     model: anthropic("claude-sonnet-4-6"),
     system: buildSystemPrompt(pageContext),
-    messages: messages as Parameters<typeof streamText>[0]["messages"],
-    maxSteps: 6,
+    messages,
+    stopWhen: stepCountIs(4),
+    maxOutputTokens: 1500,
     tools: {
       // ── Search for politicians by name, state, office ────────────────────
       search_politicians: tool({
         description:
           "Search for politicians by name, state, or office. Returns matching profiles with id, name, slug, office, and state.",
-        parameters: z.object({
-          query: z.string().describe("Name or partial name to search for"),
-          state: z.string().optional().describe("Two-letter state code to filter by, e.g. CO"),
-          office: z.string().optional().describe("Office type to filter by, e.g. Senator, Representative"),
+        inputSchema: z.object({
+          query: z.string().max(200).describe("Name or partial name to search for"),
+          state: z.string().regex(/^[a-zA-Z]{2}$/).optional().describe("Two-letter state code to filter by, e.g. CO"),
+          office: z.string().max(100).optional().describe("Office type to filter by, e.g. Senator, Representative"),
         }),
         execute: async ({ query, state, office }) => {
-          let q = admin
+          let q = publicData
             .from("politicians")
             .select("id, full_name, slug, office, state, verification_tier, party")
-            .eq("is_active", true)
-            .ilike("full_name", `%${query}%`)
+            .eq("is_active", true).eq("is_test", false)
+            .ilike("full_name", `%${query.replace(/[%_]/g, "")}%`)
             .limit(8);
 
           if (state) q = q.eq("state", state.toUpperCase());
@@ -114,18 +117,18 @@ export async function POST(req: Request) {
       get_politician_qa: tool({
         description:
           "Fetch the questions a politician has been asked and their answers. Returns raw data from the database only. Use this before summarizing any politician's record.",
-        parameters: z.object({
-          politician_id: z.string().describe("The UUID of the politician"),
+        inputSchema: z.object({
+          politician_id: z.string().uuid().describe("The UUID of the politician"),
           politician_name: z.string().describe("The politician's name (for display)"),
           period: z
             .enum(["week", "month", "all"])
             .optional()
             .default("all")
             .describe("Time period to fetch questions for"),
-          limit: z.number().optional().default(20).describe("Max questions to return"),
+          limit: z.number().int().min(1).max(20).optional().default(20).describe("Max questions to return"),
         }),
         execute: async ({ politician_id, period, limit }) => {
-          const admin2 = createAdminClient();
+          const admin2 = createPublicClient();
 
           // Build time filter
           let since: string | null = null;
@@ -137,9 +140,10 @@ export async function POST(req: Request) {
               .from("questions")
               .select(`
                 id, body, net_upvotes, week_number, is_seeded, created_at,
-                answers (id, body, answer_type, is_ai_generated, ai_confidence, created_at)
+                answers (id, body, answer_type, is_ai_generated, is_draft, ai_confidence, created_at)
               `)
               .eq("politician_id", politician_id)
+              .eq("answers.is_draft", false)
               .eq("status", "active")
               .eq("week_number", weekNum)
               .order("net_upvotes", { ascending: false })
@@ -154,9 +158,10 @@ export async function POST(req: Request) {
             .from("questions")
             .select(`
               id, body, net_upvotes, week_number, is_seeded, created_at,
-              answers (id, body, answer_type, is_ai_generated, ai_confidence, created_at)
+              answers (id, body, answer_type, is_ai_generated, is_draft, ai_confidence, created_at)
             `)
             .eq("politician_id", politician_id)
+              .eq("answers.is_draft", false)
             .eq("status", "active")
             .order("net_upvotes", { ascending: false })
             .limit(limit);
@@ -173,7 +178,7 @@ export async function POST(req: Request) {
       query_site_stats: tool({
         description:
           "Query site-wide statistics. Use for questions like 'who answers the most questions', 'who has the highest response rate', 'how many questions were asked this week', etc.",
-        parameters: z.object({
+        inputSchema: z.object({
           stat_type: z
             .enum([
               "most_answered",
@@ -187,120 +192,36 @@ export async function POST(req: Request) {
             .string()
             .optional()
             .describe("Filter by state code (for by_state or filtering most_answered/most_questions)"),
-          office: z.string().optional().describe("Filter by office type"),
-          limit: z.number().optional().default(10),
+          office: z.string().max(100).optional().describe("Filter by office type"),
+          limit: z.number().int().min(1).max(20).optional().default(10),
         }),
         execute: async ({ stat_type, state, office, limit }) => {
-          const admin2 = createAdminClient();
+          const admin2 = createPublicClient();
 
           if (stat_type === "platform_overview") {
             const [
               { count: totalPoliticians },
               { count: totalQuestions },
               { count: totalAnswers },
-              { count: totalVotes },
               { data: weekData },
             ] = await Promise.all([
-              admin2.from("politicians").select("*", { count: "exact", head: true }).eq("is_active", true),
+              admin2.from("politicians").select("*", { count: "exact", head: true }).eq("is_active", true).eq("is_test", false),
               admin2.from("questions").select("*", { count: "exact", head: true }).eq("status", "active"),
-              admin2.from("answers").select("*", { count: "exact", head: true }).eq("is_ai_generated", false),
-              admin2.from("votes").select("*", { count: "exact", head: true }),
+              admin2.from("answers").select("*", { count: "exact", head: true }).eq("is_ai_generated", false).eq("is_draft", false).in("answer_type", ["direct", "team_statement"]),
               admin2.rpc("current_week_number"),
             ]);
             return {
               total_politicians: totalPoliticians,
               total_questions: totalQuestions,
               official_answers: totalAnswers,
-              total_votes: totalVotes,
               current_week: weekData,
             };
           }
 
-          if (stat_type === "most_answered") {
-            let q = admin2
-              .from("politicians")
-              .select("full_name, slug, office, state, party")
-              .eq("is_active", true)
-              .order("full_name")
-              .limit(limit);
-            if (state) q = q.eq("state", state.toUpperCase());
-            if (office) q = q.ilike("office", `%${office}%`);
-            // Get politicians with answered questions count
-            const { data } = await q;
-            // Enrich with answer counts
-            const enriched = await Promise.all(
-              (data ?? []).map(async (p) => {
-                const { count } = await admin2
-                  .from("answers")
-                  .select("*", { count: "exact", head: true })
-                  .eq("politician_id", (p as { id?: string } & typeof p).id ?? "")
-                  .eq("is_ai_generated", false);
-                return { ...p, answer_count: count ?? 0 };
-              })
-            );
-            return {
-              results: enriched.sort((a, b) => b.answer_count - a.answer_count).slice(0, limit),
-            };
-          }
-
-          if (stat_type === "most_questions") {
-            const q = admin2
-              .from("questions")
-              .select("politician_id, politicians!politician_id(full_name, slug, office, state, party)")
-              .eq("status", "active");
-            const { data } = await q;
-            // Tally by politician
-            const tally: Record<string, { count: number; politician: unknown }> = {};
-            for (const row of data ?? []) {
-              const pid = row.politician_id;
-              if (!tally[pid]) tally[pid] = { count: 0, politician: row.politicians };
-              tally[pid].count++;
-            }
-            const sorted = Object.values(tally)
-              .sort((a, b) => b.count - a.count)
-              .slice(0, limit)
-              .map(({ count, politician }) => ({ ...(politician as object), question_count: count }));
-            return { results: sorted };
-          }
-
-          if (stat_type === "response_rate_leaders") {
-            const { data } = await admin2
-              .from("politicians")
-              .select("id, full_name, slug, office, state, party")
-              .eq("is_active", true)
-              .limit(50);
-
-            const enriched = await Promise.all(
-              (data ?? []).map(async (p) => {
-                const { data: rateData } = await admin2.rpc("participation_rate_period", {
-                  p_politician_id: p.id,
-                  p_period: "all",
-                });
-                return { ...p, response_rate: rateData ?? 0 };
-              })
-            );
-            return {
-              results: enriched
-                .filter((p) => p.response_rate > 0)
-                .sort((a, b) => b.response_rate - a.response_rate)
-                .slice(0, limit),
-            };
-          }
-
-          if (stat_type === "by_state") {
-            const { data } = await admin2
-              .from("politicians")
-              .select("state, id")
-              .eq("is_active", true);
-            const stateCounts: Record<string, number> = {};
-            for (const p of data ?? []) {
-              if (p.state) stateCounts[p.state] = (stateCounts[p.state] ?? 0) + 1;
-            }
-            return {
-              results: Object.entries(stateCounts)
-                .map(([state, count]) => ({ state, politician_count: count }))
-                .sort((a, b) => b.politician_count - a.politician_count),
-            };
+          // A limited sample is not a site-wide ranking. The public leaderboard
+          // owns its complete aggregate methodology and reporting window.
+          if (["most_answered", "most_questions", "response_rate_leaders", "by_state"].includes(stat_type)) {
+            return { available: false, message: "This chat tool cannot verify a complete ranking. Open the public leaderboard and select the reporting period.", url: "https://whytho.us/leaderboard", filters: { state, office, limit } };
           }
 
           return { error: "Unknown stat_type" };
@@ -311,15 +232,15 @@ export async function POST(req: Request) {
       search_knowledge_base: tool({
         description:
           "Search the WhyTho FAQ and team-answered questions knowledge base. Call this before answering any question about how WhyTho works.",
-        parameters: z.object({
-          query: z.string().describe("The question or topic to search for"),
+        inputSchema: z.object({
+          query: z.string().max(200).describe("The question or topic to search for"),
         }),
         execute: async ({ query }) => {
           const admin2 = createAdminClient();
           const { data } = await admin2
             .from("chatbot_knowledge")
             .select("question, answer, category")
-            .or(`question.ilike.%${query}%,answer.ilike.%${query}%`)
+            .ilike("question", `%${query.replace(/[%_]/g, "").slice(0,200)}%`)
             .limit(5);
 
           if (!data || data.length === 0) {
@@ -329,102 +250,19 @@ export async function POST(req: Request) {
         },
       }),
 
-      // ── Post a question to politician page(s) ────────────────────────────
-      post_question: tool({
-        description:
-          "Post a question to one or more politician pages on behalf of the user. Requires politician IDs (get them from search_politicians first). Max 5 politicians per call.",
-        parameters: z.object({
-          question: z.string().describe("The question text to post"),
-          politician_ids: z
-            .array(z.string())
-            .min(1)
-            .max(MAX_POLITICIAN_TARGETS)
-            .describe("Array of politician UUIDs to post the question to (max 5)"),
-          politician_names: z
-            .array(z.string())
-            .describe("Matching array of politician names (for confirmation messaging)"),
-        }),
-        execute: async ({ question, politician_ids, politician_names }) => {
-          // Validate question
-          const trimmed = question.trim();
-          if (trimmed.length < MIN_QUESTION_LENGTH) {
-            return { error: `Question must be at least ${MIN_QUESTION_LENGTH} characters.` };
-          }
-          if (trimmed.length > MAX_QUESTION_LENGTH) {
-            return { error: `Question must be at most ${MAX_QUESTION_LENGTH} characters.` };
-          }
-          if (containsProfanity(trimmed)) {
-            return { error: "Question contains inappropriate language. Please revise." };
-          }
-
-          const admin2 = createAdminClient();
-          const { data: weekData } = await admin2.rpc("current_week_number");
-          const week_number = weekData as number;
-
-          const posted: string[] = [];
-          const failed: string[] = [];
-
-          for (let i = 0; i < politician_ids.length; i++) {
-            const politician_id = politician_ids[i]!;
-            const name = politician_names[i] ?? politician_id;
-
-            // Verify politician exists
-            const { data: politician } = await admin2
-              .from("politicians")
-              .select("id")
-              .eq("id", politician_id)
-              .eq("is_active", true)
-              .single();
-
-            if (!politician) {
-              failed.push(name);
-              continue;
-            }
-
-            const { error } = await admin2.from("questions").insert({
-              politician_id: politician_id,
-              body: trimmed,
-              submitted_by: userId,
-              week_number,
-              is_seeded: false,
-              status: "active" as const,
-              source: "chatbot",
-            });
-
-            if (error) {
-              failed.push(name);
-            } else {
-              posted.push(name);
-            }
-          }
-
-          // Instrumentation log
-          if (posted.length > 0) {
-            await admin2.from("chatbot_question_posts").insert({
-              user_id: userId,
-              question_text: trimmed,
-              politician_ids: politician_ids.slice(0, posted.length),
-              question_ids: [],
-            });
-          }
-
-          return {
-            posted,
-            failed,
-            message:
-              posted.length > 0
-                ? `Posted your question to: ${posted.join(", ")}.${failed.length > 0 ? ` Failed for: ${failed.join(", ")}.` : ""}`
-                : "Failed to post the question. Please try again.",
-          };
-        },
+      // Publication requires the normal form's review, bot check and daily quota.
+      prepare_question: tool({
+        description: "Help prepare a question. The user must review and submit it on the politician profile; this tool does not publish.",
+        inputSchema: z.object({ question: z.string().min(10).max(500), politician_slug: z.string().regex(/^[a-z0-9-]+$/).max(160) }),
+        execute: async ({ question, politician_slug }) => ({ draft: question, profile_url: `https://whytho.us/${politician_slug}`, published: false, message: "Open this profile and use Ask a question to review and submit your question." }),
       }),
 
       // ── Log user feedback ─────────────────────────────────────────────────
       log_feedback: tool({
         description:
           "Log user feedback or a product improvement suggestion. Use when the user says something like 'you should add...', 'it would be great if...', 'I found a bug...', or is expressing a complaint or suggestion.",
-        parameters: z.object({
-          message: z.string().describe("The user's feedback verbatim"),
+        inputSchema: z.object({
+          message: z.string().min(1).max(4000).describe("The user's feedback verbatim"),
           category: z
             .enum(["bug", "feature", "ux", "content", "other"])
             .describe("Category of feedback"),
@@ -451,10 +289,10 @@ export async function POST(req: Request) {
       forward_to_team: tool({
         description:
           "Forward a question to the WhyTho team when you cannot answer it. Use as a last resort after exhausting search_knowledge_base.",
-        parameters: z.object({
-          question: z.string().describe("The user's question verbatim"),
+        inputSchema: z.object({
+          question: z.string().min(1).max(4000).describe("The user's question verbatim"),
           user_email: z
-            .string()
+            .string().email().max(254)
             .optional()
             .describe("User's email if they want a follow-up response"),
         }),
@@ -471,7 +309,7 @@ export async function POST(req: Request) {
     },
   });
 
-  return result.toDataStreamResponse();
+  return result.toTextStreamResponse();
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
@@ -488,6 +326,7 @@ type QuestionRow = {
     body: string;
     answer_type: string;
     is_ai_generated: boolean;
+    is_draft: boolean;
     ai_confidence: string | null;
     created_at: string;
   }[];
@@ -501,8 +340,9 @@ function buildQAResult(questions: QuestionRow[] | null, period: string) {
     };
   }
 
-  const answered = questions.filter((q) => q && q.answers && q.answers.length > 0);
-  const unanswered = questions.filter((q) => q && (!q.answers || q.answers.length === 0));
+  const official = (q: QuestionRow) => q?.answers?.some(a => !a.is_draft && !a.is_ai_generated && ["direct", "team_statement"].includes(a.answer_type)) ?? false;
+  const answered = questions.filter(official);
+  const unanswered = questions.filter(q => !official(q));
 
   return {
     period,
@@ -515,7 +355,7 @@ function buildQAResult(questions: QuestionRow[] | null, period: string) {
       upvotes: q?.net_upvotes,
       is_seeded: q?.is_seeded,
       week: q?.week_number,
-      answers: (q?.answers ?? []).map((a) => ({
+      answers: (q?.answers ?? []).filter(a => !a.is_draft).map((a) => ({
         id: a.id,
         body: a.body,
         type: a.answer_type,

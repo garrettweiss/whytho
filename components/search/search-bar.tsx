@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { usePoliticianSearch, type SearchIndexEntry } from "@/lib/search/use-politician-search";
 import { matchingStates, type StateEntry } from "@/lib/search/states";
@@ -18,6 +18,7 @@ type ResultItem =
 
 export function SearchBar({ placeholder = "Search politicians, states..." }: { placeholder?: string }) {
   const router = useRouter();
+  const resultsId = useId();
   const { search } = usePoliticianSearch();
 
   const [query, setQuery] = useState("");
@@ -100,7 +101,10 @@ export function SearchBar({ placeholder = "Search politicians, states..." }: { p
           ref={inputRef}
           type="text"
           role="combobox"
+          aria-label="Search politicians and states"
           aria-expanded={showDropdown}
+          aria-controls={resultsId}
+          aria-activedescendant={showDropdown && activeIndex >= 0 && activeIndex < items.length ? `${resultsId}-${activeIndex}` : undefined}
           aria-autocomplete="list"
           autoComplete="off"
           value={query}
@@ -129,7 +133,9 @@ export function SearchBar({ placeholder = "Search politicians, states..." }: { p
 
       {showDropdown && (
         <div
+          id={resultsId}
           role="listbox"
+          aria-label="Search results"
           className="absolute left-0 right-0 top-full mt-1.5 z-50 rounded-xl border bg-popover shadow-lg ring-1 ring-foreground/5 overflow-hidden"
         >
           {!hasResults ? (
@@ -148,6 +154,7 @@ export function SearchBar({ placeholder = "Search politicians, states..." }: { p
                     return (
                       <button
                         key={entry.s}
+                        id={`${resultsId}-${i}`}
                         role="option"
                         aria-selected={isActive}
                         onMouseEnter={() => setActiveIndex(i)}
@@ -181,6 +188,7 @@ export function SearchBar({ placeholder = "Search politicians, states..." }: { p
                     return (
                       <button
                         key={state.code}
+                        id={`${resultsId}-${idx}`}
                         role="option"
                         aria-selected={isActive}
                         onMouseEnter={() => setActiveIndex(idx)}

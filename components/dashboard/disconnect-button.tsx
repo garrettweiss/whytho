@@ -46,7 +46,7 @@ export function DisconnectButton({ politicianId, politicianName, isOnlyAdmin }: 
           <p className={styles.meta}>
             This will remove your access to this politician&apos;s dashboard.
             {isOnlyAdmin && (
-              <> Since you are the only admin, the profile will return to <strong>Unclaimed</strong> status and all team members will lose access.</>
+              <> You are the only admin. Add another admin before leaving, or contact WhyTho support to release the claim.</>
             )}
           </p>
         </div>
@@ -55,7 +55,7 @@ export function DisconnectButton({ politicianId, politicianName, isOnlyAdmin }: 
           <button
             type="button"
             onClick={handleDisconnect}
-            disabled={isPending}
+            disabled={isPending || isOnlyAdmin}
             className={styles.dangerButton}
           >
             {isPending ? "Removing…" : "Yes, remove profile"}

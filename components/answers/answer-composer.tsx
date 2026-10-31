@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useRef } from "react";
+import { useState, useTransition, useRef, useId } from "react";
 import { useRouter } from "next/navigation";
 import { ShareTray } from "@/components/answers/share-tray";
 import { parseSavedAnswerResult, type SavedAnswerResult } from "./answer-result";
@@ -56,6 +56,7 @@ export function AnswerComposer({
   onAnswered,
 }: Props) {
   const router = useRouter();
+  const fieldId = useId();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [isOpen, setIsOpen] = useState(false);
@@ -143,7 +144,7 @@ export function AnswerComposer({
     setUploadProgress(null);
   }
 
-  function handleSubmit() {
+  function handleSubmit(saveDraft = false) {
     setError(null);
     startTransition(async () => {
       try {
@@ -155,6 +156,7 @@ export function AnswerComposer({
             question_id: questionId,
             body: buildBody(),
             sources: buildSources(),
+            ...(saveDraft ? { answer_type: "team_statement" } : {}),
           }),
         });
 
@@ -280,7 +282,9 @@ export function AnswerComposer({
       {mode === "text" && (
         <>
           <div className="relative">
+            <label htmlFor={`${fieldId}-answer`} className="text-xs text-muted-foreground">Your response</label>
             <textarea
+              id={`${fieldId}-answer`}
               value={text}
               onChange={(e) => { if (e.target.value.length <= TEXT_MAX) setText(e.target.value); }}
               placeholder="Write your answer here. Be clear, specific, and honest."
@@ -295,10 +299,11 @@ export function AnswerComposer({
             </span>
           </div>
           <div>
-            <label className="text-xs text-muted-foreground mb-1 block">
+            <label htmlFor={`${fieldId}-sources`} className="text-xs text-muted-foreground mb-1 block">
               Sources (optional, one per line or comma-separated URLs)
             </label>
             <textarea
+              id={`${fieldId}-sources`}
               value={sources}
               onChange={(e) => setSources(e.target.value)}
               placeholder="https://example.gov/statement"
@@ -314,10 +319,11 @@ export function AnswerComposer({
       {mode === "link" && (
         <div className="space-y-2">
           <div>
-            <label className="text-xs text-muted-foreground mb-1 block">
+            <label htmlFor={`${fieldId}-link`} className="text-xs text-muted-foreground mb-1 block">
               Statement URL <span className="text-destructive">*</span>
             </label>
             <input
+              id={`${fieldId}-link`}
               type="url"
               value={linkUrl}
               onChange={(e) => setLinkUrl(e.target.value)}
@@ -332,10 +338,11 @@ export function AnswerComposer({
             )}
           </div>
           <div>
-            <label className="text-xs text-muted-foreground mb-1 block">
+            <label htmlFor={`${fieldId}-summary`} className="text-xs text-muted-foreground mb-1 block">
               Brief summary (optional, shown before the link)
             </label>
             <textarea
+              id={`${fieldId}-summary`}
               value={linkDescription}
               onChange={(e) => { if (e.target.value.length <= 500) setLinkDescription(e.target.value); }}
               placeholder="I addressed this in my statement on March 15th…"
@@ -411,7 +418,7 @@ export function AnswerComposer({
       <p className="text-xs text-muted-foreground">{!profileVerified
         ? "Identity verification is required before publishing. This response and its attachments will be saved as a private draft."
         : canPublish
-          ? "This response will be published on the public profile when you submit it."
+          ? "Publish this response now, or save a private draft to review first."
           : "Your response and attachments stay private until an admin or editor approves them for publication."}</p>
 
       <div className="flex gap-2">
@@ -431,9 +438,10 @@ export function AnswerComposer({
         >
           Cancel
         </button>
+        {canPublish && <button type="button" onClick={() => handleSubmit(true)} disabled={!isValid || isPending || submissionUncertain} className="rounded-md border px-4 py-2 text-sm font-medium disabled:opacity-50">Save private draft</button>}
         <button
           type="button"
-          onClick={handleSubmit}
+          onClick={() => handleSubmit(false)}
           disabled={!isValid || isPending || submissionUncertain}
           className="flex-1 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >

@@ -23,6 +23,7 @@ export type InboxQuestion = {
     is_ai_generated: boolean;
     is_draft: boolean;
     created_at: string;
+    published_at?: string | null;
   }[];
 };
 
@@ -78,7 +79,7 @@ function QuestionCard({
     {officialAnswer && <div className={styles.answer}>
       <p className={`${styles.eyebrow} ${styles.success}`}>Official response</p>
       <p className={styles.answerBody}>{officialAnswer.body}</p>
-      {canPublish && <AnswerEditButton answerId={officialAnswer.id} initialBody={officialAnswer.body} createdAt={officialAnswer.created_at} />}
+      {canPublish && <AnswerEditButton answerId={officialAnswer.id} initialBody={officialAnswer.body} createdAt={officialAnswer.published_at ?? officialAnswer.created_at} />}
     </div>}
     {aiAnswer && <div className={styles.analysis}>
       <p className={styles.eyebrow}>🤖 AI Analysis of Public Record</p>

@@ -1,31 +1,26 @@
 /**
- * Jack — Herald Agent
+ * Jack - Herald Agent
  *
- * Notifies constituents from @WhyTho_official that their question is live.
+ * Previews source-attributed notifications for imported public X questions.
  *
- * Posts a standalone mention tweet (NOT a reply) to avoid X's restriction
- * that blocks replies from accounts not previously engaged with by the author.
- * A mention tweet lands in the user's notifications identically to a reply.
- *
- * For each published x_post with no outreach log entry:
- *   1. Build tweet: "@handle Your question is now live on WhyTho → [link]"
- *   2. POST /2/tweets (no in_reply_to_tweet_id — standalone mention)
- *   3. Log to x_outreach_log
- *   4. Update x_posts.status = 'notified'
+ * Preview-only: historical automatic mentions lacked explicit recipient consent.
+ * Live delivery is blocked at the CLI and provider boundary. Follow the reviewed
+ * opt-in notification plan before implementing a durable dispatcher.
  *
  * Uses OAuth 1.0a User Context (required for write operations).
- * Rate limit: 1 tweet per post, 2s delay between posts.
+ * Historical provider code is blocked and must not be re-enabled directly.
  *
  * Usage:
- *   npx tsx scripts/jack-herald.ts                 # All published, unnotified
+ *   npx tsx scripts/jack-herald.ts                 # Preview published, unnotified
  *   npx tsx scripts/jack-herald.ts --dry-run       # Preview only, no writes
- *   npx tsx scripts/jack-herald.ts --limit=10      # First N posts
+ *   npx tsx scripts/jack-herald.ts --limit=10      # Preview first N posts
  */
 
 import * as dotenv from "dotenv";
 dotenv.config({ path: ".env.local", override: true });
 
 import * as crypto from "crypto";
+import { requireOutreachPreview, blockLegacyOutreachDelivery } from "../lib/notifications/outreach-guard";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
 
@@ -38,12 +33,12 @@ const CONSUMER_KEY    = process.env.X_API_KEY!;
 const CONSUMER_SECRET = process.env.X_API_SECRET!;
 const ACCESS_TOKEN    = process.env.X_ACCESS_TOKEN!;
 const ACCESS_SECRET   = process.env.X_ACCESS_TOKEN_SECRET!;
-// Always use production URL for outbound tweets — localhost is dev-only
+// Always use production URL for outbound tweets - localhost is dev-only
 const rawSiteUrl      = process.env.NEXT_PUBLIC_SITE_URL ?? "";
 const SITE_URL        = rawSiteUrl.includes("localhost") ? "https://whytho.us" : (rawSiteUrl || "https://whytho.us");
 
 const args    = process.argv.slice(2);
-const DRY_RUN = args.includes("--dry-run");
+const DRY_RUN = requireOutreachPreview(args);
 const LIMIT   = parseInt(args.find((a) => a.startsWith("--limit="))?.split("=")[1] ?? "9999");
 
 // ── OAuth 1.0a ────────────────────────────────────────────────────────────────
@@ -99,9 +94,7 @@ function buildOAuthHeader(method: string, url: string, extraParams: Record<strin
   return headerValue;
 }
 
-// ── Post tweet (standalone mention — NOT a reply) ─────────────────────────────
-// X blocks replies from accounts not previously engaged with by the author.
-// A standalone @mention delivers to their notifications identically.
+// Historical provider code remains for review, with delivery blocked below.
 
 interface TweetResponse {
   data?: { id: string; text: string };
@@ -109,10 +102,11 @@ interface TweetResponse {
 }
 
 async function postMention(mentionText: string): Promise<string> {
+  blockLegacyOutreachDelivery();
   const url  = "https://api.twitter.com/2/tweets";
   const body = JSON.stringify({
     text: mentionText,
-    // No `reply` field — standalone tweet, not a reply thread
+    // No `reply` field - standalone tweet, not a reply thread
   });
 
   const auth = buildOAuthHeader("POST", url);
@@ -135,12 +129,12 @@ async function postMention(mentionText: string): Promise<string> {
       const errJson = JSON.parse(rawText) as { errors?: Array<{ message: string }>; detail?: string; title?: string };
       msg = errJson.errors?.[0]?.message ?? errJson.detail ?? errJson.title ?? msg;
     } catch { /* use raw text */ }
-    throw new Error(`X API error: ${msg} — raw: ${rawText.slice(0, 300)}`);
+    throw new Error(`X API error: ${msg} - raw: ${rawText.slice(0, 300)}`);
   }
 
   const json = JSON.parse(rawText) as TweetResponse;
   if (json.errors) {
-    throw new Error(`X API error: ${json.errors[0]?.message ?? "Unknown error"}`);
+    throw new Error(`X API error: ${json.errors?.[0]?.message ?? "Unknown error"}`);
   }
 
   return json.data!.id;
@@ -149,21 +143,21 @@ async function postMention(mentionText: string): Promise<string> {
 // ── Build reply text ──────────────────────────────────────────────────────────
 
 function buildReplyText(authorHandle: string, politicianSlug: string, questionId: string): string {
-  const url = `${SITE_URL}/${politicianSlug}`;
+  const url = `${SITE_URL}/${politicianSlug}#question-${questionId}`;
   // Stay under 280 chars
-  return `@${authorHandle} Your question is now live on WhyTho — vote it up to demand a response 👇\n${url}`;
+  return `@${authorHandle} A question you posted on X is displayed on WhyTho with its source. You can view it here:\n${url}`;
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 async function main() {
-  console.log("📣 Jack — Herald Agent");
+  console.log("📣 Jack - Herald Agent");
   console.log("======================");
-  if (DRY_RUN) console.log("🔍 DRY RUN — no tweets will be sent\n");
+  if (DRY_RUN) console.log("🔍 DRY RUN - no tweets will be sent\n");
   console.log(`📦 Limit: ${LIMIT}\n`);
 
   // Validate OAuth creds
-  if (!CONSUMER_KEY || !CONSUMER_SECRET || !ACCESS_TOKEN || !ACCESS_SECRET) {
+  if (!DRY_RUN && (!CONSUMER_KEY || !CONSUMER_SECRET || !ACCESS_TOKEN || !ACCESS_SECRET)) {
     throw new Error("Missing X OAuth credentials. Need: X_API_KEY, X_API_SECRET, X_ACCESS_TOKEN, X_ACCESS_TOKEN_SECRET");
   }
 
@@ -224,7 +218,7 @@ async function main() {
   for (const post of toNotify) {
     const pol = post.politician_id ? polMap.get(post.politician_id) : undefined;
     if (!pol) {
-      console.log(`  ⏭️  Skipping ${post.id} — no politician slug found`);
+      console.log(`  ⏭️  Skipping ${post.id} - no politician slug found`);
       skipped++;
       continue;
     }
@@ -236,7 +230,7 @@ async function main() {
     console.log(`     Reply: "${replyText}"`);
 
     if (DRY_RUN) {
-      console.log(`     [dry run — would mention @${post.author_handle}]`);
+      console.log(`     [dry run - would mention @${post.author_handle}]`);
       sent++;
       continue;
     }

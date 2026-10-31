@@ -150,7 +150,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: error.code === "P0001" ? "You have reached the daily question limit." : "Question could not be saved. Please try again." }, { status: error.code === "P0001" ? 429 : 503 });
     }
 
     return NextResponse.json({ question }, { status: 201 });

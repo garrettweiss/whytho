@@ -1,6 +1,6 @@
 "use client";
 
-import type { Message } from "ai";
+type Message = { id: string; role: "user" | "assistant"; content: string };
 
 interface ChatMessageProps {
   message: Message;

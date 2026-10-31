@@ -9,6 +9,7 @@ import { QuestionList } from "@/components/politician/question-list";
 import { AskQuestionForm } from "@/components/questions/ask-question-form";
 import { PeriodTabs } from "@/components/politician/period-tabs";
 import { ProfileViewTracker } from "@/components/analytics/profile-view-tracker";
+import { PhotoCredit } from "@/components/profile/photo-credit";
 import { ProfilePortrait } from "@/components/profile/profile-portrait";
 import { AskQuestionLink, QuestionAnchorNotice } from "@/components/profile/profile-actions";
 import { faceBody, faceDisplay } from "@/components/home/fonts";
@@ -94,6 +95,7 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
 
         <section className={styles.hero} aria-labelledby="politician-name">
           <ProfilePortrait photoUrl={politician.photo_url} name={politician.full_name} responded={data.officialAnsweredQuestions > 0} />
+          <PhotoCredit politicianId={politician.id} />
           <div className={styles.identity}>
             <p className={styles.office}>{isCandidate ? "Candidate for " : ""}{politician.office ?? politician.candidate_office ?? "Public office"}{politician.state ? ` · ${politician.state}` : ""}{politician.district ? ` · District ${politician.district}` : ""}</p>
             <h1 id="politician-name">{politician.full_name}</h1>

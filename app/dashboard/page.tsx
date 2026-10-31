@@ -2,10 +2,11 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { TeamManager } from "@/components/dashboard/team-manager";
 import { ProfileEditor } from "@/components/dashboard/profile-editor";
 import { DisconnectButton } from "@/components/dashboard/disconnect-button";
+import { AnswerEditButton } from "@/components/dashboard/answer-edit-button";
 import { DraftApproveButton } from "@/components/dashboard/draft-approve-button";
 import { DashboardQuestionInbox } from "@/components/dashboard/question-inbox";
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
@@ -157,7 +158,7 @@ export default async function DashboardPage() {
     ] = await Promise.all([
       supabase
         .from("questions")
-        .select(`id, body, net_upvotes, week_number, created_at, is_seeded, answers ( id, answer_type, body, is_ai_generated, is_draft, created_at )`)
+        .select(`id, body, net_upvotes, week_number, created_at, is_seeded, answers ( id, answer_type, body, is_ai_generated, is_draft, created_at, published_at )`)
         .eq("politician_id", politician.id)
         .eq("week_number", currentWeekNumber)
         .eq("status", "active")
@@ -172,9 +173,8 @@ export default async function DashboardPage() {
         .in("answer_type", ["direct", "team_statement"]).abortSignal(readSignal),
       supabase.from("questions").select("*", { count: "exact", head: true })
         .eq("politician_id", politician.id).eq("week_number", currentWeekNumber).eq("status", "active").abortSignal(readSignal),
-      // Fetch pending drafts (only relevant for admin/editor roles)
-      ["admin", "editor"].includes(membership.role)
-        ? supabase
+      // RLS includes each responder's own drafts and all drafts for admin/editor.
+      supabase
             .from("answers")
             .select(`id, body, created_at, question_id, questions ( body ), answer_media ( id, media_type, public_url, file_name )`, { count: "exact" })
             .eq("politician_id", politician.id)
@@ -182,10 +182,10 @@ export default async function DashboardPage() {
             .eq("is_ai_generated", false)
             .order("created_at", { ascending: true })
             .order("id", { ascending: true })
-            .limit(1000).abortSignal(readSignal)
-        : Promise.resolve({ data: [], count: 0, error: null }),
-      // Count admins to determine if caller is the only one
-      supabase
+            .limit(1000).abortSignal(readSignal),
+      // Membership RLS exposes only the caller. Count with service role only
+      // after this page has established their membership in this profile.
+      createAdminClient()
         .from("politician_team")
         .select("*", { count: "exact", head: true })
         .eq("politician_id", politician.id)
@@ -264,7 +264,7 @@ export default async function DashboardPage() {
 
         <div className={styles.workspace}>
           <section className={styles.inbox} id={`inbox-${politician.id}`} aria-label="Questions and drafts">
-            {["admin", "editor"].includes(role) && drafts.length > 0 && <section className={styles.draftQueue} aria-label="Drafts awaiting approval">
+            {drafts.length > 0 && <section className={styles.draftQueue} aria-label="Drafts awaiting approval">
               <p className={styles.eyebrow}>{profileVerified ? "Review before publishing" : "Private until verified"}</p>
               <h3>{pendingDrafts} private draft response{pendingDrafts !== 1 ? "s" : ""}</h3>
               {pendingDrafts > drafts.length && <p className={styles.meta}>Showing the oldest {drafts.length} drafts. Publishing a draft makes room for the next one after refreshing.</p>}
@@ -276,6 +276,7 @@ export default async function DashboardPage() {
                 <p className={styles.eyebrow}>Draft response</p>
                 <p className={styles.draftBody}>{draft.body}</p>
                 {draft.media.length > 0 && <div><p className={styles.meta}>Private attachments. Approval publishes these with the response.</p><AnswerMediaDisplay media={draft.media} /></div>}
+                <AnswerEditButton answerId={draft.id} initialBody={draft.body} createdAt={draft.created_at} isDraft />
                 {canPublish && <DraftApproveButton answerId={draft.id} />}
               </article>)}
             </section>}
@@ -284,9 +285,9 @@ export default async function DashboardPage() {
           <aside className={styles.settings} id={`settings-${politician.id}`} aria-label={`${politician.full_name} profile and team settings`}>
             <h3 className={styles.sectionTitle}>Profile & team</h3>
             <p className={styles.meta}>Your access: {role}. Changes here apply to {politician.full_name}.</p>
-            {role === "admin" && <ProfileEditor politicianId={politician.id} currentWebsiteUrl={politician.website_url} currentBio={politician.bio} currentSocialHandles={politician.social_handles as Record<string, string> | null} />}
+            {role === "admin" && profileVerified && <ProfileEditor currentPhotoUrl={politician.photo_url} politicianId={politician.id} currentWebsiteUrl={politician.website_url} currentBio={politician.bio} currentSocialHandles={politician.social_handles as Record<string, string> | null} />}
             <TeamManager politicianId={politician.id} callerRole={role} />
-            {role === "admin" && <div className={styles.panel}><DisconnectButton politicianId={politician.id} politicianName={politician.full_name} isOnlyAdmin={isOnlyAdmin} /></div>}
+            <div className={styles.panel}><DisconnectButton politicianId={politician.id} politicianName={politician.full_name} isOnlyAdmin={isOnlyAdmin} /></div>
           </aside>
         </div>
       </section>;

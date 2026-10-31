@@ -128,6 +128,10 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  if (result.insufficientRecord) {
+    return NextResponse.json({ success: true, insufficient: true, confidence: "insufficient", message: "Reviewed public-record sources are required before analysis can be published." });
+  }
+
   // Insert into answers table
   const { data: answer, error: insertErr } = await supabase
     .from("answers")
@@ -139,8 +143,8 @@ export async function POST(request: NextRequest) {
       is_ai_generated: true,
       is_disputed: false,
       ai_confidence: result.confidence,
-      body: result.insufficientRecord ? "" : result.body,
-      sources: (result.insufficientRecord ? [] : result.sources) as unknown as Json,
+      body: result.body,
+      sources: result.sources as unknown as Json,
       published_by: null, // system-generated
     })
     .select("id")

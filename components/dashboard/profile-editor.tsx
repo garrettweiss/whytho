@@ -3,6 +3,8 @@
 import { useId, useState, useTransition } from "react";
 
 import styles from "./dashboard.module.css";
+import { PhotoEditor } from "./photo-editor";
+import { useRouter } from "next/navigation";
 
 interface SocialHandles {
   x?: string;
@@ -13,13 +15,15 @@ interface SocialHandles {
 
 interface Props {
   politicianId: string;
+  currentPhotoUrl?: string | null;
   currentWebsiteUrl: string | null;
   currentBio: string | null;
   currentSocialHandles?: SocialHandles | null;
 }
 
-export function ProfileEditor({ politicianId, currentWebsiteUrl, currentBio, currentSocialHandles }: Props) {
+export function ProfileEditor({ politicianId, currentWebsiteUrl, currentBio, currentSocialHandles, currentPhotoUrl = null }: Props) {
   const fieldId = useId();
+  const router = useRouter();
   const handles = currentSocialHandles ?? {};
   const [isOpen, setIsOpen] = useState(false);
   const [websiteUrl, setWebsiteUrl] = useState(currentWebsiteUrl ?? "");
@@ -38,11 +42,11 @@ export function ProfileEditor({ politicianId, currentWebsiteUrl, currentBio, cur
       try {
         const socialHandles: SocialHandles = { ...handles };
         if (instagram.trim()) socialHandles.instagram = instagram.trim().replace(/^@/, "");
-        else delete socialHandles.instagram;
+        else socialHandles.instagram = "";
         if (facebook.trim()) socialHandles.facebook = facebook.trim();
-        else delete socialHandles.facebook;
+        else socialHandles.facebook = "";
         if (tiktok.trim()) socialHandles.tiktok = tiktok.trim().replace(/^@/, "");
-        else delete socialHandles.tiktok;
+        else socialHandles.tiktok = "";
 
         const res = await fetch("/api/dashboard/profile", {
           method: "PATCH",
@@ -59,6 +63,7 @@ export function ProfileEditor({ politicianId, currentWebsiteUrl, currentBio, cur
           setError(data.error ?? "Failed to save. Please try again.");
           return;
         }
+        router.refresh();
         setSaved(true);
         setIsOpen(false);
       } catch {
@@ -73,6 +78,7 @@ export function ProfileEditor({ politicianId, currentWebsiteUrl, currentBio, cur
     </button>
     {saved && <p role="status" className={`${styles.meta} ${styles.success}`}>Profile updated.</p>}
     {isOpen && <div id={`${fieldId}-panel`} className={styles.panelBody}>
+      <PhotoEditor politicianId={politicianId} currentPhotoUrl={currentPhotoUrl} />
       <div className={styles.field}>
         <label htmlFor={`${fieldId}-website`}>Website URL</label>
         <input id={`${fieldId}-website`} type="url" value={websiteUrl} onChange={e => setWebsiteUrl(e.target.value)} placeholder="https://yourwebsite.gov" />

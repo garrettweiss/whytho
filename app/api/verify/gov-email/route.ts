@@ -1,270 +1,57 @@
-/**
- * POST /api/verify/gov-email
- *
- * Method A — Government email verification.
- * User proves they have access to a .gov email associated with their office.
- *
- * Actions:
- *   { action: "request", politician_id, email } — sends 6-digit OTP to .gov address
- *   { action: "confirm", politician_id, code }  — validates OTP, marks method completed
- *
- * Auth: Supabase session + politician_team membership
- *
- * On confirm success: DB trigger trg_verification_tier auto-upgrades politician
- * to tier 2 if 2+ distinct methods are now completed.
- *
- * NOTE: Requires a verified Resend sending domain configured in RESEND_FROM_EMAIL
- * env var (default: noreply@whytho.us). Set up DNS records in Resend dashboard.
- */
-
 import { NextRequest, NextResponse } from "next/server";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
-import crypto from "crypto";
+import { randomInt } from "node:crypto";
 import { getResend, FROM_EMAIL } from "@/lib/email/resend";
-import { verificationConfirmedEmail } from "@/lib/email/templates";
+import { durableRateLimit, rateLimitKey } from "@/lib/security/durable-rate-limit";
+import { permittedGovernmentEmail, reviewedSource } from "@/lib/security/verification";
+import { z } from "zod";
 
-const CODE_TTL_MINUTES = 30;
-
-function generateOtp(): string {
-  // 6-digit numeric OTP
-  return crypto.randomInt(100_000, 999_999).toString();
-}
-
-async function getTeamMembership(
-  admin: ReturnType<typeof createAdminClient>,
-  politicianId: string,
-  userId: string
-): Promise<boolean> {
-  const { data } = await admin
-    .from("politician_team")
-    .select("id")
-    .eq("politician_id", politicianId)
-    .eq("user_id", userId)
-    .maybeSingle();
-  return !!data;
-}
+const schema=z.discriminatedUnion("action",[
+  z.object({action:z.literal("request"),politician_id:z.string().uuid(),email:z.string().email().max(254)}),
+  z.object({action:z.literal("confirm"),politician_id:z.string().uuid(),code:z.string().regex(/^\d{6}$/)}),
+]);
 
 export async function POST(request: NextRequest) {
-  const supabase = await createClient();
+  const parsed=schema.safeParse(await request.json().catch(()=>null));
+  if (!parsed.success) return NextResponse.json({error:"Invalid verification request."},{status:400});
+  const body=parsed.data;
+  const supabase=await createClient();
+  const {data:{user}}=await supabase.auth.getUser();
+  if (!user || user.is_anonymous) return NextResponse.json({error:"Authentication required"},{status:401});
+  const admin=createAdminClient();
+  const membership=await admin.from("politician_team").select("role").eq("politician_id",body.politician_id).eq("user_id",user.id).maybeSingle();
+  if (membership.error) return NextResponse.json({error:"Verification is temporarily unavailable."},{status:503});
+  if (membership.data?.role!=="admin") return NextResponse.json({error:"Only the profile admin can verify this profile."},{status:403});
+  const source=await reviewedSource(body.politician_id);
+  if (!source) return NextResponse.json({error:"The official verification sources for this profile need review by WhyTho. Contact support before continuing."},{status:422});
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user || user.is_anonymous) {
-    return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+  if (body.action==="request") {
+    const email=body.email.toLowerCase().trim();
+    if (!permittedGovernmentEmail(email,source.government_email_domains)) return NextResponse.json({error:"Use the government email domain approved for this office. Contact WhyTho if it needs review."},{status:422});
+    const limit=await durableRateLimit(rateLimitKey("gov-email-send",user.id),3,3600);
+    if (limit!=="allowed") return NextResponse.json({error:limit==="limited"?"Please wait before requesting another code.":"Verification is temporarily unavailable."},{status:limit==="limited"?429:503});
+    const code=randomInt(100000,1000000).toString();
+    const expires=new Date(Date.now()+30*60*1000).toISOString();
+    const result=await admin.from("politician_verifications").insert({politician_id:body.politician_id,user_id:user.id,method:"gov_email",status:"pending",verification_code:code,code_expires_at:expires,metadata:{email,assurance:"reviewed_source_v1",source_url:source.evidence_url}});
+    if (result.error) return NextResponse.json({error:"Unable to create verification."},{status:503});
+    try {
+      const sent=await getResend().emails.send({from:FROM_EMAIL,to:email,subject:"Your WhyTho verification code",text:`Your WhyTho verification code is ${code}. It expires in 30 minutes. Do not share it. If you did not request this code, ignore this message.`});
+      if (sent.error) return NextResponse.json({error:"The verification email could not be delivered. Please try again later."},{status:503});
+    } catch { return NextResponse.json({error:"The verification email could not be delivered. Please try again later."},{status:503}); }
+    return NextResponse.json({success:true,message:"Verification code sent. It expires in 30 minutes."});
   }
-
-  const body = (await request.json()) as {
-    action?: string;
-    politician_id?: string;
-    email?: string;
-    code?: string;
-  };
-
-  if (!body.politician_id) {
-    return NextResponse.json({ error: "politician_id is required" }, { status: 400 });
-  }
-
-  const admin = createAdminClient();
-
-  const onTeam = await getTeamMembership(admin, body.politician_id, user.id);
-  if (!onTeam) {
-    return NextResponse.json(
-      { error: "You are not authorized for this profile" },
-      { status: 403 }
-    );
-  }
-
-  // ── REQUEST ─────────────────────────────────────────────────────────────────
-  if (body.action === "request") {
-    if (!body.email) {
-      return NextResponse.json({ error: "email is required" }, { status: 400 });
-    }
-
-    const email = body.email.toLowerCase().trim();
-    if (!email.endsWith(".gov")) {
-      return NextResponse.json(
-        { error: "Must be a .gov email address" },
-        { status: 422 }
-      );
-    }
-
-    const code = generateOtp();
-    const expiresAt = new Date(Date.now() + CODE_TTL_MINUTES * 60 * 1000).toISOString();
-
-    // Find existing pending record to update, or create new
-    const { data: existingVerification } = await admin
-      .from("politician_verifications")
-      .select("id")
-      .eq("politician_id", body.politician_id)
-      .eq("user_id", user.id)
-      .eq("method", "gov_email")
-      .in("status", ["pending", "expired"])
-      .maybeSingle();
-
-    if (existingVerification) {
-      const { error: updateErr } = await admin
-        .from("politician_verifications")
-        .update({
-          status: "pending",
-          verification_code: code,
-          code_expires_at: expiresAt,
-          metadata: { email },
-        })
-        .eq("id", existingVerification.id);
-
-      if (updateErr) {
-        return NextResponse.json({ error: updateErr.message }, { status: 500 });
-      }
-    } else {
-      const { error: insertErr } = await admin.from("politician_verifications").insert({
-        politician_id: body.politician_id,
-        user_id: user.id,
-        method: "gov_email",
-        status: "pending",
-        verification_code: code,
-        code_expires_at: expiresAt,
-        metadata: { email },
-      });
-
-      if (insertErr) {
-        return NextResponse.json({ error: insertErr.message }, { status: 500 });
-      }
-    }
-
-    // Send verification email via Resend
-    const { error: emailErr } = await getResend().emails.send({
-      from: `WhyTho Verification <${FROM_EMAIL}>`,
-      to: email,
-      subject: "Your WhyTho verification code",
-      html: `
-        <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
-          <h2 style="margin-bottom: 8px;">WhyTho Verification</h2>
-          <p>Your verification code is:</p>
-          <div style="
-            font-size: 2rem;
-            font-weight: bold;
-            letter-spacing: 0.3em;
-            background: #f4f4f5;
-            padding: 16px 24px;
-            border-radius: 8px;
-            display: inline-block;
-            margin: 12px 0;
-          ">${code}</div>
-          <p style="color: #71717a; font-size: 0.875rem;">
-            This code expires in ${CODE_TTL_MINUTES} minutes. Do not share it.
-          </p>
-          <p style="color: #71717a; font-size: 0.875rem;">
-            If you did not request this code, you can safely ignore this email.
-          </p>
-        </div>
-      `,
-    });
-
-    if (emailErr) {
-      return NextResponse.json(
-        { error: "Failed to send verification email. Check that the email address is valid." },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json({
-      success: true,
-      message: `Verification code sent to ${email}. Expires in ${CODE_TTL_MINUTES} minutes.`,
-    });
-  }
-
-  // ── CONFIRM ──────────────────────────────────────────────────────────────────
-  if (body.action === "confirm") {
-    if (!body.code) {
-      return NextResponse.json({ error: "code is required" }, { status: 400 });
-    }
-
-    const { data: verification } = await admin
-      .from("politician_verifications")
-      .select("id, verification_code, code_expires_at, status")
-      .eq("politician_id", body.politician_id)
-      .eq("user_id", user.id)
-      .eq("method", "gov_email")
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (!verification) {
-      return NextResponse.json(
-        { error: "No pending verification found. Please request a new code." },
-        { status: 404 }
-      );
-    }
-
-    if (verification.status === "completed") {
-      return NextResponse.json({ success: true, already_verified: true });
-    }
-
-    if (
-      !verification.code_expires_at ||
-      new Date(verification.code_expires_at) < new Date()
-    ) {
-      await admin
-        .from("politician_verifications")
-        .update({ status: "expired" })
-        .eq("id", verification.id);
-      return NextResponse.json(
-        { error: "Verification code expired. Please request a new one." },
-        { status: 422 }
-      );
-    }
-
-    if (verification.verification_code !== body.code.trim()) {
-      return NextResponse.json({ error: "Incorrect verification code" }, { status: 422 });
-    }
-
-    // Mark completed — DB trigger trg_verification_tier handles tier upgrade
-    const { error: updateErr } = await admin
-      .from("politician_verifications")
-      .update({
-        status: "completed",
-        verified_at: new Date().toISOString(),
-        verification_code: null,
-        code_expires_at: null,
-      })
-      .eq("id", verification.id);
-
-    if (updateErr) {
-      return NextResponse.json({ error: updateErr.message }, { status: 500 });
-    }
-
-    // Fire-and-forget: check if politician reached tier 2 and notify the team
-    void (async () => {
-      try {
-        const { data: pol } = await admin
-          .from("politicians")
-          .select("full_name, slug, verification_tier")
-          .eq("id", body.politician_id!)
-          .single();
-        if (!pol || pol.verification_tier !== "2") return;
-        const email = user.email;
-        if (!email) return;
-        const { subject, html, text } = verificationConfirmedEmail({
-          politicianName: pol.full_name,
-          politicianSlug: pol.slug,
-        });
-        await getResend().emails.send({ from: FROM_EMAIL, to: email, subject, html, text });
-      } catch {
-        // Never let email errors affect the API response
-      }
-    })();
-
-    return NextResponse.json({
-      success: true,
-      method: "gov_email",
-      message: "Government email verified successfully.",
-    });
-  }
-
-  return NextResponse.json(
-    { error: "Invalid action. Use 'request' or 'confirm'." },
-    { status: 400 }
-  );
+  const result=await admin.from("politician_verifications").select("id,status,verification_code,code_expires_at,metadata").eq("politician_id",body.politician_id).eq("user_id",user.id).eq("method","gov_email").order("created_at",{ascending:false}).limit(1).maybeSingle();
+  if (result.error) return NextResponse.json({error:"Verification is temporarily unavailable."},{status:503});
+  const verification=result.data;
+  if (!verification) return NextResponse.json({error:"Request a verification code first."},{status:404});
+  const metadata=verification.metadata as {email?: string;assurance?:string;source_url?:string} | null;
+  if (metadata?.assurance!=="reviewed_source_v1" || metadata.source_url!==source.evidence_url || !metadata.email || !permittedGovernmentEmail(metadata.email,source.government_email_domains)) return NextResponse.json({error:"Request a new code using the approved office email."},{status:422});
+  if (verification.status==="completed") return NextResponse.json({success:true,already_verified:true});
+  if (verification.status!=="pending" || !verification.code_expires_at || new Date(verification.code_expires_at).getTime()<=Date.now()) return NextResponse.json({error:"Code expired. Request a new code."},{status:422});
+  const limit=await durableRateLimit(rateLimitKey("gov-email-attempt",verification.id),5,86400);
+  if (limit!=="allowed") return NextResponse.json({error:limit==="limited"?"Too many attempts. Request a new code.":"Verification is temporarily unavailable."},{status:limit==="limited"?429:503});
+  if (verification.verification_code!==body.code) return NextResponse.json({error:"Incorrect verification code."},{status:422});
+  const completed=await admin.from("politician_verifications").update({status:"completed",verified_at:new Date().toISOString(),verification_code:null,code_expires_at:null}).eq("id",verification.id).eq("status","pending").eq("verification_code",body.code).gt("code_expires_at",new Date().toISOString()).select("id").maybeSingle();
+  if (completed.error || !completed.data) return NextResponse.json({error:"Verification changed. Please reload and try again."},{status:409});
+  return NextResponse.json({success:true,method:"gov_email",message:"Government email verified successfully."});
 }

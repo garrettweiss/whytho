@@ -30,6 +30,9 @@ const BATCH_SIZE = 5;            // politicians per Anthropic call
 const DELAY_MS = 1000;           // delay between batches
 const GENERATE_PER_POLITICIAN = 3; // questions to generate per politician
 
+// This legacy path publishes unreferenced model prose. Retained for audit only.
+throw new Error("Legacy bulk generation is paused. Follow docs/launch/PERSONALIZED_QUESTIONS_PLAN.md and supply reviewed evidence before publishing.");
+
 // ── Clients ───────────────────────────────────────────────────────────────────
 
 const supabase = createClient<Database>(
