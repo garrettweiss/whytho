@@ -1,62 +1,57 @@
 import type { Metadata } from "next";
 import { VerifyWizard } from "@/components/verify/verify-wizard";
+import { PublicPage } from "@/components/public/public-layout";
+import styles from "@/components/verify/verify.module.css";
+import { createClient } from "@/lib/supabase/server";
+import { buildVerificationResumes, type VerificationResume } from "@/components/verify/resume";
 
 export const metadata: Metadata = {
   title: "Claim & Verify Your Profile | WhyTho",
   description:
     "Are you an elected official? Claim your WhyTho profile and verify your identity to start answering constituent questions.",
+  robots: { index: false, follow: true },
 };
 
 interface Props {
-  searchParams: Promise<{ prefill?: string }>;
+  searchParams: Promise<{ prefill?: string | string[] }>;
 }
 
 export default async function VerifyPage({ searchParams }: Props) {
-  const { prefill } = await searchParams;
+  const params = await searchParams;
+  const prefill = typeof params.prefill === "string" && /^[0-9a-f-]{36}$/i.test(params.prefill) ? params.prefill : undefined;
+  const supabase = await createClient();
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  const resumeUserId = user && !user.is_anonymous ? user.id : null;
+  let resumeProfiles: VerificationResume[] = [];
+  let resumeError = !!authError && authError.name !== "AuthSessionMissingError";
+  if (resumeUserId) {
+    const signal = AbortSignal.timeout(8_000);
+    const [memberships, verifications] = await Promise.all([
+      supabase.from("politician_team")
+        .select("user_id,role,politicians(id,slug,full_name,office,state,party,photo_url,verification_tier)", { count: "exact" })
+        .eq("user_id", resumeUserId).order("politician_id").limit(1000).abortSignal(signal),
+      supabase.from("politician_verifications")
+        .select("user_id,politician_id,method,status", { count: "exact" })
+        .eq("user_id", resumeUserId).eq("status", "completed").in("method", ["gov_email", "meta_tag"])
+        .order("id").limit(1000).abortSignal(signal),
+    ]);
+    resumeError = !!memberships.error || !!verifications.error || !memberships.data || !verifications.data ||
+      memberships.count !== memberships.data.length || verifications.count !== verifications.data.length;
+    if (!resumeError) resumeProfiles = buildVerificationResumes(resumeUserId, memberships.data!, verifications.data!);
+  }
 
-  return (
-    <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-2xl px-4 py-12">
-        {/* Header */}
-        <div className="text-center mb-10">
-          <h1 className="text-3xl font-bold tracking-tight mb-3">
-            Claim Your Profile
-          </h1>
-          <p className="text-muted-foreground max-w-md mx-auto">
-            Are you an elected official or their authorized representative? Claim your
-            profile and verify your identity to respond to constituent questions.
-          </p>
-        </div>
-
-        {/* How it works */}
-        <div className="grid grid-cols-3 gap-4 mb-10 text-center">
-          {[
-            { icon: "🔍", label: "Find", desc: "Search for your profile" },
-            { icon: "🏛️", label: "Claim", desc: "Claim as your own" },
-            { icon: "✓", label: "Verify", desc: "Prove your identity" },
-          ].map((s) => (
-            <div key={s.label} className="space-y-1">
-              <div className="text-2xl">{s.icon}</div>
-              <p className="text-sm font-semibold">{s.label}</p>
-              <p className="text-xs text-muted-foreground">{s.desc}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Wizard */}
-        <VerifyWizard prefillId={prefill} />
-
-        {/* Footer note */}
-        <p className="mt-8 text-center text-xs text-muted-foreground">
-          All profile claims are reviewed for accuracy. Questions?{" "}
-          <a
-            href="mailto:hello@whytho.us"
-            className="underline hover:text-foreground transition-colors"
-          >
-            Contact us
-          </a>
-        </p>
-      </div>
+  return <PublicPage title="Put your name behind the answer." kicker="For politicians and their teams" description="Claim your WhyTho profile and verify your identity. Then respond to the questions people want you to answer.">
+    <div className={styles.layout}>
+      <VerifyWizard key={resumeUserId ?? "signed-out"} prefillId={prefill} resumeUserId={resumeUserId} resumeProfiles={resumeProfiles} resumeError={resumeError} />
+      <aside className={styles.guide} aria-labelledby="verification-guide">
+        <h2 id="verification-guide">Make it official.</h2>
+        <ol className={styles.guideSteps}>
+          <li><span aria-hidden="true">01</span><div><h3>Find your profile</h3><p>Start with the public profile for you or the politician you represent.</p></div></li>
+          <li><span aria-hidden="true">02</span><div><h3>Confirm your authority</h3><p>Claim only if you are the politician or have permission to act on their behalf.</p></div></li>
+          <li><span aria-hidden="true">03</span><div><h3>Verify your identity</h3><p>Complete two verification methods to receive Verified status.</p></div></li>
+        </ol>
+        <p className={styles.support}>Need help with a claim? <a href="mailto:hello@whytho.us">Contact WhyTho</a></p>
+      </aside>
     </div>
-  );
+  </PublicPage>;
 }

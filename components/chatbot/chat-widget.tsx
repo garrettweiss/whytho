@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { MessageCircleQuestion } from "lucide-react";
 import { ChatPanel } from "./chat-panel";
+import { faceBody } from "@/components/home/fonts";
+import styles from "./chat-widget.module.css";
 
 /**
  * Floating chatbot widget, fixed bottom-right on every page.
@@ -12,41 +14,45 @@ import { ChatPanel } from "./chat-panel";
 export function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
+  const trigger = useRef<HTMLButtonElement>(null);
+  const panel = useRef<HTMLDivElement>(null);
+  const close = () => { setIsOpen(false); requestAnimationFrame(() => trigger.current?.focus()); };
+  useEffect(() => {
+    if (isOpen) panel.current?.querySelector<HTMLTextAreaElement>("textarea")?.focus();
+  }, [isOpen]);
 
   // Build page context from URL
   const pageContext = buildPageContext(pathname);
 
   return (
-    <>
+    <div className={`${styles.theme} ${faceBody.variable}`}>
       {/* Panel */}
       {isOpen && (
         <div
-          className="fixed bottom-20 right-4 z-50 w-[360px] max-w-[calc(100vw-2rem)] h-[520px] max-h-[calc(100vh-6rem)] rounded-2xl border bg-background shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 fade-in duration-200"
+          ref={panel}
+          id="whytho-assistant"
+          className={styles.panel}
+          onKeyDown={event => { if (event.key === "Escape") { event.preventDefault(); close(); } }}
           role="dialog"
           aria-label="WhyTho Assistant"
         >
-          <ChatPanel pageContext={pageContext} onClose={() => setIsOpen(false)} />
+          <ChatPanel pageContext={pageContext} onClose={close} />
         </div>
       )}
 
       {/* Trigger button */}
       <button
-        onClick={() => setIsOpen((v) => !v)}
-        className={`
-          fixed bottom-4 right-4 z-50
-          flex items-center gap-2
-          h-12 rounded-full shadow-lg
-          bg-primary text-primary-foreground
-          transition-all duration-200
-          hover:opacity-90 active:scale-95
-          ${isOpen ? "px-4" : "px-4"}
-        `}
+        ref={trigger}
+        onClick={() => isOpen ? close() : setIsOpen(true)}
+        className={styles.trigger}
+        aria-expanded={isOpen}
+        aria-controls={isOpen ? "whytho-assistant" : undefined}
         aria-label={isOpen ? "Close assistant" : "Open WhyTho Assistant"}
       >
         <MessageCircleQuestion size={18} />
         <span className="text-sm font-medium">{isOpen ? "Close" : "Ask WhyTho"}</span>
       </button>
-    </>
+    </div>
   );
 }
 
@@ -66,18 +72,17 @@ function buildPageContext(pathname: string): string | null {
   if (pathname === "/verify") return "the politician verification page";
   if (pathname === "/dashboard") return "the politician dashboard";
 
-  // Politician profile page (slug)
+  const informationPages: Record<string, string> = {
+    "/about": "the About WhyTho page", "/faq": "the WhyTho FAQ page",
+    "/how-it-works": "the How WhyTho works page", "/account": "the account settings and activity page",
+    "/races": "the election directory", "/sign-in": "the WhyTho sign-in page",
+    "/settings/notifications": "the notification preferences page",
+  };
+  if (informationPages[pathname]) return informationPages[pathname];
+  if (pathname.startsWith("/races/")) return "an election record page";
+  if (pathname.startsWith("/admin") || pathname.startsWith("/auth") || pathname.startsWith("/settings")) return "a WhyTho account management page";
   const slugMatch = pathname.match(/^\/([a-z0-9-]+)$/);
-  if (slugMatch) {
-    const slug = slugMatch[1] ?? "";
-    // Convert slug to readable name for context hint
-    const name = slug
-      .split("-")
-      .slice(0, -1) // remove state suffix
-      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-      .join(" ");
-    return `the WhyTho profile page for ${name} (slug: ${slug})`;
-  }
+  if (slugMatch) return `the public politician profile with slug ${slugMatch[1]}`;
 
   return null;
 }

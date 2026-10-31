@@ -2,6 +2,8 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
+import { PublicPage } from "@/components/public/public-layout";
+import styles from "@/components/public/public.module.css";
 import * as Sentry from "@sentry/nextjs";
 
 interface Props {
@@ -19,36 +21,8 @@ export default function GlobalError({ error, reset }: Props) {
     }
   }, [error]);
 
-  return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4">
-      <div className="max-w-sm w-full text-center space-y-5">
-        <div className="space-y-2">
-          <p className="text-4xl font-bold">500</p>
-          <h1 className="text-xl font-semibold">Something went wrong</h1>
-          <p className="text-sm text-muted-foreground">
-            We hit an unexpected error. Our team has been notified.
-          </p>
-          {error.digest && (
-            <p className="text-xs text-muted-foreground font-mono">
-              Error ID: {error.digest}
-            </p>
-          )}
-        </div>
-        <div className="flex flex-col gap-2">
-          <button
-            onClick={reset}
-            className="w-full rounded-lg bg-foreground text-background px-4 py-2.5 text-sm font-semibold hover:opacity-90 transition-opacity"
-          >
-            Try again
-          </button>
-          <Link
-            href="/"
-            className="w-full rounded-lg border px-4 py-2.5 text-sm font-medium hover:bg-muted transition-colors text-center"
-          >
-            Go home
-          </Link>
-        </div>
-      </div>
-    </div>
-  );
+  return <PublicPage title="This page couldn’t load." kicker="Something went wrong" description="Please try again, or return to the politician directory.">
+    <span id="profile-questions" tabIndex={-1} />
+    <div role="alert" className={styles.notice}>{error.digest && <p>Error reference: {error.digest}</p>}<div className={styles.actions}><button onClick={reset} className={styles.button}>Try again</button><Link href="/" className={styles.button}>Go home</Link></div></div>
+  </PublicPage>;
 }

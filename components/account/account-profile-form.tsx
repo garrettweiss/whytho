@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
+import styles from "./account.module.css";
 
 const US_STATES = [
   { code: "AL", name: "Alabama" }, { code: "AK", name: "Alaska" },
@@ -86,6 +87,7 @@ function Combobox({
   placeholder,
   minChars = 1,
   freeform = false,
+  disabled = false,
 }: {
   id: string;
   value: string;
@@ -94,6 +96,7 @@ function Combobox({
   placeholder?: string;
   minChars?: number;
   freeform?: boolean;
+  disabled?: boolean;
 }) {
   const [inputValue, setInputValue] = useState(value);
   const [open, setOpen] = useState(false);
@@ -126,6 +129,7 @@ function Combobox({
   function handleKeyDown(e: React.KeyboardEvent) {
     if (!open || filtered.length === 0) {
       if (e.key === "ArrowDown") {
+        e.preventDefault();
         setOpen(true);
         setHighlighted(0);
       }
@@ -137,45 +141,46 @@ function Combobox({
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
       setHighlighted((h) => Math.max(h - 1, 0));
-    } else if (e.key === "Tab" || e.key === "Enter") {
+    } else if (e.key === "Enter") {
       if (filtered[highlighted]) {
         e.preventDefault();
         select(filtered[highlighted]);
       }
-    } else if (e.key === "Escape") {
+    } else if (e.key === "Escape" || e.key === "Tab") {
       setOpen(false);
     }
   }
 
   function handleBlur() {
-    // Delay to let onMouseDown on list item fire first
-    setTimeout(() => {
-      setOpen(false);
-      if (!freeform) {
-        // Snap back to last valid value if input doesn't exactly match an option
-        const exact = options.find(
-          (o) => o.label.toLowerCase() === inputValue.toLowerCase()
-        );
-        if (exact) {
-          setInputValue(exact.label);
-          onChange(exact.value);
-        } else if (!inputValue.trim()) {
-          onChange("");
-        } else {
-          // Partial / invalid - reset to whatever was committed
-          setInputValue(value);
-        }
+    // Pointer selection keeps focus on the input, so blur can commit immediately.
+    setOpen(false);
+    if (!freeform) {
+      const exact = options.find((option) => option.label.toLowerCase() === inputValue.toLowerCase());
+      if (exact) {
+        setInputValue(exact.label);
+        onChange(exact.value);
+      } else if (!inputValue.trim()) {
+        onChange("");
       } else {
-        onChange(inputValue);
+        setInputValue(value);
       }
-    }, 150);
+    } else {
+      onChange(inputValue);
+    }
   }
 
   return (
-    <div className="relative">
+    <div className={styles.combobox}>
       <input
         id={id}
         type="text"
+        name={id}
+        role="combobox"
+        aria-autocomplete="list"
+        aria-expanded={open && filtered.length > 0}
+        aria-controls={open && filtered.length > 0 ? `${id}-options` : undefined}
+        aria-activedescendant={open && filtered[highlighted] ? `${id}-option-${highlighted}` : undefined}
+        disabled={disabled}
         value={inputValue}
         onChange={(e) => {
           setInputValue(e.target.value);
@@ -192,17 +197,18 @@ function Combobox({
         onBlur={handleBlur}
         placeholder={placeholder}
         autoComplete="off"
-        className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+        className={styles.input}
       />
       {open && filtered.length > 0 && (
-        <ul className="absolute z-20 mt-1 w-full rounded-lg border bg-popover shadow-lg overflow-hidden max-h-56 overflow-y-auto">
+        <ul id={`${id}-options`} role="listbox" aria-label="Suggestions" className={styles.options}>
           {filtered.map((opt, i) => (
             <li
               key={opt.value}
-              onMouseDown={() => select(opt)}
-              className={`px-3 py-2 text-sm cursor-pointer transition-colors ${
-                i === highlighted ? "bg-muted" : "hover:bg-muted/60"
-              }`}
+              id={`${id}-option-${i}`}
+              role="option"
+              aria-selected={i === highlighted}
+              onMouseDown={(event) => { event.preventDefault(); select(opt); }}
+              className={styles.option}
             >
               {opt.label}
             </li>
@@ -285,17 +291,15 @@ export function AccountProfileForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-xl border bg-card p-6 space-y-5">
-      <div>
-        <h2 className="text-base font-semibold">Location</h2>
-        <p className="text-xs text-muted-foreground mt-0.5">
-          Help us show you the most relevant politicians for your area.
-        </p>
+    <form onSubmit={handleSubmit} className={styles.form} aria-labelledby="profile-form-heading" aria-busy={saving}>
+      <div className={styles.formIntro}>
+        <h2 id="profile-form-heading">Your profile.</h2>
+        <p>Help us show politicians for your area. Every field is optional.</p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className={styles.formGrid}>
         {/* City */}
-        <div className="space-y-1.5">
+        <div className={styles.field}>
           <label htmlFor="profile-city" className="text-sm font-medium">
             City
           </label>
@@ -306,28 +310,31 @@ export function AccountProfileForm({
             options={cityOptions}
             placeholder="e.g. Denver"
             minChars={2}
+            disabled={saving}
             freeform
           />
         </div>
 
         {/* County */}
-        <div className="space-y-1.5">
+        <div className={styles.field}>
           <label htmlFor="profile-county" className="text-sm font-medium">
             County
           </label>
           <input
             id="profile-county"
+            name="county"
+            disabled={saving}
             type="text"
             value={county}
             onChange={(e) => setCounty(e.target.value)}
             placeholder="e.g. Denver County"
             autoComplete="off"
-            className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            className={styles.input}
           />
         </div>
 
         {/* State */}
-        <div className="space-y-1.5">
+        <div className={styles.field}>
           <label htmlFor="profile-state" className="text-sm font-medium">
             State
           </label>
@@ -338,19 +345,22 @@ export function AccountProfileForm({
             options={stateOptions}
             placeholder="Type a state…"
             minChars={1}
+            disabled={saving}
           />
         </div>
 
         {/* Political Affiliation */}
-        <div className="space-y-1.5">
+        <div className={styles.field}>
           <label htmlFor="profile-affiliation" className="text-sm font-medium">
             Political Affiliation
           </label>
           <select
             id="profile-affiliation"
+            name="political_affiliation"
+            disabled={saving}
             value={affiliation}
             onChange={(e) => setAffiliation(e.target.value)}
-            className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            className={styles.input}
           >
             <option value="">Prefer not to say</option>
             {AFFILIATIONS.map((a) => (
@@ -360,20 +370,20 @@ export function AccountProfileForm({
         </div>
       </div>
 
-      <div className="flex items-center gap-3 pt-1">
+      <div className={styles.formActions}>
         <button
           type="submit"
           disabled={saving}
-          className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-60"
+          className={styles.button}
         >
           {saving ? "Saving…" : "Save profile"}
         </button>
 
         {status === "saved" && (
-          <span className="text-sm text-green-600 font-medium">✓ Saved</span>
+          <span role="status" className={styles.success}>Profile saved.</span>
         )}
         {status === "error" && (
-          <span className="text-sm text-destructive">Something went wrong. Try again.</span>
+          <span role="alert" className={styles.error}>We could not confirm your changes were saved. Please try again.</span>
         )}
       </div>
     </form>

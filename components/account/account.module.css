@@ -1,0 +1,53 @@
+.signInLayout { display: grid; grid-template-columns: minmax(0, 470px) minmax(0, 1fr); gap: 48px 100px; align-items: start; max-width: 1150px; }
+.signInAside { border-top: 1px solid #54565c; padding-top: 24px; max-width: 460px; }
+.signInAside h2 { font: 400 36px/1.15 var(--font-face-display), Impact, sans-serif; text-transform: uppercase; margin: 0 0 18px; }
+.signInAside p { font-size: 15px; line-height: 1.7; color: #b4b7bd; }
+.signInAside a { display: inline-flex; align-items: center; min-height: 44px; margin-top: 12px; text-underline-offset: 5px; }
+.authForm { display: grid; gap: 22px; padding-top: 24px; border-top: 1px solid #54565c; }
+.authForm h2 { font-size: 22px; font-weight: 750; letter-spacing: -.035em; margin: 0; }
+.form { display: grid; gap: 24px; max-width: 840px; }
+.emailForm { display: grid; gap: 16px; }
+.formIntro { border-bottom: 1px solid #54565c; padding-bottom: 24px; }
+.formIntro h2 { font-size: 28px; font-weight: 750; letter-spacing: -.035em; margin: 0 0 12px; }
+.formIntro p, .formHint, .authHint { margin: 0; color: #b4b7bd; font-size: 13px; line-height: 1.7; }
+.formGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.field { min-width: 0; display: grid; gap: 9px; }
+.field label { font-size: 13px; font-weight: 700; }
+.input { display: block; width: 100%; min-height: 50px; border: 1px solid #787a82; border-radius: 0; padding: 12px 14px; background: #1c1d21; color: #f9f9f6; font: 400 16px/1.5 var(--font-face-body), Arial, sans-serif; }
+.input::placeholder { color: #a6a9b0; }
+.input:disabled { opacity: .65; cursor: wait; }
+.button, .secondaryButton { display: inline-flex; align-items: center; justify-content: center; gap: 14px; min-height: 50px; border: 1px solid #f9f9f6; border-radius: 0; padding: 12px 20px; background: #f9f9f6; color: #151619; font: 700 14px/1.5 var(--font-face-body), Arial, sans-serif; cursor: pointer; }
+.secondaryButton { background: transparent; color: #f9f9f6; }
+.button:disabled, .secondaryButton:disabled { opacity: .6; cursor: wait; }
+.button:hover:not(:disabled) { background: #dddedb; }
+.secondaryButton:hover:not(:disabled) { background: #292b30; }
+.button svg, .secondaryButton svg { width: 20px; height: 20px; flex: none; }
+.divider { display: flex; align-items: center; gap: 16px; color: #b4b7bd; font-size: 12px; }
+.divider::before, .divider::after { content: ""; height: 1px; background: #54565c; flex: 1; }
+.notice { border-block: 1px solid #54565c; padding: 16px 0; color: #c2c4ca; font-size: 13px; line-height: 1.7; }
+.notice p { margin: 0; }
+.error { margin: 0; color: #ffb0af; font-size: 13px; line-height: 1.6; }
+.success { margin: 0; color: #f9f9f6; font-size: 14px; line-height: 1.6; }
+.confirmation { border-top: 1px solid #54565c; padding-top: 24px; }
+.confirmation h2 { font: 400 38px/1.2 var(--font-face-display), Impact, sans-serif; margin: 0 0 16px; text-transform: uppercase; }
+.confirmation p { color: #b4b7bd; font-size: 15px; line-height: 1.7; }
+.formActions { display: flex; align-items: center; flex-wrap: wrap; gap: 16px 24px; padding-top: 6px; }
+.combobox { position: relative; min-width: 0; }
+.options { position: absolute; z-index: 30; top: 100%; left: 0; width: 100%; max-height: 280px; overflow-y: auto; border: 1px solid #787a82; background: #202226; padding: 0; margin: 4px 0 0; list-style: none; }
+.option { min-height: 44px; padding: 11px 14px; font-size: 14px; cursor: pointer; }
+.option[aria-selected="true"], .option:hover { background: #f9f9f6; color: #151619; }
+.historyHeader { display: flex; justify-content: space-between; align-items: baseline; gap: 12px 30px; flex-wrap: wrap; padding: 4px 0 24px; }
+.historyHeader h2 { margin: 0; font: 400 36px/1.2 var(--font-face-display), Impact, sans-serif; text-transform: uppercase; }
+.historyHeader p { margin: 0; color: #b4b7bd; font-size: 13px; line-height: 1.6; }
+.history { border-top: 1px solid #54565c; }
+.historyRow { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 20px 40px; border-bottom: 1px solid #54565c; padding: 26px 0; }
+.historyBody { font-size: 18px; font-weight: 600; line-height: 1.55; letter-spacing: -.02em; white-space: pre-wrap; overflow-wrap: anywhere; margin: 0 0 16px; }
+.historyMeta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 18px; color: #b4b7bd; font-size: 12px; line-height: 1.6; }
+.historyMeta a { display: inline-flex; align-items: center; min-height: 44px; color: #f9f9f6; text-underline-offset: 5px; }
+.historyAside { align-self: start; text-align: right; color: #b4b7bd; font-size: 12px; min-width: 70px; }
+.historyAside strong { display: block; color: #f9f9f6; font-size: 28px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.voteDirection { display: inline-flex; gap: 8px; align-items: center; color: #f9f9f6; font-size: 13px; font-weight: 700; }
+.accountIdentity { margin-bottom: 24px; font-size: 13px; color: #b4b7bd; overflow-wrap: anywhere; }
+@media(max-width: 800px) { .signInLayout { grid-template-columns: 1fr; gap: 36px; max-width: 540px; } .signInAside { max-width: none; } }
+@media(max-width: 500px) { .formGrid { grid-template-columns: 1fr; gap: 20px; } .historyRow { grid-template-columns: 1fr; gap: 12px; padding-block: 22px; } .historyAside { text-align: left; display: flex; align-items: baseline; gap: 10px; } .historyAside strong { font-size: 22px; } .historyBody { font-size: 16px; } .historyHeader h2 { font-size: 30px; } .formActions .button { width: 100%; } }
+@media(prefers-reduced-motion: reduce) { .authForm *, .form * { transition: none; scroll-behavior: auto; } }

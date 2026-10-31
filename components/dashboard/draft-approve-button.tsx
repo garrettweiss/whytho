@@ -2,6 +2,8 @@
 
 import { useState, useTransition } from "react";
 
+import styles from "./dashboard.module.css";
+
 interface Props {
   answerId: string;
   onApproved?: () => void;
@@ -33,7 +35,7 @@ export function DraftApproveButton({ answerId, onApproved }: Props) {
   }
 
   if (approved) {
-    return <span className="text-xs font-medium text-green-600 dark:text-green-400">✓ Published</span>;
+    return <span role="status" className={`${styles.meta} ${styles.success}`}>✓ Published</span>;
   }
 
   return (
@@ -42,11 +44,11 @@ export function DraftApproveButton({ answerId, onApproved }: Props) {
         type="button"
         onClick={handleApprove}
         disabled={isPending}
-        className="self-start rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50"
+        className={styles.button}
       >
         {isPending ? "Approving…" : "Approve and Publish"}
       </button>
-      {error && <p className="text-xs text-destructive">{error}</p>}
+      {error && <p role="alert" className={`${styles.meta} ${styles.error}`}>{error}</p>}
     </div>
   );
 }

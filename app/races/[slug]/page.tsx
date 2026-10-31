@@ -1,225 +1,77 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { createPublicClient } from "@/lib/supabase/server";
-import { PoliticianAvatar } from "@/components/politician/politician-avatar";
+import { PublicPage, PublicPersonLink } from "@/components/public/public-layout";
+import styles from "@/components/public/public.module.css";
+import { ELECTION_PAGE_SIZE, candidateRecordLabel, electionDateLabel, electionDetailHref, electionDirectoryHref, electionPhaseLabel, electionStateName, electionToday, electionTypeLabel, parseElectionPage } from "@/lib/elections/helpers";
+import { loadElectionDetail, loadElectionRace } from "@/lib/elections/server";
+import type { ElectionDetail } from "@/lib/elections/types";
 
-export const revalidate = 3600;
-
-type Props = { params: Promise<{ slug: string }> };
-
-const STATE_NAMES: Record<string, string> = {
-  AL: "Alabama", AK: "Alaska", AZ: "Arizona", AR: "Arkansas", CA: "California",
-  CO: "Colorado", CT: "Connecticut", DE: "Delaware", FL: "Florida", GA: "Georgia",
-  HI: "Hawaii", ID: "Idaho", IL: "Illinois", IN: "Indiana", IA: "Iowa",
-  KS: "Kansas", KY: "Kentucky", LA: "Louisiana", ME: "Maine", MD: "Maryland",
-  MA: "Massachusetts", MI: "Michigan", MN: "Minnesota", MS: "Mississippi", MO: "Missouri",
-  MT: "Montana", NE: "Nebraska", NV: "Nevada", NH: "New Hampshire", NJ: "New Jersey",
-  NM: "New Mexico", NY: "New York", NC: "North Carolina", ND: "North Dakota", OH: "Ohio",
-  OK: "Oklahoma", OR: "Oregon", PA: "Pennsylvania", RI: "Rhode Island", SC: "South Carolina",
-  SD: "South Dakota", TN: "Tennessee", TX: "Texas", UT: "Utah", VT: "Vermont",
-  VA: "Virginia", WA: "Washington", WV: "West Virginia", WI: "Wisconsin", WY: "Wyoming",
-  DC: "D.C.",
-};
-
-function PartyBadge({ party }: { party: string | null }) {
-  if (!party) return null;
-  const color =
-    party === "Democrat" ? "bg-blue-100 text-blue-800" :
-    party === "Republican" ? "bg-red-100 text-red-800" :
-    "bg-muted text-muted-foreground";
-  const short =
-    party === "Democrat" ? "D" :
-    party === "Republican" ? "R" :
-    party === "Independent" ? "I" :
-    party.slice(0, 1);
-  return (
-    <span className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-xs font-semibold ${color}`}>
-      {short} · {party}
-    </span>
-  );
-}
+export const revalidate = 900;
+type Props = { params: Promise<{ slug: string }>; searchParams: Promise<{ page?: string | string[] }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const supabase = createPublicClient();
-  const { data: race } = await supabase
-    .from("races")
-    .select("name, office, state")
-    .eq("slug", slug)
-    .maybeSingle();
-
-  if (!race) return { title: "Race | WhyTho" };
-  return {
-    title: `${race.name} | WhyTho`,
-    description: `${race.office} race in ${STATE_NAMES[race.state ?? ""] ?? race.state}. Ask candidates where they stand.`,
-  };
+  try {
+    const race = await loadElectionRace(slug);
+    if (race) return { title: `${race.name} | WhyTho`, description: `Explore the profiles linked to this ${race.office} race in ${electionStateName(race.state)} and ask candidates questions.` };
+  } catch { /* The page presents an explicit load error. */ }
+  return { title: "Election record | WhyTho" };
 }
 
-export default async function RaceDetailPage({ params }: Props) {
-  const { slug } = await params;
-  const supabase = createPublicClient();
-
-  const { data: race } = await supabase
-    .from("races")
-    .select("id, slug, name, office, state, district, election_date, election_type, party, status, incumbent_id")
-    .eq("slug", slug)
-    .maybeSingle();
-
-  if (!race) notFound();
-
-  // Fetch incumbent
-  const incumbent = race.incumbent_id
-    ? (await supabase
-        .from("politicians")
-        .select("id, slug, full_name, party, photo_url, office, state, district")
-        .eq("id", race.incumbent_id)
-        .maybeSingle()
-      ).data
-    : null;
-
-  // Fetch candidates
-  const { data: candidates } = await supabase
-    .from("politicians")
-    .select("id, slug, full_name, party, photo_url, candidate_status")
-    .eq("race_id", race.id)
-    .eq("politician_type", "candidate")
-    .eq("is_active", true)
-    .order("full_name");
-
-  const electionDate = race.election_date
-    ? new Date(race.election_date + "T12:00:00").toLocaleDateString("en-US", {
-        weekday: "long", month: "long", day: "numeric", year: "numeric",
-      })
-    : null;
-
-  const isOver = race.status === "completed";
-  const stateName = STATE_NAMES[race.state ?? ""] ?? race.state;
-  const electionTypeLabel =
-    race.election_type === "general" ? "General Election" :
-    race.election_type === "runoff" ? "Runoff" :
-    "Primary";
-
-  type Candidate = {
-    id: string;
-    slug: string;
-    full_name: string;
-    party: string | null;
-    photo_url: string | null;
-    candidate_status: string | null;
-  };
-
-  function CandidateRow({ p, isIncumbent }: { p: Candidate | typeof incumbent; isIncumbent?: boolean }) {
-    if (!p) return null;
-    const cand = p as Candidate;
-    const won = cand.candidate_status === "won";
-    const lost = cand.candidate_status === "lost";
-    return (
-      <Link
-        href={`/${cand.slug}`}
-        className="flex items-center gap-3 px-4 py-3 hover:bg-muted/50 transition-colors group"
-      >
-        <PoliticianAvatar photoUrl={cand.photo_url} fullName={cand.full_name} size={40} />
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <p className="font-medium truncate group-hover:underline underline-offset-2">
-              {cand.full_name}
-            </p>
-            {isIncumbent && (
-              <span className="inline-flex items-center rounded-full px-1.5 py-0.5 text-xs font-semibold bg-muted text-muted-foreground">
-                Incumbent
-              </span>
-            )}
-            {won && (
-              <span className="inline-flex items-center rounded-full px-1.5 py-0.5 text-xs font-semibold bg-green-100 text-green-800">
-                Won ✓
-              </span>
-            )}
-            {lost && (
-              <span className="inline-flex items-center rounded-full px-1.5 py-0.5 text-xs font-semibold bg-muted text-muted-foreground">
-                Did not advance
-              </span>
-            )}
-          </div>
-        </div>
-        <PartyBadge party={cand.party} />
-      </Link>
-    );
+export default async function RaceDetailPage({ params, searchParams }: Props) {
+  const [{ slug }, search] = await Promise.all([params, searchParams]);
+  const page = parseElectionPage(search.page);
+  let detail: ElectionDetail | null;
+  try { detail = await loadElectionDetail(slug, page); } catch {
+    return <PublicPage title="Election record unavailable." description="We could not load this race right now." breadcrumbs={[{ label: "Elections", href: "/races" }]}>
+      <section className={styles.empty} role="alert"><h2>Please try again.</h2><p>This is a loading problem. It does not mean the race has no candidates.</p><Link href={electionDetailHref(slug, page)}>Reload the race</Link></section>
+    </PublicPage>;
   }
+  if (!detail) notFound();
+  const { race, candidates, recordedOfficeholder, totalCandidates } = detail;
+  const stateName = electionStateName(race.state);
+  const today = electionToday();
+  const phase = electionPhaseLabel(race, today);
+  const stateHref = electionDirectoryHref({ office: "all", state: race.state, period: "all", page: 1 });
+  const pages = Math.max(1, Math.ceil(totalCandidates / ELECTION_PAGE_SIZE));
+  const firstItem = (page - 1) * ELECTION_PAGE_SIZE + 1;
 
-  const allCandidates = candidates ?? [];
-  const hasCandidates = allCandidates.length > 0;
-
-  return (
-    <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-3xl px-4 py-8 space-y-6">
-        {/* Breadcrumb */}
-        <nav className="text-sm text-muted-foreground flex items-center gap-1.5">
-          <Link href="/races" className="hover:text-foreground hover:underline underline-offset-2">
-            Elections
-          </Link>
-          <span>›</span>
-          <span>{stateName}</span>
-        </nav>
-
-        {/* Race header */}
-        <div className="rounded-xl border bg-card p-6 shadow-sm space-y-3">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">{race.name}</h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              {electionTypeLabel}
-              {stateName && ` · ${stateName}`}
-              {race.district && ` · ${race.district}`}
-            </p>
-          </div>
-
-          {electionDate && (
-            <div className={`inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium ${
-              isOver ? "bg-muted text-muted-foreground" : "bg-orange-50 text-orange-800 border border-orange-200"
-            }`}>
-              {isOver ? "Election concluded" : `🗓️ ${electionDate}`}
-            </div>
-          )}
-
-          <p className="text-sm text-muted-foreground">
-            Ask any candidate a question. Their response rate is always public.
-          </p>
-        </div>
-
-        {/* Incumbent */}
-        {incumbent && (
-          <div>
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2">
-              Current Officeholder
-            </h2>
-            <div className="rounded-xl border bg-card shadow-sm overflow-hidden">
-              <CandidateRow p={incumbent as unknown as Candidate} isIncumbent />
-            </div>
-          </div>
-        )}
-
-        {/* Candidates */}
-        <div>
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2">
-            {hasCandidates
-              ? `Candidates (${allCandidates.length})`
-              : "Candidates"}
-          </h2>
-          {hasCandidates ? (
-            <div className="rounded-xl border bg-card shadow-sm overflow-hidden divide-y">
-              {allCandidates.map((c) => (
-                <CandidateRow key={c.id} p={c} />
-              ))}
-            </div>
-          ) : (
-            <div className="rounded-xl border bg-card p-6 text-center">
-              <p className="text-muted-foreground text-sm">
-                Candidates will be listed here once added. Check back soon.
-              </p>
-            </div>
-          )}
-        </div>
-      </div>
+  return <PublicPage title={race.name} kicker={`${electionTypeLabel(race.election_type)} · ${stateName}`} description={`Explore the people linked to this ${race.office} race. Open a profile to see their questions and responses.`}
+    breadcrumbs={[{ label: "Elections", href: "/races" }, { label: stateName, href: stateHref }]}>
+    <div className={styles.summary}>
+      <div className={styles.stat}><strong>{electionDateLabel(race.election_date)}</strong>Recorded election date</div>
+      <div className={styles.stat}><strong>{totalCandidates.toLocaleString()}</strong>Linked candidate profile{totalCandidates === 1 ? "" : "s"}</div>
+      <div className={styles.stat}><strong>{phase}</strong>{race.office}{race.district ? ` · District ${race.district}` : ""}{race.party ? ` · ${race.party}` : ""}</div>
     </div>
-  );
+
+    <section aria-labelledby="candidate-heading">
+      <h2 id="candidate-heading" className={styles.sectionHeading}>Meet the candidates.</h2>
+      {candidates.length > 0 ? <>
+        <p className={styles.meta}>Showing {firstItem.toLocaleString()}–{(firstItem + candidates.length - 1).toLocaleString()} of {totalCandidates.toLocaleString()} linked profiles.</p>
+        <div className={styles.grid}>
+          {candidates.map((candidate) => <PublicPersonLink key={candidate.id} person={candidate} eyebrow={candidateRecordLabel(candidate)}
+            detail={candidate.id === race.incumbent_id ? "Also recorded as the officeholder for this race." : !candidate.is_active ? "This profile is currently inactive." : undefined} />)}
+        </div>
+        <nav className={styles.pagination} aria-label="Candidate pages">
+          {page > 1 ? <Link href={electionDetailHref(slug, page - 1)}>← Previous candidates</Link> : <span />}
+          <span className={styles.meta}>Page {page} of {pages.toLocaleString()}</span>
+          {page < pages ? <Link href={electionDetailHref(slug, page + 1)}>Next candidates →</Link> : <span />}
+        </nav>
+      </> : <div className={styles.empty}>
+        <h2>{totalCandidates > 0 ? "No candidates on this page." : "Candidate profiles have not been linked yet."}</h2>
+        <p>{totalCandidates > 0 ? "Return to the first page to explore the profiles linked to this race." : "You can still search WhyTho for the person you want to ask."}</p>
+        <Link href={totalCandidates > 0 ? electionDetailHref(slug) : "/#find-politician"}>{totalCandidates > 0 ? "Go to the first candidate page" : "Find a politician"}</Link>
+      </div>}
+    </section>
+
+    {recordedOfficeholder && <section aria-labelledby="officeholder-heading">
+      <h2 id="officeholder-heading" className={styles.sectionHeading}>Recorded officeholder.</h2>
+      <p className={styles.meta}>The person associated with this office in the race record. This listing alone does not establish that they are running.</p>
+      <div className={styles.grid}><PublicPersonLink person={recordedOfficeholder}
+        eyebrow={recordedOfficeholder.race_id === race.id ? "Also linked to this race as a candidate" : "Officeholder listed in this record"}
+        detail={!recordedOfficeholder.is_active ? "This profile is currently inactive." : undefined} /></div>
+    </section>}
+    <p className={styles.footnote}>This page preserves profiles explicitly linked to the race, including people whose profiles later became inactive. Candidate labels reflect stored records. An election date passing does not establish a winner or a final result.</p>
+  </PublicPage>;
 }

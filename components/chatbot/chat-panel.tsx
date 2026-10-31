@@ -35,7 +35,7 @@ export function ChatPanel({ pageContext, onClose }: ChatPanelProps) {
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    bottomRef.current?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
   }, [messages, isLoading]);
 
   const showSuggestions = messages.length <= 1 && !isLoading;
@@ -45,7 +45,7 @@ export function ChatPanel({ pageContext, onClose }: ChatPanelProps) {
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b bg-card shrink-0">
         <div>
-          <p className="text-sm font-semibold">WhyTho Assistant</p>
+          <p className="text-sm font-semibold">WhyTho AI assistant</p>
           <p className="text-xs text-muted-foreground">Ask anything about the platform or politicians</p>
         </div>
         <button
@@ -66,14 +66,13 @@ export function ChatPanel({ pageContext, onClose }: ChatPanelProps) {
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3 min-h-0">
-        {messages.map((m) => (
-          <ChatMessage key={m.id} message={m} />
-        ))}
-
-        {isLoading && <TypingIndicator />}
+        <div role="log" aria-label="Conversation with the WhyTho AI assistant" aria-live="polite" aria-relevant="additions text" className="space-y-3">
+          {messages.map((m) => <ChatMessage key={m.id} message={m} />)}
+        </div>
+        {isLoading && <><p role="status" className="sr-only">The assistant is responding.</p><TypingIndicator /></>}
 
         {error && (
-          <p className="text-xs text-destructive text-center py-1">
+          <p role="alert" className="text-xs text-destructive text-center py-1">
             Something went wrong. Please try again.
           </p>
         )}
@@ -115,6 +114,7 @@ export function ChatPanel({ pageContext, onClose }: ChatPanelProps) {
       >
         <div className="flex gap-2 items-end">
           <textarea
+            aria-label="Message the WhyTho AI assistant"
             value={input}
             onChange={handleInputChange}
             onKeyDown={(e) => {
@@ -142,8 +142,8 @@ export function ChatPanel({ pageContext, onClose }: ChatPanelProps) {
             <Send size={14} />
           </button>
         </div>
-        <p className="text-[10px] text-muted-foreground/50 text-center mt-1.5">
-          Politician summaries are based only on verified platform data.
+        <p className="text-xs text-muted-foreground text-center mt-1.5">
+          AI assistance. Check sources and official records.
         </p>
       </form>
     </div>

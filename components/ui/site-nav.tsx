@@ -1,12 +1,15 @@
 "use client";
 
 import Link from "next/link";
+import { HomeNavigation } from "@/components/home/home-navigation";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useUser } from "@/lib/auth/use-user";
 import { useIsPolitician } from "@/lib/auth/use-is-politician";
 import { useViewMode } from "@/lib/auth/use-view-mode";
 import { SearchBar } from "@/components/search/search-bar";
+
+const RESERVED_ROUTES = new Set(["about", "account", "admin", "dashboard", "faq", "federal", "how-it-works", "leaderboard", "races", "sign-in", "verify", "settings", "auth", "api"]);
 
 const RIGHT_NAV_LINKS = [
   { href: "/leaderboard", label: "Leaderboard" },
@@ -53,6 +56,11 @@ export function SiteNav() {
     setMenuOpen(false);
     router.push(href);
   }
+
+  const routeParts = pathname.split("/").filter(Boolean);
+  const isProfile = routeParts.length === 1 && !RESERVED_ROUTES.has(routeParts[0] ?? "");
+  const isPublicListing = ["federal", "leaderboard", "races", "state", "region", "sign-in", "account", "dashboard", "verify", "settings", "about", "faq", "how-it-works"].includes(routeParts[0] ?? "");
+  if (isHome || isProfile || isPublicListing) return <HomeNavigation skipTarget={isPublicListing ? "#public-content" : undefined} skipLabel={isPublicListing ? "Skip to content" : undefined} canUsePoliticianMode={!!isPolitician && modeReady} onToggleMode={toggle} isHome={isHome} loggedIn={!!isLoggedIn} loading={isLoading} politicianMode={!!inPoliticianMode} />;
 
   return (
     <nav

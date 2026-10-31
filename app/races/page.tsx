@@ -1,236 +1,84 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { unstable_cache } from "next/cache";
-import { createPublicClient } from "@/lib/supabase/server";
+import { PublicPage } from "@/components/public/public-layout";
+import styles from "@/components/public/public.module.css";
+import { STATES } from "@/lib/search/states";
+import { ELECTION_OFFICES, ELECTION_PAGE_SIZE, electionDateLabel, electionDirectoryHref, electionPhaseLabel, electionStateName, electionToday, electionTypeLabel, parseElectionFilters } from "@/lib/elections/helpers";
+import { loadElectionDirectory } from "@/lib/elections/server";
+import type { ElectionDirectory, ElectionPeriod, ElectionSearchParams } from "@/lib/elections/types";
 
 export const metadata: Metadata = {
-  title: "2026 Elections | WhyTho",
-  description:
-    "Track 2026 primary and general election candidates. Submit questions and hold candidates accountable before Election Day.",
+  title: "Elections | WhyTho",
+  description: "Find an election, explore the candidates, and ask the questions you want answered.",
 };
+export const revalidate = 900;
 
-export const revalidate = 3600;
+const PERIODS: { value: ElectionPeriod; label: string }[] = [
+  { value: "upcoming", label: "Upcoming elections" },
+  { value: "past", label: "Past elections" },
+  { value: "all", label: "All records" },
+];
 
-const STATE_NAMES: Record<string, string> = {
-  AL: "Alabama", AK: "Alaska", AZ: "Arizona", AR: "Arkansas", CA: "California",
-  CO: "Colorado", CT: "Connecticut", DE: "Delaware", FL: "Florida", GA: "Georgia",
-  HI: "Hawaii", ID: "Idaho", IL: "Illinois", IN: "Indiana", IA: "Iowa",
-  KS: "Kansas", KY: "Kentucky", LA: "Louisiana", ME: "Maine", MD: "Maryland",
-  MA: "Massachusetts", MI: "Michigan", MN: "Minnesota", MS: "Mississippi", MO: "Missouri",
-  MT: "Montana", NE: "Nebraska", NV: "Nevada", NH: "New Hampshire", NJ: "New Jersey",
-  NM: "New Mexico", NY: "New York", NC: "North Carolina", ND: "North Dakota", OH: "Ohio",
-  OK: "Oklahoma", OR: "Oregon", PA: "Pennsylvania", RI: "Rhode Island", SC: "South Carolina",
-  SD: "South Dakota", TN: "Tennessee", TX: "Texas", UT: "Utah", VT: "Vermont",
-  VA: "Virginia", WA: "Washington", WV: "West Virginia", WI: "Wisconsin", WY: "Wyoming",
-  DC: "D.C.",
-};
+export default async function RacesPage({ searchParams }: { searchParams: Promise<ElectionSearchParams> }) {
+  const filters = parseElectionFilters(await searchParams);
+  const today = electionToday();
+  let directory: ElectionDirectory | null = null;
+  try { directory = await loadElectionDirectory(filters, today); } catch { /* Render a distinct failure state below. */ }
+  const pages = directory ? Math.max(1, Math.ceil(directory.total / ELECTION_PAGE_SIZE)) : 1;
+  const firstItem = (filters.page - 1) * ELECTION_PAGE_SIZE + 1;
 
-const OFFICE_ORDER: Record<string, number> = {
-  "Governor": 1,
-  "U.S. Senator": 2,
-  "U.S. Representative": 3,
-};
+  return <PublicPage title="Before you vote, ask." kicker="Elections" description="Find a race. Meet the candidates. Open their profiles and ask what you want answered.">
+    <nav className={styles.tabs} aria-label="Election period">
+      {PERIODS.map((period) => <Link key={period.value} href={electionDirectoryHref(filters, { period: period.value, page: 1 })} aria-current={filters.period === period.value ? "page" : undefined}>{period.label}</Link>)}
+    </nav>
+    <form key={`${filters.state}:${filters.office}:${filters.period}`} action="/races" method="get" className={styles.filterForm} aria-label="Filter elections">
+      <input type="hidden" name="period" value={filters.period} />
+      <label className={styles.field}>State
+        <select name="state" defaultValue={filters.state}>
+          <option value="">All states</option>
+          {STATES.map((state) => <option key={state.code} value={state.code}>{state.name}</option>)}
+        </select>
+      </label>
+      <label className={styles.field}>Office
+        <select name="filter" defaultValue={filters.office}>
+          {ELECTION_OFFICES.map((office) => <option key={office.value} value={office.value}>{office.label}</option>)}
+        </select>
+      </label>
+      <button type="submit" className={styles.button}>Find races <span aria-hidden="true">→</span></button>
+    </form>
 
-type RaceRow = {
-  id: string;
-  slug: string;
-  name: string;
-  office: string;
-  state: string;
-  district: string | null;
-  election_date: string;
-  election_type: string;
-  party: string | null;
-  status: string;
-  incumbent_id: string | null;
-};
-
-type FilterType = "all" | "governor" | "senate" | "house";
-
-/**
- * Active races plus candidate counts, cached hourly per (filter, state).
- *
- * ?filter= and ?state= shape the query, so they are cache keys. The page itself
- * stays dynamic because it reads searchParams; only the data is cached.
- */
-const loadRaces = unstable_cache(
-  async (filter: FilterType, stateParam: string | undefined) => {
-    const supabase = createPublicClient();
-
-    let query = supabase
-      .from("races")
-      .select("id, slug, name, office, state, district, election_date, election_type, party, status, incumbent_id")
-      .eq("status", "active")
-      .order("election_date", { ascending: true })
-      .order("state", { ascending: true });
-
-    if (filter === "governor") query = query.eq("office", "Governor");
-    if (filter === "senate") query = query.eq("office", "U.S. Senator");
-    if (filter === "house") query = query.eq("office", "U.S. Representative");
-    if (stateParam) query = query.eq("state", stateParam.toUpperCase());
-
-    const { data: races } = await query;
-    const allRaces = (races ?? []) as RaceRow[];
-
-    const raceIds = allRaces.map((r) => r.id);
-    const { data: candidateCounts } = raceIds.length > 0
-      ? await supabase
-          .from("politicians")
-          .select("race_id")
-          .in("race_id", raceIds)
-          .eq("politician_type", "candidate")
-          .eq("is_active", true)
-      : { data: [] };
-
-    const countMap: Record<string, number> = {};
-    for (const c of candidateCounts ?? []) {
-      if (c.race_id) countMap[c.race_id] = (countMap[c.race_id] ?? 0) + 1;
-    }
-
-    return { allRaces, countMap };
-  },
-  ["races-list"],
-  { revalidate: 3600, tags: ["races"] }
-);
-
-export default async function RacesPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ filter?: string; state?: string }>;
-}) {
-  const { filter: filterParam, state: stateParam } = await searchParams;
-  const filter: FilterType =
-    filterParam === "governor" ? "governor" :
-    filterParam === "senate" ? "senate" :
-    filterParam === "house" ? "house" :
-    "all";
-
-  const { allRaces, countMap } = await loadRaces(filter, stateParam);
-
-  // Group by state
-  const byState: Record<string, RaceRow[]> = {};
-  for (const race of allRaces) {
-    const s = race.state ?? "Other";
-    if (!byState[s]) byState[s] = [];
-    byState[s]!.push(race);
-  }
-
-  // Sort races within each state by office order
-  for (const state of Object.keys(byState)) {
-    byState[state]!.sort(
-      (a, b) => (OFFICE_ORDER[a.office] ?? 99) - (OFFICE_ORDER[b.office] ?? 99)
-    );
-  }
-
-  const sortedStates = Object.keys(byState).sort();
-  const total = allRaces.length;
-
-  const govCount = allRaces.filter((r) => r.office === "Governor").length;
-  const senCount = allRaces.filter((r) => r.office === "U.S. Senator").length;
-  const houseCount = allRaces.filter((r) => r.office === "U.S. Representative").length;
-
-  const PILLS = [
-    { value: "all" as FilterType, label: "All Races", count: allRaces.length > 0 ? total : null },
-    { value: "governor" as FilterType, label: "Governor", count: govCount || null },
-    { value: "senate" as FilterType, label: "Senate", count: senCount || null },
-    { value: "house" as FilterType, label: "House", count: houseCount || null },
-  ];
-
-  function electionLabel(race: RaceRow) {
-    const label = race.election_type === "general" ? "General" : "Primary";
-    const date = race.election_date
-      ? new Date(race.election_date + "T12:00:00").toLocaleDateString("en-US", {
-          month: "short", day: "numeric", year: "numeric",
-        })
-      : null;
-    return date ? `${label} · ${date}` : label;
-  }
-
-  return (
-    <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-3xl px-4 py-8 space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">2026 Elections</h1>
-          <p className="mt-1 text-muted-foreground">
-            {total > 0
-              ? `${total} active race${total !== 1 ? "s" : ""}, ask candidates where they stand`
-              : "No races added yet. Check back soon"}
-          </p>
-        </div>
-
-        {/* Filter pills */}
-        <div className="flex flex-wrap gap-2">
-          {PILLS.map((pill) => (
-            <Link
-              key={pill.value}
-              href={pill.value === "all" ? "/races" : `/races?filter=${pill.value}`}
-              className={`rounded-full px-3 py-1 text-sm font-medium border transition-colors ${
-                filter === pill.value ? "bg-foreground text-background" : "hover:bg-muted"
-              }`}
-            >
-              {pill.label}
-              {pill.count !== null && (
-                <span className="ml-1 text-xs opacity-60">({pill.count})</span>
-              )}
-            </Link>
-          ))}
-        </div>
-
-        {total === 0 ? (
-          <div className="rounded-xl border bg-card p-8 text-center">
-            <p className="text-muted-foreground">No races found. Run the seed script to add candidates.</p>
+    {!directory ? <section className={styles.empty} role="alert">
+      <h2>Election records could not load.</h2>
+      <p>We could not retrieve the race directory. Please try again.</p>
+      <Link href={electionDirectoryHref(filters)}>Reload election records</Link>
+    </section> : directory.races.length === 0 ? <section className={styles.empty}>
+      <h2>{directory.total > 0 ? "No races on this page." : filters.period === "upcoming" ? "No upcoming races listed here yet." : "No races match these filters."}</h2>
+      <p>{directory.total > 0 ? "Return to the first page to explore the matching races." : "WhyTho’s race directory is still growing. You can also find a politician directly and explore their questions."}</p>
+      {directory.total > 0 ? <Link href={electionDirectoryHref(filters, { page: 1 })}>Go to the first page</Link> : <>
+        <Link href={electionDirectoryHref(filters, { office: "all", state: "", period: "all", page: 1 })}>View all election records</Link>{" · "}<Link href="/#find-politician">Find a politician</Link>
+      </>}
+    </section> : <>
+      <h2 className={styles.sectionHeading}>{filters.state ? `${electionStateName(filters.state)} races` : "Explore the races"}</h2>
+      <p className={styles.meta}>{directory.total.toLocaleString()} matching race{directory.total === 1 ? "" : "s"}. Showing {firstItem.toLocaleString()}–{(firstItem + directory.races.length - 1).toLocaleString()}.</p>
+      <div className={styles.rowList}>
+        {directory.races.map((race) => <Link key={race.id} href={`/races/${encodeURIComponent(race.slug)}`} prefetch={false} className={styles.row}>
+          <div className={styles.rowMain}>
+            <p className={styles.rowMeta}>{electionStateName(race.state)} · {race.office}{race.district ? ` · District ${race.district}` : ""}</p>
+            <h3 className={styles.rowTitle}>{race.name}</h3>
+            <p className={styles.rowMeta}>{electionTypeLabel(race.election_type)} · {electionDateLabel(race.election_date)}{race.party ? ` · ${race.party}` : ""}</p>
           </div>
-        ) : (
-          <div className="space-y-8">
-            {sortedStates.map((stateCode) => (
-              <div key={stateCode}>
-                <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2">
-                  {STATE_NAMES[stateCode] ?? stateCode}
-                </h2>
-                <div className="rounded-xl border bg-card shadow-sm overflow-hidden divide-y">
-                  {byState[stateCode]!.map((race) => {
-                    const candidateCount = countMap[race.id] ?? 0;
-                    const hasIncumbent = !!race.incumbent_id;
-                    return (
-                      <Link
-                        key={race.id}
-                        href={`/races/${race.slug}`}
-                        className="flex items-center justify-between gap-3 px-4 py-3 hover:bg-muted/50 transition-colors group"
-                      >
-                        <div className="min-w-0">
-                          <p className="font-medium truncate group-hover:underline underline-offset-2">
-                            {race.name}
-                          </p>
-                          <p className="text-xs text-muted-foreground mt-0.5">
-                            {electionLabel(race)}
-                            {hasIncumbent && " · Incumbent running"}
-                          </p>
-                        </div>
-                        <div className="shrink-0 flex items-center gap-2">
-                          {candidateCount > 0 && (
-                            <span className="text-xs text-muted-foreground">
-                              {candidateCount} candidate{candidateCount !== 1 ? "s" : ""}
-                            </span>
-                          )}
-                          {race.party && (
-                            <span className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-xs font-semibold ${
-                              race.party === "Democrat" ? "bg-blue-100 text-blue-800" :
-                              race.party === "Republican" ? "bg-red-100 text-red-800" :
-                              "bg-muted text-muted-foreground"
-                            }`}>
-                              {race.party === "Democrat" ? "D" : race.party === "Republican" ? "R" : race.party.slice(0, 1)}
-                            </span>
-                          )}
-                        </div>
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
+          <div className={styles.rowAside}>
+            <p>{electionPhaseLabel(race, today)}</p>
+            <p>{race.candidateCount.toLocaleString()} linked candidate profile{race.candidateCount === 1 ? "" : "s"} <span aria-hidden="true">↗</span></p>
           </div>
-        )}
+        </Link>)}
       </div>
-    </div>
-  );
+      <nav className={styles.pagination} aria-label="Election pages">
+        {filters.page > 1 ? <Link href={electionDirectoryHref(filters, { page: filters.page - 1 })}>← Previous races</Link> : <span />}
+        <span className={styles.meta}>Page {filters.page} of {pages.toLocaleString()}</span>
+        {filters.page < pages ? <Link href={electionDirectoryHref(filters, { page: filters.page + 1 })}>Next races →</Link> : <span />}
+      </nav>
+    </>}
+    <p className={styles.footnote}>Race and candidate listings reflect the records available on WhyTho. Dates determine whether an election is upcoming or past; they do not establish a winner.</p>
+  </PublicPage>;
 }

@@ -1,0 +1,66 @@
+[
+  {
+    "check": "first page bounds, fields, integer counts, public cache",
+    "result": "pass",
+    "rows": 24,
+    "week": 202644
+  },
+  {
+    "check": "cursor continuation with no duplicate IDs and same week",
+    "result": "pass",
+    "rows": 48
+  },
+  {
+    "check": "state and office compose",
+    "result": "pass",
+    "rows": 6
+  },
+  {
+    "check": "AOC alias and explicit end of results",
+    "result": "pass",
+    "rows": 2
+  },
+  {
+    "check": "unknown state",
+    "result": "pass",
+    "status": 400
+  },
+  {
+    "check": "unknown office",
+    "result": "pass",
+    "status": 400
+  },
+  {
+    "check": "oversized query",
+    "result": "pass",
+    "status": 400
+  },
+  {
+    "check": "malformed cursor",
+    "result": "pass",
+    "status": 400
+  },
+  {
+    "check": "cursor filter mismatch",
+    "result": "pass",
+    "status": 400
+  },
+  {
+    "check": "unexpected parameter",
+    "result": "pass",
+    "status": 400
+  },
+  {
+    "check": "valid empty search is distinct from error",
+    "result": "pass"
+  },
+  {
+    "check": "filter punctuation remains literal",
+    "result": "pass"
+  },
+  {
+    "check": "filtered cursor pagination retains state and office, no duplicate IDs",
+    "result": "pass",
+    "rows": 48
+  }
+]

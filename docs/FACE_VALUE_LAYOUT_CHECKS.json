@@ -1,0 +1,368 @@
+{
+  "checks": [
+    {
+      "h1": "California",
+      "scrollWidth": 320,
+      "url": "/region/california",
+      "width": 320
+    },
+    {
+      "h1": "California",
+      "scrollWidth": 390,
+      "url": "/region/california",
+      "width": 390
+    },
+    {
+      "h1": "California",
+      "scrollWidth": 768,
+      "url": "/region/california",
+      "width": 768
+    },
+    {
+      "h1": "California",
+      "scrollWidth": 1024,
+      "url": "/region/california",
+      "width": 1024
+    },
+    {
+      "h1": "California",
+      "scrollWidth": 1440,
+      "url": "/region/california",
+      "width": 1440
+    },
+    {
+      "h1": "California",
+      "scrollWidth": 320,
+      "url": "/state/ca",
+      "width": 320
+    },
+    {
+      "h1": "California",
+      "scrollWidth": 390,
+      "url": "/state/ca",
+      "width": 390
+    },
+    {
+      "h1": "California",
+      "scrollWidth": 768,
+      "url": "/state/ca",
+      "width": 768
+    },
+    {
+      "h1": "California",
+      "scrollWidth": 1024,
+      "url": "/state/ca",
+      "width": 1024
+    },
+    {
+      "h1": "California",
+      "scrollWidth": 1440,
+      "url": "/state/ca",
+      "width": 1440
+    },
+    {
+      "h1": "U.S. officials.",
+      "scrollWidth": 320,
+      "url": "/federal",
+      "width": 320
+    },
+    {
+      "h1": "U.S. officials.",
+      "scrollWidth": 390,
+      "url": "/federal",
+      "width": 390
+    },
+    {
+      "h1": "U.S. officials.",
+      "scrollWidth": 768,
+      "url": "/federal",
+      "width": 768
+    },
+    {
+      "h1": "U.S. officials.",
+      "scrollWidth": 1024,
+      "url": "/federal",
+      "width": 1024
+    },
+    {
+      "h1": "U.S. officials.",
+      "scrollWidth": 1440,
+      "url": "/federal",
+      "width": 1440
+    },
+    {
+      "h1": "Who's answering?",
+      "scrollWidth": 320,
+      "url": "/leaderboard",
+      "width": 320
+    },
+    {
+      "h1": "Who's answering?",
+      "scrollWidth": 390,
+      "url": "/leaderboard",
+      "width": 390
+    },
+    {
+      "h1": "Who's answering?",
+      "scrollWidth": 768,
+      "url": "/leaderboard",
+      "width": 768
+    },
+    {
+      "h1": "Who's answering?",
+      "scrollWidth": 1024,
+      "url": "/leaderboard",
+      "width": 1024
+    },
+    {
+      "h1": "Who's answering?",
+      "scrollWidth": 1440,
+      "url": "/leaderboard",
+      "width": 1440
+    },
+    {
+      "url": "/races",
+      "width": 320,
+      "scrollWidth": 320,
+      "h1": "Before you vote, ask."
+    },
+    {
+      "url": "/races",
+      "width": 390,
+      "scrollWidth": 390,
+      "h1": "Before you vote, ask."
+    },
+    {
+      "url": "/races",
+      "width": 768,
+      "scrollWidth": 768,
+      "h1": "Before you vote, ask."
+    },
+    {
+      "url": "/races",
+      "width": 1024,
+      "scrollWidth": 1024,
+      "h1": "Before you vote, ask."
+    },
+    {
+      "url": "/races",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "h1": "Before you vote, ask."
+    },
+    {
+      "h1": "Your voice. On record.",
+      "route": "/sign-in",
+      "scrollWidth": 320,
+      "width": 320
+    },
+    {
+      "h1": "Your voice. On record.",
+      "route": "/sign-in",
+      "scrollWidth": 390,
+      "width": 390
+    },
+    {
+      "h1": "Your voice. On record.",
+      "route": "/sign-in",
+      "scrollWidth": 768,
+      "width": 768
+    },
+    {
+      "h1": "Your voice. On record.",
+      "route": "/sign-in",
+      "scrollWidth": 1024,
+      "width": 1024
+    },
+    {
+      "h1": "Your voice. On record.",
+      "route": "/sign-in",
+      "scrollWidth": 1440,
+      "width": 1440
+    },
+    {
+      "h1": "Put your name behind the answer.",
+      "route": "/verify",
+      "scrollWidth": 320,
+      "width": 320
+    },
+    {
+      "h1": "Put your name behind the answer.",
+      "route": "/verify",
+      "scrollWidth": 390,
+      "width": 390
+    },
+    {
+      "h1": "Put your name behind the answer.",
+      "route": "/verify",
+      "scrollWidth": 768,
+      "width": 768
+    },
+    {
+      "h1": "Put your name behind the answer.",
+      "route": "/verify",
+      "scrollWidth": 1024,
+      "width": 1024
+    },
+    {
+      "h1": "Put your name behind the answer.",
+      "route": "/verify",
+      "scrollWidth": 1440,
+      "width": 1440
+    },
+    {
+      "h1": "Public office. Public questions.",
+      "route": "/about",
+      "scrollWidth": 320,
+      "width": 320
+    },
+    {
+      "h1": "Public office. Public questions.",
+      "route": "/about",
+      "scrollWidth": 390,
+      "width": 390
+    },
+    {
+      "h1": "Public office. Public questions.",
+      "route": "/about",
+      "scrollWidth": 768,
+      "width": 768
+    },
+    {
+      "h1": "Public office. Public questions.",
+      "route": "/about",
+      "scrollWidth": 1024,
+      "width": 1024
+    },
+    {
+      "h1": "Public office. Public questions.",
+      "route": "/about",
+      "scrollWidth": 1440,
+      "width": 1440
+    },
+    {
+      "h1": "Questions about the questions.",
+      "route": "/faq",
+      "scrollWidth": 320,
+      "width": 320
+    },
+    {
+      "h1": "Questions about the questions.",
+      "route": "/faq",
+      "scrollWidth": 390,
+      "width": 390
+    },
+    {
+      "h1": "Questions about the questions.",
+      "route": "/faq",
+      "scrollWidth": 768,
+      "width": 768
+    },
+    {
+      "h1": "Questions about the questions.",
+      "route": "/faq",
+      "scrollWidth": 1024,
+      "width": 1024
+    },
+    {
+      "h1": "Questions about the questions.",
+      "route": "/faq",
+      "scrollWidth": 1440,
+      "width": 1440
+    },
+    {
+      "h1": "Find. Ask. Follow up.",
+      "route": "/how-it-works",
+      "scrollWidth": 320,
+      "width": 320
+    },
+    {
+      "h1": "Find. Ask. Follow up.",
+      "route": "/how-it-works",
+      "scrollWidth": 390,
+      "width": 390
+    },
+    {
+      "h1": "Find. Ask. Follow up.",
+      "route": "/how-it-works",
+      "scrollWidth": 768,
+      "width": 768
+    },
+    {
+      "h1": "Find. Ask. Follow up.",
+      "route": "/how-it-works",
+      "scrollWidth": 1024,
+      "width": 1024
+    },
+    {
+      "h1": "Find. Ask. Follow up.",
+      "route": "/how-it-works",
+      "scrollWidth": 1440,
+      "width": 1440
+    },
+    {
+      "h1": "Your notifications.",
+      "route": "/settings/notifications",
+      "scrollWidth": 320,
+      "width": 320
+    },
+    {
+      "h1": "Your notifications.",
+      "route": "/settings/notifications",
+      "scrollWidth": 390,
+      "width": 390
+    },
+    {
+      "h1": "Your notifications.",
+      "route": "/settings/notifications",
+      "scrollWidth": 768,
+      "width": 768
+    },
+    {
+      "h1": "Your notifications.",
+      "route": "/settings/notifications",
+      "scrollWidth": 1024,
+      "width": 1024
+    },
+    {
+      "h1": "Your notifications.",
+      "route": "/settings/notifications",
+      "scrollWidth": 1440,
+      "width": 1440
+    },
+    {
+      "h1": "That page isn’t here.",
+      "route": "/missing-face-value-check-profile",
+      "scrollWidth": 320,
+      "width": 320
+    },
+    {
+      "h1": "That page isn’t here.",
+      "route": "/missing-face-value-check-profile",
+      "scrollWidth": 390,
+      "width": 390
+    },
+    {
+      "h1": "That page isn’t here.",
+      "route": "/missing-face-value-check-profile",
+      "scrollWidth": 768,
+      "width": 768
+    },
+    {
+      "h1": "That page isn’t here.",
+      "route": "/missing-face-value-check-profile",
+      "scrollWidth": 1024,
+      "width": 1024
+    },
+    {
+      "h1": "That page isn’t here.",
+      "route": "/missing-face-value-check-profile",
+      "scrollWidth": 1440,
+      "width": 1440
+    }
+  ],
+  "notes": [
+    "Signed-out pages only; authenticated account/dashboard/verification steps were code-reviewed but not exercised with a signed-in session.",
+    "No live writes or assistant messages submitted."
+  ]
+}

@@ -3,256 +3,93 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { AccountProfileForm } from "@/components/account/account-profile-form";
+import { PublicPage } from "@/components/public/public-layout";
+import publicStyles from "@/components/public/public.module.css";
+import styles from "@/components/account/account.module.css";
 
-export const metadata: Metadata = {
-  title: "My Account | WhyTho",
-};
-
-interface Props {
-  searchParams: Promise<{ tab?: string }>;
-}
-
+export const metadata: Metadata = { title: "My Account | WhyTho", robots: { index: false, follow: false } };
+interface Props { searchParams: Promise<{ tab?: string | string[] }> }
 type Tab = "questions" | "votes" | "profile";
 
 function formatWeekLabel(weekNumber: number): string {
-  const year = Math.floor(weekNumber / 100);
-  const week = weekNumber % 100;
-  return `Week ${week}, ${year}`;
+  return `Week ${weekNumber % 100}, ${Math.floor(weekNumber / 100)}`;
+}
+function formatDate(value: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Date unavailable";
+  return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
 }
 
-function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
+function AccountReadError({ tab }: { tab: Tab }) {
+  return <section className={publicStyles.empty} role="alert">
+    <h2>This part of your account could not load.</h2>
+    <p>Your records could not be retrieved. This does not mean your history is empty.</p>
+    <Link href={`/account?tab=${tab}`}>Reload this section</Link>
+  </section>;
 }
 
 export default async function AccountPage({ searchParams }: Props) {
-  const { tab: tabParam } = await searchParams;
-  const activeTab: Tab =
-    tabParam === "votes" ? "votes" :
-    tabParam === "profile" ? "profile" :
-    "questions";
-
+  const { tab } = await searchParams;
+  const activeTab: Tab = tab === "votes" ? "votes" : tab === "profile" ? "profile" : "questions";
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user || user.is_anonymous) redirect(`/sign-in?redirect=${encodeURIComponent(`/account?tab=${activeTab}`)}`);
 
-  // Must be logged in with a real account (not anonymous)
-  if (!user || user.is_anonymous) {
-    redirect("/sign-in");
-  }
+  // Account reads stay authenticated, user-scoped, and outside public caches.
+  const [questionResult, voteResult, profileResult] = await Promise.all([
+    supabase.from("questions").select("id, body, net_upvotes, week_number, status, created_at, politicians ( full_name, slug )")
+      .eq("submitted_by", user.id).order("created_at", { ascending: false }).limit(50),
+    supabase.from("votes").select("id, value, week_number, created_at, questions ( id, body, net_upvotes, week_number, politicians ( full_name, slug ) )")
+      .eq("user_id", user.id).order("created_at", { ascending: false }).limit(100),
+    supabase.from("user_profiles").select("city, county, state_code, political_affiliation").eq("id", user.id).maybeSingle(),
+  ]);
+  const questions = questionResult.data ?? [];
+  const votes = voteResult.data ?? [];
+  const profile = profileResult.data;
 
-  // ── My Questions ──────────────────────────────────────────────────────────
-  const { data: myQuestions } = await supabase
-    .from("questions")
-    .select(
-      `id, body, net_upvotes, week_number, status, created_at,
-       politicians ( full_name, slug )`
-    )
-    .eq("submitted_by", user.id)
-    .order("created_at", { ascending: false })
-    .limit(50);
+  return <PublicPage title="Your voice. Your record." kicker="My account" description="Return to the questions you asked, the ones you voted on, and your profile.">
+    {user.email && <p className={styles.accountIdentity}>Signed in as {user.email}</p>}
+    <nav className={publicStyles.tabs} aria-label="Account sections">
+      <Link href="/account?tab=questions" aria-current={activeTab === "questions" ? "page" : undefined}>My questions</Link>
+      <Link href="/account?tab=votes" aria-current={activeTab === "votes" ? "page" : undefined}>My votes</Link>
+      <Link href="/account?tab=profile" aria-current={activeTab === "profile" ? "page" : undefined}>Profile</Link>
+    </nav>
 
-  // ── My Votes ──────────────────────────────────────────────────────────────
-  const { data: myVotes } = await supabase
-    .from("votes")
-    .select(
-      `id, value, week_number, created_at,
-       questions ( id, body, net_upvotes, week_number,
-         politicians ( full_name, slug )
-       )`
-    )
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: false })
-    .limit(100);
+    {activeTab === "questions" && (questionResult.error ? <AccountReadError tab="questions" /> : <section aria-labelledby="my-questions-heading">
+      <div className={styles.historyHeader}><h2 id="my-questions-heading">Your recent questions.</h2><p>Up to 50 of your most recent questions.</p></div>
+      {questions.length === 0 ? <div className={publicStyles.empty}><h2>Your first question starts here.</h2><p>Questions you submit to politicians will appear in your account.</p><Link href="/#find-politician">Find someone to ask</Link></div> : <div className={styles.history}>
+        {questions.map((question) => {
+          const politician = Array.isArray(question.politicians) ? question.politicians[0] : question.politicians;
+          return <article key={question.id} className={styles.historyRow}>
+            <div><p className={styles.historyBody}>{question.body}</p><div className={styles.historyMeta}>
+              {politician?.slug ? <Link href={`/${politician.slug}`}>{politician.full_name}</Link> : <span>Politician profile unavailable</span>}
+              <span>{formatWeekLabel(question.week_number)}</span><span>{formatDate(question.created_at)}</span>
+              {question.status === "removed" && <span>Question removed</span>}{question.status === "merged" && <span>Question merged</span>}
+            </div></div>
+            <div className={styles.historyAside}><strong>{question.net_upvotes > 0 ? "+" : ""}{question.net_upvotes}</strong><span>net votes</span></div>
+          </article>;
+        })}
+      </div>}
+    </section>)}
 
-  // ── Profile ───────────────────────────────────────────────────────────────
-  const { data: profileData } = await supabase
-    .from("user_profiles")
-    .select("city, county, state_code, political_affiliation")
-    .eq("id", user.id)
-    .maybeSingle();
+    {activeTab === "votes" && (voteResult.error ? <AccountReadError tab="votes" /> : <section aria-labelledby="my-votes-heading">
+      <div className={styles.historyHeader}><h2 id="my-votes-heading">Your recent votes.</h2><p>Up to 100 of your most recent votes.</p></div>
+      {votes.length === 0 ? <div className={publicStyles.empty}><h2>Good questions deserve support.</h2><p>Questions you vote on will appear here.</p><Link href="/#find-politician">Explore the questions</Link></div> : <div className={styles.history}>
+        {votes.map((vote) => {
+          const question = Array.isArray(vote.questions) ? vote.questions[0] : vote.questions;
+          const politician = question ? (Array.isArray(question.politicians) ? question.politicians[0] : question.politicians) : null;
+          const isUp = vote.value > 0;
+          return <article key={vote.id} className={styles.historyRow}>
+            <div><p className={styles.historyBody}>{question?.body ?? "Question details are unavailable."}</p><div className={styles.historyMeta}>
+              {politician?.slug ? <Link href={`/${politician.slug}`}>{politician.full_name}</Link> : <span>Politician profile unavailable</span>}
+              <span>{formatWeekLabel(question?.week_number ?? vote.week_number)}</span><span>{formatDate(vote.created_at)}</span>
+            </div></div>
+            <span className={styles.voteDirection}><span aria-hidden="true">{isUp ? "↑" : "↓"}</span>{isUp ? "Upvoted" : "Downvoted"}</span>
+          </article>;
+        })}
+      </div>}
+    </section>)}
 
-  const questions = myQuestions ?? [];
-  const votes = myVotes ?? [];
-
-  return (
-    <main className="mx-auto max-w-3xl px-4 py-8 space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">My Account</h1>
-        <p className="text-sm text-muted-foreground mt-1">{user.email}</p>
-      </div>
-
-      {/* Tabs */}
-      <div className="flex gap-1 rounded-lg border bg-muted p-1 w-fit" role="tablist">
-        <Link
-          href="/account?tab=questions"
-          role="tab"
-          aria-selected={activeTab === "questions"}
-          className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
-            activeTab === "questions"
-              ? "bg-background shadow-sm text-foreground"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          My Questions ({questions.length})
-        </Link>
-        <Link
-          href="/account?tab=votes"
-          role="tab"
-          aria-selected={activeTab === "votes"}
-          className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
-            activeTab === "votes"
-              ? "bg-background shadow-sm text-foreground"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          My Votes ({votes.length})
-        </Link>
-        <Link
-          href="/account?tab=profile"
-          role="tab"
-          aria-selected={activeTab === "profile"}
-          className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
-            activeTab === "profile"
-              ? "bg-background shadow-sm text-foreground"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          Profile
-        </Link>
-      </div>
-
-      {/* Question History */}
-      {activeTab === "questions" && (
-        <section className="space-y-3">
-          {questions.length === 0 ? (
-            <div className="rounded-xl border bg-card p-8 text-center space-y-2">
-              <p className="font-medium">No questions yet</p>
-              <p className="text-sm text-muted-foreground">
-                Questions you submit to politicians will appear here.
-              </p>
-            </div>
-          ) : (
-            questions.map((q) => {
-              const pol = Array.isArray(q.politicians) ? q.politicians[0] : q.politicians;
-              const slug = pol?.slug ?? null;
-              const polName = pol?.full_name ?? "Unknown Politician";
-              return (
-                <div
-                  key={q.id}
-                  className="rounded-xl border bg-card p-4 space-y-2"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <p className="text-sm font-medium leading-snug">{q.body}</p>
-                    <span
-                      className={`shrink-0 text-xs font-medium tabular-nums ${
-                        q.net_upvotes > 0
-                          ? "text-green-600"
-                          : q.net_upvotes < 0
-                          ? "text-red-600"
-                          : "text-muted-foreground"
-                      }`}
-                    >
-                      {q.net_upvotes > 0 ? "+" : ""}
-                      {q.net_upvotes}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                    {slug ? (
-                      <Link
-                        href={`/${slug}`}
-                        className="hover:text-foreground underline-offset-2 hover:underline"
-                      >
-                        {polName}
-                      </Link>
-                    ) : (
-                      <span>{polName}</span>
-                    )}
-                    <span>·</span>
-                    <span>{formatWeekLabel(q.week_number)}</span>
-                    <span>·</span>
-                    <span>{formatDate(q.created_at)}</span>
-                  </div>
-                </div>
-              );
-            })
-          )}
-        </section>
-      )}
-
-      {/* Profile */}
-      {activeTab === "profile" && (
-        <section>
-          <AccountProfileForm
-            initialCity={profileData?.city ?? null}
-            initialCounty={profileData?.county ?? null}
-            initialStateCode={profileData?.state_code ?? null}
-            initialAffiliation={profileData?.political_affiliation ?? null}
-          />
-        </section>
-      )}
-
-      {/* Vote History */}
-      {activeTab === "votes" && (
-        <section className="space-y-3">
-          {votes.length === 0 ? (
-            <div className="rounded-xl border bg-card p-8 text-center space-y-2">
-              <p className="font-medium">No votes yet</p>
-              <p className="text-sm text-muted-foreground">
-                Questions you upvote or downvote will appear here.
-              </p>
-            </div>
-          ) : (
-            votes.map((v) => {
-              const q = Array.isArray(v.questions) ? v.questions[0] : v.questions;
-              if (!q) return null;
-              const pol = Array.isArray(q.politicians) ? q.politicians[0] : q.politicians;
-              const slug = pol?.slug ?? null;
-              const polName = pol?.full_name ?? "Unknown Politician";
-              const isUp = v.value > 0;
-              return (
-                <div
-                  key={v.id}
-                  className="rounded-xl border bg-card p-4 space-y-2"
-                >
-                  <div className="flex items-start gap-3">
-                    <span
-                      className={`shrink-0 mt-0.5 text-sm font-bold ${
-                        isUp ? "text-green-600" : "text-red-600"
-                      }`}
-                      aria-label={isUp ? "Upvoted" : "Downvoted"}
-                    >
-                      {isUp ? "▲" : "▼"}
-                    </span>
-                    <p className="text-sm font-medium leading-snug">{q.body}</p>
-                  </div>
-                  <div className="flex items-center gap-3 text-xs text-muted-foreground pl-6">
-                    {slug ? (
-                      <Link
-                        href={`/${slug}`}
-                        className="hover:text-foreground underline-offset-2 hover:underline"
-                      >
-                        {polName}
-                      </Link>
-                    ) : (
-                      <span>{polName}</span>
-                    )}
-                    <span>·</span>
-                    <span>{formatWeekLabel(q.week_number)}</span>
-                    <span>·</span>
-                    <span>{formatDate(v.created_at)}</span>
-                  </div>
-                </div>
-              );
-            })
-          )}
-        </section>
-      )}
-    </main>
-  );
+    {activeTab === "profile" && (profileResult.error ? <AccountReadError tab="profile" /> : <AccountProfileForm initialCity={profile?.city ?? null} initialCounty={profile?.county ?? null} initialStateCode={profile?.state_code ?? null} initialAffiliation={profile?.political_affiliation ?? null} />)}
+  </PublicPage>;
 }

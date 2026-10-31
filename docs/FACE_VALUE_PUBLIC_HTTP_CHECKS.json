@@ -1,0 +1,98 @@
+[
+  {
+    "check": "State page is bounded and excludes federal offices",
+    "passed": true
+  },
+  {
+    "check": "State cursor continues with distinct politicians",
+    "passed": true
+  },
+  {
+    "check": "Scope-crossing cursor rejected",
+    "passed": true
+  },
+  {
+    "check": "Full Cabinet office filter returns stored office",
+    "passed": true
+  },
+  {
+    "check": "Federal titles stay out of state-only DC query",
+    "passed": true
+  },
+  {
+    "check": "Unknown scope rejected",
+    "passed": true
+  },
+  {
+    "check": "Legacy federal senate URL available",
+    "passed": true
+  },
+  {
+    "check": "Legacy federal house URL available",
+    "passed": true
+  },
+  {
+    "check": "Legacy federal governors URL available",
+    "passed": true
+  },
+  {
+    "check": "Legacy federal executive URL available",
+    "passed": true
+  },
+  {
+    "check": "Leaderboard truthfully shows no qualifying records",
+    "passed": true
+  },
+  {
+    "check": "Election empty state retains all filters",
+    "passed": true
+  },
+  {
+    "check": "DC state route redirects regionally",
+    "passed": true
+  },
+  {
+    "check": "DC regional page avoids a state-only loop",
+    "passed": true
+  },
+  {
+    "check": "Account auth gate retains destination",
+    "passed": true
+  },
+  {
+    "check": "Dashboard retains sign-in guard",
+    "passed": true
+  },
+  {
+    "check": "Sign-in renders new shell and safe account return",
+    "passed": true
+  },
+  {
+    "check": "External sign-in destination discarded",
+    "passed": true
+  },
+  {
+    "check": "/about uses the new public shell",
+    "passed": true
+  },
+  {
+    "check": "/faq uses the new public shell",
+    "passed": true
+  },
+  {
+    "check": "/how-it-works uses the new public shell",
+    "passed": true
+  },
+  {
+    "check": "/verify uses the new public shell",
+    "passed": true
+  },
+  {
+    "check": "/settings/notifications uses the new public shell",
+    "passed": true
+  },
+  {
+    "check": "Missing profile renders new not-found state",
+    "passed": true
+  }
+]
