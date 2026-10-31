@@ -66,7 +66,9 @@ export function AskQuestionForm({ politicianId, politicianName, onSubmitted, app
 
   useEffect(() => {
     if (isLoading || !user || user.is_anonymous || success || isPending || verification.status !== "loading") return;
-    // A blocked script may never fire a Turnstile callback. Stop waiting visibly.
+    // Wait for a challenge callback, not onWidgetLoad (container mount).
+    // This also covers blocked scripts without scriptOptions.onError, which
+    // removes the library's onload callback in react-turnstile 1.4.2.
     const timeout = window.setTimeout(() => {
       setVerification((current) => current.status === "loading" ? { status: "error", token: null } : current);
     }, VERIFICATION_LOAD_TIMEOUT_MS);
@@ -164,14 +166,15 @@ export function AskQuestionForm({ politicianId, politicianName, onSubmitted, app
       <p id={`${id}-verification-status`} role="status" className={canRetryVerification || verification.status === "unavailable" || verification.status === "unsupported" ? (face ? styles.error : "text-sm text-destructive") : textClass}>{VERIFICATION_MESSAGES[verification.status]}</p>
       {SITE_KEY && <Turnstile key={verificationAttempt} id={`${id}-turnstile`} siteKey={SITE_KEY}
         options={{ size: "compact", appearance: "always", theme: face ? "dark" : "auto", retry: "never", refreshExpired: "manual", refreshTimeout: "manual" }}
-        onWidgetLoad={() => setVerification((current) => current.status === "loading" ? { status: "ready", token: null } : current)}
         onBeforeInteractive={() => setVerification({ status: "ready", token: null })}
         onSuccess={(token) => setVerification({ status: token ? "verified" : "error", token: token || null })}
         onExpire={() => setVerification({ status: "expired", token: null })}
-        onError={() => setVerification({ status: "error", token: null })}
+        onError={(code) => {
+          console.warn("Question verification failed", code);
+          setVerification({ status: "error", token: null });
+        }}
         onTimeout={() => setVerification({ status: "error", token: null })}
-        onUnsupported={() => setVerification({ status: "unsupported", token: null })}
-        scriptOptions={{ onError: () => setVerification({ status: "error", token: null }) }} />}
+        onUnsupported={() => setVerification({ status: "unsupported", token: null })} />}
       {canRetryVerification && <button type="button" disabled={isPending} onClick={restartVerification} className={face ? styles.textButton : "min-h-11 text-sm underline underline-offset-2"}>Retry verification</button>}
     </div>
     {error && <p id={`${id}-error`} role="alert" className={face ? styles.error : "text-sm text-destructive"}>{error}</p>}
