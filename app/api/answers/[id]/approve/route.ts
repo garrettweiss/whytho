@@ -2,7 +2,7 @@
  * POST /api/answers/[id]/approve
  *
  * Approves a draft answer, making it live. Only team admins and editors
- * may approve. Responders cannot approve their own drafts.
+ * on a verified profile may approve. Responders cannot approve drafts.
  *
  * Auth: Supabase session + admin or editor role on politician_team
  */
@@ -30,7 +30,7 @@ export async function POST(
   // Fetch the answer
   const { data: answer } = await admin
     .from("answers")
-    .select("id, politician_id, is_ai_generated, is_draft, published_by")
+    .select("id, politician_id, is_ai_generated, is_draft, answer_type")
     .eq("id", id)
     .single();
 
@@ -42,8 +42,8 @@ export async function POST(
     return NextResponse.json({ error: "Answer is already published" }, { status: 409 });
   }
 
-  if (answer.is_ai_generated) {
-    return NextResponse.json({ error: "AI answers cannot be approved via this endpoint" }, { status: 422 });
+  if (answer.is_ai_generated || !["direct", "team_statement"].includes(answer.answer_type)) {
+    return NextResponse.json({ error: "Only human response drafts can be approved" }, { status: 422 });
   }
 
   // Verify team membership — must be admin or editor
@@ -61,18 +61,33 @@ export async function POST(
     );
   }
 
-  // Responders cannot approve their own submissions
-  if (answer.published_by === user.id && membership.role === "editor") {
-    // editors can still approve (they could edit/submit themselves); only block responders
+  const { data: politician, error: politicianError } = await admin
+    .from("politicians")
+    .select("verification_tier")
+    .eq("id", answer.politician_id)
+    .single();
+  if (politicianError || !politician) {
+    return NextResponse.json({ error: "Could not confirm profile verification. Please try again." }, { status: 503 });
+  }
+  if (!["2", "3"].includes(politician.verification_tier)) {
+    return NextResponse.json({ error: "Verify this profile's identity before publishing responses. This response remains a private draft." }, { status: 403 });
   }
 
-  const { error: updateErr } = await admin
+  const { data: published, error: updateErr } = await admin
     .from("answers")
     .update({ is_draft: false })
-    .eq("id", id);
+    .eq("id", id)
+    .eq("is_draft", true)
+    .eq("is_ai_generated", false)
+    .in("answer_type", ["direct", "team_statement"])
+    .select("id")
+    .maybeSingle();
 
   if (updateErr) {
     return NextResponse.json({ error: updateErr.message }, { status: 500 });
+  }
+  if (!published) {
+    return NextResponse.json({ error: "The response changed. Refresh before approving it." }, { status: 409 });
   }
 
   return NextResponse.json({ success: true });

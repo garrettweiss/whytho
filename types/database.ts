@@ -1105,6 +1105,20 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      attach_answer_media: {
+        Args: {
+          p_actor_id: string
+          p_answer_id: string
+          p_media_id: string
+          p_storage_path: string
+          p_media_type: string
+          p_public_url: string
+          p_file_name: string | null
+          p_file_size_bytes: number
+          p_mime_type: string
+        }
+        Returns: string
+      }
       current_week_number: { Args: never; Returns: number }
       generate_slug: {
         Args: { p_full_name: string; p_state?: string }

@@ -1,0 +1,44 @@
+[
+  {
+    "case": "current",
+    "status": 200,
+    "expected_content": true,
+    "private_identifiers_exposed": false,
+    "passed": true
+  },
+  {
+    "case": "all",
+    "status": 200,
+    "expected_content": true,
+    "private_identifiers_exposed": false,
+    "passed": true
+  },
+  {
+    "case": "month",
+    "status": 200,
+    "expected_content": true,
+    "private_identifiers_exposed": false,
+    "passed": true
+  },
+  {
+    "case": "archive",
+    "status": 200,
+    "expected_content": true,
+    "private_identifiers_exposed": false,
+    "passed": true
+  },
+  {
+    "case": "invalid_week",
+    "status": 200,
+    "expected_content": true,
+    "private_identifiers_exposed": false,
+    "passed": true
+  },
+  {
+    "case": "missing",
+    "status": 200,
+    "expected_content": true,
+    "private_identifiers_exposed": false,
+    "passed": true
+  }
+]

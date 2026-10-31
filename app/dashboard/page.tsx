@@ -8,6 +8,11 @@ import { ProfileEditor } from "@/components/dashboard/profile-editor";
 import { DisconnectButton } from "@/components/dashboard/disconnect-button";
 import { DraftApproveButton } from "@/components/dashboard/draft-approve-button";
 import { DashboardQuestionInbox } from "@/components/dashboard/question-inbox";
+import { DashboardShell } from "@/components/dashboard/dashboard-shell";
+import { AnswerMediaDisplay } from "@/components/answers/answer-media-display";
+import { safeAnswerMediaUrl } from "@/components/answers/media-url";
+import { isValidIsoWeek, safeWebUrl } from "@/lib/profile/helpers";
+import styles from "@/components/dashboard/dashboard.module.css";
 
 export const metadata: Metadata = {
   title: "Politician Dashboard | WhyTho",
@@ -20,6 +25,7 @@ type QuestionRow = {
   net_upvotes: number;
   week_number: number;
   created_at: string;
+  is_seeded: boolean;
   answers: {
     id: string;
     answer_type: string;
@@ -36,26 +42,25 @@ type DraftRow = {
   created_at: string;
   question_id: string;
   question_body: string;
+  media: { id: string; media_type: "image" | "video" | "audio"; public_url: string; file_name: string | null }[];
 };
 
 const NEW_QUESTION_HOURS = 48;
 
-/** Friendly verification tier badge */
 function TierBadge({ tier }: { tier: string }) {
-  const badges: Record<string, { label: string; className: string }> = {
-    "0": { label: "Unclaimed", className: "bg-muted text-muted-foreground" },
-    "1": { label: "Self-Claimed", className: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300" },
-    "2": { label: "Verified ✓", className: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300" },
-    "3": { label: "Fully Verified ✓✓", className: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300" },
-  };
-  const badge = badges[tier] ?? badges["0"]!;
-  return (
-    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${badge.className}`}>
-      {badge.label}
-    </span>
-  );
+  const labels: Record<string, string> = { "0": "Unclaimed", "1": "Self-claimed", "2": "Verified", "3": "Fully verified" };
+  return <span className={`${styles.badge} ${Number(tier) >= 2 ? styles.verified : ""}`}>{labels[tier] ?? labels["0"]}</span>;
 }
 
+function DashboardUnavailable() {
+  return <DashboardShell><section className={styles.empty}>
+    <h2>Dashboard unavailable.</h2>
+    <p>We could not load your profile information. Your saved work has not changed.</p>
+    {/* A full reload retries failed server reads instead of reusing the current route payload. */}
+    {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+    <a href="/dashboard" className={styles.secondaryButton}>Try again</a>
+  </section></DashboardShell>;
+}
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -73,10 +78,11 @@ export default async function DashboardPage() {
     redirect("/");
   }
 
-  const { data: weekData } = await supabase.rpc("current_week_number");
-  const currentWeekNumber = weekData as number;
+  const { data: weekData, error: weekError } = await supabase.rpc("current_week_number").abortSignal(AbortSignal.timeout(8_000));
+  if (weekError || typeof weekData !== "number" || !isValidIsoWeek(weekData)) return <DashboardUnavailable />;
+  const currentWeekNumber = weekData;
 
-  const { data: memberships } = await supabase
+  const { data: memberships, error: membershipError } = await supabase
     .from("politician_team")
     .select(`
       role,
@@ -94,27 +100,18 @@ export default async function DashboardPage() {
         social_handles
       )
     `)
-    .eq("user_id", user.id);
+    .eq("user_id", user.id).abortSignal(AbortSignal.timeout(8_000));
+
+  if (membershipError) return <DashboardUnavailable />;
 
   if (!memberships || memberships.length === 0) {
-    return (
-      <div className="min-h-screen bg-background">
-        <div className="mx-auto max-w-3xl px-4 py-12">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold mb-2">Politician Dashboard</h1>
-            <p className="text-muted-foreground mb-8">
-              You haven&apos;t claimed a politician profile yet.
-            </p>
-            <Link
-              href="/verify"
-              className="inline-flex items-center justify-center rounded-md bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
-            >
-              Claim Your Profile →
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
+    return <DashboardShell>
+      <section className={styles.empty}>
+        <h2>Put your name on the record.</h2>
+        <p>You have not claimed a politician profile yet. Claim yours to respond to questions and manage your team.</p>
+        <Link href="/verify" className={styles.button}>Claim your profile <span aria-hidden="true">→</span></Link>
+      </section>
+    </DashboardShell>;
   }
 
   const cutoff48h = new Date(Date.now() - NEW_QUESTION_HOURS * 60 * 60 * 1000).toISOString();
@@ -137,7 +134,7 @@ export default async function DashboardPage() {
     isOnlyAdmin: boolean;
     questions: QuestionRow[];
     drafts: DraftRow[];
-    participationRate: number | null;
+    pendingDrafts: number;
     stats: { totalQuestions: number; totalAnswers: number; thisWeekQuestions: number };
   };
 
@@ -149,50 +146,54 @@ export default async function DashboardPage() {
       : membership.politicians;
     if (!politician) continue;
 
+    const readSignal = AbortSignal.timeout(8_000);
     const [
-      { data: questions },
-      { data: rateData },
-      { count: totalQuestions },
-      { count: totalAnswers },
-      { count: thisWeekQuestions },
-      { data: rawDrafts },
-      { count: adminCount },
+      { data: questions, error: questionsError },
+      { count: totalQuestions, error: totalQuestionsError },
+      { count: totalAnswers, error: totalAnswersError },
+      { count: thisWeekQuestions, error: thisWeekError },
+      { data: rawDrafts, count: pendingDrafts, error: draftsError },
+      { count: adminCount, error: adminError },
     ] = await Promise.all([
       supabase
         .from("questions")
-        .select(`id, body, net_upvotes, week_number, created_at, answers ( id, answer_type, body, is_ai_generated, is_draft, created_at )`)
+        .select(`id, body, net_upvotes, week_number, created_at, is_seeded, answers ( id, answer_type, body, is_ai_generated, is_draft, created_at )`)
         .eq("politician_id", politician.id)
         .eq("week_number", currentWeekNumber)
         .eq("status", "active")
+        .eq("answers.is_draft", false)
         .order("net_upvotes", { ascending: false })
-        .limit(100),
-      supabase.rpc("participation_rate_period", {
-        p_politician_id: politician.id,
-        p_period: "week",
-      }),
+        .order("id", { ascending: true })
+        .limit(100).abortSignal(readSignal),
       supabase.from("questions").select("*", { count: "exact", head: true })
-        .eq("politician_id", politician.id).eq("status", "active"),
+        .eq("politician_id", politician.id).eq("status", "active").abortSignal(readSignal),
       supabase.from("answers").select("*", { count: "exact", head: true })
-        .eq("politician_id", politician.id).eq("is_ai_generated", false).eq("is_draft", false),
+        .eq("politician_id", politician.id).eq("is_ai_generated", false).eq("is_draft", false)
+        .in("answer_type", ["direct", "team_statement"]).abortSignal(readSignal),
       supabase.from("questions").select("*", { count: "exact", head: true })
-        .eq("politician_id", politician.id).eq("week_number", currentWeekNumber).eq("status", "active"),
+        .eq("politician_id", politician.id).eq("week_number", currentWeekNumber).eq("status", "active").abortSignal(readSignal),
       // Fetch pending drafts (only relevant for admin/editor roles)
       ["admin", "editor"].includes(membership.role)
         ? supabase
             .from("answers")
-            .select(`id, body, created_at, question_id, questions ( body )`)
+            .select(`id, body, created_at, question_id, questions ( body ), answer_media ( id, media_type, public_url, file_name )`, { count: "exact" })
             .eq("politician_id", politician.id)
             .eq("is_draft", true)
             .eq("is_ai_generated", false)
             .order("created_at", { ascending: true })
-        : Promise.resolve({ data: [] }),
+            .order("id", { ascending: true })
+            .limit(1000).abortSignal(readSignal)
+        : Promise.resolve({ data: [], count: 0, error: null }),
       // Count admins to determine if caller is the only one
       supabase
         .from("politician_team")
         .select("*", { count: "exact", head: true })
         .eq("politician_id", politician.id)
-        .eq("role", "admin"),
+        .eq("role", "admin").abortSignal(readSignal),
     ]);
+
+    if (questionsError || totalQuestionsError || totalAnswersError || thisWeekError || draftsError || adminError ||
+      !questions || !rawDrafts || totalQuestions === null || totalAnswers === null || thisWeekQuestions === null || pendingDrafts === null || adminCount === null) return <DashboardUnavailable />;
 
     // Normalize rawDrafts (questions is a joined object)
     const drafts: DraftRow[] = (rawDrafts ?? []).map((d) => {
@@ -203,6 +204,11 @@ export default async function DashboardPage() {
         created_at: d.created_at,
         question_id: d.question_id,
         question_body: (q as { body: string } | null)?.body ?? "",
+        media: (d.answer_media ?? []).flatMap((media): DraftRow["media"] => {
+          const url = safeAnswerMediaUrl(media.public_url);
+          if (!url || !["image", "video", "audio"].includes(media.media_type)) return [];
+          return [{ id: media.id, media_type: media.media_type as "image" | "video" | "audio", public_url: url, file_name: media.file_name }];
+        }),
       };
     });
 
@@ -212,7 +218,7 @@ export default async function DashboardPage() {
       isOnlyAdmin: membership.role === "admin" && (adminCount ?? 0) <= 1,
       questions: (questions ?? []) as QuestionRow[],
       drafts,
-      participationRate: rateData as number | null,
+      pendingDrafts,
       stats: {
         totalQuestions: totalQuestions ?? 0,
         totalAnswers: totalAnswers ?? 0,
@@ -221,155 +227,69 @@ export default async function DashboardPage() {
     });
   }
 
-  return (
-    <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-3xl px-4 py-8 space-y-8">
-
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold">Politician Dashboard</h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Qualifying questions have 10+ net upvotes and count toward your public response rate.
-            </p>
+  return <DashboardShell>
+    {politiciansData.map(({ politician, role, isOnlyAdmin, questions, drafts, pendingDrafts, stats }) => {
+      const photoUrl = safeWebUrl(politician.photo_url);
+      const profileVerified = ["2", "3"].includes(politician.verification_tier);
+      const canPublish = profileVerified && ["admin", "editor"].includes(role);
+      return <section key={politician.id} className={styles.politician} aria-labelledby={`name-${politician.id}`}>
+        <header className={styles.profileHeader}>
+          <div className={styles.portrait}>
+            {photoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={photoUrl} alt="" loading="lazy" />
+            ) : politician.full_name.slice(0, 1).toUpperCase()}
           </div>
-          <Link
-            href="/verify"
-            className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2 shrink-0"
-          >
-            Manage verification
+          <div className={styles.profileIdentity}>
+            <div className={styles.badgeRow}><TierBadge tier={politician.verification_tier} /><span className={styles.eyebrow}>{role} access</span></div>
+            <h2 id={`name-${politician.id}`}><Link href={`/${politician.slug}`}>{politician.full_name}</Link></h2>
+            <p className={styles.identityMeta}>{[politician.office, politician.state, politician.party].filter(Boolean).join(" · ")}</p>
+          </div>
+          <Link href={!profileVerified ? `/verify?prefill=${politician.id}` : `/${politician.slug}`} className={styles.secondaryButton}>
+            {!profileVerified ? "Verify your identity" : "View public profile"} <span aria-hidden="true">↗</span>
           </Link>
+        </header>
+        {!profileVerified && <p className={styles.meta}>Complete identity verification before publishing official responses. You can prepare private drafts now.</p>}
+
+        <dl className={styles.summary}>
+          <div className={styles.stat}><dd><strong>{stats.thisWeekQuestions}</strong></dd><dt>active questions this week</dt></div>
+          <div className={styles.stat}><dd><strong>{stats.totalQuestions}</strong></dd><dt>active questions across all weeks</dt></div>
+          <div className={styles.stat}><dd><strong>{stats.totalAnswers}</strong></dd><dt>published official responses, all time</dt></div>
+        </dl>
+        <nav className={styles.sectionNav} aria-label={`${politician.full_name} dashboard sections`}>
+          <a href={`#inbox-${politician.id}`}>Questions & drafts</a>
+          <a href={`#settings-${politician.id}`}>Profile & team</a>
+          <Link href={`/${politician.slug}`}>Public response record ↗</Link>
+        </nav>
+
+        <div className={styles.workspace}>
+          <section className={styles.inbox} id={`inbox-${politician.id}`} aria-label="Questions and drafts">
+            {["admin", "editor"].includes(role) && drafts.length > 0 && <section className={styles.draftQueue} aria-label="Drafts awaiting approval">
+              <p className={styles.eyebrow}>{profileVerified ? "Review before publishing" : "Private until verified"}</p>
+              <h3>{pendingDrafts} private draft response{pendingDrafts !== 1 ? "s" : ""}</h3>
+              {pendingDrafts > drafts.length && <p className={styles.meta}>Showing the oldest {drafts.length} drafts. Publishing a draft makes room for the next one after refreshing.</p>}
+              <p className={styles.meta}>Only responses approved by an admin or editor of a verified profile appear publicly.</p>
+              {!profileVerified && <Link href={`/verify?prefill=${politician.id}`} className={styles.secondaryButton}>Verify identity to publish</Link>}
+              {drafts.map(draft => <article key={draft.id} className={styles.draft}>
+                <p className={styles.eyebrow}>Question</p>
+                <p className={styles.draftBody}>{draft.question_body}</p>
+                <p className={styles.eyebrow}>Draft response</p>
+                <p className={styles.draftBody}>{draft.body}</p>
+                {draft.media.length > 0 && <div><p className={styles.meta}>Private attachments. Approval publishes these with the response.</p><AnswerMediaDisplay media={draft.media} /></div>}
+                {canPublish && <DraftApproveButton answerId={draft.id} />}
+              </article>)}
+            </section>}
+            <DashboardQuestionInbox questions={questions} totalQuestions={stats.thisWeekQuestions} role={role} profileVerified={profileVerified} politicianSlug={politician.slug} politicianName={politician.full_name} cutoff48h={cutoff48h} />
+          </section>
+          <aside className={styles.settings} id={`settings-${politician.id}`} aria-label={`${politician.full_name} profile and team settings`}>
+            <h3 className={styles.sectionTitle}>Profile & team</h3>
+            <p className={styles.meta}>Your access: {role}. Changes here apply to {politician.full_name}.</p>
+            {role === "admin" && <ProfileEditor politicianId={politician.id} currentWebsiteUrl={politician.website_url} currentBio={politician.bio} currentSocialHandles={politician.social_handles as Record<string, string> | null} />}
+            <TeamManager politicianId={politician.id} callerRole={role} />
+            {role === "admin" && <div className={styles.panel}><DisconnectButton politicianId={politician.id} politicianName={politician.full_name} isOnlyAdmin={isOnlyAdmin} /></div>}
+          </aside>
         </div>
-
-        {politiciansData.map(({ politician, role, isOnlyAdmin, questions, drafts, participationRate, stats }) => {
-          const rateDisplay =
-            participationRate !== null ? `${Math.round(participationRate)}%` : "—";
-          const rateColor =
-            participationRate === null
-              ? "text-muted-foreground"
-              : participationRate >= 75
-              ? "text-green-600 dark:text-green-400"
-              : participationRate >= 40
-              ? "text-amber-600 dark:text-amber-400"
-              : "text-red-600 dark:text-red-400";
-
-          return (
-            <div key={politician.id} className="space-y-4">
-              {/* Politician header */}
-              <div className="flex items-center gap-4">
-                <div className="shrink-0 flex h-12 w-12 items-center justify-center rounded-full border bg-muted text-sm font-bold text-muted-foreground overflow-hidden">
-                  {politician.photo_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={politician.photo_url} alt={politician.full_name} className="h-full w-full object-cover" />
-                  ) : (
-                    politician.full_name.slice(0, 1).toUpperCase()
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <Link
-                      href={`/${politician.slug}`}
-                      className="font-semibold hover:underline underline-offset-2"
-                    >
-                      {politician.full_name}
-                    </Link>
-                    <TierBadge tier={politician.verification_tier} />
-                    <span className="text-xs text-muted-foreground capitalize">{role}</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground truncate">
-                    {[politician.office, politician.state].filter(Boolean).join(" · ")}
-                  </p>
-                </div>
-
-                {/* Analytics strip */}
-                <div className="flex gap-4 shrink-0 text-center">
-                  <div>
-                    <p className={`text-lg font-bold tabular-nums ${rateColor}`}>{rateDisplay}</p>
-                    <p className="text-xs text-muted-foreground">response rate</p>
-                  </div>
-                  <div className="border-l pl-4">
-                    <p className="text-lg font-bold tabular-nums">{stats.thisWeekQuestions}</p>
-                    <p className="text-xs text-muted-foreground">this week</p>
-                  </div>
-                  <div className="border-l pl-4">
-                    <p className="text-lg font-bold tabular-nums">{stats.totalAnswers}</p>
-                    <p className="text-xs text-muted-foreground">answered</p>
-                  </div>
-                </div>
-
-                {/* Verification prompt for tier < 2 */}
-                {parseInt(politician.verification_tier) < 2 && (
-                  <Link
-                    href="/verify"
-                    className="shrink-0 inline-flex items-center gap-1 rounded-md border border-amber-300 bg-amber-50 dark:border-amber-700 dark:bg-amber-950/30 px-3 py-1.5 text-xs font-medium text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-colors"
-                  >
-                    ⚠️ Verify identity
-                  </Link>
-                )}
-              </div>
-
-              {/* Draft queue (admin/editor only) */}
-              {["admin", "editor"].includes(role) && drafts.length > 0 && (
-                <div className="rounded-xl border border-amber-200 bg-amber-50/50 dark:border-amber-800 dark:bg-amber-950/20 overflow-hidden">
-                  <div className="px-4 py-3 border-b border-amber-200 dark:border-amber-800">
-                    <p className="text-sm font-medium text-amber-800 dark:text-amber-300">
-                      {drafts.length} draft response{drafts.length !== 1 ? "s" : ""} awaiting approval
-                    </p>
-                    <p className="text-xs text-amber-700 dark:text-amber-400 mt-0.5">
-                      Submitted by a responder. Review and approve to publish.
-                    </p>
-                  </div>
-                  <div className="divide-y divide-amber-200 dark:divide-amber-800">
-                    {drafts.map((draft) => (
-                      <div key={draft.id} className="px-4 py-4 space-y-2">
-                        <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Question</p>
-                        <p className="text-sm text-muted-foreground">{draft.question_body}</p>
-                        <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide mt-2">Draft Response</p>
-                        <p className="text-sm">{draft.body}</p>
-                        <div className="pt-1">
-                          <DraftApproveButton answerId={draft.id} />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Question inbox */}
-              <DashboardQuestionInbox
-                questions={questions}
-                role={role}
-                politicianSlug={politician.slug}
-                politicianName={politician.full_name}
-                cutoff48h={cutoff48h}
-              />
-
-              {/* Profile editing (admin only) */}
-              {role === "admin" && (
-                <ProfileEditor
-                  politicianId={politician.id}
-                  currentWebsiteUrl={politician.website_url}
-                  currentBio={politician.bio}
-                  currentSocialHandles={politician.social_handles as Record<string, string> | null}
-                />
-              )}
-
-              {/* Team Management */}
-              <TeamManager politicianId={politician.id} callerRole={role} />
-
-              {/* Disconnect from this profile */}
-              {role === "admin" && (
-                <div className="pt-2 border-t">
-                  <DisconnectButton
-                    politicianId={politician.id}
-                    politicianName={politician.full_name}
-                    isOnlyAdmin={isOnlyAdmin}
-                  />
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
+      </section>;
+    })}
+  </DashboardShell>;
 }

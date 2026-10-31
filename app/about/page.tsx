@@ -1,115 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-
-export const metadata: Metadata = {
-  title: "About | WhyTho",
-  description:
-    "WhyTho is a civic accountability platform where the public asks questions of elected officials and silence is always visible.",
-};
-
+import { PublicPage } from "@/components/public/public-layout";
+import styles from "@/components/public/public.module.css";
+export const metadata: Metadata = { title: "About | WhyTho", description: "A public place to ask politicians questions and explore their response records." };
 export default function AboutPage() {
-  return (
-    <main className="min-h-screen bg-background">
-      <div className="mx-auto max-w-2xl px-4 py-12 space-y-10">
-
-        <div className="space-y-3">
-          <Link href="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-            ← Back to home
-          </Link>
-          <h1 className="text-3xl font-bold tracking-tight">About WhyTho</h1>
-          <p className="text-lg text-muted-foreground">
-            A civic accountability platform where silence is its own answer.
-          </p>
-        </div>
-
-        <div className="prose prose-sm dark:prose-invert max-w-none space-y-6">
-
-          <section className="space-y-3">
-            <h2 className="text-xl font-semibold">The Problem</h2>
-            <p className="text-muted-foreground leading-relaxed">
-              Elected officials are supposed to be accountable to the people who elected them.
-              But in practice, constituents rarely get direct answers to direct questions, and
-              when a politician dodges, changes the subject, or goes silent, there&apos;s no
-              permanent record of that silence.
-            </p>
-            <p className="text-muted-foreground leading-relaxed">
-              WhyTho fixes that.
-            </p>
-          </section>
-
-          <section className="space-y-3">
-            <h2 className="text-xl font-semibold">What We Do</h2>
-            <p className="text-muted-foreground leading-relaxed">
-              We track every US elected official: federal representatives, senators, governors,
-              and state legislators. Anyone can submit a question, and the community upvotes the
-              ones that matter most. Questions that reach 10+ net votes become
-              &ldquo;qualifying&rdquo;: ones that politicians are publicly expected to answer.
-            </p>
-            <p className="text-muted-foreground leading-relaxed">
-              Every week, we record each politician&apos;s response rate: how many qualifying
-              questions they answered vs. how many they ignored. That record is permanent. It
-              follows them.
-            </p>
-          </section>
-
-          <section className="space-y-3">
-            <h2 className="text-xl font-semibold">The Weekly Cycle</h2>
-            <p className="text-muted-foreground leading-relaxed">
-              Every Monday at midnight Eastern, the week resets. Questions are archived, scores
-              are locked in, and a fresh week begins. Politicians who answered their qualifying
-              questions carry a strong response rate. Those who went silent carry that record too.
-            </p>
-          </section>
-
-          <section className="space-y-3">
-            <h2 className="text-xl font-semibold">For Politicians</h2>
-            <p className="text-muted-foreground leading-relaxed">
-              Any elected official can claim their profile and respond directly to questions from
-              constituents. Verified officials get a checkmark and the ability to post answers
-              in their own voice. Responding builds trust, and the platform surfaces that to
-              constituents actively.
-            </p>
-            <Link
-              href="/verify"
-              className="inline-flex items-center text-sm font-medium text-foreground hover:underline"
-            >
-              Claim your profile →
-            </Link>
-          </section>
-
-          <section className="space-y-3">
-            <h2 className="text-xl font-semibold">Built by Quinnivations LLC</h2>
-            <p className="text-muted-foreground leading-relaxed">
-              WhyTho is an independent civic tech project. We have no affiliation with any
-              political party, PAC, or government agency. We believe informed voters and
-              accountable officials make democracy work better for everyone.
-            </p>
-          </section>
-
-        </div>
-
-        <div className="flex flex-wrap gap-3 pt-4 border-t">
-          <Link
-            href="/how-it-works"
-            className="rounded-lg border px-4 py-2 text-sm font-medium hover:bg-muted transition-colors"
-          >
-            How It Works
-          </Link>
-          <Link
-            href="/faq"
-            className="rounded-lg border px-4 py-2 text-sm font-medium hover:bg-muted transition-colors"
-          >
-            FAQ
-          </Link>
-          <Link
-            href="/leaderboard"
-            className="rounded-lg border px-4 py-2 text-sm font-medium hover:bg-muted transition-colors"
-          >
-            View Leaderboard
-          </Link>
-        </div>
-
-      </div>
-    </main>
-  );
+  return <PublicPage title="Public office. Public questions." kicker="About WhyTho" description="A direct question deserves a place on the record.">
+    <div className={styles.reading}>
+      <section><h2>Start with the person.</h2><p>WhyTho brings questions to the people who hold public office and those seeking it. Find a politician, read what people are asking, and add the question you want answered.</p><p>Profiles exist independently of whether a politician has joined. A listing is not an endorsement by the person or by WhyTho.</p></section>
+      <section><h2>Make the question count.</h2><p>The community votes on current questions. Questions with at least ten net votes qualify for the response-rate calculation. Politicians and their teams can publish responses on their profiles.</p></section>
+      <section><h2>Read the record carefully.</h2><p>Published official responses, AI analysis, and suggested questions have different labels. AI analysis never counts as an official response. The absence of a recorded response does not prove that a politician saw or declined a question.</p><p>Each record shows its reporting period. Missing data stays unknown, and a politician with no qualifying questions has no response rate for that period.</p></section>
+      <section><h2>Have a public role?</h2><p>Claim your profile and complete verification to participate as a politician or authorized team member.</p><Link className={styles.button} href="/verify">Claim your profile →</Link></section>
+      <section><h2>Independent civic engagement.</h2><p>WhyTho is an independent civic technology project. The questions and response records use the same rules across political parties.</p><div className={styles.actions}><Link href="/how-it-works">How it works →</Link><Link href="/faq">Common questions →</Link></div></section>
+    </div>
+  </PublicPage>;
 }

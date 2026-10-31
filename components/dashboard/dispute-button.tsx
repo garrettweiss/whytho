@@ -2,6 +2,8 @@
 
 import { useState, useTransition } from "react";
 
+import styles from "./dashboard.module.css";
+
 export function DisputeClientButton({ answerId }: { answerId: string }) {
   const [disputed, setDisputed] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -30,7 +32,7 @@ export function DisputeClientButton({ answerId }: { answerId: string }) {
 
   if (disputed) {
     return (
-      <p className="text-xs text-orange-600 font-medium">⚠️ Disputed — flagged for admin review within 48h</p>
+      <p role="status" className={`${styles.meta} ${styles.warning}`}>Disputed. Flagged for admin review within 48 hours.</p>
     );
   }
 
@@ -40,11 +42,11 @@ export function DisputeClientButton({ answerId }: { answerId: string }) {
         type="button"
         onClick={handleDispute}
         disabled={isPending}
-        className="self-start text-xs text-muted-foreground hover:text-destructive underline underline-offset-2 transition-colors disabled:opacity-50"
+        className={styles.textButton}
       >
         {isPending ? "Submitting…" : "Dispute this analysis"}
       </button>
-      {error && <p className="text-xs text-destructive">{error}</p>}
+      {error && <p role="alert" className={`${styles.meta} ${styles.error}`}>{error}</p>}
     </div>
   );
 }

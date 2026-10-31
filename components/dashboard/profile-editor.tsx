@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useId, useState, useTransition } from "react";
+
+import styles from "./dashboard.module.css";
 
 interface SocialHandles {
   x?: string;
@@ -17,6 +19,7 @@ interface Props {
 }
 
 export function ProfileEditor({ politicianId, currentWebsiteUrl, currentBio, currentSocialHandles }: Props) {
+  const fieldId = useId();
   const handles = currentSocialHandles ?? {};
   const [isOpen, setIsOpen] = useState(false);
   const [websiteUrl, setWebsiteUrl] = useState(currentWebsiteUrl ?? "");
@@ -64,113 +67,40 @@ export function ProfileEditor({ politicianId, currentWebsiteUrl, currentBio, cur
     });
   }
 
-  return (
-    <div className="rounded-xl border bg-card overflow-hidden">
-      <button
-        type="button"
-        onClick={() => setIsOpen((o) => !o)}
-        className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium hover:bg-muted/50 transition-colors"
-      >
-        <span>Edit Profile</span>
-        <span className="text-muted-foreground text-xs">{isOpen ? "▲" : "▼"}</span>
-      </button>
-
-      {isOpen && (
-        <div className="border-t px-4 py-4 space-y-4 bg-muted/10">
-          <div className="space-y-1.5">
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide" htmlFor="website-url">
-              Website URL
-            </label>
-            <input
-              id="website-url"
-              type="url"
-              value={websiteUrl}
-              onChange={(e) => setWebsiteUrl(e.target.value)}
-              placeholder="https://yourwebsite.gov"
-              className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-            />
-            <p className="text-xs text-muted-foreground">
-              Required for website meta tag verification.
-            </p>
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide" htmlFor="bio">
-              Bio
-            </label>
-            <textarea
-              id="bio"
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
-              placeholder="A brief description visible on your public profile."
-              rows={3}
-              maxLength={1000}
-              className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none"
-            />
-            <p className="text-xs text-muted-foreground text-right">{bio.length}/1000</p>
-          </div>
-
-          {/* Social accounts */}
-          <div className="space-y-3">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Social Accounts</p>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <span className="text-sm w-24 shrink-0 text-muted-foreground">Instagram</span>
-                <input
-                  type="text"
-                  value={instagram}
-                  onChange={(e) => setInstagram(e.target.value)}
-                  placeholder="@yourhandle"
-                  className="flex-1 rounded-md border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm w-24 shrink-0 text-muted-foreground">Facebook</span>
-                <input
-                  type="text"
-                  value={facebook}
-                  onChange={(e) => setFacebook(e.target.value)}
-                  placeholder="facebook.com/yourpage or page name"
-                  className="flex-1 rounded-md border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm w-24 shrink-0 text-muted-foreground">TikTok</span>
-                <input
-                  type="text"
-                  value={tiktok}
-                  onChange={(e) => setTiktok(e.target.value)}
-                  placeholder="@yourhandle"
-                  className="flex-1 rounded-md border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                />
-              </div>
-            </div>
-            <p className="text-xs text-muted-foreground">Display only — links shown on your public profile.</p>
-          </div>
-
-          {error && <p className="text-sm text-destructive">{error}</p>}
-          {saved && <p className="text-sm text-green-600 dark:text-green-400">✓ Profile updated</p>}
-
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={handleSave}
-              disabled={isPending}
-              className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50"
-            >
-              {isPending ? "Saving…" : "Save Changes"}
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsOpen(false)}
-              disabled={isPending}
-              className="rounded-md border px-4 py-2 text-sm font-medium hover:bg-muted transition-colors disabled:opacity-50"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
-  );
+  return <section className={styles.panel}>
+    <button type="button" onClick={() => setIsOpen(o => !o)} aria-expanded={isOpen} aria-controls={`${fieldId}-panel`} className={styles.panelToggle}>
+      <span>Edit public profile</span><span aria-hidden="true">{isOpen ? "−" : "+"}</span>
+    </button>
+    {saved && <p role="status" className={`${styles.meta} ${styles.success}`}>Profile updated.</p>}
+    {isOpen && <div id={`${fieldId}-panel`} className={styles.panelBody}>
+      <div className={styles.field}>
+        <label htmlFor={`${fieldId}-website`}>Website URL</label>
+        <input id={`${fieldId}-website`} type="url" value={websiteUrl} onChange={e => setWebsiteUrl(e.target.value)} placeholder="https://yourwebsite.gov" />
+        <p>Required for website meta tag verification.</p>
+      </div>
+      <div className={styles.field}>
+        <label htmlFor={`${fieldId}-bio`}>Public bio</label>
+        <textarea id={`${fieldId}-bio`} value={bio} onChange={e => setBio(e.target.value)} placeholder="A brief description visible on your public profile." rows={5} maxLength={1000} />
+        <p>{bio.length}/1000 characters</p>
+      </div>
+      <div className={styles.field}>
+        <label htmlFor={`${fieldId}-instagram`}>Instagram</label>
+        <input id={`${fieldId}-instagram`} type="text" value={instagram} onChange={e => setInstagram(e.target.value)} placeholder="@yourhandle" />
+      </div>
+      <div className={styles.field}>
+        <label htmlFor={`${fieldId}-facebook`}>Facebook</label>
+        <input id={`${fieldId}-facebook`} type="text" value={facebook} onChange={e => setFacebook(e.target.value)} placeholder="facebook.com/yourpage or page name" />
+      </div>
+      <div className={styles.field}>
+        <label htmlFor={`${fieldId}-tiktok`}>TikTok</label>
+        <input id={`${fieldId}-tiktok`} type="text" value={tiktok} onChange={e => setTiktok(e.target.value)} placeholder="@yourhandle" />
+        <p>These links appear on your public profile.</p>
+      </div>
+      {error && <p role="alert" className={`${styles.meta} ${styles.error}`}>{error}</p>}
+      <div className={styles.actions}>
+        <button type="button" onClick={handleSave} disabled={isPending} className={styles.button}>{isPending ? "Saving…" : "Save changes"}</button>
+        <button type="button" onClick={() => setIsOpen(false)} disabled={isPending} className={styles.secondaryButton}>Cancel</button>
+      </div>
+    </div>}
+  </section>;
 }

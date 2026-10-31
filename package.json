@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "test": "tsx --test lib/directory/*.test.ts lib/profile/*.test.ts lib/leaderboard/*.test.ts lib/elections/*.test.ts components/questions/*.test.ts components/auth/*.test.ts components/answers/*.test.ts components/verify/*.test.ts scripts/release-integration.test.ts",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {

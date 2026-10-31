@@ -2,21 +2,21 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { getResend, FROM_EMAIL } from "@/lib/email/resend";
 import { qualifyingQuestionAlertEmail } from "@/lib/email/templates";
+import { z } from "zod";
+import { getVoteEligibilityError, isValidIsoWeek } from "@/lib/profile/helpers";
 
-interface VoteBody {
-  question_id: string;
-  week_number: number;
-  value: 1 | -1 | null; // null = remove vote
-}
+const voteBodySchema = z.object({
+  question_id: z.string().uuid(),
+  week_number: z.number().int().refine(isValidIsoWeek),
+  value: z.union([z.literal(1), z.literal(-1), z.null()]),
+});
 
 export async function POST(request: NextRequest) {
   try {
-    const body = (await request.json()) as VoteBody;
-    const { question_id, week_number, value } = body;
-
-    if (!question_id || !week_number) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
-    }
+    const body: unknown = await request.json().catch(() => null);
+    const parsedBody = voteBodySchema.safeParse(body);
+    if (!parsedBody.success) return NextResponse.json({ error: "Invalid vote request" }, { status: 400 });
+    const { question_id, week_number, value } = parsedBody.data;
 
     const supabase = await createClient();
     const {
@@ -25,6 +25,24 @@ export async function POST(request: NextRequest) {
 
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Validate before either branch, including removal of an existing vote.
+    const signal = AbortSignal.timeout(8_000);
+    const [questionResult, weekResult] = await Promise.all([
+      supabase.from("questions")
+        .select("status,week_number")
+        .eq("id", question_id)
+        .abortSignal(signal)
+        .maybeSingle(),
+      supabase.rpc("current_week_number").abortSignal(signal),
+    ]);
+    if (questionResult.error || weekResult.error || typeof weekResult.data !== "number" || !isValidIsoWeek(weekResult.data)) {
+      return NextResponse.json({ error: "Voting is temporarily unavailable. Please try again." }, { status: 503 });
+    }
+    const eligibilityError = getVoteEligibilityError(questionResult.data, week_number, weekResult.data);
+    if (eligibilityError) {
+      return NextResponse.json({ error: eligibilityError.error }, { status: eligibilityError.status });
     }
 
     if (value === null) {
@@ -41,10 +59,6 @@ export async function POST(request: NextRequest) {
       }
 
       return NextResponse.json({ success: true });
-    }
-
-    if (value !== 1 && value !== -1) {
-      return NextResponse.json({ error: "Invalid vote value" }, { status: 400 });
     }
 
     // Rate limit: 30 votes per user per 10 minutes (new votes only — not toggles)

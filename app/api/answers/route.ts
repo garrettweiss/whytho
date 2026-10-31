@@ -13,9 +13,9 @@
  *   }
  *
  * Role logic:
- *   admin  → may submit "direct" (politician's own voice) or "team_statement"
- *   editor → "team_statement" only
- *   responder → "team_statement" only
+ *   admin/editor → publish only for a verified profile (tier 2 or 3)
+ *   responder → private drafts only
+ *   unverified profiles → private drafts regardless of team role
  *
  * Returns: { success: true, answer_id: string }
  */
@@ -93,30 +93,33 @@ export async function POST(request: NextRequest) {
     .eq("user_id", user.id)
     .maybeSingle();
 
-  if (!membership) {
+  if (!membership || !["admin", "editor", "responder"].includes(membership.role)) {
     return NextResponse.json(
       { error: "You are not authorized to answer for this politician" },
       { status: 403 }
     );
   }
 
-  // Determine answer_type — direct and team_statement are treated identically.
-  // Responders always go to draft; admins and editors publish live as "direct".
-  const role = membership.role;
-  let answerType: "direct" | "team_statement";
-
-  if (body.answer_type === "direct") {
-    if (role === "responder") {
-      return NextResponse.json(
-        { error: "Responders must submit drafts for review" },
-        { status: 403 }
-      );
-    }
-    answerType = "direct";
-  } else {
-    // Default: admins + editors → direct, responders → team_statement (draft)
-    answerType = role !== "responder" ? "direct" : "team_statement";
+  const { data: politician, error: politicianError } = await admin
+    .from("politicians")
+    .select("verification_tier")
+    .eq("id", question.politician_id)
+    .single();
+  if (politicianError || !politician) {
+    return NextResponse.json({ error: "Could not confirm profile verification. Please try again." }, { status: 503 });
   }
+
+  // A self-claimed identity may prepare drafts but cannot speak officially.
+  const profileVerified = ["2", "3"].includes(politician.verification_tier);
+  const role = membership.role;
+  if (body.answer_type === "direct" && role === "responder") {
+    return NextResponse.json(
+      { error: "Responders must submit drafts for review" },
+      { status: 403 }
+    );
+  }
+  const isDraft = !profileVerified || role === "responder";
+  const answerType = isDraft ? "team_statement" : "direct";
 
   // Validate sources if provided
   const sources: string[] = [];
@@ -127,9 +130,6 @@ export async function POST(request: NextRequest) {
       }
     }
   }
-
-  // Responders submit drafts; admins/editors go live immediately
-  const isDraft = role === "responder";
 
   // Idempotency: check if this politician already has a live answer for this question
   const { data: existing } = await admin

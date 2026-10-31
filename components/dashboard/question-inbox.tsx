@@ -5,6 +5,7 @@ import Link from "next/link";
 import { AnswerComposer } from "@/components/answers/answer-composer";
 import { AnswerEditButton } from "@/components/dashboard/answer-edit-button";
 import { DisputeClientButton } from "@/components/dashboard/dispute-button";
+import styles from "./dashboard.module.css";
 
 const QUALIFYING_THRESHOLD = 10;
 
@@ -14,6 +15,7 @@ export type InboxQuestion = {
   net_upvotes: number;
   week_number: number;
   created_at: string;
+  is_seeded: boolean;
   answers: {
     id: string;
     answer_type: string;
@@ -35,12 +37,16 @@ function hasOfficialAnswer(q: InboxQuestion): boolean {
 function QuestionCard({
   question,
   isAdmin,
+  profileVerified,
+  canPublish,
   politicianSlug,
   politicianName,
   isNew,
 }: {
   question: InboxQuestion;
   isAdmin: boolean;
+  profileVerified: boolean;
+  canPublish: boolean;
   politicianSlug: string;
   politicianName: string;
   isNew: boolean;
@@ -49,87 +55,40 @@ function QuestionCard({
     (a) => ["direct", "team_statement"].includes(a.answer_type) && !a.is_ai_generated && !a.is_draft
   );
   const aiAnswer = question.answers.find(
-    (a) => a.answer_type === "ai_analysis" && a.is_ai_generated
+    (a) => a.answer_type === "ai_analysis" && a.is_ai_generated && !a.is_draft
   );
   const isQualifying = question.net_upvotes >= QUALIFYING_THRESHOLD;
 
-  return (
-    <div className="rounded-xl border bg-card shadow-sm overflow-hidden">
-      <div className="p-4 border-b bg-muted/30">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1 flex-wrap">
-              {isNew && (
-                <span className="inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-900/40 px-2 py-0.5 text-xs font-semibold text-blue-700 dark:text-blue-300">
-                  New
-                </span>
-              )}
-              {isQualifying ? (
-                <span className="inline-flex items-center rounded-full bg-amber-100 dark:bg-amber-900/30 px-2 py-0.5 text-xs font-semibold text-amber-700 dark:text-amber-400">
-                  ⚡ Qualifying
-                </span>
-              ) : (
-                <span className="text-xs text-muted-foreground">
-                  {question.net_upvotes} vote{question.net_upvotes !== 1 ? "s" : ""} — not yet qualifying
-                </span>
-              )}
-            </div>
-            <p className="text-sm font-medium leading-snug">{question.body}</p>
-          </div>
-          <div className="shrink-0 flex flex-col items-end gap-2">
-            <span className="text-xs font-semibold tabular-nums text-muted-foreground">
-              ▲ {question.net_upvotes}
-            </span>
-            <Link
-              href={`/${politicianSlug}#question-${question.id}`}
-              className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2 whitespace-nowrap"
-              target="_blank"
-            >
-              View on profile →
-            </Link>
-          </div>
+  return <article className={styles.question} aria-label="Constituent question">
+    <header className={styles.questionHeader}>
+      <div>
+        <div className={styles.badgeRow}>
+          {isNew && <span className={styles.badge}>New</span>}
+          {isQualifying ? <span className={styles.badge}>Qualifying question</span> : <span className={styles.meta}>Below 10 net upvotes</span>}
         </div>
+        {question.is_seeded && <p className={styles.meta}>📋 Suggested Question — AI-generated from public record</p>}
+        <p className={styles.questionBody}>{question.body}</p>
       </div>
-
-      <div className="p-4 space-y-3">
-        {officialAnswer && (
-          <div className="space-y-1">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-              ✓ Official Response
-            </p>
-            <p className="text-sm leading-relaxed">{officialAnswer.body}</p>
-            <AnswerEditButton
-              answerId={officialAnswer.id}
-              initialBody={officialAnswer.body}
-              createdAt={officialAnswer.created_at}
-            />
-          </div>
-        )}
-
-        {aiAnswer && (
-          <div className="rounded-lg border border-muted bg-muted/20 px-3 py-3 space-y-2">
-            <p className="text-xs font-medium text-muted-foreground">
-              🤖 AI Analysis of Public Record
-            </p>
-            <p className="text-xs text-muted-foreground leading-relaxed line-clamp-3">
-              {aiAnswer.body}
-            </p>
-            <DisputeClientButton answerId={aiAnswer.id} />
-          </div>
-        )}
-
-        {!officialAnswer && (
-          <AnswerComposer
-            questionId={question.id}
-            questionBody={question.body}
-            politicianSlug={politicianSlug}
-            politicianName={politicianName}
-            isAdmin={isAdmin}
-          />
-        )}
+      <div className={styles.questionAside}>
+        <p className={styles.meta}>{question.net_upvotes} net upvote{question.net_upvotes !== 1 ? "s" : ""}</p>
+        <Link href={`/${politicianSlug}#question-${question.id}`} className={styles.textButton} target="_blank" rel="noopener noreferrer">View on profile ↗<span className="sr-only"> (opens in a new tab)</span></Link>
       </div>
-    </div>
-  );
+    </header>
+
+    {officialAnswer && <div className={styles.answer}>
+      <p className={`${styles.eyebrow} ${styles.success}`}>Official response</p>
+      <p className={styles.answerBody}>{officialAnswer.body}</p>
+      {canPublish && <AnswerEditButton answerId={officialAnswer.id} initialBody={officialAnswer.body} createdAt={officialAnswer.created_at} />}
+    </div>}
+    {aiAnswer && <div className={styles.analysis}>
+      <p className={styles.eyebrow}>🤖 AI Analysis of Public Record</p>
+      <p className={styles.analysisBody}>{aiAnswer.body}</p>
+      <DisputeClientButton answerId={aiAnswer.id} />
+    </div>}
+    {!officialAnswer && <div className={styles.composer}>
+      <AnswerComposer questionId={question.id} questionBody={question.body} politicianSlug={politicianSlug} politicianName={politicianName} isAdmin={isAdmin} profileVerified={profileVerified} canPublish={canPublish} />
+    </div>}
+  </article>;
 }
 
 const FILTERS: { key: Filter; label: string }[] = [
@@ -141,19 +100,24 @@ const FILTERS: { key: Filter; label: string }[] = [
 
 export function DashboardQuestionInbox({
   questions,
+  totalQuestions,
   role,
+  profileVerified,
   politicianSlug,
   politicianName,
   cutoff48h,
 }: {
   questions: InboxQuestion[];
+  totalQuestions: number;
   role: string;
+  profileVerified: boolean;
   politicianSlug: string;
   politicianName: string;
   cutoff48h: string;
 }) {
   const [filter, setFilter] = useState<Filter>("all");
   const isAdmin = role === "admin";
+  const canPublish = profileVerified && ["admin", "editor"].includes(role);
 
   const qualifying = questions.filter((q) => q.net_upvotes >= QUALIFYING_THRESHOLD);
   const unansweredQualifying = qualifying.filter((q) => !hasOfficialAnswer(q));
@@ -167,93 +131,25 @@ export function DashboardQuestionInbox({
 
   const sorted = [...filtered].sort((a, b) => b.net_upvotes - a.net_upvotes);
 
-  return (
-    <div className="space-y-3">
-      {/* Header + filter tabs */}
-      <div className="flex items-start justify-between gap-3 flex-wrap">
-        <div>
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-sm text-muted-foreground">
-              {questions.length} question{questions.length !== 1 ? "s" : ""} this week
-            </span>
-            {unansweredQualifying.length > 0 ? (
-              <span className="text-sm font-medium text-amber-600 dark:text-amber-400">
-                · {unansweredQualifying.length} qualifying unanswered
-              </span>
-            ) : qualifying.length > 0 ? (
-              <span className="text-sm font-medium text-green-600 dark:text-green-400">
-                · All qualifying answered ✓
-              </span>
-            ) : null}
-          </div>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {qualifying.length} of {questions.length} questions have 10+ votes and count toward your response rate.
-          </p>
-        </div>
+  const isLimited = totalQuestions > questions.length;
 
-        {/* Filter tabs */}
-        <div className="flex items-center gap-1 rounded-lg bg-muted p-0.5">
-          {FILTERS.map(({ key, label }) => {
-            const count =
-              key === "all" ? questions.length :
-              key === "qualifying" ? qualifying.length :
-              key === "unanswered" ? questions.filter((q) => !hasOfficialAnswer(q)).length :
-              questions.filter((q) => hasOfficialAnswer(q)).length;
-
-            return (
-              <button
-                key={key}
-                onClick={() => setFilter(key)}
-                className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
-                  filter === key
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {label}
-                {count > 0 && (
-                  <span className={`ml-1 tabular-nums ${filter === key ? "text-foreground" : "text-muted-foreground"}`}>
-                    {count}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Question cards */}
-      {sorted.length === 0 ? (
-        <div className="rounded-xl border bg-card p-8 text-center">
-          <p className="text-muted-foreground text-sm">
-            {filter === "qualifying"
-              ? "No qualifying questions yet. Questions need 10+ net upvotes."
-              : filter === "unanswered"
-              ? "No unanswered questions — all caught up."
-              : filter === "answered"
-              ? "No answered questions yet."
-              : "No questions this week yet."}
-          </p>
-          {filter === "qualifying" && (
-            <p className="text-xs text-muted-foreground mt-1">
-              Your public response rate is based on questions that reach 10+ votes.
-            </p>
-          )}
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {sorted.map((question) => (
-            <QuestionCard
-              key={question.id}
-              question={question}
-              isAdmin={isAdmin}
-              politicianSlug={politicianSlug}
-              politicianName={politicianName}
-              isNew={question.created_at > cutoff48h}
-            />
-          ))}
-        </div>
-      )}
+  return <div>
+    <div className={styles.inboxHeader}>
+      <h3 className={styles.sectionTitle}>This week’s questions</h3>
+      <p className={styles.meta}>{isLimited ? `Showing the top ${questions.length} of ${totalQuestions} active questions by net upvotes.` : `${questions.length} active question${questions.length !== 1 ? "s" : ""} this week.`}</p>
+      <p className={styles.meta}>{qualifying.length} {isLimited ? "shown " : ""}question{qualifying.length !== 1 ? "s have" : " has"} at least 10 net upvotes. {unansweredQualifying.length} of those have no published official response.</p>
+      <p className={styles.meta}>Questions with 10+ net upvotes count toward the public response rate. AI analysis and unpublished drafts do not count as official responses.</p>
+      {isLimited && <p className={styles.meta}>Filters apply to these {questions.length} loaded questions.</p>}
     </div>
-  );
+    <div className={styles.filters} role="group" aria-label="Filter loaded questions">
+      {FILTERS.map(({ key, label }) => {
+        const count = key === "all" ? questions.length : key === "qualifying" ? qualifying.length : key === "unanswered" ? questions.filter(q => !hasOfficialAnswer(q)).length : questions.filter(q => hasOfficialAnswer(q)).length;
+        return <button key={key} type="button" onClick={() => setFilter(key)} aria-pressed={filter === key} className={styles.filter}>{label} <span>{count}</span></button>;
+      })}
+    </div>
+    <p className="sr-only" role="status">{sorted.length} {filter} question{sorted.length !== 1 ? "s" : ""} shown.</p>
+    {sorted.length === 0 ? <div className={styles.empty}>
+      <p>{filter === "qualifying" ? "No questions in this view have reached 10 net upvotes yet." : filter === "unanswered" ? "Every question in this view has an official response." : filter === "answered" ? "No official responses in this view yet." : "No questions this week yet."}</p>
+    </div> : <div>{sorted.map(question => <QuestionCard key={question.id} question={question} isAdmin={isAdmin} profileVerified={profileVerified} canPublish={canPublish} politicianSlug={politicianSlug} politicianName={politicianName} isNew={question.created_at > cutoff48h} />)}</div>}
+  </div>;
 }

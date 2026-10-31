@@ -1,9 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useState, useEffect, useRef } from "react";
+import styles from "@/components/account/account.module.css";
 import { createClient } from "@/lib/supabase/client";
 
 /**
@@ -31,6 +29,10 @@ export function SignInForm({ redirectAfter = "/" }: { redirectAfter?: string }) 
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [loadingMethod, setLoadingMethod] = useState<"google" | "email" | null>(null);
+  const confirmationRef = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => { if (emailSent) confirmationRef.current?.focus(); }, [emailSent]);
 
   // Detect if visitor already has an anonymous session
   useEffect(() => {
@@ -43,6 +45,7 @@ export function SignInForm({ redirectAfter = "/" }: { redirectAfter?: string }) 
   // ── Google ────────────────────────────────────────────────────────────────
 
   async function handleGoogleSignIn() {
+    setLoadingMethod("google");
     setLoading(true);
     setError(null);
     setInfo(null);
@@ -59,7 +62,7 @@ export function SignInForm({ redirectAfter = "/" }: { redirectAfter?: string }) 
       });
 
       if (!linkError) {
-        // linkIdentity redirects the browser — nothing more to do here
+        // linkIdentity redirects the browser, so there is nothing more to do here.
         return;
       }
 
@@ -72,7 +75,7 @@ export function SignInForm({ redirectAfter = "/" }: { redirectAfter?: string }) 
         linkError.status === 422
       ) {
         setInfo(
-          "This Google account is already linked to a WhyTho account. Signing you in now…"
+          "This Google account is already linked to a WhyTho account. Signing you in now. Votes from this anonymous session will not be merged."
         );
         // Brief pause so user sees the message
         await new Promise((r) => setTimeout(r, 1500));
@@ -89,13 +92,14 @@ export function SignInForm({ redirectAfter = "/" }: { redirectAfter?: string }) 
       setError("Google sign-in failed. Please try again.");
       setLoading(false);
     }
-    // On success the browser redirects — no need to setLoading(false)
+    // On success the browser redirects, so loading stays active.
   }
 
   // ── Email / Magic link ────────────────────────────────────────────────────
 
   async function handleMagicLink(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setLoadingMethod("email");
     setLoading(true);
     setError(null);
     setInfo(null);
@@ -131,7 +135,7 @@ export function SignInForm({ redirectAfter = "/" }: { redirectAfter?: string }) 
         return;
       }
 
-      // Unexpected error — fall through to standard magic link
+      // Unexpected errors fall through to the standard magic link.
     }
 
     // Standard magic link (non-anonymous, or fallback)
@@ -150,102 +154,35 @@ export function SignInForm({ redirectAfter = "/" }: { redirectAfter?: string }) 
     setLoading(false);
   }
 
-  // ── Render ────────────────────────────────────────────────────────────────
-
   if (emailSent) {
-    return (
-      <div className="rounded-lg border bg-card p-6 text-center space-y-2">
-        <p className="font-medium">Check your email</p>
-        <p className="text-sm text-muted-foreground">
-          We sent you a link. Click it to{" "}
-          {isAnonymous ? "finish setting up your account" : "sign in"}.
-        </p>
-      </div>
-    );
+    return <section className={styles.confirmation} aria-labelledby="sign-in-confirmation">
+      <h2 ref={confirmationRef} tabIndex={-1} id="sign-in-confirmation">Check your email.</h2>
+      <p role="status">Check your inbox for a link to {isAnonymous ? "finish setting up your account" : "sign in"}. Keep this page open while you look for it.</p>
+    </section>;
   }
 
-  return (
-    <div className="space-y-4">
-      {/* Context banner for anonymous upgrade */}
-      {isAnonymous && (
-        <div className="rounded-md border border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/30 px-3 py-2">
-          <p className="text-xs text-blue-800 dark:text-blue-300">
-            Your votes are saved. Create an account to submit questions and
-            keep your history permanently.
-          </p>
-        </div>
-      )}
-
-      {info && (
-        <p className="text-sm text-muted-foreground text-center">{info}</p>
-      )}
-
-      {/* Google */}
-      <Button
-        type="button"
-        variant="outline"
-        className="w-full"
-        onClick={handleGoogleSignIn}
-        disabled={loading}
-      >
-        <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24" aria-hidden="true">
-          <path
-            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-            fill="#4285F4"
-          />
-          <path
-            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-            fill="#34A853"
-          />
-          <path
-            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-            fill="#FBBC05"
-          />
-          <path
-            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-            fill="#EA4335"
-          />
-        </svg>
-        {isAnonymous ? "Continue with Google" : "Continue with Google"}
-      </Button>
-
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t" />
-        </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-background px-2 text-muted-foreground">or</span>
-        </div>
+  return <section className={styles.authForm} aria-labelledby="auth-form-heading" aria-busy={loading}>
+    <h2 id="auth-form-heading">Sign in or create an account.</h2>
+    {isAnonymous && <div className={styles.notice}><p>You have votes in this session. Creating a new account can keep them together. Signing into an existing account may leave a separate voting history.</p></div>}
+    {info && <p role="status" className={styles.formHint}>{info}</p>}
+    {error && <p id="auth-form-error" role="alert" className={styles.error}>{error}</p>}
+    <button type="button" className={styles.secondaryButton} onClick={handleGoogleSignIn} disabled={loading}>
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
+        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+      </svg>
+      {loading && loadingMethod === "google" ? "Opening Google…" : "Continue with Google"}
+    </button>
+    <div className={styles.divider} aria-hidden="true">or use email</div>
+    <form onSubmit={handleMagicLink} className={styles.emailForm}>
+      <div className={styles.field}>
+        <label htmlFor="email">Email address</label>
+        <input id="email" name="email" type="email" autoComplete="email" inputMode="email" placeholder="you@example.com" required disabled={loading} className={styles.input} aria-describedby={`email-sign-in-hint${error ? " auth-form-error" : ""}`} />
       </div>
-
-      {/* Magic link */}
-      <form onSubmit={handleMagicLink} className="space-y-3">
-        <div className="space-y-1">
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            name="email"
-            type="email"
-            placeholder="you@example.com"
-            required
-            disabled={loading}
-          />
-        </div>
-        {error && <p className="text-sm text-destructive">{error}</p>}
-        <Button type="submit" className="w-full" disabled={loading}>
-          {loading
-            ? "Sending…"
-            : isAnonymous
-            ? "Continue with email"
-            : "Send magic link"}
-        </Button>
-      </form>
-
-      <p className="text-center text-xs text-muted-foreground">
-        {isAnonymous
-          ? "Your existing votes will be saved to your new account."
-          : "Anonymous users can vote. Create an account to submit questions."}
-      </p>
-    </div>
-  );
+      <p id="email-sign-in-hint" className={styles.formHint}>We will email you a sign-in link. No password needed.</p>
+      <button type="submit" className={styles.button} disabled={loading}>{loading && loadingMethod === "email" ? "Sending sign-in link…" : "Email me a sign-in link"}</button>
+    </form>
+  </section>;
 }

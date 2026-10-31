@@ -1,192 +1,64 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { createPublicClient } from "@/lib/supabase/server";
-import { PoliticianAvatar } from "@/components/politician/politician-avatar";
+import { PublicPage, PublicPersonLink } from "@/components/public/public-layout";
+import styles from "@/components/public/public.module.css";
+import { getLeaderboard } from "@/lib/leaderboard/server";
+import { leaderboardDisplayPage, LEADERBOARD_DISPLAY_PAGE_SIZE } from "@/lib/leaderboard/ranking";
 
 export const metadata: Metadata = {
-  title: "Response Rate Leaderboard | WhyTho",
-  description:
-    "See which politicians answer their constituents' questions and which ones stay silent. Updated weekly.",
+  title: "Official Response Leaderboard | WhyTho",
+  description: "Compare official responses to this week's qualifying questions. Published politician and team answers only.",
 };
 
-// Revalidate every hour - leaderboard is not real-time
-export const revalidate = 3600;
+// Search parameters paginate the display; the complete ranking has its own cache.
+export const revalidate = 300;
 
-interface LeaderboardRow {
-  politician_id: string;
-  slug: string;
-  full_name: string;
-  office: string | null;
-  state: string | null;
-  party: string | null;
-  photo_url: string | null;
-  participation_rate: number | null;
-  answered_qualifying: number;
-  qualifying_questions: number;
-  week_number: number;
-}
+export default async function LeaderboardPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
+  const [data, params] = await Promise.all([getLeaderboard(), searchParams]);
+  const page = leaderboardDisplayPage(typeof params.page === "string" ? params.page : undefined, data.entries.length);
+  const pageCount = Math.max(1, Math.ceil(data.entries.length / LEADERBOARD_DISPLAY_PAGE_SIZE));
+  const start = (page - 1) * LEADERBOARD_DISPLAY_PAGE_SIZE;
+  const visible = data.entries.slice(start, start + LEADERBOARD_DISPLAY_PAGE_SIZE);
+  const weekLabel = `Week ${data.weekNumber % 100}, ${Math.floor(data.weekNumber / 100)}`;
+  const percent = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 });
+  const updated = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "UTC" }).format(new Date(data.generatedAt));
 
-function rateColor(rate: number | null): string {
-  if (rate === null) return "text-muted-foreground";
-  if (rate >= 75) return "text-green-600";
-  if (rate >= 40) return "text-yellow-600";
-  return "text-red-600";
-}
+  return <PublicPage title="Who's answering?" description={`${weekLabel}. Ranked by official responses to questions with at least 10 net upvotes.`}
+    action={<Link href="/#find-politician" className={styles.button}>Find a politician <span aria-hidden="true">↗</span></Link>}>
+    <div className={styles.summary} aria-label="This week's qualifying record">
+      <div className={styles.stat}><strong>{data.entries.length.toLocaleString("en-US")}</strong>politicians with qualifying questions</div>
+      <div className={styles.stat}><strong>{data.totalQualifyingQuestions.toLocaleString("en-US")}</strong>qualifying questions</div>
+      <div className={styles.stat}><strong>{data.totalAnsweredQuestions.toLocaleString("en-US")}</strong>with an official response</div>
+    </div>
 
-function rateBg(rate: number): string {
-  if (rate >= 75) return "bg-green-500";
-  if (rate >= 40) return "bg-yellow-500";
-  return "bg-red-500";
-}
+    {data.entries.length === 0 ? <section className={styles.empty}>
+      <h2>No qualifying questions this week yet.</h2>
+      <p>A question enters this ranking when it reaches 10 net upvotes. There is no response rate to compare until questions qualify.</p>
+      <Link href="/#find-politician">Find someone and support a question <span aria-hidden="true">↗</span></Link>
+    </section> : <section aria-labelledby="leaderboard-ranking">
+      <h2 id="leaderboard-ranking" className={styles.sectionHeading}>The response record</h2>
+      {data.totalAnsweredQuestions === 0 && <p className={styles.notice}>No official responses are recorded for this week’s qualifying questions. Every listed politician currently shares a 0% response rate.</p>}
+      <p className={styles.meta}>Showing {start + 1} to {Math.min(start + visible.length, data.entries.length)} of {data.entries.length} eligible politicians. Ranks are calculated across the complete eligible population.</p>
+      <ol start={start + 1} aria-label="Politicians ranked by official response rate" style={{ listStyle: "none", margin: 0, padding: 0 }}>
+        {visible.map((entry) => <li key={entry.id}>
+          <PublicPersonLink person={entry}
+            eyebrow={`Rank ${entry.rank}${entry.is_candidate || entry.politician_type === "candidate" ? " · Candidate" : ""}`}
+            detail={`${entry.answeredQualifying} of ${entry.qualifyingQuestions} qualifying ${entry.qualifyingQuestions === 1 ? "question has" : "questions have"} an official response.`}
+            trailing={<span className={styles.stat}><strong style={{ color: entry.answeredQualifying > 0 ? "var(--green)" : "var(--ink)" }}>{percent.format(entry.responseRate)}%</strong><span>official response rate</span></span>} />
+        </li>)}
+      </ol>
+      {pageCount > 1 && <nav aria-label="Leaderboard pages" className={styles.pagination}>
+        {page > 1 ? <Link href={page === 2 ? "/leaderboard" : `/leaderboard?page=${page - 1}`} rel="prev">← Previous page</Link> : <span />}
+        <span className={styles.meta}>Page {page} of {pageCount}</span>
+        {page < pageCount ? <Link href={`/leaderboard?page=${page + 1}`} rel="next">Next page →</Link> : <span />}
+      </nav>}
+    </section>}
 
-function PartyDot({ party }: { party: string | null }) {
-  const color =
-    party === "Democrat" ? "bg-blue-500" :
-    party === "Republican" ? "bg-red-500" :
-    party === "Independent" ? "bg-purple-500" :
-    "bg-muted-foreground";
-  return <span className={`inline-block h-2 w-2 rounded-full ${color} shrink-0`} aria-hidden />;
-}
-
-export default async function LeaderboardPage() {
-  const supabase = createPublicClient();
-
-  const { data: weekData } = await supabase.rpc("current_week_number");
-  const weekNumber = weekData as number;
-
-  // Pull latest snapshots joined with politician info
-  const { data: rows } = await supabase
-    .from("weekly_snapshots")
-    .select(`
-      politician_id,
-      participation_rate,
-      answered_qualifying,
-      qualifying_questions,
-      week_number,
-      politicians (
-        slug,
-        full_name,
-        office,
-        state,
-        party,
-        photo_url,
-        is_test
-      )
-    `)
-    .eq("week_number", weekNumber)
-    .not("politicians", "is", null)
-    .order("participation_rate", { ascending: false, nullsFirst: false })
-    .limit(200);
-
-  // Flatten the join — exclude test politicians
-  const leaderboard: LeaderboardRow[] = (rows ?? [])
-    .filter((r) => r.politicians !== null && !(r.politicians as { is_test?: boolean }).is_test)
-    .map((r) => {
-      const p = r.politicians as {
-        slug: string;
-        full_name: string;
-        office: string | null;
-        state: string | null;
-        party: string | null;
-        photo_url: string | null;
-        is_test: boolean;
-      };
-      return {
-        politician_id: r.politician_id,
-        slug: p.slug,
-        full_name: p.full_name,
-        office: p.office,
-        state: p.state,
-        party: p.party,
-        photo_url: p.photo_url,
-        participation_rate: r.participation_rate,
-        answered_qualifying: r.answered_qualifying,
-        qualifying_questions: r.qualifying_questions,
-        week_number: r.week_number,
-      };
-    });
-
-  const year = Math.floor(weekNumber / 100);
-  const week = weekNumber % 100;
-
-  return (
-    <main className="min-h-screen bg-background">
-      <div className="mx-auto max-w-3xl px-4 py-8 space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Response Leaderboard</h1>
-          <p className="mt-1 text-muted-foreground">
-            Week {week}, {year} · Ranked by response rate on qualifying questions (10+ votes)
-          </p>
-        </div>
-
-        {leaderboard.length === 0 ? (
-          <div className="rounded-xl border bg-card p-8 text-center space-y-2">
-            <p className="font-medium">No data yet for this week</p>
-            <p className="text-sm text-muted-foreground">
-              Check back after questions start accumulating.
-            </p>
-          </div>
-        ) : (
-          <div className="rounded-xl border bg-card shadow-sm overflow-hidden divide-y">
-            {leaderboard.map((row, i) => (
-              <Link
-                key={row.politician_id}
-                href={`/${row.slug}`}
-                className="flex items-center gap-4 px-4 py-3 hover:bg-muted/50 transition-colors group"
-              >
-                {/* Rank */}
-                <span className="w-6 text-sm font-semibold text-muted-foreground tabular-nums shrink-0 text-right">
-                  {i + 1}
-                </span>
-
-                {/* Photo */}
-                <PoliticianAvatar
-                  photoUrl={row.photo_url}
-                  fullName={row.full_name}
-                  size={40}
-                />
-
-                {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <PartyDot party={row.party} />
-                    <p className="font-medium truncate group-hover:underline underline-offset-2">
-                      {row.full_name}
-                    </p>
-                  </div>
-                  <p className="text-xs text-muted-foreground truncate">
-                    {row.office}{row.state && ` · ${row.state}`}
-                  </p>
-                </div>
-
-                {/* Rate */}
-                <div className="shrink-0 text-right space-y-1">
-                  <p className={`text-lg font-bold tabular-nums ${rateColor(row.participation_rate)}`}>
-                    {row.participation_rate !== null ? `${Math.round(row.participation_rate)}%` : "-"}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {row.answered_qualifying}/{row.qualifying_questions}
-                  </p>
-                </div>
-
-                {/* Bar */}
-                <div className="w-16 shrink-0">
-                  <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-                    <div
-                      className={`h-full rounded-full ${rateBg(row.participation_rate ?? 0)}`}
-                      style={{ width: `${Math.min(row.participation_rate ?? 0, 100)}%` }}
-                    />
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        )}
-
-        <p className="text-center text-xs text-muted-foreground">
-          Silence is its own answer.
-        </p>
-      </div>
-    </main>
-  );
+    <section aria-labelledby="leaderboard-methodology" className={styles.footnote}>
+      <h2 id="leaderboard-methodology" className={styles.sectionHeading}>How the ranking works</h2>
+      <p>Response rate is the share of this week’s active questions with 10 or more net upvotes that have at least one published official response from the politician or their team. Each qualifying question counts once. AI analysis and unpublished drafts do not count.</p>
+      <p>The population includes active politician and candidate profiles, with test profiles excluded. Equal unrounded response rates share a rank. Within a tie, profiles with more qualifying questions appear first, followed by name. A missing response does not establish that a politician saw or declined a question.</p>
+      <p>Updated {updated} UTC. Records refresh about every five minutes. This ranking is calculated from question and published response records; it does not use historical snapshot rates.</p>
+    </section>
+  </PublicPage>;
 }

@@ -1,0 +1,79 @@
+{
+  "migration": "20261031041730_release_rls_hardening",
+  "recordedAt": "2026-10-31T04:17:58Z",
+  "anonymousVisibleDrafts": 0,
+  "checks": [
+    {
+      "check_name": "all_public_tables_rls",
+      "passed": true
+    },
+    {
+      "check_name": "media_rpc_service_only",
+      "passed": true
+    },
+    {
+      "check_name": "official_publication_guard_enabled",
+      "passed": true
+    },
+    {
+      "check_name": "private_4MiB_media_bucket",
+      "passed": true
+    },
+    {
+      "check_name": "public.answer_media",
+      "passed": true
+    },
+    {
+      "check_name": "public.answers",
+      "passed": true
+    },
+    {
+      "check_name": "public.politician_team",
+      "passed": true
+    },
+    {
+      "check_name": "public.politician_verifications",
+      "passed": true
+    },
+    {
+      "check_name": "public.politicians",
+      "passed": true
+    },
+    {
+      "check_name": "public.questions",
+      "passed": true
+    },
+    {
+      "check_name": "public.votes",
+      "passed": true
+    },
+    {
+      "check_name": "question_direct_writes_revoked",
+      "passed": true
+    },
+    {
+      "check_name": "storage.objects",
+      "passed": true
+    },
+    {
+      "check_name": "tally_definer_locked_path",
+      "passed": true
+    },
+    {
+      "check_name": "tally_not_client_callable",
+      "passed": true
+    },
+    {
+      "check_name": "verification_direct_writes_revoked",
+      "passed": true
+    },
+    {
+      "check_name": "verification_otp_read_revoked",
+      "passed": true
+    },
+    {
+      "check_name": "verification_resume_safe_columns",
+      "passed": true
+    }
+  ]
+}

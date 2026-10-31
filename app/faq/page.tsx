@@ -1,174 +1,35 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-
-export const metadata: Metadata = {
-  title: "FAQ | WhyTho",
-  description: "Frequently asked questions about WhyTho's civic accountability platform.",
-};
-
-const faqs = [
-  {
-    category: "General",
-    items: [
-      {
-        q: "Is WhyTho affiliated with any political party?",
-        a: "No. WhyTho is an independent civic tech project run by Quinnivations LLC. We track all elected officials regardless of party and apply the same accountability standards to everyone.",
-      },
-      {
-        q: "Are the politicians on here real?",
-        a: "Yes. All profiles are generated from public government data sources: Congress.gov, OpenStates, and official state records. Politicians don't need to \"sign up\" to have a profile.",
-      },
-      {
-        q: "What does \"silence is its own answer\" mean?",
-        a: "It means that when a politician doesn't respond to qualifying questions, that non-response is recorded and displayed permanently. There's no neutral option; ignoring questions is a choice that shows on their public record.",
-      },
-    ],
-  },
-  {
-    category: "Asking Questions",
-    items: [
-      {
-        q: "Do I need to sign in to ask questions or vote?",
-        a: "You need a free account (anonymous, Google, or email) to submit questions and vote. This prevents spam and ensures each person votes once. Reading profiles and questions is always open.",
-      },
-      {
-        q: "How many questions can I ask per week?",
-        a: "You can submit up to 5 questions per day total, and up to 3 questions per politician per 24-hour window. This keeps the platform focused on quality over quantity.",
-      },
-      {
-        q: "What makes a question \"qualifying\"?",
-        a: "A question becomes qualifying when it reaches 10+ net upvotes (upvotes minus downvotes). Only qualifying questions count toward a politician's response rate.",
-      },
-      {
-        q: "What happens to my question at the weekly reset?",
-        a: "Your question is archived. It won't appear on the politician's active feed anymore, but it's always accessible through their profile's question history. The week's response rate is locked in permanently.",
-      },
-      {
-        q: "Can I ask about anything?",
-        a: "Questions must relate to a politician's public duties, policies, or public statements. Personal attacks, harassment, and off-topic content are removed. We use both automated filters and human moderation.",
-      },
-    ],
-  },
-  {
-    category: "Response Rates",
-    items: [
-      {
-        q: "How is the response rate calculated?",
-        a: "Response rate = (qualifying questions answered) / (total qualifying questions) × 100. Only questions with 10+ net votes count. If a politician has no qualifying questions in a week, that week doesn't affect their rate.",
-      },
-      {
-        q: "Can a politician's historical response rate change?",
-        a: "No. Once a week's scores are locked in at Monday reset, they're permanent. A politician cannot go back and answer archived questions to change their historical record.",
-      },
-      {
-        q: "What if a politician answered the question somewhere else (a press conference, tweet, etc.)?",
-        a: "Verified politicians and their teams can link public statements as answer sources. Alternatively, our AI analysis scans public record and may note if a related statement exists, but this is clearly labeled as AI analysis, not a direct answer.",
-      },
-    ],
-  },
-  {
-    category: "For Politicians",
-    items: [
-      {
-        q: "How do I claim my profile?",
-        a: "Go to /verify, search for your name, and click \"Claim this profile.\" You'll need to create a free account first. After claiming (Tier 1), you can start the verification process to get the Verified checkmark.",
-      },
-      {
-        q: "What verification methods are available?",
-        a: "Government email address (.gov domain), FEC ID verification, social media code post, Stripe Identity (ID check), or website meta tag. Any two of these grant Tier 2 Verified status.",
-      },
-      {
-        q: "Does participating in WhyTho endorse it?",
-        a: "No. Claiming your profile and answering questions means you're engaging with your constituents. It doesn't imply endorsement of the platform or any political position.",
-      },
-      {
-        q: "Can I dispute an AI-generated analysis?",
-        a: "Yes. If an AI analysis of public record is inaccurate, verified politicians can flag it for review. Disputed content is marked with a ⚠️ warning until our team reviews it within 48 hours.",
-      },
-    ],
-  },
-  {
-    category: "Moderation & Safety",
-    items: [
-      {
-        q: "How do you handle abusive or off-topic questions?",
-        a: "Questions are filtered for profanity automatically. Users can report questions. Questions that receive 3+ reports are automatically hidden pending review. Our moderation team reviews flagged content.",
-      },
-      {
-        q: "Can I report a question?",
-        a: "Yes, there's a report button on every question card. Select the reason (spam, offensive, off-topic, duplicate, or other) and we'll review it.",
-      },
-      {
-        q: "What are the AI-generated questions I see?",
-        a: "Some questions are pre-seeded by our system from public record to ensure each politician has at least a few relevant questions on their profile. These are always labeled \"💡 WhyTho suggested question\" and treated like any other question.",
-      },
-    ],
-  },
+import { PublicPage } from "@/components/public/public-layout";
+import styles from "@/components/public/public.module.css";
+export const metadata: Metadata = { title: "FAQ | WhyTho", description: "Questions about asking politicians, voting, response records, and verification." };
+const sections = [
+  { title: "Getting started", questions: [
+    ["Does a profile mean the politician has joined?", "No. Profiles can be created from public records. Read the verification label to see the profile’s claim status. A listing does not imply endorsement."],
+    ["Can I read without signing in?", "Yes. Public profiles, questions, and published responses are available to read. The question form will guide you to sign in when needed. Voting may use an anonymous session."],
+    ["How do I search by office?", "Use a full office name such as U.S. Senate or State Senate, and optionally add a state. If you type Senate without a level, WhyTho asks which office you mean."],
+  ]},
+  { title: "Questions and votes", questions: [
+    ["What should I ask?", "Ask a specific, civil question about the person’s public responsibilities, policies, or public statements. Use the report control on a question to flag spam, harassment, or other concerns."],
+    ["How many questions can I submit?", "The current limit is five questions per user in a rolling 24-hour window, with at most three for the same politician in that window."],
+    ["What makes a question qualifying?", "At least ten net votes, meaning upvotes minus downvotes. Qualifying questions determine the response-rate denominator. Current-week questions can receive votes; archived questions are read-only."],
+    ["What are suggested questions?", "Some questions are generated from public records. They are labeled as AI-generated suggested questions and can be voted on like other current-week questions."],
+  ]},
+  { title: "Understanding the record", questions: [
+    ["How is the response rate calculated?", "It is the number of qualifying questions with a published official response divided by all qualifying questions in the displayed period. Multiple responses to one question still count as one answered question. With no qualifying questions, no rate is shown."],
+    ["Does AI analysis count as an answer from the politician?", "No. AI analysis is labeled separately. Only published, non-AI direct responses and team statements count as official responses."],
+    ["Does no response mean the politician ignored me?", "It means no official response is recorded for that question. It does not establish whether the politician saw it or chose not to answer."],
+    ["Why do counts or rates change?", "The displayed period, qualifying votes, and available published records determine the calculation. Public pages refresh periodically, so a new response may not appear immediately."],
+  ]},
+  { title: "For politicians", questions: [
+    ["How do I claim a profile?", "Open For politicians, sign in, find the profile, and follow the claim and verification steps. Claiming alone is distinct from completing verification."],
+    ["Which verification methods can I use?", "The current verification screen offers an official government email method and an official website meta-tag method. Follow the instructions and status shown there."],
+    ["Can my team respond?", "Authorized team members can use the politician dashboard according to their assigned role. Published responses from authorized teams count as official responses."],
+  ]},
 ];
-
 export default function FaqPage() {
-  return (
-    <main className="min-h-screen bg-background">
-      <div className="mx-auto max-w-2xl px-4 py-12 space-y-10">
-
-        <div className="space-y-3">
-          <Link href="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-            ← Back to home
-          </Link>
-          <h1 className="text-3xl font-bold tracking-tight">FAQ</h1>
-          <p className="text-lg text-muted-foreground">
-            Frequently asked questions about WhyTho.
-          </p>
-        </div>
-
-        <div className="space-y-10">
-          {faqs.map((section) => (
-            <div key={section.category} className="space-y-4">
-              <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground border-b pb-2">
-                {section.category}
-              </h2>
-              <div className="space-y-5">
-                {section.items.map((item, i) => (
-                  <div key={i} className="space-y-1.5">
-                    <p className="font-medium text-sm">{item.q}</p>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{item.a}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="rounded-xl border bg-card p-5 space-y-2">
-          <p className="text-sm font-medium">Still have questions?</p>
-          <p className="text-sm text-muted-foreground">
-            We&apos;re a small team building this in public. Reach out via{" "}
-            <a
-              href="mailto:support@whytho.us"
-              className="underline hover:text-foreground transition-colors"
-            >
-              support@whytho.us
-            </a>
-            .
-          </p>
-        </div>
-
-        <div className="flex flex-wrap gap-3 pt-4 border-t">
-          <Link
-            href="/how-it-works"
-            className="rounded-lg border px-4 py-2 text-sm font-medium hover:bg-muted transition-colors"
-          >
-            How It Works
-          </Link>
-          <Link
-            href="/about"
-            className="rounded-lg border px-4 py-2 text-sm font-medium hover:bg-muted transition-colors"
-          >
-            About WhyTho
-          </Link>
-        </div>
-
-      </div>
-    </main>
-  );
+  return <PublicPage title="Questions about the questions." kicker="FAQ" description="A closer look at how asking, voting, and response records work.">
+    <div className={styles.reading}>{sections.map(section => <section key={section.title}><h2>{section.title}</h2>{section.questions.map(([question,answer]) => <details key={question}><summary>{question}</summary><p>{answer}</p></details>)}</section>)}
+      <section><h2>Need help?</h2><p>Contact <a href="mailto:support@whytho.us">support@whytho.us</a>.</p></section>
+    </div>
+  </PublicPage>;
 }

@@ -1,0 +1,108 @@
+{
+  "origin": "http://127.0.0.1:8771",
+  "checkedAt": "2026-10-31T04:16:57.714Z",
+  "passed": 25,
+  "total": 25,
+  "results": [
+    {
+      "name": "Health checks pass with populated civic data",
+      "passed": true
+    },
+    {
+      "name": "Homepage has the redesigned search and real politician links",
+      "passed": true
+    },
+    {
+      "name": "Directory is bounded, public, and cacheable",
+      "passed": true
+    },
+    {
+      "name": "Infinite directory continuation has no duplicate IDs",
+      "passed": true
+    },
+    {
+      "name": "Composed state and office search stays scoped",
+      "passed": true
+    },
+    {
+      "name": "Invalid directory input is rejected: ?state=invalid",
+      "passed": true
+    },
+    {
+      "name": "Invalid directory input is rejected: ?cursor=broken",
+      "passed": true
+    },
+    {
+      "name": "Invalid directory input is rejected: ?scope=invalid",
+      "passed": true
+    },
+    {
+      "name": "Invalid directory input is rejected: ?q=a&q=b",
+      "passed": true
+    },
+    {
+      "name": "Invalid directory input is rejected: ?limit=100000",
+      "passed": true
+    },
+    {
+      "name": "Profile renders without private author fields",
+      "passed": true
+    },
+    {
+      "name": "Public route renders: /federal",
+      "passed": true
+    },
+    {
+      "name": "Public route renders: /region/california",
+      "passed": true
+    },
+    {
+      "name": "Public route renders: /state/CA",
+      "passed": true
+    },
+    {
+      "name": "Public route renders: /leaderboard",
+      "passed": true
+    },
+    {
+      "name": "Public route renders: /races",
+      "passed": true
+    },
+    {
+      "name": "Public route renders: /sign-in",
+      "passed": true
+    },
+    {
+      "name": "Public route renders: /verify",
+      "passed": true
+    },
+    {
+      "name": "Public route renders: /about",
+      "passed": true
+    },
+    {
+      "name": "Public route renders: /faq",
+      "passed": true
+    },
+    {
+      "name": "Public route renders: /how-it-works",
+      "passed": true
+    },
+    {
+      "name": "Public route renders: /settings/notifications",
+      "passed": true
+    },
+    {
+      "name": "Signed-out access is gated: /account",
+      "passed": true
+    },
+    {
+      "name": "Signed-out access is gated: /dashboard",
+      "passed": true
+    },
+    {
+      "name": "Missing private attachment is unavailable and not cached",
+      "passed": true
+    }
+  ]
+}

@@ -3,33 +3,12 @@
  *
  * Upload a photo, video, or audio file attached to an answer.
  * Accepts multipart/form-data with a "file" field.
- * Auth: team member on the politician that owns this answer.
+ * Auth: publishing team role, or a responder attaching to their own draft.
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
-
-const MAX_SIZES: Record<string, number> = {
-  image: 10 * 1024 * 1024,   // 10 MB
-  video: 200 * 1024 * 1024,  // 200 MB
-  audio: 25 * 1024 * 1024,   // 25 MB
-};
-
-const MIME_TO_TYPE: Record<string, "image" | "video" | "audio"> = {
-  "image/jpeg": "image",
-  "image/png": "image",
-  "image/webp": "image",
-  "image/heic": "image",
-  "image/gif": "image",
-  "video/mp4": "video",
-  "video/quicktime": "video",
-  "video/webm": "video",
-  "audio/mpeg": "audio",
-  "audio/wav": "audio",
-  "audio/mp4": "audio",
-  "audio/ogg": "audio",
-  "audio/x-m4a": "audio",
-};
+import { MAX_MEDIA_BYTES, MEDIA_TYPES } from "@/components/answers/media-limits";
 
 export async function POST(
   request: NextRequest,
@@ -48,7 +27,7 @@ export async function POST(
   // Look up the answer and its politician
   const { data: answer } = await admin
     .from("answers")
-    .select("id, politician_id")
+    .select("id, politician_id, is_draft, is_ai_generated, answer_type, published_by")
     .eq("id", answerId)
     .maybeSingle();
 
@@ -64,8 +43,14 @@ export async function POST(
     .eq("user_id", user.id)
     .maybeSingle();
 
-  if (!membership) {
+  const canPublish = membership && ["admin", "editor"].includes(membership.role);
+  const ownsDraft = membership?.role === "responder" && answer.is_draft && answer.published_by === user.id;
+  if (!canPublish && !ownsDraft) {
     return NextResponse.json({ error: "Not authorized" }, { status: 403 });
+  }
+
+  if (answer.is_ai_generated || !["direct", "team_statement"].includes(answer.answer_type)) {
+    return NextResponse.json({ error: "Media can be attached only to an official response." }, { status: 422 });
   }
 
   // Parse the uploaded file
@@ -82,7 +67,7 @@ export async function POST(
   }
 
   const mimeType = file.type;
-  const mediaType = MIME_TO_TYPE[mimeType];
+  const mediaType = MEDIA_TYPES[mimeType];
   if (!mediaType) {
     return NextResponse.json(
       { error: `Unsupported file type: ${mimeType}` },
@@ -90,18 +75,17 @@ export async function POST(
     );
   }
 
-  const maxSize = MAX_SIZES[mediaType]!;
-  if (file.size > maxSize) {
-    const maxMB = maxSize / (1024 * 1024);
+  if (file.size > MAX_MEDIA_BYTES) {
     return NextResponse.json(
-      { error: `File too large. Maximum size for ${mediaType} is ${maxMB}MB` },
+      { error: "Files must be 4 MB or smaller. Use a link for larger media." },
       { status: 422 }
     );
   }
 
   const fileName = file instanceof File ? file.name : `upload.${mimeType.split("/")[1]}`;
-  const ext = fileName.split(".").pop() ?? mimeType.split("/")[1] ?? "bin";
-  const uniqueName = `${crypto.randomUUID()}.${ext}`;
+  // Object names are independent of untrusted original filenames.
+  const extension = mimeType === "image/jpeg" ? "jpg" : mimeType === "video/quicktime" ? "mov" : mimeType === "audio/mpeg" ? "mp3" : mimeType === "audio/x-m4a" ? "m4a" : mimeType.split("/")[1];
+  const uniqueName = `${crypto.randomUUID()}.${extension}`;
   const storagePath = `${answer.politician_id}/${answerId}/${uniqueName}`;
 
   // Upload to Supabase Storage
@@ -117,34 +101,31 @@ export async function POST(
     return NextResponse.json({ error: uploadError.message }, { status: 500 });
   }
 
-  // Get public URL
-  const { data: urlData } = admin.storage
-    .from("answer-media")
-    .getPublicUrl(storagePath);
+  // Keep private objects behind a stable route that rechecks answer visibility.
+  // Signed storage URLs are short lived and are never saved in the database.
+  const mediaId = crypto.randomUUID();
+  const publicUrl = `/api/answer-media/${mediaId}`;
 
-  const publicUrl = urlData.publicUrl;
+  // The RPC locks the answer while rechecking membership and draft ownership.
+  // An approval during the upload cannot authorize a responder's late attachment.
+  const { data: attachedId, error: dbError } = await admin.rpc("attach_answer_media", {
+    p_actor_id: user.id,
+    p_answer_id: answerId,
+    p_media_id: mediaId,
+    p_storage_path: storagePath,
+    p_media_type: mediaType,
+    p_public_url: publicUrl,
+    p_file_name: fileName,
+    p_file_size_bytes: file.size,
+    p_mime_type: mimeType,
+  });
 
-  // Insert answer_media record
-  const { data: mediaRecord, error: dbError } = await admin
-    .from("answer_media")
-    .insert({
-      answer_id: answerId,
-      politician_id: answer.politician_id,
-      media_type: mediaType,
-      storage_path: storagePath,
-      public_url: publicUrl,
-      file_name: fileName,
-      file_size_bytes: file.size,
-      mime_type: mimeType,
-    })
-    .select()
-    .single();
-
-  if (dbError) {
+  if (dbError || attachedId !== mediaId) {
     // Clean up storage on DB failure
     await admin.storage.from("answer-media").remove([storagePath]);
-    return NextResponse.json({ error: dbError.message }, { status: 500 });
+    const changedAccess = dbError?.code === "42501";
+    return NextResponse.json({ error: changedAccess ? "Your access or the response status changed. Refresh before attaching media." : "The attachment could not be saved. Please try again." }, { status: changedAccess ? 409 : 500 });
   }
 
-  return NextResponse.json({ media: mediaRecord }, { status: 201 });
+  return NextResponse.json({ media: { id: mediaId, answer_id: answerId, politician_id: answer.politician_id, media_type: mediaType, storage_path: storagePath, public_url: publicUrl, file_name: fileName, file_size_bytes: file.size, mime_type: mimeType } }, { status: 201 });
 }
