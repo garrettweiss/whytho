@@ -18,6 +18,7 @@ dotenv.config({ path: ".env.local", override: true });
 
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
+import { handleOf, identityMemberIds, loadJackProfiles, normalizedJackName, normalizedJackState, uniqueCanonicalMatch, verifiedIdentityHandle, type JackProfile } from "./jack-identity";
 
 const supabase = createClient<Database>(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -30,6 +31,7 @@ const CONGRESS_BASE = "https://api.congress.gov/v3";
 const args = process.argv.slice(2);
 const DRY_RUN = args.includes("--dry-run");
 const OFFICE_ARG = args.find((a) => a.startsWith("--office="))?.split("=")[1];
+let profiles: JackProfile[] = [];
 
 async function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
@@ -151,26 +153,19 @@ export async function fetchMemberSocialHandles(bioguideId: string): Promise<stri
 // ── Database helpers ──────────────────────────────────────────────────────────
 
 async function findPoliticianByBioguide(bioguideId: string) {
-  // Our politicians table may have bioguide_id from Congress.gov seeding
-  const { data } = await supabase
-    .from("politicians")
-    .select("id, full_name, social_handles, office, state")
-    .eq("bioguide_id", bioguideId)
-    .maybeSingle();
-  return data;
+  const matches = profiles.filter(row => row.bioguide_id === bioguideId);
+  if (matches.length && !uniqueCanonicalMatch(profiles, matches)) throw new Error(`Ambiguous Bioguide identity: ${bioguideId}`);
+  return uniqueCanonicalMatch(profiles, matches);
 }
 
 async function findPoliticianByName(name: string, state: string, office: string) {
-  // Fuzzy fallback: match by name + state + office
-  const { data } = await supabase
-    .from("politicians")
-    .select("id, full_name, social_handles, office, state")
-    .eq("state", state)
-    .eq("office", office)
-    .ilike("full_name", `%${name.split(",").reverse().join(" ").trim().split(" ")[0]}%`)
-    .limit(1)
-    .maybeSingle();
-  return data;
+  // Only an exact normalized full name and jurisdiction may be a fallback.
+  const normalizedName = normalizedJackName(name.split(",").reverse().join(" "));
+  const normalizedState = normalizedJackState(state);
+  if (!normalizedState) return undefined;
+  return uniqueCanonicalMatch(profiles, profiles.filter(row => row.office === office
+    && normalizedJackState(row.state) === normalizedState
+    && normalizedJackName(row.full_name) === normalizedName));
 }
 
 async function updateHandle(
@@ -187,10 +182,14 @@ async function updateHandle(
     twitter_confidence: confidence,
   };
 
-  await supabase
+  const { error } = await supabase
     .from("politicians")
     .update({ social_handles: updated })
-    .eq("id", politicianId);
+    .eq("id", politicianId).is("canonical_politician_id", null)
+    .eq("is_active", true).eq("is_test", false).select("id").single();
+  if (error) throw error;
+  const profile = profiles.find(row => row.id === politicianId);
+  if (profile) profile.social_handles = updated;
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
@@ -222,7 +221,7 @@ async function scoutChamber(chamber: "senate" | "house") {
 
     // Check if already has a handle
     const existingHandles = (politician.social_handles ?? {}) as Record<string, string>;
-    if (existingHandles.twitter) {
+    if (verifiedIdentityHandle(profiles, politician.id)) {
       found++;
       continue;
     }
@@ -230,6 +229,12 @@ async function scoutChamber(chamber: "senate" | "house") {
     const handle = socialMap.get(member.bioguideId) ?? null;
 
     if (handle) {
+      const members = new Set(identityMemberIds(profiles, politician.id));
+      if (profiles.some(row => members.has(row.id) && handleOf(row) && handleOf(row)!.toLowerCase() !== handle.toLowerCase())) {
+        console.log(`  Skipping ${politician.full_name}: conflicting handle requires review`);
+        skipped++;
+        continue;
+      }
       if (DRY_RUN) {
         console.log(`  [preview] ${politician.full_name} → @${handle} (verified)`);
       } else {
@@ -249,19 +254,12 @@ async function scoutChamber(chamber: "senate" | "house") {
 async function reportMissingHandles() {
   console.log("\n📊 Current handle coverage in DB...");
 
-  const { data } = await supabase
-    .from("politicians")
-    .select("office, social_handles")
-    .in("office", ["U.S. Senator", "U.S. Representative", "Governor"])
-    .eq("is_active", true);
-
   const summary: Record<string, { total: number; hasHandle: number }> = {};
-  for (const p of data ?? []) {
+  for (const p of profiles.filter(row => !row.canonical_politician_id && ["U.S. Senator", "U.S. Representative", "Governor"].includes(row.office || ""))) {
     const office = p.office ?? "Other";
     if (!summary[office]) summary[office] = { total: 0, hasHandle: 0 };
     summary[office]!.total++;
-    const handles = (p.social_handles ?? {}) as Record<string, string>;
-    if (handles.twitter) summary[office]!.hasHandle++;
+    if (verifiedIdentityHandle(profiles, p.id)) summary[office]!.hasHandle++;
   }
 
   for (const [office, counts] of Object.entries(summary)) {
@@ -274,6 +272,7 @@ async function main() {
   console.log("🕵️  Jack — Scout Agent");
   console.log("=======================");
   if (DRY_RUN) console.log("🔍 DRY RUN — no writes\n");
+  profiles = await loadJackProfiles(supabase);
 
   const chambers: Array<"senate" | "house"> = [];
   if (!OFFICE_ARG || OFFICE_ARG === "senate") chambers.push("senate");

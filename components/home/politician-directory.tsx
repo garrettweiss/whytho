@@ -198,13 +198,13 @@ export function PoliticianDirectory({ initialPage, context }: { initialPage: Dir
     window.history.pushState({ ...window.history.state, whythoDirectoryId: activeEntry.current }, "", params.size ? `${context?.basePath ?? "/"}?${params}` : context?.basePath ?? "/");
     setChoices([]); setInputError(""); void fetchPage(nextFilters);
   }
-  function search(value: string) {
+  function search(value: string, previousFilters = filters) {
     setText(value); setInputError(""); setNameAlternative("");
     try {
       const parsed = parseDirectorySearch(value);
       const availableChoices = parsed.officeChoices.filter(value => officeOptions.some(office => office.value === value));
       if (availableChoices.length === 1) {
-        apply({ ...parsed.filters, state: parsed.filters.state || filters.state, office: availableChoices[0]! }); return;
+        apply({ ...parsed.filters, state: parsed.filters.state || previousFilters.state, office: availableChoices[0]! }); return;
       }
       if (availableChoices.length) {
         setChoices(availableChoices);
@@ -212,7 +212,7 @@ export function PoliticianDirectory({ initialPage, context }: { initialPage: Dir
         return;
       }
       if (parsed.filters.state && !parsed.filters.office && !parsed.filters.q) setNameAlternative(value.trim());
-      apply({ q: parsed.filters.q, state: parsed.filters.state || filters.state, office: parsed.filters.office || filters.office });
+      apply({ q: parsed.filters.q, state: parsed.filters.state || previousFilters.state, office: parsed.filters.office || previousFilters.office });
     } catch {
       setInputError("Use a name, state, or office of 100 characters or fewer.");
     }
@@ -228,7 +228,7 @@ export function PoliticianDirectory({ initialPage, context }: { initialPage: Dir
         <button type="submit" aria-label="Find politicians"><span className={styles.submitLabel}>Find politicians</span><ArrowRight size={24} aria-hidden="true" /></button>
       </form>
       {inputError && <p id="search-error" role="alert" className={styles.inputError}>{inputError}</p>}
-      <div className={styles.examples}><span>Try</span>{(context ? (context.scope === "state" ? ["State Senate", "State House", "Governor"] : context.state ? ["U.S. Senate", "State Senate", "Governor"] : ["U.S. Senate", "U.S. House", "Cabinet", "Governor"]) : ["AOC", "California", "Congress Senate", "California state senator"]).map(example => <button key={example} onClick={() => search(example)}>{example}</button>)}</div>
+      <div className={styles.examples}><span>Try</span>{(context ? (context.scope === "state" ? ["State Senate", "State House", "Governor"] : context.state ? ["U.S. Senate", "State Senate", "Governor"] : ["U.S. Senate", "U.S. House", "Cabinet", "Governor"]) : ["AOC", "California", "Congress Senate", "California state senator"]).map(example => <button key={example} onClick={() => search(example, defaults)}>{example}</button>)}</div>
       {choices.length > 0 && <div ref={choiceGroup} className={styles.officeChoices} role="group" aria-label="Which office do you mean?" onKeyDown={event => { if (event.key === "Escape") { setChoices([]); input.current?.focus(); } }}><p>Which office do you mean?</p>{choices.map(value => <button key={value} onClick={() => { const parsed = parseDirectorySearch(text); apply({ ...parsed.filters, state: parsed.filters.state || filters.state, office: value }); }}>{OFFICES.find(office => office.value === value)?.label ?? value}{parseDirectorySearch(text).filters.state ? ` · ${stateByCode(parseDirectorySearch(text).filters.state)?.name}` : ""}</button>)}</div>}
       {nameAlternative && <button className={styles.nameAlternative} onClick={() => { const name = nameAlternative; setNameAlternative(""); apply({ q: name, state: "", office: "" }); }}>Looking for a person? Search names for “{nameAlternative}”</button>}
       <div className={styles.filters}>

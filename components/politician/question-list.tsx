@@ -41,6 +41,7 @@ type XAttribution = {
 
 export type Question = {
   id: string;
+  politician_id?: string;
   body: string;
   net_upvotes: number;
   is_seeded: boolean;
@@ -56,12 +57,14 @@ export type Question = {
 interface QuestionListProps {
   questions: Question[];
   politicianId: string;
+  memberIds?: string[];
   politicianSlug: string;
   politicianName: string;
   weekNumber: number;
   currentWeekNumber?: number;
   isHistorical?: boolean;
   period?: "week" | "month" | "year" | "all";
+  profileSort?: "votes" | "newest" | "unanswered";
   isOwner?: boolean;
   ownerRole?: string;
   profileVerified?: boolean;
@@ -347,13 +350,15 @@ function QuestionCard({ question, politicianSlug, politicianName, isHistorical, 
 
 const PROFILE_PROMPT_KEY = "whytho_profile_prompt_dismissed";
 
-export function QuestionList({ questions, politicianId, politicianSlug, politicianName, weekNumber, currentWeekNumber, isHistorical = false, period = "week", isOwner: isOwnerProp, ownerRole: ownerRoleProp, profileVerified = false, appearance = "default" }: QuestionListProps) {
+export function QuestionList({ questions, politicianId, memberIds, politicianSlug, politicianName, weekNumber, currentWeekNumber, isHistorical = false, period = "week", isOwner: isOwnerProp, ownerRole: ownerRoleProp, profileVerified = false, appearance = "default", profileSort }: QuestionListProps) {
   // Ownership stays client-side so the public profile can remain cached.
   const { user, isLoading: isUserLoading } = useUser();
   const membership = useOwnerMembership(politicianId, user);
   const isOwner = isOwnerProp ?? membership.isOwner;
   const ownerRole = ownerRoleProp ?? membership.ownerRole ?? undefined;
   const [localQuestions, setLocalQuestions] = useState<Question[]>(questions);
+  const [localSort, setLocalSort] = useState<"votes" | "newest" | "unanswered">("votes");
+  const questionSort = profileSort ?? localSort;
   const [showProfileBanner, setShowProfileBanner] = useState(false);
   const hasCheckedProfile = useRef(false);
   const face = appearance === "face";
@@ -435,11 +440,13 @@ export function QuestionList({ questions, politicianId, politicianSlug, politici
     }
   }, []);
 
+  const memberKey = [...new Set(memberIds ?? [politicianId])].sort().join(",");
   useEffect(() => {
     if (isHistorical || period !== "week") return;
     const supabase = createClient();
-    const channel = supabase.channel(`questions:${politicianId}:${weekNumber}`)
-      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "questions", filter: `politician_id=eq.${politicianId}` }, (payload) => {
+    const channel = supabase.channel(`questions:${politicianId}:${weekNumber}`);
+    for (const sourceId of memberKey.split(",")) channel
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "questions", filter: `politician_id=eq.${sourceId}` }, (payload) => {
         const updated = payload.new as { id: string; net_upvotes: number; status: string; week_number: number };
         if (updated.week_number !== weekNumber) return;
         if (updated.status !== "active") {
@@ -448,18 +455,23 @@ export function QuestionList({ questions, politicianId, politicianSlug, politici
         }
         setLocalQuestions((previous) => previous.map((question) => question.id === updated.id ? { ...question, net_upvotes: updated.net_upvotes } : question));
       })
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "questions", filter: `politician_id=eq.${politicianId}` }, (payload) => {
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "questions", filter: `politician_id=eq.${sourceId}` }, (payload) => {
         const question = payload.new as Question;
         if (question.week_number !== weekNumber || question.status !== "active") return;
         setLocalQuestions((previous) => previous.some((item) => item.id === question.id) ? previous : [...previous, { ...question, x_posts: null, answers: [] }]);
-      }).subscribe();
+      });
+    channel.subscribe();
     return () => { supabase.removeChannel(channel); };
-  }, [politicianId, weekNumber, isHistorical, period]);
+  }, [politicianId, memberKey, weekNumber, isHistorical, period]);
 
   const periodLabels = { week: "This week's questions", month: "Questions from the last 28 days", year: "Questions from the last 365 days", all: "All questions" };
   const emptyMessages = { week: "No questions this week", month: "No questions in the last 28 days", year: "No questions in the last 365 days", all: "No questions yet" };
   const title = isHistorical ? `${formatWeekBadge(weekNumber)} questions` : periodLabels[period];
-  const sorted = [...localQuestions].sort((first, second) => second.net_upvotes - first.net_upvotes);
+  const sorted = localQuestions
+    .filter((question) => questionSort !== "unanswered" || !question.answers.some((answer) => isPublishedAnswer(answer) && isOfficialAnswer(answer)))
+    .sort((first, second) => (questionSort === "newest" ? 0 : second.net_upvotes - first.net_upvotes)
+      || Date.parse(second.created_at) - Date.parse(first.created_at)
+      || first.id.localeCompare(second.id));
   const qualifying = sorted.filter((question) => question.net_upvotes >= 10);
 
   function renderQuestion(question: Question) {
@@ -468,7 +480,7 @@ export function QuestionList({ questions, politicianId, politicianSlug, politici
       votingDisabled={!canVoteOnQuestion(question.week_number, activeWeek, isHistorical)} onVoteSuccess={handleVoteSuccess}
       votesReady={votesReady} hydratedVote={voteHydration.identity === voteIdentity ? voteHydration.votes[question.id] ?? 0 : 0}
       voteIdentity={voteIdentity} onVoteSaved={handleVoteSaved}
-      isOwner={isOwner} ownerRole={ownerRole} profileVerified={profileVerified} appearance={appearance} />;
+      isOwner={isOwner && (!question.politician_id || question.politician_id === politicianId)} ownerRole={ownerRole} profileVerified={profileVerified} appearance={appearance} />;
   }
 
   return (
@@ -482,18 +494,37 @@ export function QuestionList({ questions, politicianId, politicianSlug, politici
       </div>}
       <div className={face ? styles.listHeading : "flex flex-wrap items-center justify-between gap-2"}>
         <h2 id="question-list-heading" className={face ? styles.listTitle : "text-lg font-semibold"}>{title}</h2>
-        <span className={face ? styles.meta : "text-sm text-muted-foreground"}>{localQuestions.length} question{localQuestions.length !== 1 ? "s" : ""} shown</span>
+        <label className={face ? styles.meta : "text-sm text-muted-foreground"}>
+          Sort questions{" "}
+          <select className="min-h-11 rounded-md border bg-background px-2 text-foreground" value={questionSort} onChange={(event) => {
+            const sort = event.target.value as typeof questionSort;
+            if (profileSort === undefined) {
+              setLocalSort(sort);
+              return;
+            }
+            const url = new URL(window.location.href);
+            if (sort === "votes") url.searchParams.delete("sort");
+            else url.searchParams.set("sort", sort);
+            url.hash = "profile-questions";
+            window.location.assign(url.href);
+          }}>
+            <option value="votes">Most votes</option>
+            <option value="newest">Newest</option>
+            <option value="unanswered">Most votes unanswered</option>
+          </select>
+        </label>
+        <span className={face ? styles.meta : "text-sm text-muted-foreground"} role="status">{sorted.length} question{sorted.length !== 1 ? "s" : ""} shown</span>
       </div>
       {!!currentQuestionIdsKey && !votesReady && <div role="status" className={face ? styles.profilePrompt : "flex flex-wrap items-center gap-3 text-sm"}>
         <p>{votesFailed ? "We could not load your previous votes. Voting is paused to keep your selections accurate." : "Loading your previous votes…"}</p>
         {votesFailed && <button type="button" className={face ? styles.textButton : "min-h-11 underline"} onClick={() => setVoteRetry((value) => value + 1)}>Retry loading votes</button>}
       </div>}
       {sorted.length === 0 ? <div className={face ? styles.empty : "rounded-xl border bg-card p-8 space-y-2"}>
-        <p>{isHistorical ? `No questions recorded for ${formatWeekBadge(weekNumber).toLowerCase()}.` : emptyMessages[period]}</p>
+        <p>{questionSort === "unanswered" ? "No unanswered questions in this view." : isHistorical ? `No questions recorded for ${formatWeekBadge(weekNumber).toLowerCase()}.` : emptyMessages[period]}</p>
         <p className={face ? styles.meta : "text-sm text-muted-foreground"}>{isHistorical || period !== "week" ? "Choose another period to explore the record." : "Have something to ask? Add your question for this week."}</p>
       </div> : <div className={face ? styles.group : "space-y-2"}>
         {sorted.map((question, index) => <div key={question.id}>
-          {(period === "week" || isHistorical) && qualifying.length > 0 && (index === 0 || index === qualifying.length) &&
+          {questionSort !== "newest" && (period === "week" || isHistorical) && qualifying.length > 0 && (index === 0 || index === qualifying.length) &&
             <p className={face ? styles.groupLabel : "text-sm font-medium text-muted-foreground"}>{index === 0 ? "10+ net votes" : "More questions"}</p>}
           {renderQuestion(question)}
         </div>)}

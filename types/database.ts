@@ -14,6 +14,117 @@ export type Database = {
   }
   public: {
     Tables: {
+      politician_verification_sources: {
+        Row: { politician_id: string; official_website_url: string; government_email_domains: string[]; evidence_url: string; reviewed_at: string; reviewed_by: string | null }
+        Insert: { politician_id: string; official_website_url: string; government_email_domains?: string[]; evidence_url: string; reviewed_at?: string; reviewed_by?: string | null }
+        Update: { politician_id?: string; official_website_url?: string; government_email_domains?: string[]; evidence_url?: string; reviewed_at?: string; reviewed_by?: string | null }
+        Relationships: [{ foreignKeyName: "politician_verification_sources_politician_id_fkey"; columns: ["politician_id"]; isOneToOne: true; referencedRelation: "politicians"; referencedColumns: ["id"] }]
+      }
+      politician_identity_observations: {
+        Row: {
+          id: string
+          namespace: string
+          external_id: string
+          canonical_id: string | null
+          source_profile_id: string | null
+          source_url: string | null
+          record: Json
+          review_required_fields: string[]
+          record_hash: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          namespace: string
+          external_id: string
+          canonical_id?: string | null
+          source_profile_id?: string | null
+          source_url?: string | null
+          record: Json
+          review_required_fields?: string[]
+          record_hash: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          namespace?: string
+          external_id?: string
+          canonical_id?: string | null
+          source_profile_id?: string | null
+          source_url?: string | null
+          record?: Json
+          review_required_fields?: string[]
+          record_hash?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
+      politician_external_identifiers: {
+        Row: {
+          namespace: string
+          external_id: string
+          canonical_id: string
+          source_profile_id: string
+          source_url: string | null
+          created_at: string
+        }
+        Insert: {
+          namespace: string
+          external_id: string
+          canonical_id: string
+          source_profile_id: string
+          source_url?: string | null
+          created_at?: string
+        }
+        Update: {
+          namespace?: string
+          external_id?: string
+          canonical_id?: string
+          source_profile_id?: string
+          source_url?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
+      politician_identity_decisions: {
+        Row: {
+          id: string
+          source_id: string
+          canonical_id: string
+          reviewed_by: string
+          evidence: Json
+          fields: Json
+          before_state: Json
+          dependency_counts: Json
+          transaction_id: number
+          created_at: string
+        }
+        Insert: {
+          id: string
+          source_id: string
+          canonical_id: string
+          reviewed_by: string
+          evidence: Json
+          fields: Json
+          before_state: Json
+          dependency_counts: Json
+          transaction_id?: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          source_id?: string
+          canonical_id?: string
+          reviewed_by?: string
+          evidence?: Json
+          fields?: Json
+          before_state?: Json
+          dependency_counts?: Json
+          transaction_id?: number
+          created_at?: string
+        }
+        Relationships: []
+      }
       ai_audit_log: {
         Row: {
           created_at: string
@@ -478,6 +589,7 @@ export type Database = {
       }
       politicians: {
         Row: {
+          canonical_politician_id: string | null
           aliases: string[]
           bio: string | null
           bioguide_id: string | null
@@ -515,6 +627,7 @@ export type Database = {
           website_url: string | null
         }
         Insert: {
+          canonical_politician_id?: string | null
           aliases?: string[]
           bio?: string | null
           bioguide_id?: string | null
@@ -552,6 +665,7 @@ export type Database = {
           website_url?: string | null
         }
         Update: {
+          canonical_politician_id?: string | null
           aliases?: string[]
           bio?: string | null
           bioguide_id?: string | null
@@ -589,6 +703,7 @@ export type Database = {
           website_url?: string | null
         }
         Relationships: [
+          { foreignKeyName: "politicians_canonical_politician_id_fkey"; columns: ["canonical_politician_id"]; isOneToOne: false; referencedRelation: "politicians"; referencedColumns: ["id"] },
           {
             foreignKeyName: "politicians_race_id_fkey"
             columns: ["race_id"]
@@ -1114,6 +1229,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      publish_x_post: { Args: { p_x_post_id: string; p_body: string; p_week_number: number }; Returns: Json }
+      ingest_politician_identity: { Args: { p_namespace: string; p_external_id: string; p_record: Json; p_source_url?: string | null; p_apply?: boolean }; Returns: Json }
+      link_politician_identity: {
+        Args: { p_source_id: string; p_canonical_id: string; p_source_updated_at: string; p_canonical_updated_at: string; p_expected_counts: Json; p_decision_id: string; p_reviewed_by: string; p_evidence: Json; p_fields?: Json }
+        Returns: Json
+      }
+      politician_identity_dependency_counts: { Args: { p_ids: string[] }; Returns: Json }
+      identity_profile_summary: { Args: { p_id: string; p_period: string; p_week: number; p_cutoff?: string | null }; Returns: Json }
+      identity_directory_counts: { Args: { p_ids: string[]; p_week: number }; Returns: Json }
+      identity_profile_question_ids: { Args: { p_id: string; p_period: string; p_week: number; p_cutoff?: string | null; p_sort?: string; p_limit?: number }; Returns: string[] }
+      canonical_politician_id: { Args: { p_id: string }; Returns: string }
+      resolve_politician_identity: { Args: { p_id: string }; Returns: Json }
       update_verified_profile: {
         Args: { p_actor: string; p_politician: string; p_fields: Json }
         Returns: string

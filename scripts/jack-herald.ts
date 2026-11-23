@@ -23,6 +23,7 @@ import * as crypto from "crypto";
 import { requireOutreachPreview, blockLegacyOutreachDelivery } from "../lib/notifications/outreach-guard";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
+import { canonicalProfile, idChunks, loadJackProfiles } from "./jack-identity";
 
 const supabase = createClient<Database>(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -39,7 +40,7 @@ const SITE_URL        = rawSiteUrl.includes("localhost") ? "https://whytho.us" :
 
 const args    = process.argv.slice(2);
 const DRY_RUN = requireOutreachPreview(args);
-const LIMIT   = parseInt(args.find((a) => a.startsWith("--limit="))?.split("=")[1] ?? "9999");
+const LIMIT   = Math.min(500, parseInt(args.find((a) => a.startsWith("--limit="))?.split("=")[1] ?? "500"));
 
 // ── OAuth 1.0a ────────────────────────────────────────────────────────────────
 
@@ -182,13 +183,16 @@ async function main() {
 
   // Filter out already-notified (check outreach log)
   const postIds = posts.map((p) => p.id);
-  const { data: alreadyLogged } = await supabase
-    .from("x_outreach_log")
-    .select("x_post_id")
-    .eq("target_type", "constituent")
-    .in("x_post_id", postIds);
-
-  const notifiedSet = new Set((alreadyLogged ?? []).map((r) => r.x_post_id));
+  const notifiedSet = new Set<string>();
+  for (const ids of idChunks(postIds)) {
+    for (let offset = 0; ; offset += 500) {
+      const { data, error } = await supabase.from("x_outreach_log").select("id,x_post_id")
+        .eq("target_type", "constituent").in("x_post_id", ids).order("id").range(offset, offset + 499);
+      if (error) throw error;
+      for (const row of data) if (row.x_post_id) notifiedSet.add(row.x_post_id);
+      if (data.length < 500) break;
+    }
+  }
   const toNotify = posts.filter((p) => !notifiedSet.has(p.id));
 
   console.log(`→ ${posts.length} published posts | ${toNotify.length} unnotified\n`);
@@ -198,17 +202,8 @@ async function main() {
     return;
   }
 
-  // Enrich with politician slugs
-  const polIds = [...new Set(toNotify.map((p) => p.politician_id).filter(Boolean))] as string[];
-  const { data: politicians } = await supabase
-    .from("politicians")
-    .select("id, slug, full_name")
-    .in("id", polIds);
-
-  const polMap = new Map<string, { slug: string; full_name: string }>();
-  for (const pol of politicians ?? []) {
-    polMap.set(pol.id, { slug: pol.slug, full_name: pol.full_name });
-  }
+  // Keep the source IDs in posts and logs; only the destination link resolves.
+  const profiles = await loadJackProfiles(supabase);
 
   // Send replies
   let sent    = 0;
@@ -216,7 +211,7 @@ async function main() {
   let errors  = 0;
 
   for (const post of toNotify) {
-    const pol = post.politician_id ? polMap.get(post.politician_id) : undefined;
+    const pol = post.politician_id ? canonicalProfile(profiles, post.politician_id) : undefined;
     if (!pol) {
       console.log(`  ⏭️  Skipping ${post.id} - no politician slug found`);
       skipped++;

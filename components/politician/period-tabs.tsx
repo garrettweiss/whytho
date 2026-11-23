@@ -14,15 +14,17 @@ interface PeriodTabsProps {
   slug: string;
   /** Current active period, passed from the server. */
   activePeriod: Period;
+  sort?: "votes" | "newest" | "unanswered";
 }
 
-export function PeriodTabs({ slug, activePeriod }: PeriodTabsProps) {
+export function PeriodTabs({ slug, activePeriod, sort = "votes" }: PeriodTabsProps) {
+  const sortParam = sort === "votes" ? "" : `&sort=${sort}`;
   return (
     <nav className={styles.periods} aria-label="Question period">
       {TABS.map((tab) => (
         <Link
           key={tab.value}
-          href={`/${slug}?period=${tab.value}#profile-questions`}
+          href={`/${slug}?period=${tab.value}${sortParam}#profile-questions`}
           aria-current={activePeriod === tab.value ? "page" : undefined}
         >
           {tab.label}

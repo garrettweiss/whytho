@@ -4,10 +4,8 @@
  * Promotes approved x_posts into WhyTho question records.
  * Runs after Curator approves posts (status='approved').
  *
- * For each approved x_post:
- *   1. Inserts a question row (source='x', is_seeded=false, x_post_id=...)
- *   2. Sets x_posts.whytho_question_id = new question ID
- *   3. Sets x_posts.status = 'published'
+ * One atomic RPC creates or recovers the source question, then links and marks
+ * the post published. Retries keep the existing question and source attribution.
  *
  * The tweet body becomes the question body verbatim.
  * Attribution is preserved via x_post_id → x_posts.author_handle / tweet_url.
@@ -23,6 +21,7 @@ dotenv.config({ path: ".env.local", override: true });
 
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
+import { canonicalProfile, loadJackProfiles } from "./jack-identity";
 
 const supabase = createClient<Database>(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -31,7 +30,7 @@ const supabase = createClient<Database>(
 
 const args = process.argv.slice(2);
 const DRY_RUN = args.includes("--dry-run");
-const LIMIT = parseInt(args.find((a) => a.startsWith("--limit="))?.split("=")[1] ?? "500");
+const LIMIT = Math.min(500, parseInt(args.find((a) => a.startsWith("--limit="))?.split("=")[1] ?? "500"));
 
 let published = 0;
 let skipped = 0;
@@ -40,8 +39,9 @@ let errors = 0;
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 async function getCurrentWeek(): Promise<number> {
-  const { data } = await supabase.rpc("current_week_number");
-  return data as number;
+  const { data, error } = await supabase.rpc("current_week_number");
+  if (error || typeof data !== "number" || !Number.isInteger(data)) throw new Error("Reporting week unavailable");
+  return data;
 }
 
 function cleanBody(raw: string): string {
@@ -82,11 +82,12 @@ async function main() {
     console.log("Nothing to publish. Run jack-harvester + jack-curator first.");
     return;
   }
+  const profiles = DRY_RUN ? await loadJackProfiles(supabase) : [];
 
   for (const post of posts) {
     const body = cleanBody(post.body!);
-    if (body.length < 10) {
-      console.log(`  ⏭️  Skipping @${post.author_handle} — body too short after cleaning`);
+    if (body.length < 10 || body.length > 500) {
+      console.log(`  Skipping @${post.author_handle}: body must be 10 to 500 characters`);
       skipped++;
       continue;
     }
@@ -94,52 +95,21 @@ async function main() {
     console.log(`  📝 @${post.author_handle} → "${body.slice(0, 80)}..."`);
 
     if (DRY_RUN) {
-      console.log(`     [dry run — would create question for politician ${post.politician_id}]`);
+      const canonical = post.politician_id ? canonicalProfile(profiles, post.politician_id) : undefined;
+      if (!canonical) { errors++; console.log("     Identity unavailable; publication blocked"); continue; }
+      console.log(`     [dry run: source ${post.politician_id}, canonical question destination ${canonical.id}]`);
       published++;
       continue;
     }
 
     try {
-      // Insert the WhyTho question
-      const { data: question, error: qErr } = await supabase
-        .from("questions")
-        .insert({
-          body,
-          politician_id: post.politician_id!,
-          week_number: weekNumber,
-          source: "x",
-          is_seeded: false,
-          submitted_by: null,
-          x_post_id: post.id,
-          status: "active",
-          net_upvotes: 0,
-        })
-        .select("id")
-        .single();
-
-      if (qErr) {
-        if (qErr.code === "23505") {
-          console.log(`     ⏭️  Duplicate — already exists`);
-          skipped++;
-          continue;
-        }
-        throw qErr;
+      const { data, error } = await supabase.rpc("publish_x_post", { p_x_post_id: post.id, p_body: body, p_week_number: weekNumber });
+      if (error) throw error;
+      if (!data || typeof data !== "object" || Array.isArray(data) || typeof data.question_id !== "string" || typeof data.published !== "boolean") {
+        throw new Error("Publication result unavailable; inspect the post before retrying");
       }
-
-      // Link x_post → question + mark published
-      const { error: updateErr } = await supabase
-        .from("x_posts")
-        .update({
-          whytho_question_id: question.id,
-          status: "published",
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", post.id);
-
-      if (updateErr) throw updateErr;
-
-      console.log(`     ✅ Question created (${question.id})`);
-      published++;
+      console.log(`     Question ${data.question_id}: ${data.published ? "published" : "existing publication retained"}`);
+      if (data.published) published++; else skipped++;
     } catch (err) {
       console.log(`     ❌ Error: ${err instanceof Error ? err.message : String(err)}`);
       errors++;
@@ -151,8 +121,8 @@ async function main() {
   console.log(`   Published: ${published}`);
   console.log(`   Skipped:   ${skipped}`);
   if (errors > 0) console.log(`   Errors:    ${errors}`);
-  console.log(`\n   Questions now live with source='x' — visible on politician profiles.`);
-  console.log(`   Next: npx tsx scripts/jack-herald.ts  (notify via @WhyTho_official)`);
+  console.log(DRY_RUN ? "\n   Preview complete; no publication writes." : "\n   Published questions are visible on canonical politician profiles.");
+  console.log("   Herald remains preview-only; outbound messages require separate approval.");
 }
 
 main().catch((err) => {

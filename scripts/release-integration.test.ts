@@ -161,6 +161,14 @@ function fixture(options: { user?: User | null; role?: string; draft?: boolean; 
     "next/headers": { cookies: async () => ({ get: () => options.cookie ? { value: options.cookie } : undefined }) },
     "next/link": { __esModule: true, default: ({ children, ...props }: { children?: React.ReactNode }) => React.createElement("a", props, children) },
     "@/lib/email/resend": { FROM_EMAIL: "offline@example.test", getResend: () => ({ emails: { send: async (email: unknown) => { emails.push(email); } } }) },
+    "@/lib/identity/server": { resolvePoliticianIdentity: async (id: string) => {
+      if (failedReads.has("politicians")) throw new Error("Identity unavailable");
+      const source = data.politicians!.find(row => row.id === id);
+      if (!source) return null;
+      const canonicalId = String(source.canonical_politician_id ?? source.id);
+      const canonical = data.politicians!.find(row => row.id === canonicalId)!;
+      return { canonicalId, canonicalSlug: canonical.slug, memberIds: data.politicians!.filter(row => row.id === canonicalId || row.canonical_politician_id === canonicalId).map(row => row.id) };
+    } },
     "@/lib/email/templates": { answerNotificationEmail: () => ({}), draftAnswerNotificationEmail: () => ({}), claimWelcomeEmail: () => ({}), teamInviteEmail: () => ({}) },
   };
   for (const [path, name] of [
@@ -585,4 +593,18 @@ test("platform admin status alone does not grant a politician team voice", async
   assert.equal((await f.load<Route>("app/api/answers/route.ts").POST(jsonRequest({ question_id: QUESTION, body: "A site administrator attempting to answer." }))).status, 403);
   assert.equal((await f.load<Route>("app/api/dashboard/team/route.ts").GET(new NextRequest(`https://whytho.example.test/api/dashboard/team?politician_id=${POLITICIAN}`))).status, 403);
   assert.equal(f.data.answers!.length, 0);
+});
+
+
+test("claiming an old identity URL targets only the canonical profile and fails closed", async () => {
+  const f = fixture();
+  f.data.politicians!.push({ id: OTHER, canonical_politician_id: POLITICIAN, slug: "old-profile" });
+  f.rpcOverrides.set("claim_politician_profile", { data: { success: true, resumed: true }, error: null });
+  const route = f.load<Route>("app/api/verify/claim/route.ts");
+  assert.equal((await route.POST(jsonRequest({ politician_id: OTHER }))).status, 200);
+  assert.deepEqual(f.rpcCalls.at(-1)?.args, { p_actor_id: USER, p_politician_id: POLITICIAN });
+  f.failedReads.add("politicians");
+  const calls = f.rpcCalls.length;
+  assert.equal((await route.POST(jsonRequest({ politician_id: OTHER }))).status, 503);
+  assert.equal(f.rpcCalls.length, calls);
 });

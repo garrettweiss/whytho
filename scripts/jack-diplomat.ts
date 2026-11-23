@@ -24,6 +24,7 @@ import * as crypto from "crypto";
 import { requireOutreachPreview, blockLegacyOutreachDelivery } from "../lib/notifications/outreach-guard";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
+import { canonicalProfile, collectionTargets, idChunks, identityMemberIds, loadJackProfiles } from "./jack-identity";
 
 const supabase = createClient<Database>(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -131,39 +132,29 @@ async function main() {
     throw new Error("Missing X OAuth credentials. Check X_API_KEY, X_API_SECRET, X_ACCESS_TOKEN, X_ACCESS_TOKEN_SECRET");
   }
 
-  // Find politicians with qualifying questions (no WhyTho account, has X handle)
-  const { data: politicians, error } = await supabase
-    .from("politicians")
-    .select("id, full_name, slug, social_handles, verification_tier")
-    .eq("verification_tier", "0") // UNCLAIMED only - don't outreach to politicians who already joined
-    .not("social_handles", "is", null)
-    .limit(500); // fetch wide, filter below
-
-  if (error) throw error;
-
-  // Filter: must have a Twitter handle
-  const withHandles = (politicians ?? []).filter((p) => {
-    const handles = (p.social_handles ?? {}) as Record<string, string>;
-    return !!handles.twitter;
+  const profiles = await loadJackProfiles(supabase);
+  const withHandles = collectionTargets(profiles).filter(profile => {
+    const members = new Set(identityMemberIds(profiles, profile.id));
+    return !profiles.some(row => members.has(row.id) && row.verification_tier !== "0");
   });
 
   console.log(`→ ${withHandles.length} unclaimed politicians with X handles\n`);
 
   // Check which have qualifying questions
-  const polIds = withHandles.map((p) => p.id);
-
-  const { data: qualifyingQuestions } = await supabase
-    .from("questions")
-    .select("politician_id")
-    .in("politician_id", polIds)
-    .gte("net_upvotes", MIN_VOTES)
-    .eq("status", "active");
-
-  // Count qualifying questions per politician
+  const polIds = withHandles.flatMap(profile => identityMemberIds(profiles, profile.id));
   const qualifyingCounts = new Map<string, number>();
-  for (const q of qualifyingQuestions ?? []) {
-    if (!q.politician_id) continue;
-    qualifyingCounts.set(q.politician_id, (qualifyingCounts.get(q.politician_id) ?? 0) + 1);
+  for (const ids of idChunks(polIds)) {
+    for (let offset = 0; ; offset += 500) {
+      const { data, error } = await supabase.from("questions").select("id,politician_id")
+        .in("politician_id", ids).gte("net_upvotes", MIN_VOTES).eq("status", "active")
+        .order("id").range(offset, offset + 499);
+      if (error) throw error;
+      for (const question of data) {
+        const canonical = canonicalProfile(profiles, question.politician_id);
+        if (canonical) qualifyingCounts.set(canonical.id, (qualifyingCounts.get(canonical.id) ?? 0) + 1);
+      }
+      if (data.length < 500) break;
+    }
   }
 
   const eligible = withHandles
@@ -179,15 +170,20 @@ async function main() {
   }
 
   // Filter out already-contacted (check x_outreach_log)
-  const eligibleIds = eligible.map((p) => p.id);
-  const { data: alreadyContacted } = await supabase
-    .from("x_outreach_log")
-    .select("politician_id")
-    .eq("target_type", "politician")
-    .in("politician_id", eligibleIds);
-
-  const contactedSet = new Set((alreadyContacted ?? []).map((r) => r.politician_id));
-  const toContact    = eligible.filter((p) => !contactedSet.has(p.id));
+  const contactedIds = new Set<string>();
+  const contactedHandles = new Set<string>();
+  for (let offset = 0; ; offset += 500) {
+    const { data, error } = await supabase.from("x_outreach_log").select("id,politician_id,target_handle")
+      .eq("target_type", "politician").order("id").range(offset, offset + 499);
+    if (error) throw error;
+    for (const log of data) {
+      const canonical = log.politician_id ? canonicalProfile(profiles, log.politician_id) : undefined;
+      if (canonical) contactedIds.add(canonical.id);
+      if (log.target_handle) contactedHandles.add(log.target_handle.replace(/^@/, "").toLowerCase());
+    }
+    if (data.length < 500) break;
+  }
+  const toContact = eligible.filter(profile => !contactedIds.has(profile.id) && !contactedHandles.has(profile.verifiedHandle.toLowerCase()));
 
   console.log(`→ ${toContact.length} not yet contacted\n`);
 
@@ -201,8 +197,7 @@ async function main() {
   let errors  = 0;
 
   for (const pol of toContact) {
-    const handles      = (pol.social_handles ?? {}) as Record<string, string>;
-    const twitterHandle = handles.twitter;
+    const twitterHandle = pol.verifiedHandle;
     if (!twitterHandle) { skipped++; continue; }
 
     const questionCount = qualifyingCounts.get(pol.id) ?? 0;

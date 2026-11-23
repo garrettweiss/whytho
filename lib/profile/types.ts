@@ -32,6 +32,7 @@ export type ProfileAnswer = {
 
 export type ProfileQuestion = {
   id: string;
+  politician_id: string;
   body: string;
   net_upvotes: number;
   is_seeded: boolean;
@@ -45,6 +46,7 @@ export type ProfileQuestion = {
 
 export type PublicProfileData = {
   politician: PublicProfilePolitician;
+  memberIds: string[];
   currentWeekNumber: number;
   isHistoricalView: boolean;
   viewingWeekNumber: number;
@@ -64,5 +66,5 @@ export type ProfileView = Pick<PublicProfileData,
 >;
 
 export type ProfileMetadata = Pick<PublicProfilePolitician,
-  "full_name" | "office" | "state" | "party" | "photo_url" | "bio" | "is_test"
+  "slug" | "full_name" | "office" | "state" | "party" | "photo_url" | "bio" | "is_test"
 >;

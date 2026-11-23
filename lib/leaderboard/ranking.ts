@@ -1,5 +1,5 @@
 import { isPublishedOfficialAnswer, isValidIsoWeek, safeWebUrl } from "../profile/helpers";
-import type { LeaderboardEntry, OfficialAnswerReference, RankingQuestion } from "./types";
+import type { LeaderboardEntry, OfficialAnswerReference, RankingQuestion, RankingPolitician } from "./types";
 
 export const LEADERBOARD_QUERY_PAGE_SIZE = 500;
 export const LEADERBOARD_DISPLAY_PAGE_SIZE = 50;
@@ -30,13 +30,14 @@ export function rankOfficialResponses(
   questions: readonly RankingQuestion[],
   answers: readonly OfficialAnswerReference[],
   weekNumber: number,
+  canonicalPeople?: ReadonlyMap<string, RankingPolitician>,
 ): LeaderboardEntry[] {
   if (!isValidIsoWeek(weekNumber)) throw new Error("Invalid leaderboard week");
   const eligibleQuestions = new Map<string, RankingQuestion>();
   for (const question of questions) {
     const politician = question.politicians;
     if (question.week_number !== weekNumber || question.status !== "active" || question.net_upvotes < 10 ||
-      !politician?.is_active || politician.is_test) continue;
+      !politician || (!canonicalPeople && !politician.is_active) || politician.is_test) continue;
     if (!Number.isSafeInteger(question.net_upvotes) || politician.id !== question.politician_id) {
       throw new Error("Inconsistent qualifying question");
     }
@@ -55,7 +56,9 @@ export function rankOfficialResponses(
 
   const politicians = new Map<string, LeaderboardEntry>();
   for (const question of eligibleQuestions.values()) {
-    const politician = question.politicians!;
+    const politician = canonicalPeople ? canonicalPeople.get(question.politician_id) : question.politicians!;
+    if (!politician) throw new Error("Missing leaderboard canonical identity");
+    if (politician.is_test || !politician.is_active) continue;
     let entry = politicians.get(politician.id);
     if (!entry) {
       entry = {

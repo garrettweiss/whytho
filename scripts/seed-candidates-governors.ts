@@ -5,11 +5,13 @@
  * Data sourced from public record (Ballotpedia, state election offices).
  *
  * Covers all 36 states with governor races in 2026.
- * Incumbents running for re-election are matched to existing politician records.
- * Challengers are inserted as new profiles.
+ * The historical built-in list is preview-only. Apply requires a reviewed JSON
+ * manifest with stable external_id, source_url, reviewed_at and announced:true.
+ * Identity matches are resolved transactionally; name-only matches need review.
  *
  * Usage:
- *   npx tsx scripts/seed-candidates-governors.ts
+ *   npx tsx scripts/seed-candidates-governors.ts         # read-only preview
+ *   npx tsx scripts/seed-candidates-governors.ts --apply --reviewed-candidates=reviewed.json
  *   npx tsx scripts/seed-candidates-governors.ts --dry-run
  *   npx tsx scripts/seed-candidates-governors.ts --state CA
  */
@@ -17,6 +19,10 @@
 import { createClient } from "@supabase/supabase-js";
 import * as dotenv from "dotenv";
 import * as path from "path";
+import { readFileSync } from "node:fs";
+import type { Database } from "../types/database";
+import { importCivicObservation, shouldApplyImport } from "../lib/civic/import-observation";
+import { normalizeStateCode } from "../lib/civic/normalize";
 
 dotenv.config({
   path: path.resolve(process.cwd(), ".env.local"),
@@ -25,9 +31,11 @@ dotenv.config({
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_KEY);
 
-const DRY_RUN = process.argv.includes("--dry-run");
+const APPLY = shouldApplyImport(process.argv.slice(2));
+const DRY_RUN = !APPLY;
+const MANIFEST_PATH = process.argv.find((arg) => arg.startsWith("--reviewed-candidates="))?.slice("--reviewed-candidates=".length);
 const STATE_FILTER = (() => {
   const idx = process.argv.indexOf("--state");
   return idx !== -1 ? process.argv[idx + 1]?.toUpperCase() : null;
@@ -46,6 +54,9 @@ interface GovCandidate {
   party: string;
   incumbent_challenge: "I" | "C" | "O";
   announced?: boolean; // false = likely running but not officially announced
+  external_id?: string;
+  source_url?: string;
+  reviewed_at?: string;
 }
 
 const GOV_CANDIDATES_2026: GovCandidate[] = [
@@ -158,85 +169,54 @@ const GOV_CANDIDATES_2026: GovCandidate[] = [
   { name: "Mark Gordon", state: "WY", party: "Republican", incumbent_challenge: "I" },
 ];
 
-// ── Slug generation ───────────────────────────────────────────────────────────
-
-function makeSlug(name: string, state: string): string {
-  return [name, state, "governor"]
-    .join(" ")
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-")
-    .slice(0, 80);
+function loadCandidates(): GovCandidate[] {
+  if (!MANIFEST_PATH) {
+    if (APPLY) throw new Error("Built-in governor candidates are unreviewed. --apply requires --reviewed-candidates=path.json");
+    console.log("Historical built-in candidate list: discovery preview only; no candidacy is verified.");
+    return GOV_CANDIDATES_2026;
+  }
+  const rows: unknown = JSON.parse(readFileSync(MANIFEST_PATH, "utf8"));
+  if (!Array.isArray(rows)) throw new Error("Reviewed candidate manifest must be a JSON array");
+  const ids = new Set<string>();
+  return rows.map((value: unknown) => {
+    const row = value as GovCandidate;
+    if (!row || typeof row.name !== "string" || !row.name.trim() ||
+        typeof row.state !== "string" || typeof row.party !== "string" || !row.party.trim() ||
+        !["I", "C", "O"].includes(row.incumbent_challenge) || row.announced !== true ||
+        typeof row.external_id !== "string" || !row.external_id.trim() ||
+        typeof row.source_url !== "string" || !/^https:\/\//.test(row.source_url) ||
+        typeof row.reviewed_at !== "string" || !Number.isFinite(Date.parse(row.reviewed_at))) {
+      throw new Error("Each reviewed candidate requires name, state, party, incumbent_challenge, announced:true, external_id, source_url and reviewed_at");
+    }
+    const externalId = row.external_id.trim();
+    if (ids.has(externalId)) throw new Error(`Repeated governor provider ID in manifest: ${externalId}`);
+    ids.add(externalId);
+    return { ...row, state: normalizeStateCode(row.state), external_id: externalId };
+  });
 }
 
-// ── Upsert ────────────────────────────────────────────────────────────────────
-
-async function upsertGovCandidate(
-  candidate: GovCandidate
-): Promise<"inserted" | "updated" | "skipped"> {
-  // Match by name + state + Governor office
-  const { data: existing } = await supabase
-    .from("politicians")
-    .select("id, slug, full_name, office")
-    .ilike("full_name", candidate.name)
-    .eq("state", candidate.state)
-    .ilike("office", "%governor%")
-    .maybeSingle();
-
-  if (existing) {
-    if (!DRY_RUN) {
-      await supabase
-        .from("politicians")
-        .update({
-          is_candidate: true,
-          candidate_election_year: ELECTION_YEAR,
-          candidate_office: "Governor",
-          incumbent_challenge: candidate.incumbent_challenge,
-          party: candidate.party,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", existing.id);
-    }
-    return "updated";
-  }
-
-  // New challenger or unmatched incumbent — insert
-  const slug = makeSlug(candidate.name, candidate.state);
-
-  const { data: slugCheck } = await supabase
-    .from("politicians")
-    .select("id")
-    .eq("slug", slug)
-    .maybeSingle();
-
-  const finalSlug = slugCheck
-    ? `${slug}-${candidate.state.toLowerCase()}-2026`
-    : slug;
-
-  if (!DRY_RUN) {
-    const { error } = await supabase.from("politicians").insert({
-      slug: finalSlug,
+async function upsertGovCandidate(candidate: GovCandidate): Promise<"inserted" | "updated" | "skipped"> {
+  const state = normalizeStateCode(candidate.state);
+  const result = await importCivicObservation(supabase, {
+    namespace: "reviewed.governor",
+    externalId: candidate.external_id ?? `unreviewed:${state}:${candidate.name.toLowerCase()}`,
+    sourceUrl: candidate.source_url ?? null,
+    record: {
       full_name: candidate.name,
+      state,
       office: "Governor",
-      state: candidate.state,
       party: candidate.party,
-      is_active: true,
-      is_test: false,
       is_candidate: true,
       candidate_election_year: ELECTION_YEAR,
       candidate_office: "Governor",
       incumbent_challenge: candidate.incumbent_challenge,
-      verification_tier: "0",
-    });
-
-    if (error) {
-      console.error(`  ❌ Insert failed for ${candidate.name}: ${error.message}`);
-      return "skipped";
-    }
+    },
+  }, APPLY);
+  if (result.status === "review_required") {
+    console.warn(`  Review required for ${candidate.name}: ${result.reason}`);
+    return "skipped";
   }
-
-  return "inserted";
+  return result.status === "matched" ? "updated" : "inserted";
 }
 
 // ── Main ─────────────────────────────────────────────────────────────────────
@@ -247,16 +227,24 @@ async function main() {
   if (STATE_FILTER) console.log(`   State filter: ${STATE_FILTER}`);
   console.log("");
 
+  const sourceCandidates = loadCandidates();
   const candidates = STATE_FILTER
-    ? GOV_CANDIDATES_2026.filter((c) => c.state === STATE_FILTER)
-    : GOV_CANDIDATES_2026;
+    ? sourceCandidates.filter((c) => c.state === normalizeStateCode(STATE_FILTER))
+    : sourceCandidates;
 
   console.log(`   ${candidates.length} candidates to process`);
 
   let inserted = 0, updated = 0, skipped = 0;
 
   for (const candidate of candidates) {
-    const result = await upsertGovCandidate(candidate);
+    let result: "inserted" | "updated" | "skipped";
+    try {
+      result = await upsertGovCandidate(candidate);
+    } catch (error) {
+      console.error(`Import failed for ${candidate.name}:`, error);
+      process.exitCode = 1;
+      result = "skipped";
+    }
     const icon = result === "inserted" ? "+" : result === "updated" ? "~" : "·";
     console.log(`  ${icon} ${candidate.name} (${candidate.state}) — ${result}`);
     if (result === "inserted") inserted++;

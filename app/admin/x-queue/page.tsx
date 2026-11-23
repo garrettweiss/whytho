@@ -48,18 +48,30 @@ export default async function XQueuePage({ searchParams }: Props) {
     ]);
 
   // Posts for active tab
-  const { data: posts } = await admin
+  const { data: posts, error: postsError } = await admin
     .from("x_posts")
     .select(`
       id, tweet_id, body, author_handle, author_name,
       likes, retweets, reply_count, tweet_date, tweet_url,
       curator_score, curator_notes, rejection_reason, theme_tags,
       status, politician_id,
-      politicians!politician_id (full_name, office, state, slug)
+      politicians!politician_id (id, canonical_politician_id, full_name, office, state, slug)
     `)
     .eq("status", activeStatus)
     .order("curator_score", { ascending: false })
     .limit(100);
+  if (postsError) throw new Error("X review queue unavailable");
+  const canonicalIds = [...new Set((posts ?? []).flatMap(post => {
+    const source = Array.isArray(post.politicians) ? post.politicians[0] : post.politicians;
+    return source?.canonical_politician_id ? [source.canonical_politician_id] : [];
+  }))];
+  const canonicalProfiles = new Map<string, { id: string; full_name: string; state: string | null; slug: string }>();
+  if (canonicalIds.length) {
+    const { data, error } = await admin.from("politicians").select("id,full_name,state,slug")
+      .in("id", canonicalIds).is("canonical_politician_id", null).eq("is_active", true).eq("is_test", false);
+    if (error || data.length !== canonicalIds.length) throw new Error("X review identities unavailable");
+    for (const profile of data) canonicalProfiles.set(profile.id, profile);
+  }
 
   const secretParam = `?secret=${secret}`;
 
@@ -131,9 +143,12 @@ export default async function XQueuePage({ searchParams }: Props) {
         ) : (
           <div className="space-y-4">
             {(posts as typeof posts).map((post) => {
-              const politician = Array.isArray(post.politicians)
+              const sourcePolitician = Array.isArray(post.politicians)
                 ? post.politicians[0]
                 : post.politicians;
+              const politician = sourcePolitician?.canonical_politician_id
+                ? canonicalProfiles.get(sourcePolitician.canonical_politician_id)
+                : sourcePolitician;
 
               const tags = (post.theme_tags ?? []) as string[];
 
@@ -225,6 +240,9 @@ export default async function XQueuePage({ searchParams }: Props) {
                       ) : (
                         <span>Unknown politician</span>
                       )}
+                      {sourcePolitician?.canonical_politician_id && <p className="mt-1">
+                        Original profile: <Link href={`/${sourcePolitician.slug}`} className="underline">{sourcePolitician.full_name}</Link>
+                      </p>}
                     </div>
 
                     {activeStatus === "review" && (

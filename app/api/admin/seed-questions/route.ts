@@ -1,3 +1,4 @@
+import { resolvePoliticianIdentity } from "@/lib/identity/server";
 /**
  * POST /api/admin/seed-questions
  *
@@ -35,14 +36,17 @@ async function seedForPolitician(
   weekNumber: number,
   supabase: ReturnType<typeof createAdminClient>
 ): Promise<{ inserted: number; skipped: number; error?: string }> {
-  // Fetch existing questions this week to dedup against
-  const { data: existing } = await supabase
+  const identity = await resolvePoliticianIdentity(politician.id, supabase);
+  if (!identity) throw new Error("Profile identity unavailable");
+  // Fetch existing questions across every original profile before generating.
+  const { data: existing, error: existingError } = await supabase
     .from("questions")
     .select("body")
-    .eq("politician_id", politician.id)
+    .in("politician_id", identity.memberIds)
     .eq("week_number", weekNumber)
     .eq("status", "active");
 
+  if (existingError) throw new Error("Existing questions unavailable");
   const existingBodies = (existing ?? []).map((q) => q.body);
 
   // Generate candidate questions
@@ -62,14 +66,14 @@ async function seedForPolitician(
 
   for (const candidate of candidates) {
     // Skip if semantically similar to an existing question
-    const isDup = await isDuplicateQuestion(candidate.body, existingBodies).catch(() => false);
+    const isDup = await isDuplicateQuestion(candidate.body, existingBodies);
     if (isDup) {
       skipped++;
       continue;
     }
 
     const { error } = await supabase.from("questions").insert({
-      politician_id: politician.id,
+      politician_id: identity.canonicalId,
       body: candidate.body,
       week_number: weekNumber,
       is_seeded: true,
@@ -113,11 +117,13 @@ export async function POST(request: NextRequest) {
   }> = [];
 
   if (body.politician_id) {
+    const identity = await resolvePoliticianIdentity(body.politician_id, supabase);
+    if (!identity) return NextResponse.json({ error: "Politician not found" }, { status: 404 });
     // Single politician
     const { data: politician } = await supabase
       .from("politicians")
       .select("id, full_name, office, state, party, bio, bioguide_id")
-      .eq("id", body.politician_id)
+      .eq("id", identity.canonicalId)
       .eq("is_active", true)
       .single();
 
@@ -135,14 +141,18 @@ export async function POST(request: NextRequest) {
       .from("politicians")
       .select("id, full_name, office, state, party, bio, bioguide_id")
       .eq("is_active", true)
-      .not(
-        "id",
-        "in",
-        `(SELECT DISTINCT politician_id FROM questions WHERE week_number = ${body.week_number} AND is_seeded = true)`
-      )
+      .eq("is_test", false)
+      .is("canonical_politician_id", null)
+      .order("id")
       .limit(limit);
 
     for (const politician of politicians ?? []) {
+      const identity = await resolvePoliticianIdentity(politician.id, supabase);
+      if (!identity) throw new Error("Identity unavailable");
+      const { count, error } = await supabase.from("questions").select("id", { count: "exact", head: true })
+        .in("politician_id", identity.memberIds).eq("week_number", body.week_number).eq("is_seeded", true);
+      if (error) throw new Error("Seed history unavailable");
+      if (count) continue;
       const result = await seedForPolitician(politician, body.week_number, supabase);
       results.push({ politician_id: politician.id, name: politician.full_name, ...result });
     }

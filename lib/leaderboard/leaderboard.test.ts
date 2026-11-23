@@ -84,3 +84,26 @@ test("display pagination does not alter ranks or accept unbounded page values", 
   for (const value of ["-1", "2x", "1e3", "99999999999999", undefined]) assert.equal(leaderboardDisplayPage(value, 1501), 1);
   assert.equal(leaderboardDisplayPage("2", 0), 1);
 });
+
+
+test("linked profiles combine counts after validating original answer ownership", () => {
+  const canonical = politician("canonical"), source = politician("source");
+  const questions = [question("one", canonical), question("two", source)];
+  const mapping = new Map([[canonical.id, canonical], [source.id, canonical]]);
+  const ranking = rankOfficialResponses(questions, [answer("wrong", "two", canonical.id), answer("right", "one", canonical.id)], WEEK, mapping);
+  assert.equal(ranking.length, 1);
+  assert.equal(ranking[0]?.id, canonical.id);
+  assert.equal(ranking[0]?.qualifyingQuestions, 2);
+  assert.equal(ranking[0]?.answeredQualifying, 1);
+  assert.equal(ranking[0]?.responseRate, 50);
+  assert.equal(questions[1]?.politician_id, source.id);
+  assert.throws(() => rankOfficialResponses(questions, [], WEEK, new Map([[canonical.id, canonical]])), /Missing.*identity/);
+});
+
+test("an inactive original record retains its questions under an active canonical profile", () => {
+  const source = politician("source", { is_active: false }), root = politician("root");
+  const results = rankOfficialResponses([question("q", source)], [answer("a", "q", source.id)], WEEK, new Map([[source.id, root]]));
+  assert.equal(results.length, 1);
+  assert.equal(results[0]?.answeredQualifying, 1);
+  assert.equal(results[0]?.id, root.id);
+});

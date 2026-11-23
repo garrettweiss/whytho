@@ -1,3 +1,4 @@
+import { CanonicalProfileRedirect } from "@/components/profile/canonical-profile-redirect";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
@@ -17,7 +18,7 @@ import styles from "@/components/profile/profile.module.css";
 
 interface Props {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ week?: string; period?: string }>;
+  searchParams: Promise<{ week?: string; period?: string; sort?: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -28,6 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const images = politician.photo_url ? [politician.photo_url] : [];
   return {
     title, description,
+    alternates: { canonical: `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://whytho.us"}/${politician.slug}` },
     robots: politician.is_test ? { index: false, follow: false } : undefined,
     openGraph: { title, description, images, type: "profile" },
     twitter: { card: "summary_large_image", title, description, images },
@@ -59,10 +61,12 @@ function socialLinks(value: unknown, website: string | null) {
 
 export default async function PoliticianProfilePage({ params, searchParams }: Props) {
   const { slug } = await params;
-  const { week, period: requestedPeriod } = await searchParams;
-  const data = await getProfile(slug, week, requestedPeriod);
+  const { week, period: requestedPeriod, sort: requestedSort } = await searchParams;
+  const sort = requestedSort === "newest" || requestedSort === "unanswered" ? requestedSort : "votes";
+  const data = await getProfile(slug, week, requestedPeriod, sort);
   if (!data) notFound();
   const { politician, questions, period, isHistoricalView, viewingWeekNumber, currentWeekNumber } = data;
+  const matchingQuestions = sort === "unanswered" ? data.totalQuestions - data.officialAnsweredQuestions : data.totalQuestions;
   const periodLabel = isHistoricalView ? formatWeek(viewingWeekNumber) : {
     week: `This week · ${formatWeek(currentWeekNumber)}`,
     month: "Questions from the past 28 days",
@@ -83,6 +87,7 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
 
   return (
     <main className={`${styles.surface} ${faceBody.variable} ${faceDisplay.variable}`}>
+      {politician.slug !== slug && <CanonicalProfileRedirect slug={politician.slug} />}
       <ProfileViewTracker slug={politician.slug} politicianId={politician.id} office={politician.office} state={politician.state} verificationTier={politician.verification_tier} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }} />
       <div className={styles.container}>
@@ -91,7 +96,7 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
           <span>{politician.is_test ? "Test profile" : "The public record"}</span>
         </div>
         <OwnerBanner politicianId={politician.id} />
-        {isHistoricalView && <div className={styles.notice}><p>Archive: {formatWeek(viewingWeekNumber)}. Asking and voting are closed for this week.</p><Link href={`/${slug}`}>Return to this week →</Link></div>}
+        {isHistoricalView && <div className={styles.notice}><p>Archive: {formatWeek(viewingWeekNumber)}. Asking and voting are closed for this week.</p><Link href={`/${politician.slug}`}>Return to this week →</Link></div>}
 
         <section className={styles.hero} aria-labelledby="politician-name">
           <ProfilePortrait photoUrl={politician.photo_url} name={politician.full_name} responded={data.officialAnsweredQuestions > 0} />
@@ -103,7 +108,7 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
             <p className={styles.verification}>{tierLabel}</p>
             {politician.is_candidate && politician.candidate_election_year && <p className={styles.candidate}>{politician.candidate_status === "lost" ? "Candidate in" : politician.candidate_status === "withdrew" ? "Withdrew from" : politician.candidate_status === "won" ? "Won in" : "Running in"} {politician.candidate_election_year}{politician.candidate_office ? ` · ${politician.candidate_office}` : ""}{politician.incumbent_challenge === "I" ? " · Incumbent" : ""}</p>}
             <div className={styles.identityActions}>
-              {currentWeekView ? <AskQuestionLink /> : <Link className={styles.primaryAction} href={`/${slug}#ask-question`}>Ask this week <span aria-hidden="true">↗</span></Link>}
+              {currentWeekView ? <AskQuestionLink /> : <Link className={styles.primaryAction} href={`/${politician.slug}#ask-question`}>Ask this week <span aria-hidden="true">↗</span></Link>}
               <a className={styles.secondaryAction} href="#profile-questions">Read the questions ↓</a>
             </div>
             {politician.bio && <details className={styles.about}><summary>About {politician.full_name}</summary><p>{politician.bio}</p></details>}
@@ -124,19 +129,19 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
           </section>
         </section>
 
-        <QuestionAnchorNotice slug={slug} displayedIds={questions.map((question) => question.id)} />
+        <QuestionAnchorNotice slug={politician.slug} displayedIds={questions.map((question) => question.id)} />
         <div className={styles.mainLayout}>
           <section className={styles.questions} id="profile-questions" tabIndex={-1} aria-labelledby="questions-heading">
             <h2 id="questions-heading" className={styles.sectionTitle}>What do you want to know?</h2>
             <p className={styles.sectionIntro}>{isHistoricalView ? `Questions from ${formatWeek(viewingWeekNumber)}.` : period === "week" ? "Support the questions you want answered. Every vote helps set the agenda." : "Explore the record. Voting is open only for questions from the current week."}</p>
-            {!isHistoricalView && <PeriodTabs slug={slug} activePeriod={period} />}
-            {data.totalQuestions > questions.length && <p className={styles.sectionIntro}>Showing the top {questions.length} of {data.totalQuestions.toLocaleString("en-US")} questions, ranked by net votes. The response record covers the full period.</p>}
-            <QuestionList questions={questions} politicianId={politician.id} politicianSlug={politician.slug} politicianName={politician.full_name} profileVerified={politician.verification_tier === "2" || politician.verification_tier === "3"} weekNumber={viewingWeekNumber} currentWeekNumber={currentWeekNumber} isHistorical={isHistoricalView} period={period} appearance="face" />
+            {!isHistoricalView && <PeriodTabs slug={politician.slug} activePeriod={period} sort={sort} />}
+            {matchingQuestions > questions.length && <p className={styles.sectionIntro}>Showing {questions.length} of {matchingQuestions.toLocaleString("en-US")} {sort === "unanswered" ? "unanswered " : ""}questions, {sort === "newest" ? "newest first" : "ranked by net votes"}. The response record covers the full period.</p>}
+            <QuestionList questions={questions} memberIds={data.memberIds} politicianId={politician.id} politicianSlug={politician.slug} politicianName={politician.full_name} profileVerified={politician.verification_tier === "2" || politician.verification_tier === "3"} weekNumber={viewingWeekNumber} currentWeekNumber={currentWeekNumber} isHistorical={isHistoricalView} period={period} appearance="face" profileSort={sort} />
           </section>
           <aside className={styles.sidebar} aria-label="Ask and explore">
-            {currentWeekView ? <AskQuestionForm politicianId={politician.id} politicianName={politician.full_name} appearance="face" /> : <p className={styles.notice}>New questions go into the current week. <Link href={`/${slug}#ask-question`}>Ask this week →</Link></p>}
+            {currentWeekView ? <AskQuestionForm politicianId={politician.id} politicianName={politician.full_name} appearance="face" /> : <p className={styles.notice}>New questions go into the current week. <Link href={`/${politician.slug}#ask-question`}>Ask this week →</Link></p>}
             <div className={styles.help}><h2>A good question gets specific.</h2><ol><li>Ask about a decision, a commitment, or an issue they can act on.</li><li>Keep it clear and respectful.</li><li>Check the questions here first. Add your vote if someone has already asked.</li></ol></div>
-            {data.archiveWeeks.length > 0 && <details className={styles.archive}><summary>Previous weeks</summary><nav aria-label="Weekly archive">{data.archiveWeeks.map((archiveWeek) => <Link key={archiveWeek} href={`/${slug}?week=${archiveWeek}#profile-questions`} aria-current={isHistoricalView && viewingWeekNumber === archiveWeek ? "page" : undefined}>{formatWeek(archiveWeek)} <span aria-hidden="true">↗</span></Link>)}</nav></details>}
+            {data.archiveWeeks.length > 0 && <details className={styles.archive}><summary>Previous weeks</summary><nav aria-label="Weekly archive">{data.archiveWeeks.map((archiveWeek) => <Link key={archiveWeek} href={`/${politician.slug}?week=${archiveWeek}#profile-questions`} aria-current={isHistoricalView && viewingWeekNumber === archiveWeek ? "page" : undefined}>{formatWeek(archiveWeek)} <span aria-hidden="true">↗</span></Link>)}</nav></details>}
             {politician.verification_tier === "0" && <p className={styles.notice}>Part of {politician.full_name}’s team? <Link href={`/verify?prefill=${politician.id}`}>Claim this profile →</Link></p>}
           </aside>
         </div>
@@ -148,7 +153,7 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
 
 export async function generateStaticParams() {
   const { data, error } = await createPublicClient().from("politicians").select("slug")
-    .eq("is_active", true).eq("is_test", false).order("id").limit(1000)
+    .eq("is_active", true).eq("is_test", false).is("canonical_politician_id", null).order("id").limit(1000)
     .abortSignal(AbortSignal.timeout(8_000));
   if (error) throw new Error("Public profile paths unavailable");
   return (data ?? []).map((politician) => ({ slug: politician.slug }));

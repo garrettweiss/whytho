@@ -1,3 +1,4 @@
+import { resolvePoliticianIdentity } from "@/lib/identity/server";
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/server";
@@ -82,15 +83,18 @@ export async function POST(request: NextRequest) {
     }
 
     const admin = createAdminClient();
+    const identity = await resolvePoliticianIdentity(politician_id, admin);
+    if (!identity) return NextResponse.json({ error: "Politician not found" }, { status: 404 });
 
     // ── Rate limit: 5 questions / user / 24h (global) ────────────────────────
-    const { count: dailyCount } = await admin
+    const { count: dailyCount, error: dailyError } = await admin
       .from("questions")
       .select("*", { count: "exact", head: true })
       .eq("submitted_by", user.id)
       .eq("is_seeded", false)
       .gte("created_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
 
+    if (dailyError || dailyCount === null) throw new Error("Question limit unavailable");
     if ((dailyCount ?? 0) >= DAILY_LIMIT) {
       return NextResponse.json(
         { error: `You can submit up to ${DAILY_LIMIT} questions per day` },
@@ -99,17 +103,18 @@ export async function POST(request: NextRequest) {
     }
 
     // ── Spam detection: max 3 questions per user per politician per 24h ───────
-    const { count: politicianCount } = await admin
+    const { count: politicianCount, error: politicianCountError } = await admin
       .from("questions")
       .select("*", { count: "exact", head: true })
       .eq("submitted_by", user.id)
-      .eq("politician_id", politician_id)
+      .in("politician_id", identity.memberIds)
       .eq("is_seeded", false)
       .gte(
         "created_at",
         new Date(Date.now() - SPAM_WINDOW_HOURS * 60 * 60 * 1000).toISOString()
       );
 
+    if (politicianCountError || politicianCount === null) throw new Error("Profile question limit unavailable");
     if (exceedsSpamThreshold(politicianCount ?? 0)) {
       return NextResponse.json(
         {
@@ -123,7 +128,7 @@ export async function POST(request: NextRequest) {
     const { data: politician } = await admin
       .from("politicians")
       .select("id")
-      .eq("id", politician_id)
+      .eq("id", identity.canonicalId)
       .eq("is_active", true)
       .single();
 
@@ -139,7 +144,7 @@ export async function POST(request: NextRequest) {
     const { data: question, error } = await admin
       .from("questions")
       .insert({
-        politician_id,
+        politician_id: identity.canonicalId,
         body: trimmed,
         submitted_by: user.id,
         week_number,

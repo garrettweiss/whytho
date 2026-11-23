@@ -4,10 +4,7 @@
  *
  * Body: { secret, raceId }
  *
- * Effects:
- * - race.status = 'completed'
- * - Any candidates still in 'active' status are set to is_active=false
- *   (ensures only winner remains visible — winner should be marked first)
+ * Records completion only. It never invents losses or deactivates people.
  */
 
 import { NextRequest, NextResponse } from "next/server";
@@ -51,23 +48,10 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: raceError.message }, { status: 500 });
   }
 
-  // Hide any remaining active candidates (those not marked won)
-  const { data: remaining, error: candidateError } = await supabase
-    .from("politicians")
-    .update({ is_active: false, candidate_status: "lost" })
-    .eq("race_id", raceId)
-    .eq("politician_type", "candidate")
-    .eq("candidate_status", "active")
-    .select("id");
-
-  if (candidateError) {
-    console.error("Error hiding remaining candidates:", candidateError.message);
-  }
-
   return NextResponse.json({
     success: true,
     raceId,
     raceName: race.name,
-    hiddenCandidates: remaining?.length ?? 0,
+    hiddenCandidates: 0,
   });
 }

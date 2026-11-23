@@ -1,3 +1,4 @@
+import { resolvePoliticianIdentity } from "@/lib/identity/server";
 /**
  * GET /api/politicians/prefill?id=<politician_id>
  *
@@ -24,10 +25,12 @@ export async function GET(request: NextRequest) {
   }
 
   const admin = createAdminClient();
+  const identity = await resolvePoliticianIdentity(id, admin);
+  if (!identity) return NextResponse.json({ error: "Politician not found" }, { status: 404 });
   const { data: politician, error } = await admin
     .from("politicians")
     .select("id, slug, full_name, office, state, party, photo_url, is_test")
-    .eq("id", id)
+    .eq("id", identity.canonicalId)
     .single();
 
   if (error || !politician) {

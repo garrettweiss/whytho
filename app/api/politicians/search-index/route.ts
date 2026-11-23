@@ -1,15 +1,7 @@
-/**
- * GET /api/politicians/search-index
- *
- * Returns a lightweight index of all active politicians for client-side search caching.
- * Prefetched once after page load and cached in module memory — not called per-keystroke.
- *
- * Response is ~150KB gzipped for 6,600+ politicians.
- * Cache-Control: 1 hour at CDN, 2 hours stale-while-revalidate.
- */
+/** Complete canonical public profile index, read in bounded pages and cached for five minutes. */
 
 import { NextResponse } from "next/server";
-import { createAdminClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/server";
 import { STATES } from "@/lib/search/states";
 
 // Build a full-name → 2-letter-code lookup once at module level.
@@ -26,7 +18,7 @@ function normalizeState(raw: string | null): string | null {
   return STATE_NAME_TO_CODE[raw.toLowerCase()] ?? raw;
 }
 
-export const revalidate = 3600;
+export const revalidate = 300;
 
 export type SearchIndexEntry = {
   n: string;        // full_name
@@ -37,17 +29,23 @@ export type SearchIndexEntry = {
 };
 
 export async function GET() {
-  const admin = createAdminClient();
+  const client = createPublicClient();
 
-  const { data, error } = await admin
-    .from("politicians")
-    .select("full_name, slug, state, office, party")
-    .eq("is_active", true)
-    .eq("is_test", false)
-    .order("full_name");
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  const data = [];
+  const signal = AbortSignal.timeout(20000);
+  let after: string | null = null;
+  for (;;) {
+    let query = client.from("politicians").select("id,full_name,slug,state,office,party")
+      .eq("is_active", true).eq("is_test", false).is("canonical_politician_id", null)
+      .order("id").limit(500);
+    if (after) query = query.gt("id", after);
+    const page = await query.abortSignal(signal);
+    if (page.error || !page.data) return NextResponse.json({ error: "Search index unavailable" }, { status: 503 });
+    data.push(...page.data);
+    if (page.data.length < 500) break;
+    const next = page.data.at(-1)!.id;
+    if (after && next <= after) throw new Error("Search index did not advance");
+    after = next;
   }
 
   const index: SearchIndexEntry[] = (data ?? []).map((p) => ({
@@ -60,7 +58,7 @@ export async function GET() {
 
   return NextResponse.json(index, {
     headers: {
-      "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=7200",
+      "Cache-Control": "public, s-maxage=300, stale-while-revalidate=300",
     },
   });
 }

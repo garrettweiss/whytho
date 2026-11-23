@@ -2,14 +2,14 @@ import "server-only";
 
 import { unstable_cache } from "next/cache";
 import { createPublicClient } from "@/lib/supabase/server";
-import { decodeDirectoryCursor, encodeDirectoryCursor, readEmbeddedCount } from "./cursor";
+import { decodeDirectoryCursor, encodeDirectoryCursor } from "./cursor";
 import { EXECUTIVE_OFFICES, NATIONAL_OFFICES, STATE_OFFICES } from "./scope";
 import { arrangeDirectoryPeople } from "./presentation";
 import { escapeLike, normalizeDirectoryFilters, OFFICES, quoteFilterValue, stateRecordValues } from "./search";
 import { DIRECTORY_PAGE_SIZE, DirectoryInputError, type DirectoryFilters, type DirectoryPage, type DirectoryPerson } from "./types";
 
 const TIMEOUT_MS = 8_000;
-const PUBLIC_FIELDS = "id,slug,full_name,politician_type,is_candidate,incumbent_challenge,office,state,party,photo_url,questions(count),replies:answers(count,questions!inner())";
+const PUBLIC_FIELDS = "id,slug,full_name,politician_type,is_candidate,incumbent_challenge,office,state,party,photo_url";
 
 async function boundedRead<T>(read: (signal: AbortSignal) => Promise<T>): Promise<T> {
   const controller = new AbortController();
@@ -71,16 +71,9 @@ const loadDirectoryPage = unstable_cache(async (
 
   let query = supabase.from("politicians")
     .select(PUBLIC_FIELDS)
+    .is("canonical_politician_id", null)
     .eq("is_active", true)
     .eq("is_test", false)
-    .eq("questions.status", "active")
-    .eq("questions.week_number", weekNumber)
-    .eq("replies.week_number", weekNumber)
-    .in("replies.answer_type", ["direct", "team_statement"])
-    .eq("replies.is_ai_generated", false)
-    .eq("replies.is_draft", false)
-    .eq("replies.questions.status", "active")
-    .eq("replies.questions.week_number", weekNumber)
     .order("full_name", { ascending: true })
     .order("id", { ascending: true })
     .limit(DIRECTORY_PAGE_SIZE + 1);
@@ -102,6 +95,24 @@ const loadDirectoryPage = unstable_cache(async (
     throw new Error("Public directory unexpectedly empty");
   }
 
+  const pageRows = data.slice(0, DIRECTORY_PAGE_SIZE);
+  const result = await supabase.rpc("identity_directory_counts", { p_ids: pageRows.map(row => row.id), p_week: weekNumber }).abortSignal(signal);
+  if (result.error || !Array.isArray(result.data)) throw new Error("Directory identity counts unavailable");
+  const counts = new Map<string, { questions: number; replies: number }>();
+  for (const value of result.data) {
+    if (!value || typeof value !== "object" || Array.isArray(value) || typeof value.id !== "string" ||
+        typeof value.questions !== "number" || !Number.isSafeInteger(value.questions) || value.questions < 0 ||
+        typeof value.replies !== "number" || !Number.isSafeInteger(value.replies) || value.replies < 0 || value.replies > value.questions) {
+      throw new Error("Invalid directory identity counts");
+    }
+    if (counts.has(value.id)) throw new Error("Duplicate directory counts");
+    counts.set(value.id, { questions: value.questions, replies: value.replies });
+  }
+  const total = (id: string, key: "questions" | "replies") => {
+    const count = counts.get(id);
+    if (!count) throw new Error("Incomplete directory identity counts");
+    return count[key];
+  };
   const people: DirectoryPerson[] = data.slice(0, DIRECTORY_PAGE_SIZE).map((row) => ({
     id: row.id,
     slug: row.slug,
@@ -113,8 +124,8 @@ const loadDirectoryPage = unstable_cache(async (
     state: row.state,
     party: row.party,
     photo_url: safePhotoUrl(row.photo_url),
-    questionCount: readEmbeddedCount(row.questions),
-    replyCount: readEmbeddedCount(row.replies),
+    questionCount: total(row.id, "questions"),
+    replyCount: total(row.id, "replies"),
   }));
   const lastPerson = people.at(-1);
   const nextCursor = data.length > DIRECTORY_PAGE_SIZE && lastPerson
@@ -126,7 +137,7 @@ const loadDirectoryPage = unstable_cache(async (
     nextCursor,
     weekNumber,
   };
-}), ["public-politician-directory-v4"], { revalidate: 300 });
+}), ["public-politician-directory-identity-v5"], { revalidate: 300, tags: ["politician-directory"] });
 
 /** All validation happens before consulting the public cache. */
 export async function getDirectoryPage(filters: DirectoryFilters, cursor?: string): Promise<DirectoryPage> {

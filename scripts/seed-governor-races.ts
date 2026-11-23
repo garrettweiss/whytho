@@ -6,7 +6,11 @@
  * Run AFTER governors are in the DB (scripts/seed-governors.ts).
  *
  * Usage:
- *   npx tsx scripts/seed-governor-races.ts
+ *   npx tsx scripts/seed-governor-races.ts               # read-only preview
+ *   npx tsx scripts/seed-governor-races.ts --apply --reviewed-races=reviewed.json
+ *
+ * Reviewed manifest: [{state, primary_date, source_url, reviewed_at}].
+ * Built-in approximate dates are preview-only. Existing races are preserved.
  *   npx tsx scripts/seed-governor-races.ts --dry-run
  */
 
@@ -14,14 +18,19 @@ import * as dotenv from "dotenv";
 dotenv.config({ path: ".env.local", override: true });
 
 import { createClient } from "@supabase/supabase-js";
-import type { Database } from "@/types/database";
+import type { Database } from "../types/database";
+import { readFileSync } from "node:fs";
+import { findCanonicalIncumbent, shouldApplyImport } from "../lib/civic/import-observation";
+import { normalizeStateCode } from "../lib/civic/normalize";
 
 const supabase = createClient<Database>(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-const DRY_RUN = process.argv.includes("--dry-run");
+const APPLY = shouldApplyImport(process.argv.slice(2));
+const DRY_RUN = !APPLY;
+const MANIFEST_PATH = process.argv.find((arg) => arg.startsWith("--reviewed-races="))?.slice("--reviewed-races=".length);
 
 // 36 states with governor elections in 2026
 // election_type: 'primary' or 'general' — we track the primary cycle
@@ -76,85 +85,80 @@ const STATE_NAMES: Record<string, string> = {
   WY: "Wyoming",
 };
 
-async function main() {
-  console.log("🗳️  WhyTho 2026 Governor Races seed");
-  console.log("=====================================");
-  if (DRY_RUN) console.log("🔍 DRY RUN — no writes");
-  console.log();
+type ReviewedRace = { state: string; primary_date: string; source_url?: string; reviewed_at?: string };
 
-  // Load existing governors from DB
-  const { data: governors } = await supabase
-    .from("politicians")
-    .select("id, state, full_name")
-    .eq("office", "Governor")
-    .eq("is_active", true)
-    .eq("politician_type", "elected");
-
-  const govByState = new Map<string, string>(); // state → id
-  for (const g of governors ?? []) {
-    if (g.state) govByState.set(g.state, g.id);
+function loadRaces(): ReviewedRace[] {
+  if (!MANIFEST_PATH) {
+    if (APPLY) throw new Error("Approximate race dates cannot be applied. --apply requires --reviewed-races=path.json");
+    return [...GOV_RACES_2026];
   }
+  const rows: unknown = JSON.parse(readFileSync(MANIFEST_PATH, "utf8"));
+  if (!Array.isArray(rows)) throw new Error("Reviewed race manifest must be a JSON array");
+  const states = new Set<string>();
+  return rows.map((value: unknown) => {
+    const row = value as ReviewedRace;
+    if (!row || typeof row.state !== "string" || typeof row.primary_date !== "string" ||
+        !/^2026-\d{2}-\d{2}$/.test(row.primary_date) || !Number.isFinite(Date.parse(row.primary_date)) ||
+        typeof row.source_url !== "string" || !/^https:\/\//.test(row.source_url) ||
+        typeof row.reviewed_at !== "string" || !Number.isFinite(Date.parse(row.reviewed_at))) {
+      throw new Error("Each reviewed race requires state, a 2026 primary_date, source_url and reviewed_at");
+    }
+    const state = normalizeStateCode(row.state);
+    if (!STATE_NAMES[state] || states.has(state)) throw new Error(`Unexpected or repeated race state: ${state}`);
+    states.add(state);
+    return { ...row, state };
+  });
+}
 
-  console.log(`Found ${govByState.size} incumbent governors in DB`);
-  console.log();
-
+async function main() {
+  console.log("WhyTho 2026 Governor Races seed");
+  console.log(APPLY ? "Mode: APPLY" : "Mode: DRY RUN (no writes); pass --apply with a reviewed manifest to write");
+  const races = loadRaces();
   let inserted = 0;
   let skipped = 0;
 
-  for (const race of GOV_RACES_2026) {
-    const stateName = STATE_NAMES[race.state];
+  for (const race of races) {
     const raceSlug = `${race.state.toLowerCase()}-governor-primary-2026`;
-    const raceName = `${stateName} Governor Primary 2026`;
-    const incumbentId = govByState.get(race.state) ?? null;
-
-    if (!incumbentId) {
-      console.log(`  ⚠️  No incumbent found for ${race.state} — creating race without incumbent`);
-    }
-
-    if (DRY_RUN) {
-      console.log(`  [preview] ${raceName} — incumbent: ${incumbentId ? "linked" : "none"} — primary: ${race.primary_date}`);
-      continue;
-    }
-
-    const { data: existing } = await supabase
-      .from("races")
-      .select("id")
-      .eq("slug", raceSlug)
-      .maybeSingle();
-
-    if (existing) {
-      console.log(`  ↩️  ${raceName} already exists, skipping`);
-      skipped++;
-      continue;
-    }
-
-    const { error } = await supabase.from("races").insert({
-      slug: raceSlug,
-      name: raceName,
-      office: "Governor",
-      state: race.state,
-      district: null,
-      election_date: race.primary_date,
-      election_type: "primary",
-      party: null,
-      incumbent_id: incumbentId,
-      status: "active",
-    });
-
-    if (error) {
-      console.error(`  ❌ Error inserting ${raceName}: ${error.message}`);
-      skipped++;
-    } else {
-      console.log(`  ✅ ${raceName}${incumbentId ? " (incumbent linked)" : ""}`);
+    const raceName = `${STATE_NAMES[race.state]} Governor Primary 2026`;
+    try {
+      const { data: existing, error: lookupError } = await supabase.from("races")
+        .select("id").eq("slug", raceSlug).maybeSingle();
+      if (lookupError) throw new Error(`Race lookup failed: ${lookupError.message}`);
+      if (existing) {
+        console.log(`  ${raceName} already exists, preserving its history`);
+        skipped++;
+        continue;
+      }
+      const incumbentId = await findCanonicalIncumbent(supabase, "Governor", race.state);
+      if (DRY_RUN) {
+        console.log(`  [preview] ${raceName}; incumbent: ${incumbentId ?? "none"}; primary: ${race.primary_date}`);
+        continue;
+      }
+      const { error } = await supabase.from("races").insert({
+        slug: raceSlug,
+        name: raceName,
+        office: "Governor",
+        state: race.state,
+        district: null,
+        election_date: race.primary_date,
+        election_type: "primary",
+        party: null,
+        incumbent_id: incumbentId,
+        status: "active",
+      });
+      if (error) throw new Error(`Race insert failed: ${error.message}`);
       inserted++;
+      console.log(`  Created ${raceName}; reviewed source: ${race.source_url}`);
+    } catch (error) {
+      console.error(`  Skipping ${raceName}:`, error);
+      process.exitCode = 1;
+      skipped++;
     }
   }
-
-  console.log();
-  console.log(`✅ Done. Inserted: ${inserted} | Skipped: ${skipped}`);
+  console.log(`Done. Inserted: ${inserted} | Skipped: ${skipped}`);
 }
 
 main().catch((err) => {
-  console.error("❌ Fatal error:", err);
+  console.error("Fatal error:", err);
   process.exit(1);
 });

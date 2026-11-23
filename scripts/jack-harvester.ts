@@ -19,6 +19,7 @@ dotenv.config({ path: ".env.local", override: true });
 
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
+import { collectionTargets, loadJackProfiles } from "./jack-identity";
 
 const supabase = createClient<Database>(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -129,29 +130,18 @@ async function getPoliticiansWithHandles() {
   if (!OFFICE_ARG || OFFICE_ARG === "house")  offices.push("U.S. Representative");
   if (!OFFICE_ARG || OFFICE_ARG === "governors") offices.push("Governor");
 
-  const { data, error } = await supabase
-    .from("politicians")
-    .select("id, full_name, office, state, social_handles")
-    .in("office", offices)
-    .eq("is_active", true)
-    .not("social_handles", "eq", "{}");
-
-  if (error) throw error;
-
-  // Filter to those that actually have a twitter key
-  return (data ?? [])
-    .filter((p) => {
-      const h = (p.social_handles ?? {}) as Record<string, string>;
-      return !!h.twitter;
-    })
-    .slice(0, LIMIT);
+  // Check handle conflicts across the complete roster before narrowing office scope.
+  const rows = await loadJackProfiles(supabase);
+  return collectionTargets(rows).filter(row => row.office && offices.includes(row.office)).slice(0, LIMIT);
 }
 
-async function getExistingTweetIds(politicianId: string): Promise<Set<string>> {
-  const { data } = await supabase
+async function getExistingTweetIds(tweetIds: string[]): Promise<Set<string>> {
+  if (!tweetIds.length) return new Set();
+  const { data, error } = await supabase
     .from("x_posts")
     .select("tweet_id")
-    .eq("politician_id", politicianId);
+    .in("tweet_id", tweetIds);
+  if (error) throw error;
   return new Set((data ?? []).map((r) => r.tweet_id));
 }
 
@@ -210,8 +200,7 @@ async function main() {
   console.log(`→ ${politicians.length} politicians with X handles to harvest\n`);
 
   for (const politician of politicians) {
-    const handles = (politician.social_handles ?? {}) as Record<string, string>;
-    const handle = handles.twitter!;
+    const handle = politician.verifiedHandle;
 
     process.stdout.write(`  🔍 @${handle} (${politician.full_name})... `);
 
@@ -231,7 +220,7 @@ async function main() {
         continue;
       }
 
-      const existingIds = await getExistingTweetIds(politician.id);
+      const existingIds = await getExistingTweetIds(questionTweets.map(tweet => tweet.id));
       let saved = 0;
 
       for (const tweet of questionTweets) {
