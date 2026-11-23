@@ -2,7 +2,7 @@ import "server-only";
 
 import { unstable_cache } from "next/cache";
 import { createAdminClient, createPublicClient } from "@/lib/supabase/server";
-import { decodeDirectoryCursor, DIRECTORY_SNAPSHOT_MAX_AGE_MS, DIRECTORY_SNAPSHOT_MS, encodeDirectoryCursor } from "./cursor";
+import { decodeDirectoryCursor, DIRECTORY_SNAPSHOT_MAX_AGE_MS, DIRECTORY_SNAPSHOT_MS, encodeDirectoryCursor, type DirectoryCursor } from "./cursor";
 import { EXECUTIVE_OFFICES, NATIONAL_OFFICES, STATE_OFFICES } from "./scope";
 import { arrangeDirectoryPeople } from "./presentation";
 import { escapeLike, normalizeDirectoryFilters, OFFICES, quoteFilterValue, stateRecordValues } from "./search";
@@ -10,10 +10,10 @@ import { DIRECTORY_PAGE_SIZE, DirectoryInputError, type DirectoryFilters, type D
 import type { Database } from "@/types/database";
 
 const TIMEOUT_MS = 8_000;
-const PUBLIC_FIELDS = "id,slug,full_name,politician_type,is_candidate,incumbent_challenge,office,state,party,photo_url";
+const PUBLIC_FIELDS = "id,slug,full_name,politician_type,is_candidate,incumbent_challenge,office,district,state,party,photo_url,mayor_city_population";
 type RankedProfile = [id: string, name: string, state: string | null, office: string | null];
 type DirectoryRow = Pick<Database["public"]["Tables"]["politicians"]["Row"],
-  "id" | "slug" | "full_name" | "politician_type" | "is_candidate" | "incumbent_challenge" | "office" | "state" | "party" | "photo_url">;
+  "id" | "slug" | "full_name" | "politician_type" | "is_candidate" | "incumbent_challenge" | "office" | "district" | "state" | "party" | "photo_url" | "mayor_city_population">;
 
 async function boundedRead<T>(read: (signal: AbortSignal) => Promise<T>): Promise<T> {
   const controller = new AbortController();
@@ -92,12 +92,27 @@ const loadDirectoryPage = unstable_cache(async (
   const offices: readonly string[] | undefined = office?.records;
 
   let pageRows: DirectoryRow[];
-  let after: { name: string; id: string } | undefined;
+  const mayorDirectory = filters.office === "mayor";
+  let after: Omit<DirectoryCursor, "weekNumber" | "snapshot"> | undefined;
   if (snapshot !== undefined) {
     const ranking = await getHomepageRanking(snapshot);
     const term = filters.q.toLowerCase();
     const aliases = new Set(aliasIds);
-    const results = ranking.filter(([id, name, state, office]) =>
+    const rankedIds = new Set(ranking.map(([id]) => id));
+    const available = [...ranking];
+    // Search must also find mayors whose portraits have yet to be cleared.
+    if (term && !offices && !filters.scope) {
+      const nameFilter = `full_name.ilike.${quoteFilterValue(`%${escapeLike(filters.q)}%`)}`;
+      let mayorQuery = profileQuery().eq("office", "Mayor")
+        .or(aliasIds.length ? `${nameFilter},id.in.(${aliasIds.join(",")})` : nameFilter)
+        .order("full_name").order("id").limit(100);
+      if (states) mayorQuery = mayorQuery.in("state", states);
+      const { data, error } = await mayorQuery.abortSignal(signal);
+      if (error || !data) throw new Error("Mayor search unavailable");
+      available.push(...data.filter(row => !rankedIds.has(row.id))
+        .map((row): RankedProfile => [row.id, row.full_name, row.state, row.office]));
+    }
+    const results = available.filter(([id, name, state, office]) =>
       (!states || (state !== null && states.includes(state))) &&
       (!offices || (office !== null && offices.includes(office))) &&
       (!term || aliases.has(id) || name.toLowerCase().includes(term)));
@@ -121,19 +136,28 @@ const loadDirectoryPage = unstable_cache(async (
     const rows = new Map(data.map((row) => [row.id, row]));
     pageRows = selection.flatMap(([id]) => {
       const row = rows.get(id);
-      return row && safePhotoUrl(row.photo_url) ? [row] : [];
+      return row && (row.office === "Mayor" || safePhotoUrl(row.photo_url)) ? [row] : [];
     });
   } else {
     const filterGroups: string[] = [];
     if (filters.q) {
-      const nameFilter = `full_name.ilike.${quoteFilterValue(`%${escapeLike(filters.q)}%`)}`;
-      filterGroups.push(aliasIds.length ? `or(${nameFilter},id.in.(${aliasIds.join(",")}))` : nameFilter);
+      const term = quoteFilterValue(`%${escapeLike(filters.q)}%`);
+      const searchFields = [`full_name.ilike.${term}`];
+      if (mayorDirectory) searchFields.push(`district.ilike.${term}`);
+      if (aliasIds.length) searchFields.push(`id.in.(${aliasIds.join(",")})`);
+      filterGroups.push(searchFields.length === 1 ? searchFields[0]! : `or(${searchFields.join(",")})`);
     }
     if (cursor) {
       const name = quoteFilterValue(cursor.name);
-      filterGroups.push(`or(full_name.gt.${name},and(full_name.eq.${name},id.gt.${cursor.id}))`);
+      const nameOrder = `or(full_name.gt.${name},and(full_name.eq.${name},id.gt.${cursor.id}))`;
+      const population = cursor.population;
+      if (population === undefined) filterGroups.push(nameOrder);
+      else if (population === null) filterGroups.push("mayor_city_population.is.null", nameOrder);
+      else filterGroups.push(`or(mayor_city_population.lt.${population},mayor_city_population.is.null,and(mayor_city_population.eq.${population},${nameOrder}))`);
     }
-    let query = profileQuery()
+    let query = profileQuery();
+    if (mayorDirectory) query = query.order("mayor_city_population", { ascending: false, nullsFirst: false });
+    query = query
       .order("full_name", { ascending: true })
       .order("id", { ascending: true })
       .limit(DIRECTORY_PAGE_SIZE + 1);
@@ -150,7 +174,9 @@ const loadDirectoryPage = unstable_cache(async (
     }
     pageRows = data.slice(0, DIRECTORY_PAGE_SIZE);
     const last = pageRows.at(-1);
-    if (last && data.length > DIRECTORY_PAGE_SIZE) after = { name: last.full_name, id: last.id };
+    if (last && data.length > DIRECTORY_PAGE_SIZE) {
+      after = { name: last.full_name, id: last.id, population: mayorDirectory ? last.mayor_city_population : undefined };
+    }
   }
 
   const nextCursor = after ? encodeDirectoryCursor({ ...after, weekNumber, snapshot }, filters) : null;
@@ -180,6 +206,7 @@ const loadDirectoryPage = unstable_cache(async (
     is_candidate: row.is_candidate,
     incumbent_challenge: row.incumbent_challenge,
     office: row.office,
+    district: row.district,
     state: row.state,
     party: row.party,
     photo_url: safePhotoUrl(row.photo_url),
@@ -187,21 +214,22 @@ const loadDirectoryPage = unstable_cache(async (
     replyCount: total(row.id, "replies"),
   }));
   return {
-    people: snapshot === undefined ? arrangeDirectoryPeople(people) : people,
+    people: snapshot === undefined && !mayorDirectory ? arrangeDirectoryPeople(people) : people,
     nextCursor,
     weekNumber,
   };
-}), ["public-politician-directory-v6"], { revalidate: 300, tags: ["politician-directory"] });
+}), ["public-politician-directory-v7"], { revalidate: 300, tags: ["politician-directory"] });
 
 /** All validation happens before consulting the public cache. */
 export async function getDirectoryPage(filters: DirectoryFilters, cursor?: string, homepage = false): Promise<DirectoryPage> {
   const normalized = normalizeDirectoryFilters(filters);
   const decoded = decodeDirectoryCursor(cursor, normalized);
-  if (decoded && homepage !== (decoded.snapshot !== undefined)) {
+  const ranked = homepage && normalized.office !== "mayor";
+  if (decoded && ranked !== (decoded.snapshot !== undefined)) {
     throw new DirectoryInputError("This page link has expired. Start your search again.");
   }
   // Continuing a directory keeps the same question cohort across a weekly reset.
   const weekNumber = decoded?.weekNumber ?? await getWeekNumber();
-  const snapshot = homepage ? decoded?.snapshot ?? Math.floor(Date.now() / DIRECTORY_SNAPSHOT_MS) * DIRECTORY_SNAPSHOT_MS : undefined;
+  const snapshot = ranked ? decoded?.snapshot ?? Math.floor(Date.now() / DIRECTORY_SNAPSHOT_MS) * DIRECTORY_SNAPSHOT_MS : undefined;
   return loadDirectoryPage(normalized, cursor ?? "", weekNumber, snapshot);
 }

@@ -27,6 +27,25 @@ test("people, aliases, names with punctuation and state codes survive interpreta
   assert.deepEqual(stateRecordValues("CA"), ["CA", "California"]);
 });
 
+test("mayor search keeps the city and supports commonly used NYC wording", () => {
+  assert.deepEqual(parseDirectorySearch("Mayors").filters, { q: "", state: "", office: "mayor" });
+  assert.deepEqual(parseDirectorySearch("Mayor of New York City").filters, { q: "New York City", state: "", office: "mayor" });
+  assert.deepEqual(parseDirectorySearch("NYC mayor").filters, { q: "New York City", state: "", office: "mayor" });
+  assert.deepEqual(parseDirectorySearch("California mayors").filters, { q: "", state: "CA", office: "mayor" });
+});
+
+test("mayor pagination preserves its position before and after the ranked roster", () => {
+  const filters = { q: "", state: "", office: "mayor" };
+  const position = { name: "Zohran Mamdani", id: "127cdf41-9370-4aa7-82fc-c31936aac111", weekNumber: 202648 };
+  for (const population of [8584629, null]) {
+    const cursor = { ...position, population };
+    assert.deepEqual(decodeDirectoryCursor(encodeDirectoryCursor(cursor, filters), filters), cursor);
+  }
+  for (const population of [undefined, 0, -1, 1.5, 2147483648]) {
+    assert.throws(() => decodeDirectoryCursor(encodeDirectoryCursor({ ...position, population }, filters), filters), DirectoryInputError);
+  }
+});
+
 test("validation rejects overlong, control, unknown state and unknown office filters", () => {
   for (const input of [{ q: "a".repeat(101) }, { q: "name\nnext" }, { state: "Atlantis" }, { office: "senate" }]) {
     assert.throws(() => normalizeDirectoryFilters(input), DirectoryInputError);

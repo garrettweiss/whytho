@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { DirectoryInputError, type DirectoryFilters } from "./types";
 
-export type DirectoryCursor = { name: string; id: string; weekNumber: number; snapshot?: number };
+export type DirectoryCursor = { name: string; id: string; weekNumber: number; snapshot?: number; population?: number | null };
 export const DIRECTORY_SNAPSHOT_MS = 5 * 60_000;
 export const DIRECTORY_SNAPSHOT_MAX_AGE_MS = 24 * 60 * 60_000;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -11,7 +11,7 @@ function fingerprint(filters: DirectoryFilters): string {
 }
 
 export function encodeDirectoryCursor(cursor: DirectoryCursor, filters: DirectoryFilters): string {
-  return Buffer.from(JSON.stringify({ v: 1, n: cursor.name, i: cursor.id, w: cursor.weekNumber, f: fingerprint(filters), s: cursor.snapshot })).toString("base64url");
+  return Buffer.from(JSON.stringify({ v: 1, n: cursor.name, i: cursor.id, w: cursor.weekNumber, f: fingerprint(filters), s: cursor.snapshot, p: cursor.population })).toString("base64url");
 }
 
 export function decodeDirectoryCursor(value: string | undefined, filters: DirectoryFilters): DirectoryCursor | null {
@@ -25,7 +25,7 @@ export function decodeDirectoryCursor(value: string | undefined, filters: Direct
     if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw fail();
     const data = parsed as Record<string, unknown>;
     const keys = Object.keys(data).sort().join(",");
-    if ((keys !== "f,i,n,v,w" && keys !== "f,i,n,s,v,w") || data.v !== 1 || data.f !== fingerprint(filters) ||
+    if (!["f,i,n,v,w", "f,i,n,s,v,w", "f,i,n,p,v,w"].includes(keys) || data.v !== 1 || data.f !== fingerprint(filters) ||
       typeof data.w !== "number" || !Number.isInteger(data.w) || data.w < 200001 || data.w > 209953 || data.w % 100 < 1 || data.w % 100 > 53 ||
       typeof data.n !== "string" || !data.n || data.n.length > 200 || /[\u0000-\u001f\u007f]/.test(data.n) ||
       typeof data.i !== "string" || !UUID.test(data.i)) throw fail();
@@ -36,6 +36,13 @@ export function decodeDirectoryCursor(value: string | undefined, filters: Direct
         snapshot > now || snapshot < now - DIRECTORY_SNAPSHOT_MAX_AGE_MS) throw fail();
       return { name: data.n, id: data.i, weekNumber: data.w, snapshot };
     }
+    if (keys === "f,i,n,p,v,w") {
+      const population = data.p;
+      if (filters.office !== "mayor" || (population !== null &&
+        (typeof population !== "number" || !Number.isInteger(population) || population < 1 || population > 2147483647))) throw fail();
+      return { name: data.n, id: data.i, weekNumber: data.w, population };
+    }
+    if (filters.office === "mayor") throw fail();
     return { name: data.n, id: data.i, weekNumber: data.w };
   } catch {
     throw fail();

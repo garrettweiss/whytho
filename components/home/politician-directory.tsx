@@ -42,7 +42,7 @@ function PortraitCard({ person, index }: { person: DirectoryPerson; index: numbe
       <div className={styles.personMeta}>
         <p className={styles.office}>{person.is_candidate ? `${person.incumbent_challenge === "I" ? "Incumbent · " : ""}Candidate · ` : ""}{person.office || "Public official"}</p>
         <h3>{person.full_name}</h3>
-        <p className={styles.place}>{[state, person.party].filter(Boolean).join(" · ")}</p>
+        <p className={styles.place}>{[person.office === "Mayor" ? person.district : null, person.state === "DC" && person.district ? null : state, person.party].filter(Boolean).join(" · ")}</p>
         <div className={styles.record}>{responded ? <Check size={16} aria-hidden="true" /> : <span aria-hidden="true">○</span>}<span>{responded ? "Official response recorded" : person.questionCount > 0 ? "No official response recorded" : "No questions yet"}</span></div>
         <p className={styles.recordDetail}>{person.questionCount} {person.questionCount === 1 ? "question" : "questions"} in this week’s record</p>
         <span className={styles.cardAction}>View questions <ArrowRight size={17} aria-hidden="true" /></span>
@@ -232,7 +232,7 @@ export function PoliticianDirectory({ initialPage, context, homepage = false }: 
         <button type="submit" aria-label="Find politicians"><span className={styles.submitLabel}>Find politicians</span><ArrowRight size={24} aria-hidden="true" /></button>
       </form>
       {inputError && <p id="search-error" role="alert" className={styles.inputError}>{inputError}</p>}
-      <div className={styles.examples}><span>Try</span>{(context ? (context.scope === "state" ? ["State Senate", "State House", "Governor"] : context.state ? ["U.S. Senate", "State Senate", "Governor"] : ["U.S. Senate", "U.S. House", "Cabinet", "Governor"]) : ["AOC", "California", "Congress Senate", "California state senator"]).map(example => <button key={example} onClick={() => search(example, defaults)}>{example}</button>)}</div>
+      <div className={styles.examples}><span>Try</span>{(context ? (context.scope === "state" ? ["State Senate", "State House", "Governor"] : context.state ? ["U.S. Senate", "State Senate", "Governor"] : ["U.S. Senate", "U.S. House", "Cabinet", "Governor"]) : ["AOC", "California", "Congress Senate", "Mayors"]).map(example => <button key={example} onClick={() => search(example, defaults)}>{example}</button>)}</div>
       {choices.length > 0 && <div ref={choiceGroup} className={styles.officeChoices} role="group" aria-label="Which office do you mean?" onKeyDown={event => { if (event.key === "Escape") { setChoices([]); input.current?.focus(); } }}><p>Which office do you mean?</p>{choices.map(value => <button key={value} onClick={() => { const parsed = parseDirectorySearch(text); apply({ ...parsed.filters, state: parsed.filters.state || filters.state, office: value }); }}>{OFFICES.find(office => office.value === value)?.label ?? value}{parseDirectorySearch(text).filters.state ? ` · ${stateByCode(parseDirectorySearch(text).filters.state)?.name}` : ""}</button>)}</div>}
       {nameAlternative && <button className={styles.nameAlternative} onClick={() => { const name = nameAlternative; setNameAlternative(""); apply({ q: name, state: "", office: "" }); }}>Looking for a person? Search names for “{nameAlternative}”</button>}
       <div className={styles.filters}>
@@ -240,19 +240,20 @@ export function PoliticianDirectory({ initialPage, context, homepage = false }: 
         <label>Office<select aria-label="Filter by office" value={filters.office} onChange={event => apply({ ...filters, office: event.target.value })}><option value="">All offices</option>{officeOptions.map(office => <option key={office.value} value={office.value}>{office.label}</option>)}</select></label>
         {(activeFilters || inputError) && <button className={styles.clearFilters} onClick={() => { setText(""); apply(defaults); }}>Clear filters <span aria-hidden="true">×</span></button>}
         {context && <Link className={styles.clearFilters} href="/#find-politician">All politicians ↗</Link>}
-        {filters.q && <span className={styles.searchTerm}>Name: {filters.q}</span>}
+        {filters.q && <span className={styles.searchTerm}>{filters.office === "mayor" ? "Name or city" : "Name"}: {filters.q}</span>}
+        {filters.office === "mayor" && <Link className={styles.clearFilters} href="/suggest-mayor">Suggest a mayor</Link>}
       </div>
     </section>
     <section className={styles.directory} aria-labelledby="directory-title">
       <div className={styles.directoryHead}>
-        <div><h2 id="directory-title">{activeFilters ? "Your search results" : "Politicians on the record"}</h2><p>Questions for {periodLabel(page.weekNumber)}</p></div>
+        <div><h2 id="directory-title">{filters.office === "mayor" ? "Mayors on the record" : activeFilters ? "Your search results" : "Politicians on the record"}</h2><p>Questions for {periodLabel(page.weekNumber)}</p></div>
         <div className={styles.directoryTools}><label className={styles.autoLoad}><input type="checkbox" checked={automatic} onChange={event => setAutomatic(event.target.checked)} /> Load as I scroll</label><button className={styles.colorToggle} aria-pressed={colors} onClick={() => setColors(!colors)}>{colors ? "Hide portrait colors" : "Show portrait colors"}</button></div>
       </div>
       <p className={styles.srOnly} role="status" aria-live="polite" aria-atomic="true">{announcement}</p>
       <ul className={`${styles.people} ${colors ? styles.showColors : ""}`} aria-label="Politicians" aria-busy={busy} onClick={savePosition} onKeyDown={event => { if (event.key === "Enter") savePosition(); }}>
         {page.people.map((person, index) => <PortraitCard key={person.id} person={person} index={index} />)}
       </ul>
-      {!busy && !error && page.people.length === 0 && <div className={styles.emptyState}><h3>No politicians match these filters.</h3><p>Try a different name, state, or office.</p><button onClick={() => { setText(""); apply(defaults); }}>{context ? "Reset this directory" : "Show all politicians"}</button></div>}
+      {!busy && !error && page.people.length === 0 && <div className={styles.emptyState}><h3>No politicians match these filters.</h3><p>Try a different name, state, or office.</p><button onClick={() => { setText(""); apply(defaults); }}>{context ? "Reset this directory" : "Show all politicians"}</button>{!context && filters.office !== "mayor" && <Link className={styles.clearFilters} href="/suggest-mayor">Suggest a missing mayor</Link>}</div>}
       <div className={styles.loadArea} onFocusCapture={() => { automaticRef.current = false; setAutomatic(false); }}>
         <p>{error || (busy ? "Loading politicians…" : page.nextCursor ? `${page.people.length} politicians loaded. Keep exploring.` : "You’ve reached the end of these results.")}</p>
         {error ? <button onClick={() => void fetchPage(lastRequest.current.filters, lastRequest.current.cursor)}>Try again</button> : page.nextCursor && <button disabled={busy} onClick={() => void fetchPage(filters, page.nextCursor ?? undefined, true)}>Load more politicians</button>}

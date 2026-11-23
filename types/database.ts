@@ -621,6 +621,7 @@ export type Database = {
           is_active: boolean
           is_candidate: boolean
           is_test: boolean
+          mayor_city_population: number | null
           office: string | null
           openstates_id: string | null
           party: string | null
@@ -659,6 +660,7 @@ export type Database = {
           is_active?: boolean
           is_candidate?: boolean
           is_test?: boolean
+          mayor_city_population?: number | null
           office?: string | null
           openstates_id?: string | null
           party?: string | null
@@ -697,6 +699,7 @@ export type Database = {
           is_active?: boolean
           is_candidate?: boolean
           is_test?: boolean
+          mayor_city_population?: number | null
           office?: string | null
           openstates_id?: string | null
           party?: string | null
@@ -1241,6 +1244,11 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      publish_reviewed_mayor: {
+        Args: { p_full_name: string; p_city: string; p_state: string; p_official_url: string; p_existing_id?: string; p_reviewed_by?: string; p_government_email_domain?: string; p_evidence_url?: string }
+        Returns: string
+      }
+      approve_mayor_suggestion: { Args: { p_feedback_id: string; p_reviewer_id?: string; p_government_email_domain?: string }; Returns: string }
       has_current_participation_assent: { Args: Record<PropertyKey, never>; Returns: boolean }
       accept_participation_terms: { Args: { p_terms_version: string; p_adult: boolean }; Returns: boolean }
 

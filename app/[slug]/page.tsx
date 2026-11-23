@@ -75,6 +75,10 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
   }[period];
   const links = socialLinks(politician.social_handles, politician.website_url);
   const isCandidate = politician.is_candidate && politician.incumbent_challenge !== "I";
+  const office = politician.office ?? politician.candidate_office ?? "Public office";
+  const officeLocation = politician.office === "Mayor"
+    ? [politician.district, politician.state === "DC" && politician.district ? null : politician.state]
+    : [politician.state, politician.district ? `District ${politician.district}` : null];
   const tierLabel = { "0": "Profile not yet claimed", "1": "Self-claimed profile", "2": "Verified representative", "3": "Fully verified representative" }[politician.verification_tier];
   const baseUrl = safeWebUrl(process.env.NEXT_PUBLIC_SITE_URL) ?? "https://whytho.us/";
   const jsonLd = {
@@ -102,7 +106,7 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
           <ProfilePortrait photoUrl={politician.photo_url} name={politician.full_name} responded={data.officialAnsweredQuestions > 0} />
           <PhotoCredit politicianId={politician.id} />
           <div className={styles.identity}>
-            <p className={styles.office}>{isCandidate ? "Candidate for " : ""}{politician.office ?? politician.candidate_office ?? "Public office"}{politician.state ? ` · ${politician.state}` : ""}{politician.district ? ` · District ${politician.district}` : ""}</p>
+            <p className={styles.office}>{isCandidate ? "Candidate for " : ""}{[office, ...officeLocation].filter(Boolean).join(" · ")}</p>
             <h1 id="politician-name">{politician.full_name}</h1>
             <p className={styles.identityLine}>{politician.party && <span>{politician.party}</span>}{!politician.is_active && <span>Inactive profile</span>}</p>
             <p className={styles.verification}>{tierLabel}</p>

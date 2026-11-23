@@ -8,6 +8,7 @@ export const OFFICES = [
   { value: "state-senate", label: "State Senate", records: ["State Senator", "State Senate"] },
   { value: "state-house", label: "State House / Assembly", records: ["State Representative", "State House", "State Assembly", "State Assemblymember", "State Delegate"] },
   { value: "governor", label: "Governor", records: ["Governor"] },
+  { value: "mayor", label: "Mayor", records: ["Mayor"] },
   { value: "president", label: "President", records: ["President"] },
   { value: "vice-president", label: "Vice President", records: ["Vice President"] },
   { value: "executive", label: "President, Cabinet & executive", records: EXECUTIVE_OFFICES },
@@ -37,7 +38,9 @@ export function normalizeDirectoryFilters(input: Partial<Omit<DirectoryFilters, 
   }
   const scope = input.scope || undefined;
   if (scope && !["national", "state", "executive"].includes(scope)) throw new DirectoryInputError("Choose a valid directory scope.");
-  return { ...(scope ? { scope: scope as DirectoryFilters["scope"] } : {}), q: q.toLowerCase() === "aoc" ? "Alexandria Ocasio-Cortez" : q, state: state?.code ?? "", office };
+  const search = q.toLowerCase() === "aoc" ? "Alexandria Ocasio-Cortez"
+    : office === "mayor" && q.toLowerCase() === "nyc" ? "New York City" : q;
+  return { ...(scope ? { scope: scope as DirectoryFilters["scope"] } : {}), q: search, state: state?.code ?? "", office };
 }
 
 const OFFICE_PHRASES: Array<{ pattern: RegExp; value: string }> = [
@@ -46,6 +49,7 @@ const OFFICE_PHRASES: Array<{ pattern: RegExp; value: string }> = [
   { pattern: /\b(?:(?:u\.?s\.?|united states|federal|congress|congressional)\s+(?:senate|senator|senators))\b/i, value: "us-senate" },
   { pattern: /\b(?:(?:u\.?s\.?|united states|federal|congress|congressional)\s+(?:house|representative|representatives))\b/i, value: "us-house" },
   { pattern: /\bgovernors?\b/i, value: "governor" },
+  { pattern: /\bmayors?\b/i, value: "mayor" },
   { pattern: /\bvice president\b/i, value: "vice-president" },
   { pattern: /\b(?:executive branch|cabinet)\b/i, value: "executive" },
   { pattern: /\bpresident\b/i, value: "president" },
@@ -77,7 +81,8 @@ export function parseDirectorySearch(text: string): { filters: DirectoryFilters;
 
   const exactState = STATES.find((entry) => [entry.code, entry.name, entry.slug]
     .some((value) => value.toLowerCase() === remainder.toLowerCase()));
-  const hasOfficeContext = Boolean(office) || /\b(?:senate|senator|senators|house|representative|representatives)\b/i.test(remainder);
+  // A city can contain a state name, as in New York City.
+  const hasOfficeContext = Boolean(office && office !== "mayor") || /\b(?:senate|senator|senators|house|representative|representatives)\b/i.test(remainder);
   if (exactState) {
     state = exactState.code;
     remainder = "";
@@ -113,7 +118,7 @@ export function parseDirectorySearch(text: string): { filters: DirectoryFilters;
     officeChoices = ["us-house", "state-house"];
     remainder = clean(remainder.replace(/\b(?:house|representative|representatives)\b/gi, " "));
   }
-  remainder = clean(remainder.replace(/^(?:in|from)\s+|\s+(?:in|from)$/gi, " "));
+  remainder = clean(remainder.replace(/^(?:in|from|of)\s+|\s+(?:in|from)$/gi, " "));
   return { filters: normalizeDirectoryFilters({ q: remainder, state, office }), officeChoices };
 }
 
