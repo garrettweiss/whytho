@@ -9,7 +9,9 @@
 .loadingLayout{display:grid;grid-template-columns:min(28%,180px) minmax(0,1fr);gap:24px;padding:32px 0;border-bottom:1px solid var(--rule)}.loadingPortrait{aspect-ratio:4/5;background:#292b30}.loadingLine{height:14px;max-width:340px;width:65%;background:#292b30;margin-bottom:20px}.loadingTitle{height:44px;max-width:680px;width:90%;background:#292b30;margin:16px 0 24px}.loadingQuestion{padding:28px 0;border-bottom:1px solid var(--rule)}
 
 .portraitGroup { min-width: 0; margin: 0; }
-.photoCredit { margin-top: 6px; color: var(--secondary-ink); font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
+.photoCredit { margin-top: 4px; color: var(--secondary-ink); font-size: 10px; line-height: 1.4; overflow-wrap: anywhere; }
+.photoCredit summary { cursor: pointer; }
+.photoCreditDetails { margin-top: 4px; font-size: 12px; line-height: 1.5; }
 .photoCredit a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
 
 @media (max-width: 500px) {

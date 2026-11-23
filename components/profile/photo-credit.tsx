@@ -23,11 +23,17 @@ export function PhotoCredit({ politicianId }: { politicianId: string }) {
   const label = parts[0]?.split(": ")[0];
   const license = safeHttps(parts[0]?.split(": ").slice(1).join(": "));
   const source = safeHttps(parts[1]);
+  const changes = parts.slice(2).join("; ");
+  const byline = `Photo by ${record.credit}`;
+
   return <figcaption className={styles.photoCredit}>
-    Photo: {record.credit}. {uploaded ? "Supplied with permission by the verified profile team." : <>
-      {license && <><a href={license} rel="noopener noreferrer">{label ?? "License"}</a>. </>}
-      {source && <><a href={source} rel="noopener noreferrer">Original source</a>. </>}
-      {parts.slice(2).join("; ")}
-    </>}
+    {uploaded || license || source || changes ? <details>
+      <summary>{byline}</summary>
+      <p className={styles.photoCreditDetails}>{uploaded ? "Supplied with permission by the verified profile team." : <>
+        {license && <><a href={license} rel="noopener noreferrer">{label ?? "License"}</a>. </>}
+        {source && <><a href={source} rel="noopener noreferrer">Original source</a>. </>}
+        {changes}
+      </>}</p>
+    </details> : byline}
   </figcaption>;
 }
