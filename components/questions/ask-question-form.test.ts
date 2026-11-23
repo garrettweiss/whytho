@@ -12,7 +12,8 @@ import ts from "typescript";
 // No challenge is solved and no production question is submitted by these tests.
 type Element = React.ReactElement<Record<string, unknown>>;
 type Effect = { deps: unknown[]; cleanup?: () => void };
-type FetchResult = { ok: boolean; json: () => Promise<{ error?: string }> };
+type FetchResult = { ok: boolean; status?: number; json: () => Promise<{ error?: string; code?: string }> };
+type ParticipationStatus = "checking" | "unavailable" | "required" | "saving" | "accepted";
 const realRequire = createRequire(import.meta.url);
 const sourcePath = resolve(process.cwd(), "components/questions/ask-question-form.tsx");
 const compiled = ts.transpileModule(readFileSync(sourcePath, "utf8"), {
@@ -20,13 +21,20 @@ const compiled = ts.transpileModule(readFileSync(sourcePath, "utf8"), {
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.ReactJSX, esModuleInterop: true },
 }).outputText;
 
-function fixture(options: { siteKey?: string; signedIn?: boolean; appearance?: "default" | "face" } = {}) {
+function fixture(options: { siteKey?: string; signedIn?: boolean; appearance?: "default" | "face"; participation?: ParticipationStatus } = {}) {
   const states: unknown[] = [];
   const effects: Effect[] = [];
   const timers = new Map<number, () => void>();
   const requests: { url: string; body: string }[] = [];
   const auth = { user: options.signedIn === false ? null : { id: "fixture-user", is_anonymous: false }, isLoading: false };
   const Turnstile = () => null;
+  const ParticipationConfirmation = () => null;
+  const participation = {
+    ...auth,
+    status: options.participation ?? "accepted",
+    requireConfirmation: () => { participation.status = "required"; },
+    retry: () => { participation.status = "checking"; },
+  };
   let stateCursor = 0;
   let effectCursor = 0;
   let nextTimer = 1;
@@ -64,7 +72,8 @@ function fixture(options: { siteKey?: string; signedIn?: boolean; appearance?: "
   const stubs: Record<string, unknown> = {
     react,
     "@marsidev/react-turnstile": { Turnstile, DEFAULT_SCRIPT_ID: "cf-turnstile-script" },
-    "@/lib/auth/use-user": { useUser: () => auth },
+    "@/components/auth/participation-provider": { useParticipation: () => participation },
+    "@/components/auth/participation-banner": { ParticipationConfirmation },
     "next/navigation": { usePathname: () => "/fixture-person", useRouter: () => ({ refresh: () => { refreshed++; } }) },
     "next/link": { __esModule: true, default: "a" },
     "./face-questions.module.css": { __esModule: true, default: {} },
@@ -105,6 +114,8 @@ function fixture(options: { siteKey?: string; signedIn?: boolean; appearance?: "
   render();
   return {
     render, find, invoke, widget, textarea, submit, requests,
+    confirmation: () => find((node) => node.type === ParticipationConfirmation),
+    setParticipation: (status: ParticipationStatus) => { participation.status = status; render(); },
     status: () => find((node) => node.props.id === "fixture-verification-status").props.children,
     write: (text: string) => invoke(textarea(), "onChange", { target: { value: text } }),
     event: (name: string, ...args: unknown[]) => invoke(widget(), name, ...args),
@@ -266,4 +277,49 @@ test("signed-out visitors receive the sign-in path without starting verification
   assert.equal(f.render().type, "section");
   assert.equal(f.timers(), 0);
   assert.match(String(f.find((node) => node.type === "a").props.href), /sign-in\?redirect=/);
+});
+
+test("age and Terms confirmation blocks submission before security verification and preserves the draft", () => {
+  const f = fixture({ participation: "required" });
+  const draft = "What will you do about this issue?";
+  f.write(draft);
+  assert.equal(f.confirmation().props.forQuestion, true);
+  assert.throws(() => f.widget(), /Expected form element/);
+  f.beginSubmit();
+  assert.equal(f.requests.length, 0);
+  f.setParticipation("saving");
+  assert.throws(() => f.widget(), /Expected form element/);
+  f.setParticipation("accepted");
+  assert.equal(f.textarea().props.value, draft);
+  assert.equal(f.status(), "Loading verification…");
+  assert.equal(f.submit().props.disabled, true);
+});
+
+test("a stale confirmation returns to the inline controls without losing the draft", async () => {
+  const f = fixture();
+  const draft = "What will you do about this issue?";
+  f.scriptLoaded();
+  f.setResponse(async () => ({ ok: false, status: 403, json: async () => ({ code: "ASSENT_REQUIRED" }) }));
+  f.write(draft);
+  f.event("onSuccess", "initial-token");
+  f.beginSubmit();
+  await f.finishSubmit();
+  assert.equal(f.requests.length, 1);
+  assert.equal(f.textarea().props.value, draft);
+  assert.equal(f.confirmation().props.forQuestion, true);
+  assert.throws(() => f.widget(), /Expected form element/);
+  f.setParticipation("accepted");
+  assert.equal(f.submit().props.disabled, true);
+  f.event("onSuccess", "fresh-token");
+  assert.equal(f.submit().props.disabled, false);
+});
+
+test("an unavailable confirmation check can be retried in place", () => {
+  const f = fixture({ participation: "unavailable" });
+  const draft = "What will you do about this issue?";
+  f.write(draft);
+  assert.match(String(f.find((node) => node.props.role === "alert").props.children), /Your draft is still here/);
+  f.invoke(f.find((node) => node.props.children === "Retry confirmation check"), "onClick");
+  assert.match(String(f.find((node) => node.props.role === "status").props.children), /Checking your age/);
+  assert.equal(f.textarea().props.value, draft);
 });

@@ -1,13 +1,45 @@
 "use client";
+
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { useUser } from "@/lib/auth/use-user";
-import { TERMS_VERSION } from "@/lib/auth/participation";
+import { useState } from "react";
+import { useParticipation } from "./participation-provider";
+
+export function ParticipationConfirmation({ forQuestion = false, onConfirm }: {
+  forQuestion?: boolean;
+  onConfirm?: () => void;
+}) {
+  const { status, saveError, confirm } = useParticipation();
+  const [adult, setAdult] = useState(false);
+  const [terms, setTerms] = useState(false);
+
+  if (status !== "required" && status !== "saving") return null;
+  const saving = status === "saving";
+
+  return <fieldset disabled={saving} className="space-y-2">
+    <legend className="text-sm font-medium">Confirm your age and accept the Terms</legend>
+    <p className="text-sm">{forQuestion ? "Confirm once to submit questions." : "You can keep browsing without confirming."}</p>
+    <label className="block text-sm">
+      <input type="checkbox" checked={adult} onChange={(event) => setAdult(event.target.checked)} /> I am 18 or older.
+    </label>
+    <div className="text-sm">
+      <label>
+        <input type="checkbox" checked={terms} onChange={(event) => setTerms(event.target.checked)} /> I agree to the Terms of Service.
+      </label>{" "}
+      <Link href="/terms" target="_blank" rel="noopener" className="underline">Read the Terms<span className="sr-only"> (opens in a new tab)</span></Link>
+    </div>
+    <button type="button" className="min-h-11 text-sm underline disabled:opacity-60" disabled={!adult || !terms || saving}
+      onClick={() => { onConfirm?.(); void confirm(); }}>
+      {saving ? "Saving confirmation…" : "Confirm age and Terms"}
+    </button>
+    {saveError && <p role="alert" className="text-sm text-destructive">{saveError}</p>}
+  </fieldset>;
+}
+
 export function ParticipationBanner() {
- const { user } = useUser();
- const userId=user?.id, anonymous=user?.is_anonymous;
- const [needed,setNeeded]=useState(false),[adult,setAdult]=useState(false),[terms,setTerms]=useState(false),[busy,setBusy]=useState(false),[error,setError]=useState("");
- useEffect(()=>{let active=true;setNeeded(false);if(userId&&!anonymous)void fetch('/api/participation',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(active)setNeeded(d.accepted!==true);}).catch(()=>{if(active)setNeeded(true);});return()=>{active=false;};},[userId,anonymous]);
- if(!needed)return null;
- return <section aria-label="Participation confirmation" className="border-b bg-muted px-4 py-4 text-sm"><p>To ask, vote, chat or act for an office, confirm that you are an adult and accept the Terms. You can keep browsing without accepting.</p><label className="block"><input type="checkbox" checked={adult} onChange={e=>setAdult(e.target.checked)} /> I am 18 or older.</label><label className="block"><input type="checkbox" checked={terms} onChange={e=>setTerms(e.target.checked)} /> I agree to the <Link href="/terms" className="underline">Terms of Service</Link>.</label><button type="button" className="min-h-11 underline" disabled={!adult||!terms||busy} onClick={async()=>{setBusy(true);setError("");try{const r=await fetch('/api/participation',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({adult:true,terms_version:TERMS_VERSION})});if(!r.ok)throw Error();window.location.reload();}catch{setError('Your confirmation was not saved. Please try again.');setBusy(false);}}}>Confirm and continue</button>{error&&<p role="alert">{error}</p>}</section>;
+  const { status } = useParticipation();
+  if (status !== "required" && status !== "saving") return null;
+
+  return <section aria-label="Participation confirmation" className="border-b bg-muted px-4 py-4">
+    <ParticipationConfirmation />
+  </section>;
 }
