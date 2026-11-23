@@ -53,6 +53,8 @@
 .profileIdentity h2 a { text-decoration: none; }
 .profileIdentity p { margin: 6px 0; }
 .identityMeta { color: var(--muted-foreground); font-size: 13px; }
+.photoAttribution { overflow-wrap: anywhere; }
+.photoAttribution a { color: var(--foreground); text-decoration: underline; text-underline-offset: 3px; }
 .badgeRow { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
 .badge { display: inline-flex; align-items: center; min-height: 26px; padding: 2px 8px; border: 1px solid var(--border); font-size: 11px; letter-spacing: .04em; line-height: 1.5; text-transform: uppercase; color: var(--muted-foreground); }
 .verified, .success { color: var(--green); }
