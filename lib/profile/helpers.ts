@@ -32,6 +32,23 @@ export function isValidIsoWeek(value: number): boolean {
   return day === 4 || (day === 3 && leap);
 }
 
+const weekStartFormatter = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+  timeZone: "UTC",
+});
+
+export function formatWeekStart(weekNumber: number): string {
+  const year = Math.floor(weekNumber / 100);
+  const week = weekNumber % 100;
+  // January 4 is always in the first ISO week.
+  const monday = new Date(Date.UTC(year, 0, 4));
+  const daysSinceMonday = (monday.getUTCDay() + 6) % 7;
+  monday.setUTCDate(monday.getUTCDate() - daysSinceMonday + (week - 1) * 7);
+  return weekStartFormatter.format(monday);
+}
+
 export function resolveProfileView(currentWeekNumber: number, weekParam?: string, periodParam?: string): ProfileView {
   if (!isValidIsoWeek(currentWeekNumber)) throw new Error("Profile reporting period unavailable");
   const validPeriods: ProfilePeriod[] = ["week", "month", "year", "all"];

@@ -4,7 +4,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { createPublicClient } from "@/lib/supabase/server";
 import { getProfile, getProfileMetadata } from "@/lib/profile/server";
-import { safeJsonLd, safeWebUrl } from "@/lib/profile/helpers";
+import { formatWeekStart, safeJsonLd, safeWebUrl } from "@/lib/profile/helpers";
 import { OwnerBanner } from "@/components/politician/owner-banner";
 import { QuestionList } from "@/components/politician/question-list";
 import { AskQuestionForm } from "@/components/questions/ask-question-form";
@@ -36,10 +36,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-function formatWeek(week: number): string {
-  return `Week ${week % 100}, ${Math.floor(week / 100)}`;
-}
-
 function socialLinks(value: unknown, website: string | null) {
   const handles = (value ?? {}) as Record<string, unknown>;
   const links: { label: string; href: string }[] = [];
@@ -67,8 +63,9 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
   if (!data) notFound();
   const { politician, questions, period, isHistoricalView, viewingWeekNumber, currentWeekNumber } = data;
   const matchingQuestions = sort === "unanswered" ? data.totalQuestions - data.officialAnsweredQuestions : data.totalQuestions;
-  const periodLabel = isHistoricalView ? formatWeek(viewingWeekNumber) : {
-    week: `This week · ${formatWeek(currentWeekNumber)}`,
+  const weekStart = formatWeekStart(viewingWeekNumber);
+  const periodLabel = isHistoricalView ? `Week of ${weekStart}` : {
+    week: `This week · ${weekStart}`,
     month: "Questions from the past 28 days",
     year: "Questions from the past 365 days",
     all: "Questions from all time",
@@ -100,7 +97,7 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
           <span>{politician.is_test ? "Test profile" : "The public record"}</span>
         </div>
         <OwnerBanner politicianId={politician.id} />
-        {isHistoricalView && <div className={styles.notice}><p>Archive: {formatWeek(viewingWeekNumber)}. Asking and voting are closed for this week.</p><Link href={`/${politician.slug}`}>Return to this week →</Link></div>}
+        {isHistoricalView && <div className={styles.notice}><p>Archive for the week of {weekStart}. Asking and voting are closed for this week.</p><Link href={`/${politician.slug}`}>Return to this week →</Link></div>}
 
         <section className={styles.hero} aria-labelledby="politician-name">
           <ProfilePortrait photoUrl={politician.photo_url} name={politician.full_name} responded={data.officialAnsweredQuestions > 0} />
@@ -137,7 +134,7 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
         <div className={styles.mainLayout}>
           <section className={styles.questions} id="profile-questions" tabIndex={-1} aria-labelledby="questions-heading">
             <h2 id="questions-heading" className={styles.sectionTitle}>What do you want to know?</h2>
-            <p className={styles.sectionIntro}>{isHistoricalView ? `Questions from ${formatWeek(viewingWeekNumber)}.` : period === "week" ? "Support the questions you want answered. Every vote helps set the agenda." : "Explore the record. Voting is open only for questions from the current week."}</p>
+            <p className={styles.sectionIntro}>{isHistoricalView ? `Questions from the week of ${weekStart}.` : period === "week" ? "Support the questions you want answered. Every vote helps set the agenda." : "Explore the record. Voting is open only for questions from the current week."}</p>
             {!isHistoricalView && <PeriodTabs slug={politician.slug} activePeriod={period} sort={sort} />}
             {matchingQuestions > questions.length && <p className={styles.sectionIntro}>Showing {questions.length} of {matchingQuestions.toLocaleString("en-US")} {sort === "unanswered" ? "unanswered " : ""}questions, {sort === "newest" ? "newest first" : "ranked by net votes"}. The response record covers the full period.</p>}
             <QuestionList questions={questions} memberIds={data.memberIds} politicianId={politician.id} politicianSlug={politician.slug} politicianName={politician.full_name} profileVerified={politician.verification_tier === "2" || politician.verification_tier === "3"} weekNumber={viewingWeekNumber} currentWeekNumber={currentWeekNumber} isHistorical={isHistoricalView} period={period} appearance="face" profileSort={sort} />
@@ -145,7 +142,7 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
           <aside className={styles.sidebar} aria-label="Ask and explore">
             {currentWeekView ? <AskQuestionForm politicianId={politician.id} politicianName={politician.full_name} appearance="face" /> : <p className={styles.notice}>New questions go into the current week. <Link href={`/${politician.slug}#ask-question`}>Ask this week →</Link></p>}
             <div className={styles.help}><h2>A good question gets specific.</h2><ol><li>Ask about a decision, a commitment, or an issue they can act on.</li><li>Keep it clear and respectful.</li><li>Check the questions here first. Add your vote if someone has already asked.</li></ol></div>
-            {data.archiveWeeks.length > 0 && <details className={styles.archive}><summary>Previous weeks</summary><nav aria-label="Weekly archive">{data.archiveWeeks.map((archiveWeek) => <Link key={archiveWeek} href={`/${politician.slug}?week=${archiveWeek}#profile-questions`} aria-current={isHistoricalView && viewingWeekNumber === archiveWeek ? "page" : undefined}>{formatWeek(archiveWeek)} <span aria-hidden="true">↗</span></Link>)}</nav></details>}
+            {data.archiveWeeks.length > 0 && <details className={styles.archive}><summary>Previous weeks</summary><nav aria-label="Weekly archive">{data.archiveWeeks.map((archiveWeek) => <Link key={archiveWeek} href={`/${politician.slug}?week=${archiveWeek}#profile-questions`} aria-current={isHistoricalView && viewingWeekNumber === archiveWeek ? "page" : undefined}>{formatWeekStart(archiveWeek)} <span aria-hidden="true">↗</span></Link>)}</nav></details>}
             {politician.verification_tier === "0" && <p className={styles.notice}>Part of {politician.full_name}’s team? <Link href={`/verify?prefill=${politician.id}`}>Claim this profile →</Link></p>}
           </aside>
         </div>

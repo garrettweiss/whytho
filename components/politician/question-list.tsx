@@ -6,6 +6,7 @@ import { Enums } from "@/types/database";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/lib/auth/use-user";
 import { useOwnerMembership } from "@/lib/auth/use-owner-membership";
+import { formatWeekStart } from "@/lib/profile/helpers";
 import { AnswerComposer } from "@/components/answers/answer-composer";
 import { AnswerCorrectionButton } from "@/components/dashboard/answer-edit-button";
 import { safeAnswerMediaUrl } from "@/components/answers/media-url";
@@ -227,10 +228,6 @@ function ReportButton({ questionId, questionBody, appearance }: { questionId: st
   );
 }
 
-function formatWeekBadge(weekNumber: number): string {
-  return `Week ${weekNumber % 100}, ${Math.floor(weekNumber / 100)}`;
-}
-
 function QuestionCard({ question, politicianSlug, politicianName, isHistorical, showWeekBadge, votingDisabled, votesReady, hydratedVote, voteIdentity, onVoteSaved, onVoteSuccess, isOwner, ownerRole, profileVerified, appearance }: {
   question: Question;
   politicianSlug: string;
@@ -327,7 +324,7 @@ function QuestionCard({ question, politicianSlug, politicianName, isHistorical, 
         </div>
         <div className={face ? styles.questionContent : "flex-1 min-w-0"}>
           <div className={face ? styles.questionMeta : "flex flex-wrap items-center gap-2 text-xs text-muted-foreground mb-2"}>
-            {showWeekBadge && <span>{formatWeekBadge(question.week_number)}</span>}
+            {showWeekBadge && <span>{formatWeekStart(question.week_number)}</span>}
             {question.is_seeded && <span>Suggested Question: AI-generated from public record</span>}
             {question.source === "x" && question.x_posts && (
               <span>Asked by <a href={`https://x.com/${encodeURIComponent(question.x_posts.author_handle)}`} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">@{question.x_posts.author_handle}</a> on X{originalPostUrl && <> · <a href={originalPostUrl} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">View original</a></>}</span>
@@ -479,7 +476,7 @@ export function QuestionList({ questions, politicianId, memberIds, politicianSlu
 
   const periodLabels = { week: "This week's questions", month: "Questions from the last 28 days", year: "Questions from the last 365 days", all: "All questions" };
   const emptyMessages = { week: "No questions this week", month: "No questions in the last 28 days", year: "No questions in the last 365 days", all: "No questions yet" };
-  const title = isHistorical ? `${formatWeekBadge(weekNumber)} questions` : periodLabels[period];
+  const title = isHistorical ? `Questions for the week of ${formatWeekStart(weekNumber)}` : periodLabels[period];
   const sorted = localQuestions
     .filter((question) => questionSort !== "unanswered" || !question.answers.some((answer) => isPublishedAnswer(answer) && isOfficialAnswer(answer)))
     .sort((first, second) => (questionSort === "newest" ? 0 : second.net_upvotes - first.net_upvotes)
@@ -533,7 +530,7 @@ export function QuestionList({ questions, politicianId, memberIds, politicianSlu
         {votesFailed && <button type="button" className={face ? styles.textButton : "min-h-11 underline"} onClick={() => setVoteRetry((value) => value + 1)}>Retry loading votes</button>}
       </div>}
       {sorted.length === 0 ? <div className={face ? styles.empty : "rounded-xl border bg-card p-8 space-y-2"}>
-        <p>{questionSort === "unanswered" ? "No unanswered questions in this view." : isHistorical ? `No questions recorded for ${formatWeekBadge(weekNumber).toLowerCase()}.` : emptyMessages[period]}</p>
+        <p>{questionSort === "unanswered" ? "No unanswered questions in this view." : isHistorical ? `No questions recorded for the week of ${formatWeekStart(weekNumber)}.` : emptyMessages[period]}</p>
         <p className={face ? styles.meta : "text-sm text-muted-foreground"}>{isHistorical || period !== "week" ? "Choose another period to explore the record." : "Have something to ask? Add your question for this week."}</p>
       </div> : <div className={face ? styles.group : "space-y-2"}>
         {sorted.map((question, index) => <div key={question.id}>
