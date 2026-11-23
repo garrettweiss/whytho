@@ -158,6 +158,11 @@ baking an empty homepage into the cache for 15 minutes. So during a Supabase
 restriction, restore the database first, then deploy. Vercel keeps the previous
 deployment live through a failed build.
 
+The homepage ranking requires migration `20261123195800_homepage_directory_ranking.sql`.
+Apply it to the target database before building the release. The Vercel build
+environment also needs the existing server-only `SUPABASE_SERVICE_ROLE_KEY` for
+that database. The ranking function does not return individual votes.
+
 Verify caching is working after any deploy:
 
 ```bash

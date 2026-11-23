@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { decodeDirectoryCursor, encodeDirectoryCursor, readEmbeddedCount } from "./cursor";
+import { decodeDirectoryCursor, DIRECTORY_SNAPSHOT_MAX_AGE_MS, DIRECTORY_SNAPSHOT_MS, encodeDirectoryCursor, readEmbeddedCount } from "./cursor";
 import { arrangeDirectoryPeople } from "./presentation";
 import { escapeLike, normalizeDirectoryFilters, parseDirectorySearch, quoteFilterValue, stateRecordValues } from "./search";
 import { DirectoryInputError, type DirectoryFilters } from "./types";
@@ -54,6 +54,16 @@ test("pagination preserves its question cohort across weekly resets and rejects 
   assert.equal(decodeDirectoryCursor(encodeDirectoryCursor(cursor, filters), filters)?.weekNumber, 202653);
   for (const weekNumber of [0, 202600, 202654, 202601.5, 999999]) {
     assert.throws(() => decodeDirectoryCursor(encodeDirectoryCursor({ ...cursor, weekNumber }, filters), filters), DirectoryInputError);
+  }
+});
+
+test("homepage continuation pins the ranking snapshot and rejects invalid timestamps", () => {
+  const filters: DirectoryFilters = { q: "", state: "", office: "" };
+  const snapshot = Math.floor(Date.now() / DIRECTORY_SNAPSHOT_MS) * DIRECTORY_SNAPSHOT_MS;
+  const cursor = { name: "Same Name", id: "127cdf41-9370-4aa7-82fc-c31936aac111", weekNumber: 202653, snapshot };
+  assert.deepEqual(decodeDirectoryCursor(encodeDirectoryCursor(cursor, filters), filters), cursor);
+  for (const invalid of [snapshot + 1, snapshot + DIRECTORY_SNAPSHOT_MS, snapshot - DIRECTORY_SNAPSHOT_MAX_AGE_MS - DIRECTORY_SNAPSHOT_MS]) {
+    assert.throws(() => decodeDirectoryCursor(encodeDirectoryCursor({ ...cursor, snapshot: invalid }, filters), filters), DirectoryInputError);
   }
 });
 

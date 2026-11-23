@@ -51,7 +51,7 @@ function PortraitCard({ person, index }: { person: DirectoryPerson; index: numbe
   </li>;
 }
 
-export function PoliticianDirectory({ initialPage, context }: { initialPage: DirectoryPage; context?: DirectoryContext }) {
+export function PoliticianDirectory({ initialPage, context, homepage = false }: { initialPage: DirectoryPage; context?: DirectoryContext; homepage?: boolean }) {
   const defaults = useMemo(() => directoryContextDefaults(context), [context]);
   const officeOptions = OFFICES.filter(office => !allowedOfficeValues(context?.scope) || allowedOfficeValues(context?.scope)?.includes(office.value));
   const [page, setPage] = useState(initialPage);
@@ -99,9 +99,13 @@ export function PoliticianDirectory({ initialPage, context }: { initialPage: Dir
     if (!cursor) { setFilters(nextFilters); setPage(previous => ({ ...previous, people: [], nextCursor: null })); }
     const params = new URLSearchParams();
     for (const [key, value] of Object.entries(nextFilters)) if (value) params.set(key, value);
+    if (homepage) params.set("homepage", "1");
     if (cursor) params.set("cursor", cursor);
     try {
       const response = await fetch(`/api/politicians/directory?${params}`, { signal: request.signal });
+      if (response.status === 400 && cursor && homepage && requestId === generation.current) {
+        lastRequest.current = { filters: nextFilters };
+      }
       if (!response.ok) throw new Error("Directory unavailable");
       const next: DirectoryPage = await response.json();
       if (requestId !== generation.current) return;
@@ -115,7 +119,7 @@ export function PoliticianDirectory({ initialPage, context }: { initialPage: Dir
     } finally {
       if (requestId === generation.current) { loading.current = false; setBusy(false); }
     }
-  }, []);
+  }, [homepage]);
 
   useEffect(() => {
     const restore = (event?: PopStateEvent) => {

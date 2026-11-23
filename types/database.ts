@@ -1253,6 +1253,7 @@ export type Database = {
       politician_identity_dependency_counts: { Args: { p_ids: string[] }; Returns: Json }
       identity_profile_summary: { Args: { p_id: string; p_period: string; p_week: number; p_cutoff?: string | null }; Returns: Json }
       identity_directory_counts: { Args: { p_ids: string[]; p_week: number }; Returns: Json }
+      homepage_directory_ranking: { Args: { p_as_of: string }; Returns: Json }
       identity_profile_question_ids: { Args: { p_id: string; p_period: string; p_week: number; p_cutoff?: string | null; p_sort?: string; p_limit?: number }; Returns: string[] }
       canonical_politician_id: { Args: { p_id: string }; Returns: string }
       resolve_politician_identity: { Args: { p_id: string }; Returns: Json }

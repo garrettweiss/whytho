@@ -12,14 +12,14 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  const initialPage = await getDirectoryPage({ q: "", state: "", office: "" });
+  const initialPage = await getDirectoryPage({ q: "", state: "", office: "" }, undefined, true);
   return <main className={`${styles.theme} ${styles.shell} ${faceDisplay.variable} ${faceBody.variable}`}>
     <div className={styles.container}>
       <section className={styles.hero} aria-labelledby="home-title">
         <h1 id="home-title">Who do you want an answer from?</h1>
         <p>Find a politician. Ask a question. Vote for the questions you want answered.</p>
       </section>
-      <PoliticianDirectory initialPage={initialPage} />
+      <PoliticianDirectory initialPage={initialPage} homepage />
       <section id="how-it-works" className={styles.howItWorks} aria-labelledby="how-title">
         <h2 id="how-title">Your questions.<br />On the record.</h2>
         <div className={styles.steps}>
