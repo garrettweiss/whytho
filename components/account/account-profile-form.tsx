@@ -68,12 +68,6 @@ const US_CITIES = [
   "Worcester", "Yonkers",
 ];
 
-const AFFILIATIONS = [
-  "Democrat", "Republican", "Independent", "Green", "Libertarian", "Other",
-];
-
-// ── Generic combobox ──────────────────────────────────────────────────────────
-
 interface ComboboxOption {
   value: string;
   label: string;
@@ -225,19 +219,16 @@ interface Props {
   initialCity: string | null;
   initialCounty: string | null;
   initialStateCode: string | null;
-  initialAffiliation: string | null;
 }
 
 export function AccountProfileForm({
   initialCity,
   initialCounty,
   initialStateCode,
-  initialAffiliation,
 }: Props) {
   const [city, setCity] = useState(initialCity ?? "");
   const [county, setCounty] = useState(initialCounty ?? "");
   const [stateCode, setStateCode] = useState(initialStateCode ?? "");
-  const [affiliation, setAffiliation] = useState(initialAffiliation ?? "");
 
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState<"idle" | "saved" | "error">("idle");
@@ -274,7 +265,6 @@ export function AccountProfileForm({
           city: city.trim() || null,
           county: county.trim() || null,
           state_code: stateCode || null,
-          political_affiliation: affiliation || null,
         }),
       });
       if (!res.ok) {
@@ -349,25 +339,6 @@ export function AccountProfileForm({
           />
         </div>
 
-        {/* Political Affiliation */}
-        <div className={styles.field}>
-          <label htmlFor="profile-affiliation" className="text-sm font-medium">
-            Political Affiliation
-          </label>
-          <select
-            id="profile-affiliation"
-            name="political_affiliation"
-            disabled={saving}
-            value={affiliation}
-            onChange={(e) => setAffiliation(e.target.value)}
-            className={styles.input}
-          >
-            <option value="">Prefer not to say</option>
-            {AFFILIATIONS.map((a) => (
-              <option key={a} value={a}>{a}</option>
-            ))}
-          </select>
-        </div>
       </div>
 
       <div className={styles.formActions}>

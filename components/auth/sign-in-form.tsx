@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import styles from "@/components/account/account.module.css";
 import { createClient } from "@/lib/supabase/client";
@@ -24,6 +25,7 @@ import { createClient } from "@/lib/supabase/client";
  */
 
 export function SignInForm({ redirectAfter = "/" }: { redirectAfter?: string }) {
+  const [adult, setAdult] = useState(false);
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -45,6 +47,7 @@ export function SignInForm({ redirectAfter = "/" }: { redirectAfter?: string }) 
   // ── Google ────────────────────────────────────────────────────────────────
 
   async function handleGoogleSignIn() {
+    if (!adult) return;
     setLoadingMethod("google");
     setLoading(true);
     setError(null);
@@ -99,6 +102,7 @@ export function SignInForm({ redirectAfter = "/" }: { redirectAfter?: string }) 
 
   async function handleMagicLink(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (!adult) return;
     setLoadingMethod("email");
     setLoading(true);
     setError(null);
@@ -163,10 +167,18 @@ export function SignInForm({ redirectAfter = "/" }: { redirectAfter?: string }) 
 
   return <section className={styles.authForm} aria-labelledby="auth-form-heading" aria-busy={loading}>
     <h2 id="auth-form-heading">Sign in or create an account.</h2>
+    <label className="flex min-h-11 items-center gap-2">
+      <input type="checkbox" checked={adult} onChange={(event) => setAdult(event.target.checked)} disabled={loading} />
+      I am 18 or older.
+    </label>
+    <p className={styles.formHint}>
+      Read our <Link className="underline" href="/privacy">Privacy Notice</Link> and{" "}
+      <Link className="underline" href="/terms">Terms of Use</Link>.
+    </p>
     {isAnonymous && <div className={styles.notice}><p>You have votes in this session. Creating a new account can keep them together. Signing into an existing account may leave a separate voting history.</p></div>}
     {info && <p role="status" className={styles.formHint}>{info}</p>}
     {error && <p id="auth-form-error" role="alert" className={styles.error}>{error}</p>}
-    <button type="button" className={styles.secondaryButton} onClick={handleGoogleSignIn} disabled={loading}>
+    <button type="button" className={styles.secondaryButton} onClick={handleGoogleSignIn} disabled={loading || !adult}>
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
         <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
@@ -179,10 +191,10 @@ export function SignInForm({ redirectAfter = "/" }: { redirectAfter?: string }) 
     <form onSubmit={handleMagicLink} className={styles.emailForm}>
       <div className={styles.field}>
         <label htmlFor="email">Email address</label>
-        <input id="email" name="email" type="email" autoComplete="email" inputMode="email" placeholder="you@example.com" required disabled={loading} className={styles.input} aria-describedby={`email-sign-in-hint${error ? " auth-form-error" : ""}`} />
+        <input id="email" name="email" type="email" autoComplete="email" inputMode="email" placeholder="you@example.com" required disabled={loading || !adult} className={styles.input} aria-describedby={`email-sign-in-hint${error ? " auth-form-error" : ""}`} />
       </div>
       <p id="email-sign-in-hint" className={styles.formHint}>We will email you a sign-in link. No password needed.</p>
-      <button type="submit" className={styles.button} disabled={loading}>{loading && loadingMethod === "email" ? "Sending sign-in link…" : "Email me a sign-in link"}</button>
+      <button type="submit" className={styles.button} disabled={loading || !adult}>{loading && loadingMethod === "email" ? "Sending sign-in link…" : "Email me a sign-in link"}</button>
     </form>
   </section>;
 }

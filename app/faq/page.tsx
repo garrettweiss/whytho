@@ -5,7 +5,7 @@ export const metadata: Metadata = { title: "FAQ | WhyTho", description: "Questio
 const sections = [
   { title: "Getting started", questions: [
     ["Does a profile mean the politician has joined?", "No. Profiles can be created from public records. Read the verification label to see the profile’s claim status. A listing does not imply endorsement."],
-    ["Can I read without signing in?", "Yes. Public profiles, questions, and published responses are available to read. The question form will guide you to sign in when needed. Voting may use an anonymous session."],
+    ["Can I read without signing in?", "Yes. Public profiles, questions, and published responses are available to read. To ask or vote, sign in and confirm that you are at least 18 and agree to the Terms of Use."],
     ["How do I search by office?", "Use a full office name such as U.S. Senate or State Senate, and optionally add a state. If you type Senate without a level, WhyTho asks which office you mean."],
   ]},
   { title: "Questions and votes", questions: [

@@ -1,0 +1,122 @@
+{
+  "title": "Privacy notice",
+  "sections": [
+    {
+      "heading": "Who we are",
+      "paragraphs": [
+        "WhyTho is operated by Zellon LLC, a California limited liability company. We provide a public place to ask US politicians questions and read their responses. Public profiles may exist before a politician joins. A profile does not imply participation or endorsement.",
+        "For privacy requests, email [privacy@whytho.us](mailto:privacy@whytho.us). You can also write to Zellon LLC, Attn: WhyTho Privacy, 2108 N St., Ste N, Sacramento, CA 95816. Product and account help is available at [support@whytho.us](mailto:support@whytho.us)."
+      ]
+    },
+    {
+      "heading": "Information we process",
+      "paragraphs": [
+        "We do not require an exact home address or political affiliation for participation. Location preferences are self-reported. An account or email verification does not verify residency or establish that someone is a constituent. Records from earlier guest participation may remain associated with a pseudonymous session identifier; the current registration requirement does not automatically erase those records."
+      ],
+      "definitions": [
+        {
+          "information": "Login email, account identifier, sign-in provider information and session records",
+          "source": "You, your sign-in provider and our systems",
+          "purpose": "Sign-in, account administration and security"
+        },
+        {
+          "information": "Confirmation that you are 18 or older, accepted policy versions and acceptance time",
+          "source": "You and our systems",
+          "purpose": "Apply participation rules and record agreement; we do not ask for a birth date for this confirmation"
+        },
+        {
+          "information": "Display name, submitted questions, answers, media and corrections",
+          "source": "You or an authorized office team",
+          "purpose": "Publish and maintain the civic conversation and its history"
+        },
+        {
+          "information": "Votes and restricted account-linked voting records",
+          "source": "Your actions and our systems",
+          "purpose": "Calculate public totals, let you manage your vote, enforce voting rules and investigate abuse"
+        },
+        {
+          "information": "Optional city, county and state profile fields",
+          "source": "Information you choose to provide",
+          "purpose": "Store your location preferences; you can change them in settings or ask us to remove them"
+        },
+        {
+          "information": "Political-affiliation information supplied through earlier profile forms",
+          "source": "Your earlier account profile",
+          "purpose": "Existing values may remain until reviewed for removal; we no longer collect new values through these forms and do not use them for personalization or advertising"
+        },
+        {
+          "information": "Public names, offices, candidacy details, website links, portraits and source records",
+          "source": "Public sources and authorized offices",
+          "purpose": "Identify officials and candidates and explain the public record"
+        },
+        {
+          "information": "Office authority checks, membership, profile-change records and photo-permission evidence",
+          "source": "Claimants, authoritative sources and our systems",
+          "purpose": "Verify authority, restrict account access and investigate disputes"
+        },
+        {
+          "information": "Chat messages, feedback, support requests, reports and optional contact information",
+          "source": "You",
+          "purpose": "Provide assistance, record feedback or a question forwarded to the team, and investigate concerns"
+        },
+        {
+          "information": "AI operation records, source references, identifiers and result summaries",
+          "source": "Our systems",
+          "purpose": "Investigate accuracy, attribution and feature operation"
+        },
+        {
+          "information": "Network, browser and technical diagnostics",
+          "source": "Your device, our systems and service providers",
+          "purpose": "Deliver pages and media, prevent abuse and troubleshoot failures"
+        }
+      ]
+    },
+    {
+      "heading": "What is public",
+      "paragraphs": [
+        "Questions you submit, your chosen public display name where shown, published official responses, associated media and public corrections can be read and copied by others. Official-profile information and image credits are also public. Do not put private contact details, identity documents or other sensitive information into a public question, answer or image.",
+        "Vote totals are public. We keep the account identities behind votes and individual voting choices restricted, rather than publishing them with the totals. Your login email, private preferences, unpublished drafts and underlying office-verification evidence are not public profile fields. Information you put into public content yourself can still identify you."
+      ]
+    },
+    {
+      "heading": "Service providers and AI",
+      "paragraphs": [
+        "We use service providers to operate WhyTho. Depending on the feature, these include Supabase for accounts and data storage, Vercel for hosting, Cloudflare for bot protection, Resend for enabled email functions, Anthropic for AI features, Sentry for error diagnostics, and PostHog for system-health telemetry. Google receives information when you choose Google sign-in. Information sent to a provider depends on the feature, such as an email address for delivery or chat text for an AI response. Provider processing and retention depend on the service and its applicable arrangements.",
+        "We use AI in question assistance, chat and research. Chat conversation text and relevant page context are sent to our AI provider to produce a response. The chat may save feedback or a question for our team, together with your account or session identifier and contact information you supply. Avoid putting sensitive private information into chat. A question draft prepared for you in chat is not published by that action; you decide whether to submit it. Separately, WhyTho may display suggested questions from its research process. AI analysis is not an official response by a politician or their office. We retain operation and source records, which may include short result summaries, to investigate accuracy and attribution. Staff may use AI assistance when reviewing reports.",
+        "Photos and embedded media served by third-party hosts can send your IP address and browser request information to those hosts. Following a link takes you to a service with its own privacy practices.",
+        "We may also disclose information when needed to comply with applicable law, respond to valid legal process, protect rights and security, or address a business transfer, with the protections and notices applicable to the circumstances."
+      ]
+    },
+    {
+      "heading": "Cookies and tracking choices",
+      "paragraphs": [
+        "WhyTho uses session and security technologies for functions such as sign-in and bot protection. Optional browser behavior analytics and session replay are disabled in the launch configuration. Operational diagnostics remain enabled. We do not use WhyTho voting histories or private political preferences to create advertising audiences.",
+        "We do not currently offer cross-site behavioral advertising or change our handling in response to the browser Do Not Track signal. Providers of sign-in, security, externally hosted images or embedded content may collect information about your visits over time and across services under their own practices. Optional WhyTho browser analytics remain off regardless of that signal. If we introduce a practice requiring an opt-out, recognized preference signal or consent, we will provide the applicable choice and update this notice before that practice starts."
+      ]
+    },
+    {
+      "heading": "Retention and the public civic record",
+      "paragraphs": [
+        "We intend to maintain authentic published official answers as a permanent public civic archive, including after an account closes or the person leaves office. Answered questions remain associated with the answers. Published answer originals remain visible alongside dated corrections. Permanent archiving is subject to applicable legal obligations and review of unlawful content, impersonation and exposed private information.",
+        "Closing the asker's account does not automatically erase an answered question or an authentic official response. We review requests to detach the former user's public account identity and to address identifying details within the text. Removing an account link does not necessarily make the text anonymous.",
+        "Private account, verification, support and diagnostic records are separate from the public archive. Retention decisions consider whether the account or request remains active, the purpose of the record, and security, dispute or legal needs. We have not yet implemented a uniform automatic deletion schedule across these systems; removal requests are reviewed individually. Backups and provider-held copies can have different retention periods. We cannot control independent copies made by other readers or search services."
+      ]
+    },
+    {
+      "heading": "Your choices and requests",
+      "paragraphs": [
+        "Email [privacy@whytho.us](mailto:privacy@whytho.us) to request access, correction, account closure, removal of private information, or review of how information about you is used. You do not need a WhyTho account to raise a concern. Include enough information to locate the record and explain your request; do not send identity documents unless we explain why a proportionate verification step is needed.",
+        "We assess requests under the rules that apply to the information and the request. Some information may be retained for a specific legal or security reason or as part of a lawful public record. We will explain the outcome and how to ask for reconsideration. Contact us if you need an accessible way to make a request. We will not penalize you for exercising a privacy right that applies to you.",
+        "Automated new-question delivery to offices is currently disabled. Office notification preferences may be saved in settings, but saving a preference does not mean delivery has started. Registered users can also manage available answer and digest preferences in account settings. Necessary account-security messages are separate from optional notifications. Changing an email preference does not remove a public profile or the published-answer archive."
+      ]
+    },
+    {
+      "heading": "Age, security and updates",
+      "paragraphs": [
+        "You must be at least 18 to participate, including creating an account, asking questions, voting, using interactive chat or managing an office profile. Public pages can be read without an account. The age confirmation is a declaration, not identity or age verification. If you believe a child has supplied personal information through WhyTho, contact [privacy@whytho.us](mailto:privacy@whytho.us) so we can investigate and take appropriate action.",
+        "We use access restrictions and other safeguards designed to protect private information. No service can guarantee absolute security. Report a suspected vulnerability or account compromise to [security@whytho.us](mailto:security@whytho.us).",
+        "We will update this notice when our practices change and identify its effective date. For a material change, we will provide an appropriate notice and obtain any consent required for the new use."
+      ]
+    }
+  ]
+}

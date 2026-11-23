@@ -1241,6 +1241,9 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      has_current_participation_assent: { Args: Record<PropertyKey, never>; Returns: boolean }
+      accept_participation_terms: { Args: { p_terms_version: string; p_adult: boolean }; Returns: boolean }
+
       publish_x_post: { Args: { p_x_post_id: string; p_body: string; p_week_number: number }; Returns: Json }
       ingest_politician_identity: { Args: { p_namespace: string; p_external_id: string; p_record: Json; p_source_url?: string | null; p_apply?: boolean }; Returns: Json }
       link_politician_identity: {

@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { SiteNav } from "@/components/ui/site-nav";
 import { PostHogProvider } from "@/components/analytics/posthog-provider";
 import { ChatWidget } from "@/components/chatbot/chat-widget";
+import { ParticipationBanner } from "@/components/auth/participation-banner";
+import { LegalFooter } from "@/components/legal/legal-footer";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -31,7 +33,9 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <PostHogProvider>
           <SiteNav />
+          <ParticipationBanner />
           {children}
+          <LegalFooter />
           <ChatWidget />
         </PostHogProvider>
       </body>

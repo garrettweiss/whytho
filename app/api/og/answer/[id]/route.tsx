@@ -2,14 +2,14 @@
  * GET /api/og/answer/[id]
  *
  * Returns a PNG card for sharing an answer on social media.
- * If the answer has an attached image, it is used as the card background.
- * Otherwise uses a gradient with the politician's photo.
+ * Public records only. Attachments stay on their controlled delivery route.
  */
 
 import { ImageResponse } from "next/og";
-import { createAdminClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/server";
 
 export const runtime = "edge";
+export const dynamic = "force-dynamic";
 
 export async function GET(
   _request: Request,
@@ -17,53 +17,48 @@ export async function GET(
 ) {
   const { id } = await params;
 
-  const admin = createAdminClient();
+  const supabase = createPublicClient();
 
   // Fetch answer + politician + question
-  const { data: answer } = await admin
+  const { data: answer } = await supabase
     .from("answers")
     .select(`
       id,
       body,
       created_at,
       politician_id,
-      politicians ( full_name, office, state, photo_url ),
+      politicians ( full_name, office, state ),
       question_id
     `)
     .eq("id", id)
+    .eq("is_draft", false)
     .maybeSingle();
 
   if (!answer) {
-    return new Response("Answer not found", { status: 404 });
+    return new Response("Answer not found", { status: 404, headers: { "Cache-Control": "no-store" } });
   }
 
   const politician = Array.isArray(answer.politicians)
     ? answer.politicians[0]
     : answer.politicians;
 
-  // Fetch attached image if any
-  const { data: mediaItems } = await admin
-    .from("answer_media")
-    .select("public_url, media_type")
-    .eq("answer_id", id)
-    .eq("media_type", "image")
-    .limit(1);
-
-  const bgImage = mediaItems?.[0]?.public_url ?? null;
-
   // Fetch question body
   const { data: question } = answer.question_id
-    ? await admin
+    ? await supabase
         .from("questions")
-        .select("body")
+        .select("body, status")
         .eq("id", answer.question_id)
         .maybeSingle()
     : { data: null };
 
+  if (!question || question.status === "removed") {
+    return new Response("Answer not found", { status: 404, headers: { "Cache-Control": "no-store" } });
+  }
+
   const politicianName = politician?.full_name ?? "Politician";
   const office = politician?.office ?? "";
   const state = politician?.state ?? "";
-  const questionBody = question?.body ?? "";
+  const questionBody = question.body ?? "";
   const answerBody = answer.body ?? "";
 
   const truncate = (s: string, n: number) =>
@@ -77,27 +72,11 @@ export async function GET(
           flexDirection: "column",
           width: "100%",
           height: "100%",
-          background: bgImage ? "transparent" : "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)",
+          background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)",
           position: "relative",
           fontFamily: "sans-serif",
         }}
       >
-        {bgImage && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={bgImage}
-            alt=""
-            style={{
-              position: "absolute",
-              inset: 0,
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              filter: "brightness(0.35)",
-            }}
-          />
-        )}
-
         {/* Content */}
         <div
           style={{
@@ -203,6 +182,7 @@ export async function GET(
     {
       width: 1200,
       height: 630,
+      headers: { "Cache-Control": "no-store" },
     }
   );
 }
