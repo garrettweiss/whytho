@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { PORTRAIT_RIGHTS_VERSION } from "@/lib/photos/policy";
+import styles from "./profile.module.css";
 
 type Credit = { credit: string; basis: string | null };
 function safeHttps(value: string | undefined): string | null {
@@ -22,11 +23,11 @@ export function PhotoCredit({ politicianId }: { politicianId: string }) {
   const label = parts[0]?.split(": ")[0];
   const license = safeHttps(parts[0]?.split(": ").slice(1).join(": "));
   const source = safeHttps(parts[1]);
-  return <p style={{ fontSize: 12, lineHeight: 1.5 }}>
+  return <figcaption className={styles.photoCredit}>
     Photo: {record.credit}. {uploaded ? "Supplied with permission by the verified profile team." : <>
       {license && <><a href={license} rel="noopener noreferrer">{label ?? "License"}</a>. </>}
       {source && <><a href={source} rel="noopener noreferrer">Original source</a>. </>}
       {parts.slice(2).join("; ")}
     </>}
-  </p>;
+  </figcaption>;
 }

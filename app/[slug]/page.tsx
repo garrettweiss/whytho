@@ -100,8 +100,10 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
         {isHistoricalView && <div className={styles.notice}><p>Archive for the week of {weekStart}. Asking and voting are closed for this week.</p><Link href={`/${politician.slug}`}>Return to this week →</Link></div>}
 
         <section className={styles.hero} aria-labelledby="politician-name">
-          <ProfilePortrait photoUrl={politician.photo_url} name={politician.full_name} responded={data.officialAnsweredQuestions > 0} />
-          <PhotoCredit politicianId={politician.id} />
+          <figure className={styles.portraitGroup}>
+            <ProfilePortrait photoUrl={politician.photo_url} name={politician.full_name} responded={data.officialAnsweredQuestions > 0} />
+            {politician.photo_url && <PhotoCredit politicianId={politician.id} />}
+          </figure>
           <div className={styles.identity}>
             <p className={styles.office}>{isCandidate ? "Candidate for " : ""}{[office, ...officeLocation].filter(Boolean).join(" · ")}</p>
             <h1 id="politician-name">{politician.full_name}</h1>
