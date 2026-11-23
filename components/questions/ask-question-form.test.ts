@@ -114,6 +114,7 @@ function fixture(options: { siteKey?: string; signedIn?: boolean; appearance?: "
   render();
   return {
     render, find, invoke, widget, textarea, submit, requests,
+    verificationGroup: () => find((node) => node.props.role === "group" && node.props["aria-label"] === "Security verification"),
     confirmation: () => find((node) => node.type === ParticipationConfirmation),
     setParticipation: (status: ParticipationStatus) => { participation.status = status; render(); },
     status: () => find((node) => node.props.id === "fixture-verification-status").props.children,
@@ -136,22 +137,33 @@ function fixture(options: { siteKey?: string; signedIn?: boolean; appearance?: "
   };
 }
 
-test("verification is visible in both form layouts and gates valid questions until success", () => {
+test("both form layouts show verification only when interaction is needed and require a valid token", () => {
   for (const appearance of ["default", "face"] as const) {
-    const f = fixture({ appearance });
-    f.write("What will you do about this issue?");
-    assert.deepEqual(JSON.parse(JSON.stringify(f.widget().props.options)), {
-      size: "compact", appearance: "always", theme: appearance === "face" ? "dark" : "auto", retry: "never", refreshExpired: "manual", refreshTimeout: "manual",
-    });
-    // In 1.4.2, supplying a script error handler removes the loader's onload
-    // callback before Cloudflare executes it. Keep the default loader intact.
-    assert.equal((f.widget().props.scriptOptions as { onError?: unknown } | undefined)?.onError, undefined);
-    assert.equal(f.submit().props.disabled, true);
-    f.beginSubmit();
-    assert.equal(f.requests.length, 0);
-    f.event("onSuccess", "fresh-token");
-    assert.equal(f.submit().props.disabled, false);
-    assert.equal(f.status(), "Verification complete.");
+    for (const interactive of [false, true]) {
+      const f = fixture({ appearance });
+      f.write("What will you do about this issue?");
+      assert.deepEqual(JSON.parse(JSON.stringify(f.widget().props.options)), {
+        size: "compact", appearance: "interaction-only", theme: appearance === "face" ? "dark" : "auto", retry: "never", refreshExpired: "manual", refreshTimeout: "manual",
+      });
+      // In 1.4.2, supplying a script error handler removes the loader's onload
+      // callback before Cloudflare executes it. Keep the default loader intact.
+      assert.equal((f.widget().props.scriptOptions as { onError?: unknown } | undefined)?.onError, undefined);
+      assert.equal(f.verificationGroup().props.className, "sr-only");
+      assert.equal(f.submit().props.disabled, true);
+      f.beginSubmit();
+      assert.equal(f.requests.length, 0);
+      if (interactive) {
+        f.event("onBeforeInteractive");
+        assert.equal(f.verificationGroup().props.className, "space-y-2");
+        assert.equal(f.widget().props.style, undefined);
+        assert.equal(f.submit().props.disabled, true);
+      }
+      f.event("onSuccess", "fresh-token");
+      assert.equal(f.submit().props.disabled, false);
+      assert.equal(f.status(), "Verification complete.");
+      assert.equal(f.verificationGroup().props.className, "sr-only");
+      assert.equal((f.widget().props.style as React.CSSProperties).display, "none");
+    }
   }
 });
 
@@ -162,6 +174,7 @@ test("blocked script times out visibly and retry preserves the question while re
   assert.equal(f.timers(), 1);
   f.elapse();
   assert.match(String(f.status()), /could not load or finish/);
+  assert.equal(f.verificationGroup().props.className, "space-y-2");
   assert.equal(f.submit().props.disabled, true);
   f.retry();
   assert.equal(f.removedScripts(), 1);
@@ -208,6 +221,7 @@ test("expiry, timeout, and widget failures revoke tokens and allow a fresh chall
     f.event("onSuccess", "old-token");
     assert.equal(f.submit().props.disabled, false);
     f.event(callback, "fixture-error");
+    assert.equal(f.verificationGroup().props.className, "space-y-2");
     assert.equal(f.submit().props.disabled, true);
     f.beginSubmit();
     assert.equal(f.requests.length, 0);

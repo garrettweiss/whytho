@@ -14,7 +14,7 @@ const SITE_KEY = process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY ?? "";
 const VERIFICATION_LOAD_TIMEOUT_MS = 15_000;
 const VERIFICATION_MESSAGES = {
   loading: "Loading verification…",
-  ready: "Complete the verification check below. It may finish automatically.",
+  ready: "Complete the check below to submit your question.",
   verified: "Verification complete.",
   error: "Verification could not load or finish. Retry below. If it keeps failing, allow this site in your content blocker or try another browser.",
   expired: "Verification expired. Retry the check before submitting.",
@@ -59,6 +59,7 @@ export function AskQuestionForm({ politicianId, politicianName, onSubmitted, app
   const signInHref = `/sign-in?redirect=${encodeURIComponent(`${pathname}#ask-question`)}`;
   const verified = verification.status === "verified" && !!verification.token;
   const canRetryVerification = verification.status === "error" || verification.status === "expired";
+  const showVerification = verification.status !== "loading" && !verified;
 
   useEffect(() => {
     if (success) successRef.current?.focus();
@@ -189,11 +190,12 @@ export function AskQuestionForm({ politicianId, politicianName, onSubmitted, app
       <ParticipationConfirmation forQuestion onConfirm={() => { focusVerification.current = true; }} />
     </div>}
     {participation === "accepted" && <>
-      <div ref={verificationRef} role="group" tabIndex={-1} aria-labelledby={`${id}-verification-title`} aria-describedby={`${id}-verification-status`} className="space-y-2">
-        <p id={`${id}-verification-title`} className={face ? styles.inputLabel : "text-sm font-medium"}>Security verification</p>
+      <div ref={verificationRef} role="group" tabIndex={-1} aria-label="Security verification" aria-describedby={`${id}-verification-status`} className={showVerification ? "space-y-2" : "sr-only"}>
+        {showVerification && <p className={face ? styles.inputLabel : "text-sm font-medium"}>Security verification</p>}
         <p id={`${id}-verification-status`} role="status" className={canRetryVerification || verification.status === "unavailable" || verification.status === "unsupported" ? (face ? styles.error : "text-sm text-destructive") : textClass}>{VERIFICATION_MESSAGES[verification.status]}</p>
         {SITE_KEY && <Turnstile key={verificationAttempt} id={`${id}-turnstile`} siteKey={SITE_KEY}
-          options={{ size: "compact", appearance: "always", theme: face ? "dark" : "auto", retry: "never", refreshExpired: "manual", refreshTimeout: "manual" }}
+          style={verified ? { display: "none" } : undefined}
+          options={{ size: "compact", appearance: "interaction-only", theme: face ? "dark" : "auto", retry: "never", refreshExpired: "manual", refreshTimeout: "manual" }}
           onBeforeInteractive={() => setVerification({ status: "ready", token: null })}
           onSuccess={(token) => setVerification({ status: token ? "verified" : "error", token: token || null })}
           onExpire={() => setVerification({ status: "expired", token: null })}
