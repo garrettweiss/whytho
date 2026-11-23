@@ -12,6 +12,7 @@ import {
   toPublicAnswers,
 } from "./helpers";
 import type { ProfileMetadata, ProfileQuestion, ProfileView, PublicProfileData, PublicProfilePolitician } from "./types";
+import { profileQuestionCacheTag } from "./cache";
 
 const POLITICIAN_FIELDS = "id,slug,full_name,office,state,party,district,bio,photo_url,website_url,social_handles,verification_tier,is_active,is_test,politician_type,is_candidate,candidate_office,candidate_election_year,incumbent_challenge,candidate_status,election_date";
 const QUESTION_FIELDS = `id,politician_id,body,net_upvotes,is_seeded,source,status,created_at,week_number,
@@ -73,15 +74,19 @@ const loadCurrentWeek = unstable_cache(async (): Promise<number> => boundedRead(
   return data;
 }), ["public-profile-week-v1"], CACHE_OPTIONS);
 
-const loadProfile = unstable_cache(async (slug: string, view: ProfileView, sort: "votes" | "newest" | "unanswered"): Promise<PublicProfileData | null> => {
-  const politician = await loadPolitician(slug);
-  if (!politician) return null;
+function loadProfile(politician: PublicProfilePolitician, view: ProfileView, sort: "votes" | "newest" | "unanswered", questionLimit = view.period === "week" ? 50 : 200) {
+  return unstable_cache(readProfile, ["public-profile-record-identity-v3"], {
+    ...CACHE_OPTIONS,
+    tags: [...CACHE_OPTIONS.tags, profileQuestionCacheTag(politician.slug)],
+  })(politician, view, sort, questionLimit);
+}
+
+async function readProfile(politician: PublicProfilePolitician, view: ProfileView, sort: "votes" | "newest" | "unanswered", questionLimit: number): Promise<PublicProfileData> {
   return boundedRead(async (signal) => {
     const supabase = createPublicClient();
     const identity = await resolvePoliticianIdentity(politician.id, supabase);
     if (!identity || !identity.memberIds.length || identity.memberIds.length > 200) throw new Error("Profile identity unavailable");
     const memberIds = identity.memberIds;
-    const questionLimit = view.period === "week" ? 50 : 200;
     const cutoff = profilePeriodCutoff(view.period);
 
     const selected = await supabase.rpc("identity_profile_question_ids", {
@@ -167,13 +172,20 @@ const loadProfile = unstable_cache(async (slug: string, view: ProfileView, sort:
       questionLimit,
     };
   });
-}, ["public-profile-record-identity-v2"], CACHE_OPTIONS);
+}
 
 export async function getProfile(slug: string, weekParam?: string, periodParam?: string, sort: "votes" | "newest" | "unanswered" = "votes"): Promise<PublicProfileData | null> {
   if (!validSlug(slug)) return null;
   const currentWeekNumber = await loadCurrentWeek();
   const view = resolveProfileView(currentWeekNumber, weekParam, periodParam);
-  return loadProfile(slug, view, sort);
+  const politician = await loadPolitician(slug);
+  if (!politician) return null;
+  const profile = await loadProfile(politician, view, sort);
+  const latestQuestion = !view.isHistoricalView && view.period !== "all" &&
+    sort !== "unanswered" && profile.questions.length === 0
+    ? (await loadProfile(politician, { ...view, period: "all" }, "newest", 1)).questions[0]
+    : undefined;
+  return { ...profile, latestQuestion };
 }
 
 export async function getProfileMetadata(slug: string): Promise<ProfileMetadata | null> {

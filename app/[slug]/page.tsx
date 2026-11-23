@@ -61,7 +61,7 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
   const sort = requestedSort === "newest" || requestedSort === "unanswered" ? requestedSort : "votes";
   const data = await getProfile(slug, week, requestedPeriod, sort);
   if (!data) notFound();
-  const { politician, questions, period, isHistoricalView, viewingWeekNumber, currentWeekNumber } = data;
+  const { politician, questions, latestQuestion, period, isHistoricalView, viewingWeekNumber, currentWeekNumber } = data;
   const matchingQuestions = sort === "unanswered" ? data.totalQuestions - data.officialAnsweredQuestions : data.totalQuestions;
   const weekStart = formatWeekStart(viewingWeekNumber);
   const periodLabel = isHistoricalView ? `Week of ${weekStart}` : {
@@ -130,14 +130,14 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
           </section>
         </section>
 
-        <QuestionAnchorNotice slug={politician.slug} displayedIds={questions.map((question) => question.id)} />
+        <QuestionAnchorNotice slug={politician.slug} displayedIds={latestQuestion ? [latestQuestion.id] : questions.map((question) => question.id)} />
         <div className={styles.mainLayout}>
           <section className={styles.questions} id="profile-questions" tabIndex={-1} aria-labelledby="questions-heading">
             <h2 id="questions-heading" className={styles.sectionTitle}>What do you want to know?</h2>
             <p className={styles.sectionIntro}>{isHistoricalView ? `Questions from the week of ${weekStart}.` : period === "week" ? "Support the questions you want answered. Every vote helps set the agenda." : "Explore the record. Voting is open only for questions from the current week."}</p>
             {!isHistoricalView && <PeriodTabs slug={politician.slug} activePeriod={period} sort={sort} />}
             {matchingQuestions > questions.length && <p className={styles.sectionIntro}>Showing {questions.length} of {matchingQuestions.toLocaleString("en-US")} {sort === "unanswered" ? "unanswered " : ""}questions, {sort === "newest" ? "newest first" : "ranked by net votes"}. The response record covers the full period.</p>}
-            <QuestionList questions={questions} memberIds={data.memberIds} politicianId={politician.id} politicianSlug={politician.slug} politicianName={politician.full_name} profileVerified={politician.verification_tier === "2" || politician.verification_tier === "3"} weekNumber={viewingWeekNumber} currentWeekNumber={currentWeekNumber} isHistorical={isHistoricalView} period={period} appearance="face" profileSort={sort} />
+            <QuestionList questions={questions} latestQuestion={latestQuestion} memberIds={data.memberIds} politicianId={politician.id} politicianSlug={politician.slug} politicianName={politician.full_name} profileVerified={politician.verification_tier === "2" || politician.verification_tier === "3"} weekNumber={viewingWeekNumber} currentWeekNumber={currentWeekNumber} isHistorical={isHistoricalView} period={period} appearance="face" profileSort={sort} />
           </section>
           <aside className={styles.sidebar} aria-label="Ask and explore">
             {currentWeekView ? <AskQuestionForm politicianId={politician.id} politicianName={politician.full_name} appearance="face" /> : <p className={styles.notice}>New questions go into the current week. <Link href={`/${politician.slug}#ask-question`}>Ask this week →</Link></p>}

@@ -55,6 +55,7 @@ export type PublicProfileData = {
   viewingWeekNumber: number;
   period: ProfilePeriod;
   questions: ProfileQuestion[];
+  latestQuestion?: ProfileQuestion;
   totalQuestions: number;
   qualifyingQuestions: number;
   answeredQualifying: number;

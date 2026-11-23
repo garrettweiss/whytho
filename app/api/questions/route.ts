@@ -1,5 +1,7 @@
 import { resolvePoliticianIdentity } from "@/lib/identity/server";
 import { NextRequest, NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
+import { profileQuestionCacheTag } from "@/lib/profile/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/server";
 import {
@@ -127,7 +129,7 @@ export async function POST(request: NextRequest) {
     // ── Verify politician exists ─────────────────────────────────────────────
     const { data: politician } = await admin
       .from("politicians")
-      .select("id")
+      .select("id,slug")
       .eq("id", identity.canonicalId)
       .eq("is_active", true)
       .single();
@@ -158,6 +160,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error.code === "P0001" ? "You have reached the daily question limit." : "Question could not be saved. Please try again." }, { status: error.code === "P0001" ? 429 : 503 });
     }
 
+    revalidateTag(profileQuestionCacheTag(politician.slug));
     return NextResponse.json({ question }, { status: 201 });
   } catch {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

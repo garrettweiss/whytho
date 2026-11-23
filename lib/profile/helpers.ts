@@ -63,6 +63,10 @@ export function profilePeriodCutoff(period: ProfilePeriod, now = Date.now()): st
   return days === null ? null : new Date(now - days * 86_400_000).toISOString();
 }
 
+export function shouldSortUnvotedQuestionsByNewest(questions: readonly { net_upvotes: number }[]): boolean {
+  return questions.length > 0 && questions.every((question) => question.net_upvotes === 0);
+}
+
 export function readProfileCount(value: unknown): number {
   if (!Array.isArray(value) || value.length !== 1) throw new Error("Profile count unavailable");
   const row: unknown = value[0];

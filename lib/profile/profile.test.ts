@@ -11,9 +11,17 @@ import {
   safeJsonLd,
   safeWebUrl,
   sanitizeSources,
+  shouldSortUnvotedQuestionsByNewest,
   toPublicAnswers,
   type RawProfileAnswer,
 } from "./helpers";
+
+test("vote ranking falls back to newest for a nonempty list with all zero scores", () => {
+  assert.equal(shouldSortUnvotedQuestionsByNewest([]), false);
+  assert.equal(shouldSortUnvotedQuestionsByNewest([{ net_upvotes: 0 }, { net_upvotes: 0 }]), true);
+  assert.equal(shouldSortUnvotedQuestionsByNewest([{ net_upvotes: 0 }, { net_upvotes: 1 }]), false);
+  assert.equal(shouldSortUnvotedQuestionsByNewest([{ net_upvotes: 0 }, { net_upvotes: -1 }]), false);
+});
 
 test("archives accept real ISO weeks and reject partial, invalid and future weeks", () => {
   assert.equal(isValidIsoWeek(202053), true);
