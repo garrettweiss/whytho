@@ -185,6 +185,18 @@ export type Database = {
         }
         Relationships: []
       }
+      answer_corrections: {
+        Row: { id: string; answer_id: string; body: string; created_at: string }
+        Insert: { id: string; answer_id: string; body: string; created_at?: string }
+        Update: { id?: string; answer_id?: string; body?: string; created_at?: string }
+        Relationships: [{
+          foreignKeyName: "answer_corrections_answer_id_fkey"
+          columns: ["answer_id"]
+          isOneToOne: false
+          referencedRelation: "answers"
+          referencedColumns: ["id"]
+        }]
+      }
       answer_media: {
         Row: {
           answer_id: string
@@ -1241,6 +1253,14 @@ export type Database = {
       identity_profile_question_ids: { Args: { p_id: string; p_period: string; p_week: number; p_cutoff?: string | null; p_sort?: string; p_limit?: number }; Returns: string[] }
       canonical_politician_id: { Args: { p_id: string }; Returns: string }
       resolve_politician_identity: { Args: { p_id: string }; Returns: Json }
+      get_politician_notification_preferences: {
+        Args: { p_actor_id: string }
+        Returns: Json
+      }
+      set_politician_notification_preference: {
+        Args: { p_actor_id: string; p_politician_id: string; p_mode: string; p_timezone: string; p_consent_version?: string }
+        Returns: Json
+      }
       update_verified_profile: {
         Args: { p_actor: string; p_politician: string; p_fields: Json }
         Returns: string
@@ -1251,6 +1271,10 @@ export type Database = {
       }
       save_politician_answer: {
         Args: { p_actor_id: string; p_action: string; p_question_id?: string; p_answer_id?: string; p_body?: string; p_sources?: Json; p_requested_type?: string }
+        Returns: Json
+      }
+      publish_answer_correction: {
+        Args: { p_actor_id: string; p_answer_id: string; p_correction_id: string; p_body: string }
         Returns: Json
       }
       claim_politician_profile: {

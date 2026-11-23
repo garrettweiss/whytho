@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { TeamManager } from "@/components/dashboard/team-manager";
+import { QuestionEmailPreferences } from "@/components/dashboard/question-email-preferences";
 import { ProfileEditor } from "@/components/dashboard/profile-editor";
 import { DisconnectButton } from "@/components/dashboard/disconnect-button";
 import { AnswerEditButton } from "@/components/dashboard/answer-edit-button";
@@ -287,6 +288,7 @@ export default async function DashboardPage() {
             <p className={styles.meta}>Your access: {role}. Changes here apply to {politician.full_name}.</p>
             {role === "admin" && profileVerified && <ProfileEditor currentPhotoUrl={politician.photo_url} politicianId={politician.id} currentWebsiteUrl={politician.website_url} currentBio={politician.bio} currentSocialHandles={politician.social_handles as Record<string, string> | null} />}
             <TeamManager politicianId={politician.id} callerRole={role} />
+            <QuestionEmailPreferences politicianId={politician.id} profileVerified={profileVerified} />
             <div className={styles.panel}><DisconnectButton politicianId={politician.id} politicianName={politician.full_name} isOnlyAdmin={isOnlyAdmin} /></div>
           </aside>
         </div>

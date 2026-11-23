@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { AnswerComposer } from "@/components/answers/answer-composer";
-import { AnswerEditButton } from "@/components/dashboard/answer-edit-button";
+import { AnswerCorrectionButton } from "@/components/dashboard/answer-edit-button";
 import { DisputeClientButton } from "@/components/dashboard/dispute-button";
 import styles from "./dashboard.module.css";
 
@@ -79,7 +79,7 @@ function QuestionCard({
     {officialAnswer && <div className={styles.answer}>
       <p className={`${styles.eyebrow} ${styles.success}`}>Official response</p>
       <p className={styles.answerBody}>{officialAnswer.body}</p>
-      {canPublish && <AnswerEditButton answerId={officialAnswer.id} initialBody={officialAnswer.body} createdAt={officialAnswer.published_at ?? officialAnswer.created_at} />}
+      {canPublish && <AnswerCorrectionButton answerId={officialAnswer.id} />}
     </div>}
     {aiAnswer && <div className={styles.analysis}>
       <p className={styles.eyebrow}>🤖 AI Analysis of Public Record</p>

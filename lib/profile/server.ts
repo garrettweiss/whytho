@@ -16,8 +16,9 @@ import type { ProfileMetadata, ProfileQuestion, ProfileView, PublicProfileData, 
 const POLITICIAN_FIELDS = "id,slug,full_name,office,state,party,district,bio,photo_url,website_url,social_handles,verification_tier,is_active,is_test,politician_type,is_candidate,candidate_office,candidate_election_year,incumbent_challenge,candidate_status,election_date";
 const QUESTION_FIELDS = `id,politician_id,body,net_upvotes,is_seeded,source,status,created_at,week_number,
   x_posts:x_post_id(author_handle,author_name,tweet_url),
-  public_answers:answers(id,politician_id,answer_type,body,is_ai_generated,is_draft,ai_confidence,sources,is_disputed,created_at,
-    answer_media(id,media_type,public_url,file_name))`;
+  public_answers:answers(id,politician_id,answer_type,body,is_ai_generated,is_draft,ai_confidence,sources,is_disputed,created_at,published_at,
+    answer_media(id,media_type,public_url,file_name),
+    answer_corrections(id,body,created_at))`;
 
 const CACHE_OPTIONS = { revalidate: 300, tags: ["politician-profile"] };
 

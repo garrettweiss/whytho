@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useUser } from "@/lib/auth/use-user";
 import { useOwnerMembership } from "@/lib/auth/use-owner-membership";
 import { AnswerComposer } from "@/components/answers/answer-composer";
+import { AnswerCorrectionButton } from "@/components/dashboard/answer-edit-button";
 import { safeAnswerMediaUrl } from "@/components/answers/media-url";
 import { AnswerMediaDisplay } from "@/components/answers/answer-media-display";
 import { canVoteOnQuestion, isAIAnswer, isOfficialAnswer, isPublishedAnswer, mergeHydratedVotes, presentSources, safeExternalUrl, type VoteMap, type VoteValue } from "@/components/questions/answer-presentation";
@@ -31,6 +32,8 @@ export type Answer = {
   is_disputed: boolean;
   created_at: string;
   answer_media?: AnswerMedia[];
+  published_at?: string | null;
+  answer_corrections?: { id: string; body: string; created_at: string }[];
 };
 
 type XAttribution = {
@@ -78,22 +81,29 @@ const CONFIDENCE_LABELS: Record<Enums<"ai_confidence">, string> = {
   insufficient: "Insufficient public record",
 };
 
-function AnswerBlock({ answer, politicianName, appearance }: { answer: Answer; politicianName: string; appearance: Appearance }) {
+function AnswerBlock({ answer, politicianName, appearance, canCorrect }: { answer: Answer; politicianName: string; appearance: Appearance; canCorrect: boolean }) {
   if (!isPublishedAnswer(answer)) return null;
   const isAI = isAIAnswer(answer);
   const isOfficial = isOfficialAnswer(answer);
+  const attribution = isOfficial && answer.answer_type === "team_statement"
+    ? `Answered by ${politicianName}’s office`
+    : isOfficial ? "Official response" : isAI ? "AI Analysis of Public Record" : "Published response";
   const sources = presentSources(answer.sources);
   const media = (answer.answer_media ?? []).filter((item) => safeAnswerMediaUrl(item.public_url));
   const insufficient = isAI && answer.ai_confidence === "insufficient";
   const face = appearance === "face";
+  const publishedDate = answer.published_at ?? answer.created_at;
+  const formatDate = (date: string) =>
+    new Intl.DateTimeFormat("en-US", { dateStyle: "long", timeZone: "UTC" }).format(new Date(date));
 
   return (
     <section id={`answer-${answer.id}`} aria-label={isOfficial ? "Official response" : isAI ? "AI analysis" : "Published response"}
       className={face ? styles.answer : "mt-3 rounded-lg border px-4 py-3 text-sm space-y-2"}>
       <div className={face ? styles.answerLabels : "flex flex-wrap items-center gap-2"}>
         <p className={face ? (isOfficial ? styles.officialLabel : styles.answerLabel) : "text-xs font-semibold"}>
-          {isOfficial ? "Official response" : isAI ? "AI Analysis of Public Record" : "Published response"}
+          {attribution}
         </p>
+        {isOfficial && <time dateTime={publishedDate}>{formatDate(publishedDate)}</time>}
         {answer.is_disputed && <span className={face ? styles.disputed : "text-xs font-medium text-orange-600"}>Disputed: under review</span>}
       </div>
       {isAI && <p className={face ? styles.attribution : "text-xs text-muted-foreground"}>This is NOT a statement from {politicianName}.</p>}
@@ -104,6 +114,15 @@ function AnswerBlock({ answer, politicianName, appearance }: { answer: Answer; p
         {insufficient ? "Insufficient public record to generate analysis." : answer.body}
       </p>
       {!insufficient && media.length > 0 && <AnswerMediaDisplay media={media} />}
+      {isOfficial && answer.answer_corrections?.map((correction) => (
+        <div key={correction.id} className="mt-3 border-t pt-2">
+          <p className="font-semibold">Correction from {politicianName}’s office <time dateTime={correction.created_at}>
+            {formatDate(correction.created_at)}
+          </time></p>
+          <p className={face ? styles.answerBody : "leading-relaxed whitespace-pre-wrap break-words"}>{correction.body}</p>
+        </div>
+      ))}
+      {isOfficial && canCorrect && !answer.is_disputed && <AnswerCorrectionButton answerId={answer.id} />}
       {sources.length > 0 && (
         <div className={face ? styles.sources : "pt-2 border-t"}>
           <p className={face ? styles.meta : "text-xs font-medium mb-1"}>Sources</p>
@@ -338,7 +357,8 @@ function QuestionCard({ question, politicianSlug, politicianName, isHistorical, 
               setExpanded(false);
               document.querySelector<HTMLButtonElement>(`[aria-controls="${panelId}"]`)?.focus();
             }
-          }}>{answers.map((answer) => <AnswerBlock key={answer.id} answer={answer} politicianName={politicianName} appearance={appearance} />)}</div>}
+          }}>{answers.map((answer) => <AnswerBlock key={answer.id} answer={answer} politicianName={politicianName} appearance={appearance}
+            canCorrect={isOwner && profileVerified && (ownerRole === "admin" || ownerRole === "editor")} />)}</div>}
           {isOwner && !isHistorical && !hasOfficialAnswer && <div className={face ? styles.ownerComposer : "mt-3 pt-3 border-t"}>
             <AnswerComposer questionId={question.id} questionBody={question.body} politicianSlug={politicianSlug} politicianName={politicianName} isAdmin={ownerRole === "admin"} profileVerified={profileVerified} canPublish={profileVerified && ["admin", "editor"].includes(ownerRole ?? "")} />
           </div>}

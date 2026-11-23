@@ -116,6 +116,12 @@ export function toPublicAnswers(answers: readonly RawProfileAnswer[]): ProfileAn
     sources: sanitizeSources(answer.sources),
     is_disputed: answer.is_disputed,
     created_at: answer.created_at,
+    published_at: answer.published_at ?? null,
+    answer_corrections: isPublishedOfficialAnswer(answer)
+      ? (answer.answer_corrections ?? [])
+          .map(({ id, body, created_at }) => ({ id, body, created_at }))
+          .sort((a, b) => a.created_at.localeCompare(b.created_at) || a.id.localeCompare(b.id))
+      : [],
     answer_media: answer.answer_media.flatMap((media): ProfileAnswerMedia[] => {
       const url = safeAnswerMediaUrl(media.public_url);
       if (!url || !["image", "video", "audio"].includes(media.media_type)) return [];

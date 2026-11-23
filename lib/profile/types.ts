@@ -17,6 +17,7 @@ export type ProfileAnswerMedia = {
 };
 
 export type ProfileSource = { url?: string; title?: string; date?: string };
+export type ProfileAnswerCorrection = { id: string; body: string; created_at: string };
 
 export type ProfileAnswer = {
   id: string;
@@ -27,7 +28,9 @@ export type ProfileAnswer = {
   sources: ProfileSource[];
   is_disputed: boolean;
   created_at: string;
+  published_at?: string | null;
   answer_media: ProfileAnswerMedia[];
+  answer_corrections?: ProfileAnswerCorrection[];
 };
 
 export type ProfileQuestion = {

@@ -1,49 +1,54 @@
 "use client";
 
-import { useId, useState, useTransition } from "react";
+import { useId, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 import styles from "./dashboard.module.css";
 
-const EDIT_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
-
 interface Props {
   answerId: string;
   initialBody: string;
-  createdAt: string; // ISO timestamp
+  createdAt?: string;
   isDraft?: boolean;
 }
 
-export function AnswerEditButton({ answerId, initialBody, createdAt, isDraft = false }: Props) {
+export function AnswerCorrectionButton({ answerId }: { answerId: string }) {
+  return <AnswerEditButton answerId={answerId} initialBody="" />;
+}
+
+export function AnswerEditButton({ answerId, initialBody, isDraft = false }: Props) {
   const fieldId = useId();
   const router = useRouter();
-  const withinWindow = Date.now() - new Date(createdAt).getTime() < EDIT_WINDOW_MS;
+  const correctionRequest = useRef<{ id: string; body: string } | null>(null);
 
   const [isEditing, setIsEditing] = useState(false);
-  const [body, setBody] = useState(initialBody);
-  const [savedBody, setSavedBody] = useState(initialBody);
+  const [body, setBody] = useState(isDraft ? initialBody : "");
+  const [savedBody, setSavedBody] = useState(isDraft ? initialBody : "");
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [isPending, startTransition] = useTransition();
 
-  if (!isDraft && !withinWindow) return null;
-
   function handleSave() {
+    const text = body.trim();
     setError(null);
     setSaved(false);
     startTransition(async () => {
       try {
+        if (!isDraft && correctionRequest.current?.body !== text) {
+          correctionRequest.current = { id: crypto.randomUUID(), body: text };
+        }
         const res = await fetch(`/api/answers/${answerId}`, {
-          method: "PATCH",
+          method: isDraft ? "PATCH" : "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ body }),
+          body: JSON.stringify({ body: text, correctionId: correctionRequest.current?.id }),
         });
         const data = (await res.json()) as { error?: string };
         if (!res.ok) {
           setError(data.error ?? "Failed to save. Please try again.");
           return;
         }
-        setSavedBody(body);
+        if (isDraft) setSavedBody(text);
+        correctionRequest.current = null;
         setSaved(true);
         setIsEditing(false);
         router.refresh();
@@ -57,7 +62,7 @@ export function AnswerEditButton({ answerId, initialBody, createdAt, isDraft = f
     return (
       <div className={styles.actions}>
         {saved && (
-          <span role="status" className={`${styles.meta} ${styles.success}`}>✓ Edited</span>
+          <span role="status" className={`${styles.meta} ${styles.success}`}>{isDraft ? "Draft saved" : "Correction published"}</span>
         )}
         <button
           type="button"
@@ -68,7 +73,7 @@ export function AnswerEditButton({ answerId, initialBody, createdAt, isDraft = f
           }}
           className={styles.textButton}
         >
-          {isDraft ? "Edit draft" : "Edit (within 15 min)"}
+          {isDraft ? "Edit draft" : "Add correction"}
         </button>
       </div>
     );
@@ -77,7 +82,8 @@ export function AnswerEditButton({ answerId, initialBody, createdAt, isDraft = f
   return (
     <div className={styles.panelBody}>
       <div className={styles.field}>
-      <label htmlFor={fieldId}>Edit your response</label>
+      <label htmlFor={fieldId}>{isDraft ? "Edit your response" : "Correction to your published response"}</label>
+      {!isDraft && <p>The correction will appear publicly alongside the original response.</p>}
       <textarea
         id={fieldId}
         value={body}
@@ -95,7 +101,7 @@ export function AnswerEditButton({ answerId, initialBody, createdAt, isDraft = f
           disabled={isPending || body.trim().length < 10}
           className={styles.button}
         >
-          {isPending ? "Saving…" : "Save"}
+          {isPending ? "Saving…" : isDraft ? "Save" : "Publish correction"}
         </button>
         <button
           type="button"

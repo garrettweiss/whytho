@@ -36,7 +36,7 @@ createRoot(document.getElementById('app')).render(<main><h1>{role} component per
 <section aria-label='New answer'><AnswerComposer questionId='44444444-4444-4444-8444-444444444444' questionBody='How will you report progress publicly?' politicianSlug='fixture-person' politicianName='Fixture Person' isAdmin={role==='admin'} profileVerified={verified} canPublish={verified&&role!=='responder'}/></section></main>);
 `;
 await writeFile(join(scratch,"entry.tsx"),harness);
-await build({entryPoints:[join(scratch,"entry.tsx")],bundle:true,outfile:join(scratch,"app.js"),platform:"browser",format:"iife",jsx:"automatic",absWorkingDir:repo,tsconfig:join(repo,"tsconfig.json"),nodePaths:[join(repo,"node_modules")],plugins:[{name:"test-router",setup(b){b.onResolve({filter:/^next\/navigation$/},()=>({path:"router",namespace:"test"}));b.onLoad({filter:/.*/,namespace:"test"},()=>({contents:"export const useRouter=()=>({refresh(){window.dispatchEvent(new Event('fixture-refresh'))},replace(){},push(){}});",loader:"js"}));}}]});
+await build({entryPoints:[join(scratch,"entry.tsx")],bundle:true,outfile:join(scratch,"app.js"),platform:"browser",format:"iife",jsx:"automatic",absWorkingDir:repo,tsconfig:join(repo,"tsconfig.json"),alias:{react:join(resolve(process.argv[2]),"node_modules/react"),"react-dom":join(resolve(process.argv[2]),"node_modules/react-dom")},nodePaths:[join(resolve(process.argv[2]),"node_modules"),join(repo,"node_modules")],plugins:[{name:"test-router",setup(b){b.onResolve({filter:/^next\/navigation$/},()=>({path:"router",namespace:"test"}));b.onLoad({filter:/.*/,namespace:"test"},()=>({contents:"export const useRouter=()=>({refresh(){window.dispatchEvent(new Event('fixture-refresh'))},replace(){},push(){}});",loader:"js"}));}}]});
 const html='<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="/app.css"><style>:root{--color-ink:#111;--color-paper:#fff}body{color:#111;background:#fff;font:16px Arial;margin:20px}main{max-width:850px}section{margin-block:16px;padding:12px;border:1px solid #bbb}button,input,textarea,select{margin:6px;padding:8px}button{cursor:pointer}textarea{display:block;width:90%}</style></head><body><div id="app"></div><script src="/app.js"></script></body></html>';
 const server=createServer(async(req,res)=>{try{if(req.url?.startsWith('/app.')){const name=req.url.split('?')[0].slice(1);res.setHeader('Content-Type',name.endsWith('.js')?'text/javascript':'text/css');res.end(await readFile(join(scratch,name)));}else{res.setHeader('Content-Type','text/html');res.end(html);}}catch{res.writeHead(404);res.end();}});
 await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
@@ -69,7 +69,7 @@ async function persona({role='admin',tier='2',onlyAdmin=false,failTeam=false,rej
   await page.goto(`${origin}/?role=${role}&tier=${tier}&onlyAdmin=${onlyAdmin?'1':'0'}`);
   return {page,calls};
 }
-async function check(name,fn){const start=Date.now();try{await fn();results.push({name,status:'passed',duration_ms:Date.now()-start});}catch(error){results.push({name,status:'failed',error:String(error)});throw error;}}
+async function check(name,fn){const start=Date.now();console.log(`Checking: ${name}`);try{await fn();results.push({name,status:'passed',duration_ms:Date.now()-start});}catch(error){results.push({name,status:'failed',error:String(error)});const pages=context.pages();if(pages.length)await pages.at(-1).screenshot({path:join(scratch,'failure.png'),fullPage:true}).catch(()=>{});throw error;}}
 try{
   await check('Admin changes staff roles, adds and removes a member',async()=>{
     const {page,calls}=await persona();await page.getByRole('button',{name:'Manage your team'}).click();
@@ -103,7 +103,7 @@ try{
   });
   await check('Last admin is prevented from leaving; an editor can leave',async()=>{
     const {page}=await persona({onlyAdmin:true});await page.getByRole('button',{name:'Remove this profile from my dashboard',exact:true}).click();assert.equal(await page.getByRole('button',{name:'Yes, remove profile',exact:true}).isDisabled(),true);await page.close();
-    const second=await persona({role:'editor'});await second.page.getByRole('button',{name:'Remove this profile from my dashboard',exact:true}).click();await second.page.getByRole('button',{name:'Yes, remove profile',exact:true}).click();await second.page.waitForTimeout(50);assert.ok(second.calls.some(c=>c.path==='/api/dashboard/disconnect'&&c.method==='DELETE'));await second.page.close();
+    const second=await persona({role:'editor'});await second.page.getByRole('button',{name:'Remove this profile from my dashboard',exact:true}).click();const disconnect=second.page.waitForResponse(response=>response.url().endsWith('/api/dashboard/disconnect')&&response.request().method()==='DELETE');await second.page.getByRole('button',{name:'Yes, remove profile',exact:true}).click();await disconnect;assert.ok(second.calls.some(c=>c.path==='/api/dashboard/disconnect'&&c.method==='DELETE'));await second.page.close();
   });
   await check('Admin photo picker requires permission and credit before upload',async()=>{
     const {page,calls}=await persona();await page.getByRole('button',{name:'Edit public profile'}).click();
@@ -122,6 +122,6 @@ try{
   assert.deepEqual(errors,[],'Unexpected browser exceptions');
 }finally{
   await writeFile(join(scratch,'results.json'),JSON.stringify({scope:'Real Chrome component interactions; mocked HTTP/auth/router; not provider E2E',checked_at:new Date().toISOString(),results,browser_errors:errors},null,2));
-  await context.close();await new Promise(resolve=>server.close(resolve));
+  await context.close();server.closeAllConnections();await new Promise(resolve=>server.close(resolve));
   console.log(JSON.stringify({scratch,passed:results.filter(r=>r.status==='passed').length,total:results.length,results},null,2));
 }

@@ -129,7 +129,7 @@ function fixture(options: { user?: User | null; role?: string; draft?: boolean; 
         } else {
           if (role === "responder" && (!answer.is_draft || answer.published_by !== USER)) return fail("42501");
           if (!answer.is_draft && !verified) return fail("42501");
-          if (!answer.is_draft && Date.now() - new Date(String(answer.created_at)).getTime() > 15 * 60 * 1000) return fail("22023");
+          if (!answer.is_draft) return fail("22023");
           answer.body = args?.p_body;
         }
         return Promise.resolve({ data: { success: true, answer_id: answer.id, is_draft: answer.is_draft, answer_type: answer.answer_type }, error: null });
@@ -393,10 +393,10 @@ test("controlled media URL survives public normalization and rendering while uns
   assert.equal(helpers.toPublicAnswers([{ ...answer, is_draft: true }]).length, 0);
 });
 
-test("answer editing permits publishing roles and only a responder's own pending draft", async () => {
-  for (const [role, draft] of [["admin", false], ["editor", false], ["editor", true], ["responder", true]] as const) {
+test("draft editing permits publishing roles and a responder's own pending draft", async () => {
+  for (const role of ["admin", "editor", "responder"] as const) {
     const f = fixture({ role });
-    const answer = f.addAnswer({ is_draft: draft, created_at: new Date().toISOString() });
+    const answer = f.addAnswer({ is_draft: true, created_at: new Date().toISOString() });
     const res = await f.load<Route>("app/api/answers/[id]/route.ts").PATCH(jsonRequest({ body: "A permitted edited response." }), context());
     assert.equal(res.status, 200); assert.equal(answer.body, "A permitted edited response.");
     assert.deepEqual(f.rpcCalls.find(call => call.name === "save_politician_answer")?.args, {
@@ -405,17 +405,38 @@ test("answer editing permits publishing roles and only a responder's own pending
   }
 });
 
-test("answer editing denies published or another responder's draft and preserves the edit window", async () => {
+test("draft editing denies changes to published answers, including recently published answers", async () => {
   for (const [role, overrides, expected] of [
     ["responder", { is_draft: false }, 403], ["responder", { published_by: OTHER }, 403],
     [undefined, {}, 403], ["editor", { is_ai_generated: true }, 403], ["admin", { answer_type: "ai_analysis" }, 403],
-    ["admin", { is_draft: false, created_at: new Date(Date.now() - 16 * 60 * 1000).toISOString() }, 422],
+    ["admin", { is_draft: false }, 422],
+    ["editor", { is_draft: false, created_at: "2026-09-01T00:00:00.000Z" }, 422],
   ] as const) {
     const f = fixture({ role }); const answer = f.addAnswer({ created_at: new Date().toISOString(), ...overrides });
     const res = await f.load<Route>("app/api/answers/[id]/route.ts").PATCH(jsonRequest({ body: "An unauthorized edit attempt." }), context());
     assert.equal(res.status, expected); assert.equal(answer.body, "A draft response for review.");
     assert.equal(f.logs.filter(log => log.operation === "update").length, 0);
   }
+});
+
+test("published correction submits a separate record without replacing the original answer", async () => {
+  const f = fixture({ role: "editor" });
+  const answer = f.addAnswer({ is_draft: false, body: "Original published response." });
+  f.rpcOverrides.set("publish_answer_correction", {
+    data: { success: true, correction_id: MEDIA, created_at: "2026-11-22T12:00:00.000Z" },
+    error: null,
+  });
+  const route = f.load<Route>("app/api/answers/[id]/route.ts");
+  const response = await route.POST(jsonRequest({ body: "  A dated correction.  ", correctionId: MEDIA }), context());
+  assert.equal(response.status, 200);
+  assert.equal((await response.json()).correction_id, MEDIA);
+  assert.equal(answer.body, "Original published response.");
+  assert.deepEqual(f.rpcCalls, [{ name: "publish_answer_correction", args: {
+    p_actor_id: USER, p_answer_id: ANSWER, p_correction_id: MEDIA, p_body: "A dated correction.",
+  } }]);
+  const invalid = await route.POST(jsonRequest({ body: "A second correction." }), context());
+  assert.equal(invalid.status, 400);
+  assert.equal(f.rpcCalls.length, 1);
 });
 
 test("answer edit atomically rejects approval during the request and validates malformed payloads", async () => {
