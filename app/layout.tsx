@@ -6,6 +6,7 @@ import { ChatWidget } from "@/components/chatbot/chat-widget";
 import { ParticipationBanner } from "@/components/auth/participation-banner";
 import { ParticipationProvider } from "@/components/auth/participation-provider";
 import { LegalFooter } from "@/components/legal/legal-footer";
+import { THEME_STORAGE_KEY } from "@/lib/theme";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -17,6 +18,12 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
+const restoreTheme = `try {
+  if (localStorage.getItem(${JSON.stringify(THEME_STORAGE_KEY)}) === "light") {
+    document.documentElement.classList.remove("dark");
+  }
+} catch {}`;
 
 export const metadata: Metadata = {
   title: "WhyTho: Ask Your Representatives",
@@ -30,7 +37,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: restoreTheme }} />
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <PostHogProvider>
           <ParticipationProvider>

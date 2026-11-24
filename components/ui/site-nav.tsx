@@ -8,6 +8,7 @@ import { useUser } from "@/lib/auth/use-user";
 import { useIsPolitician } from "@/lib/auth/use-is-politician";
 import { useViewMode } from "@/lib/auth/use-view-mode";
 import { SearchBar } from "@/components/search/search-bar";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 const RESERVED_ROUTES = new Set(["about", "account", "admin", "dashboard", "faq", "federal", "how-it-works", "leaderboard", "races", "sign-in", "suggest-mayor", "verify", "settings", "auth", "api", "privacy", "terms", "report"]);
 
@@ -228,6 +229,7 @@ export function SiteNav() {
             )}
           </div>
         )}
+        <ThemeToggle placement="header" />
       </div>
 
       {/* Mobile search bar — slides in below nav when icon clicked */}

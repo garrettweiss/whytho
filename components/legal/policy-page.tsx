@@ -32,10 +32,10 @@ export function PolicyPage({ contents }: { contents: PolicyContents }) {
             {definitions && (
               <dl className="space-y-4">
                 {definitions.map(({ information, source, purpose }) => (
-                  <div className="border-b border-[#54565c] pb-4" key={information}>
+                  <div className="border-b border-[var(--editorial-rule)] pb-4" key={information}>
                     <dt className="font-semibold">{information}</dt>
-                    <dd className="text-sm text-[#b4b7bd]"><span className="font-semibold">Source</span> · {source}</dd>
-                    <dd className="text-sm text-[#b4b7bd]"><span className="font-semibold">Use</span> · {purpose}</dd>
+                    <dd className="text-sm text-[var(--editorial-secondary-ink)]"><span className="font-semibold">Source</span> · {source}</dd>
+                    <dd className="text-sm text-[var(--editorial-secondary-ink)]"><span className="font-semibold">Use</span> · {purpose}</dd>
                   </div>
                 ))}
               </dl>

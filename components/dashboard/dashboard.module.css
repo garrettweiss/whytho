@@ -1,25 +1,24 @@
 .surface {
-  --background: #151619;
-  --foreground: #f9f9f6;
-  --card: #1b1c20;
-  --card-foreground: #f9f9f6;
-  --primary: #f9f9f6;
-  --primary-foreground: #151619;
-  --muted: #27292e;
-  --muted-foreground: #b4b7bd;
-  --border: #54565c;
-  --input: #54565c;
-  --ring: #f9f9f6;
-  --destructive: #ff9d9d;
-  --destructive-foreground: #151619;
-  --green: #80e7a8;
-  --amber: #eed18a;
+  --background: var(--editorial-paper);
+  --foreground: var(--editorial-ink);
+  --card: light-dark(#f8f8fa, #1b1c20);
+  --card-foreground: var(--editorial-ink);
+  --primary: var(--editorial-ink);
+  --primary-foreground: var(--editorial-paper);
+  --muted: light-dark(#f3f4f6, #27292e);
+  --muted-foreground: var(--editorial-secondary-ink);
+  --border: var(--editorial-rule);
+  --input: var(--editorial-rule);
+  --ring: var(--editorial-ink);
+  --destructive: light-dark(#a4262c, #ff9d9d);
+  --destructive-foreground: var(--editorial-paper);
+  --green: var(--editorial-success);
+  --amber: light-dark(#765310, #eed18a);
   min-height: 100svh;
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-face-body), Arial, sans-serif;
   line-height: 1.6;
-  color-scheme: dark;
   outline-offset: -4px;
 }
 .surface * { box-sizing: border-box; }
@@ -117,7 +116,7 @@
 .composer :is(input, textarea) { font-size: 16px; }
 .composer :global(.text-green-600) { color: var(--green); }
 .composer :global(.text-amber-600), .composer :global(.text-amber-500) { color: var(--amber); }
-.composer :global(.text-blue-600) { color: #9bc5ff; }
+.composer :global(.text-blue-600) { color: light-dark(#174b8f, #9bc5ff); }
 .composer :global(.text-white) { color: var(--foreground); }
 .composer :global(.bg-green-50), .composer :global(.bg-blue-50) { background: var(--muted); }
 .composer :global(.bg-white) { background: var(--background); }

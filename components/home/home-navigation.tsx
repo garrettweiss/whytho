@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { faceBody, faceDisplay } from "./fonts";
 import styles from "./home.module.css";
 
@@ -47,6 +48,7 @@ export function HomeNavigation({ loggedIn, loading, politicianMode, canUsePoliti
               {loggedIn && <a href="/auth/sign-out">Sign out</a>}
             </nav>}
           </div>
+          <ThemeToggle placement="header" />
         </div>
       </div>
     </header>
