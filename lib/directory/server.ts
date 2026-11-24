@@ -1,6 +1,8 @@
 import "server-only";
 
 import { unstable_cache } from "next/cache";
+import { loadPoliticianIndex, POLITICIAN_INDEX_TIMEOUT_MS } from "@/lib/search/politician-index.server";
+import { politicianNameRank, preparePoliticianName } from "@/lib/search/politician-name";
 import { createAdminClient, createPublicClient } from "@/lib/supabase/server";
 import { decodeDirectoryCursor, DIRECTORY_SNAPSHOT_MAX_AGE_MS, DIRECTORY_SNAPSHOT_MS, encodeDirectoryCursor, type DirectoryCursor } from "./cursor";
 import { EXECUTIVE_OFFICES, NATIONAL_OFFICES, STATE_OFFICES } from "./scope";
@@ -10,14 +12,15 @@ import { DIRECTORY_PAGE_SIZE, DirectoryInputError, type DirectoryFilters, type D
 import type { Database } from "@/types/database";
 
 const TIMEOUT_MS = 8_000;
+const MAX_RELAXED_MATCHES = 50;
 const PUBLIC_FIELDS = "id,slug,full_name,politician_type,is_candidate,incumbent_challenge,office,district,state,party,photo_url,mayor_city_population";
 type RankedProfile = [id: string, name: string, state: string | null, office: string | null];
 type DirectoryRow = Pick<Database["public"]["Tables"]["politicians"]["Row"],
   "id" | "slug" | "full_name" | "politician_type" | "is_candidate" | "incumbent_challenge" | "office" | "district" | "state" | "party" | "photo_url" | "mayor_city_population">;
 
-async function boundedRead<T>(read: (signal: AbortSignal) => Promise<T>): Promise<T> {
+async function boundedRead<T>(read: (signal: AbortSignal) => Promise<T>, timeoutMs = TIMEOUT_MS): Promise<T> {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
     return await read(controller.signal);
   } finally {
@@ -65,32 +68,48 @@ const loadDirectoryPage = unstable_cache(async (
 ): Promise<DirectoryPage> => boundedRead(async (signal) => {
   const supabase = createPublicClient();
   const cursor = decodeDirectoryCursor(cursorValue, filters);
+  const states = filters.state ? stateRecordValues(filters.state) : null;
+  const office = OFFICES.find((entry) => entry.value === filters.office);
+  if (filters.office && !office) throw new DirectoryInputError("Choose a valid office.");
+  const offices: readonly string[] | undefined = office?.records;
+  const scopeOffices: readonly string[] | undefined = filters.scope === "national" ? NATIONAL_OFFICES
+    : filters.scope === "executive" ? EXECUTIVE_OFFICES
+    : filters.scope === "state" ? STATE_OFFICES : undefined;
   let aliasIds: string[] = [];
+  const relaxedRanks = new Map<string, number>();
 
   if (filters.q) {
-    // Exact aliases are bounded and still pass through the public profile filters.
-    // The existing fuzzy RPC does not expose is_test, so it cannot enforce this contract.
-    const { data: aliases, error } = await supabase.from("politician_aliases")
-      .select("politician_id")
-      .ilike("alias", escapeLike(filters.q))
-      .order("politician_id")
-      .limit(101)
-      .abortSignal(signal);
+    const [{ data: aliases, error }, index] = await Promise.all([
+      supabase.from("politician_aliases")
+        .select("politician_id").ilike("alias", escapeLike(filters.q))
+        .order("politician_id").limit(101).abortSignal(signal),
+      filters.q.length >= 2 ? loadPoliticianIndex() : [],
+    ]);
     if (error) throw new Error("Directory alias lookup failed");
     if (!aliases || aliases.length > 100) throw new DirectoryInputError("Use a more specific politician name.");
     aliasIds = [...new Set(aliases.map((alias) => alias.politician_id))];
+
+    // Keep literal matches in the existing queries. Bound only the additional
+    // matches, after jurisdiction filters, so the profile query stays small.
+    const queryName = preparePoliticianName(filters.q);
+    const relaxed: Array<{ id: string; name: string; rank: number }> = [];
+    for (const [id, name, , state, title] of index) {
+      if ((states && (state === null || !states.includes(state))) ||
+        (offices && (title === null || !offices.includes(title))) ||
+        (scopeOffices && (title === null || !scopeOffices.includes(title)))) continue;
+      const rank = politicianNameRank(preparePoliticianName(name), queryName);
+      if (rank >= 3 && Number.isFinite(rank)) relaxed.push({ id, name, rank });
+    }
+    relaxed.sort((left, right) => left.rank - right.rank || left.name.localeCompare(right.name));
+    for (const { id, rank } of relaxed.slice(0, MAX_RELAXED_MATCHES)) relaxedRanks.set(id, rank);
   }
+  const alternateIds = [...new Set([...aliasIds, ...relaxedRanks.keys()])];
 
   const profileQuery = () => supabase.from("politicians")
     .select(PUBLIC_FIELDS)
     .is("canonical_politician_id", null)
     .eq("is_active", true)
     .eq("is_test", false);
-  const states = filters.state ? stateRecordValues(filters.state) : null;
-  const office = OFFICES.find((entry) => entry.value === filters.office);
-  if (filters.office && !office) throw new DirectoryInputError("Choose a valid office.");
-  const offices: readonly string[] | undefined = office?.records;
-
   let pageRows: DirectoryRow[];
   const mayorDirectory = filters.office === "mayor";
   let after: Omit<DirectoryCursor, "weekNumber" | "snapshot"> | undefined;
@@ -104,7 +123,7 @@ const loadDirectoryPage = unstable_cache(async (
     if (term && !offices && !filters.scope) {
       const nameFilter = `full_name.ilike.${quoteFilterValue(`%${escapeLike(filters.q)}%`)}`;
       let mayorQuery = profileQuery().eq("office", "Mayor")
-        .or(aliasIds.length ? `${nameFilter},id.in.(${aliasIds.join(",")})` : nameFilter)
+        .or(alternateIds.length ? `${nameFilter},id.in.(${alternateIds.join(",")})` : nameFilter)
         .order("full_name").order("id").limit(100);
       if (states) mayorQuery = mayorQuery.in("state", states);
       const { data, error } = await mayorQuery.abortSignal(signal);
@@ -115,12 +134,14 @@ const loadDirectoryPage = unstable_cache(async (
     const results = available.filter(([id, name, state, office]) =>
       (!states || (state !== null && states.includes(state))) &&
       (!offices || (office !== null && offices.includes(office))) &&
-      (!term || aliases.has(id) || name.toLowerCase().includes(term)));
+      (!term || aliases.has(id) || name.toLowerCase().includes(term) || relaxedRanks.has(id)));
     if (term) {
       const nameRank = (id: string, name: string) => {
         const lowerName = name.toLowerCase();
         if (lowerName === term || aliases.has(id)) return 0;
-        return lowerName.startsWith(term) ? 1 : 2;
+        if (lowerName.startsWith(term)) return 1;
+        if (lowerName.includes(term)) return 2;
+        return relaxedRanks.get(id) ?? Infinity;
       };
       results.sort(([leftId, left], [rightId, right]) =>
         nameRank(leftId, left) - nameRank(rightId, right) || left.localeCompare(right) || leftId.localeCompare(rightId));
@@ -144,7 +165,7 @@ const loadDirectoryPage = unstable_cache(async (
       const term = quoteFilterValue(`%${escapeLike(filters.q)}%`);
       const searchFields = [`full_name.ilike.${term}`];
       if (mayorDirectory) searchFields.push(`district.ilike.${term}`);
-      if (aliasIds.length) searchFields.push(`id.in.(${aliasIds.join(",")})`);
+      if (alternateIds.length) searchFields.push(`id.in.(${alternateIds.join(",")})`);
       filterGroups.push(searchFields.length === 1 ? searchFields[0]! : `or(${searchFields.join(",")})`);
     }
     if (cursor) {
@@ -162,9 +183,7 @@ const loadDirectoryPage = unstable_cache(async (
       .order("id", { ascending: true })
       .limit(DIRECTORY_PAGE_SIZE + 1);
     if (filterGroups.length) query = query.or(`and(${filterGroups.join(",")})`);
-    if (filters.scope === "national") query = query.in("office", NATIONAL_OFFICES);
-    if (filters.scope === "executive") query = query.in("office", [...EXECUTIVE_OFFICES]);
-    if (filters.scope === "state") query = query.in("office", STATE_OFFICES);
+    if (scopeOffices) query = query.in("office", scopeOffices);
     if (states) query = query.in("state", states);
     if (offices) query = query.in("office", offices);
     const { data, error } = await query.abortSignal(signal);
@@ -218,7 +237,8 @@ const loadDirectoryPage = unstable_cache(async (
     nextCursor,
     weekNumber,
   };
-}), ["public-politician-directory-v7"], { revalidate: 300, tags: ["politician-directory"] });
+}, filters.q.length >= 2 ? TIMEOUT_MS + POLITICIAN_INDEX_TIMEOUT_MS : TIMEOUT_MS),
+["public-politician-directory-v8"], { revalidate: 300, tags: ["politician-directory"] });
 
 /** All validation happens before consulting the public cache. */
 export async function getDirectoryPage(filters: DirectoryFilters, cursor?: string, homepage = false): Promise<DirectoryPage> {

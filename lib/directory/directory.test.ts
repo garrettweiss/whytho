@@ -3,7 +3,24 @@ import test from "node:test";
 import { decodeDirectoryCursor, DIRECTORY_SNAPSHOT_MAX_AGE_MS, DIRECTORY_SNAPSHOT_MS, encodeDirectoryCursor, readEmbeddedCount } from "./cursor";
 import { arrangeDirectoryPeople } from "./presentation";
 import { escapeLike, normalizeDirectoryFilters, parseDirectorySearch, quoteFilterValue, stateRecordValues } from "./search";
+import { politicianNameRank, preparePoliticianName } from "../search/politician-name";
 import { DirectoryInputError, type DirectoryFilters } from "./types";
+
+test("politician search ranks literal, omitted-initial and typo matches in that order", () => {
+  const rank = (name: string, query: string) =>
+    politicianNameRank(preparePoliticianName(name), preparePoliticianName(query));
+  assert.ok(rank("John Curtis", "John Curtis") < rank("John R. Curtis", "John Curtis"));
+  assert.ok(rank("John R. Curtis", "John Curtis") < rank("John R. Curtis", "John Curits"));
+  assert.ok(Number.isFinite(rank("John R. Curtis", "John Curits")));
+  assert.ok(Number.isFinite(rank("John R. Curtis", "Jon Curtis")));
+  assert.ok(Number.isFinite(rank("John R. Curtis", "John Cu")));
+  assert.ok(Number.isFinite(rank("John R. Curtis", "john r curtis")));
+  assert.ok(Number.isFinite(rank("José O’Rourke", "jose o'rourke")));
+  assert.equal(rank("John R. Curtis", "Joan Curits"), Infinity);
+  assert.equal(rank("John Michael Curtis", "John Curits"), Infinity);
+  assert.equal(rank("John R. Curtis", "Jim Curits"), Infinity);
+  assert.equal(rank("John R. Curtis", "Jhn"), Infinity);
+});
 
 test("search distinguishes federal and state offices and combined jurisdictions", () => {
   assert.deepEqual(parseDirectorySearch("California state senator").filters, { q: "", state: "CA", office: "state-senate" });
