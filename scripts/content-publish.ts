@@ -9,6 +9,7 @@
  *   npx tsx scripts/content-publish.ts --week=2026-W48 --skip=2026-W48-05 --reason="hold"
  *   npx tsx scripts/content-publish.ts --week=2026-W48 --go-live             # post approved items that are due
  *   npx tsx scripts/content-publish.ts --week=2026-W48 --go-live --include-future
+ *   npx tsx scripts/content-publish.ts --week=2026-W48 --go-live --only=2026-W48-01   # one item, now
  */
 import * as dotenv from "dotenv";
 dotenv.config({ path: ".env.local", override: true });
@@ -88,8 +89,9 @@ async function main() {
     save(queue, label);
   }
 
-  const approved = queue.items.filter((item) => item.status === "approved");
-  const due = approved.filter((item) => INCLUDE_FUTURE || new Date(item.scheduled_at).getTime() <= now.getTime() + DUE_WINDOW_MS);
+  const only = option("only")?.split(",").map((s) => s.trim()).filter(Boolean) ?? [];
+  const approved = queue.items.filter((item) => item.status === "approved" && (!only.length || only.includes(item.id)));
+  const due = approved.filter((item) => INCLUDE_FUTURE || only.length || new Date(item.scheduled_at).getTime() <= now.getTime() + DUE_WINDOW_MS);
   const waiting = approved.length - due.length;
   console.log(`\n→ ${queue.items.length} items | ${approved.length} approved | ${due.length} due now${waiting ? ` | ${waiting} approved for later` : ""}`);
   const drafts = queue.items.filter((item) => item.status === "draft");
