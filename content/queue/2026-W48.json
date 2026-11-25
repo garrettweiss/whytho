@@ -1,0 +1,120 @@
+{
+  "version": 1,
+  "week": 202648,
+  "label": "2026-W48",
+  "monday": "2026-11-23",
+  "sunday": "2026-11-29",
+  "generated_at": "2026-11-25T22:52:11.605Z",
+  "site": "https://whytho.us",
+  "facts": {
+    "checked_at": "2026-11-25T22:52:11.605Z",
+    "week": 202648,
+    "user_questions_this_week": 11,
+    "officials_asked_this_week": 6,
+    "official_answers_total": 0,
+    "politicians_tracked": 10875
+  },
+  "link_checks": {
+    "https://whytho.us/verify?utm_source=x&utm_campaign=2026w48-a10": 200,
+    "https://whytho.us/?utm_source=bluesky&utm_campaign=2026w48-a1": 200,
+    "https://whytho.us/?utm_source=threads&utm_campaign=2026w48-a1": 200,
+    "https://whytho.us/?utm_source=x&utm_campaign=2026w48-week_note": 200,
+    "https://whytho.us/?utm_source=bluesky&utm_campaign=2026w48-week_note": 200,
+    "https://whytho.us/?utm_source=threads&utm_campaign=2026w48-a6": 200
+  },
+  "items": [
+    {
+      "id": "2026-W48-01",
+      "asset": "A10",
+      "channel": "x",
+      "scheduled_at": "2026-11-25T23:15:00.000Z",
+      "text": "Working for an elected official or candidate? Your verified team can manage its WhyTho profile and publish answers. Start with the claim and verification process: https://whytho.us/verify?utm_source=x&utm_campaign=2026w48-a10",
+      "links": [
+        "https://whytho.us/verify?utm_source=x&utm_campaign=2026w48-a10"
+      ],
+      "status": "failed",
+      "requires": [
+        "Confirm the claim and verification flow works on the live site before this posts"
+      ],
+      "approved_by": "Garrett",
+      "approved_at": "2026-11-25T22:56:03.763Z",
+      "error": "X API error: credits depleted"
+    },
+    {
+      "id": "2026-W48-02",
+      "asset": "A1",
+      "channel": "bluesky",
+      "scheduled_at": "2026-11-25T23:15:00.000Z",
+      "text": "What would you ask your representative if anyone could read the question and come back to see the answer? WhyTho gives public questions and official responses a place to be found. Ask one specific question: https://whytho.us/?utm_source=bluesky&utm_campaign=2026w48-a1",
+      "links": [
+        "https://whytho.us/?utm_source=bluesky&utm_campaign=2026w48-a1"
+      ],
+      "status": "approved",
+      "requires": [],
+      "approved_by": "Garrett",
+      "approved_at": "2026-11-25T22:56:03.763Z"
+    },
+    {
+      "id": "2026-W48-03",
+      "asset": "A1",
+      "channel": "threads",
+      "scheduled_at": "2026-11-25T23:15:00.000Z",
+      "text": "What would you ask your representative if anyone could read the question and come back to see the answer? WhyTho gives public questions and official responses a place to be found. Ask one specific question: https://whytho.us/?utm_source=threads&utm_campaign=2026w48-a1",
+      "links": [
+        "https://whytho.us/?utm_source=threads&utm_campaign=2026w48-a1"
+      ],
+      "status": "approved",
+      "requires": [],
+      "approved_by": "Garrett",
+      "approved_at": "2026-11-25T22:56:03.763Z"
+    },
+    {
+      "id": "2026-W48-04",
+      "asset": "WEEK_NOTE",
+      "channel": "x",
+      "scheduled_at": "2026-11-27T16:00:00.000Z",
+      "text": "This week on WhyTho: 11 public questions were asked of 6 officials. No official response is recorded on WhyTho as of {as_of}. A missing response here does not show whether an office has seen a question. Read the questions or add your own: https://whytho.us/?utm_source=x&utm_campaign=2026w48-week_note",
+      "links": [
+        "https://whytho.us/?utm_source=x&utm_campaign=2026w48-week_note"
+      ],
+      "status": "approved",
+      "requires": [
+        "Confirm the counts are audience activity, not founder or QA submissions (the generator cannot tell them apart)",
+        "Counts must be refreshed within 24 hours of posting: npm run content:weekly -- --refresh"
+      ],
+      "approved_by": "Garrett",
+      "approved_at": "2026-11-25T22:56:03.763Z"
+    },
+    {
+      "id": "2026-W48-05",
+      "asset": "WEEK_NOTE",
+      "channel": "bluesky",
+      "scheduled_at": "2026-11-27T16:00:00.000Z",
+      "text": "This week on WhyTho: 11 public questions were asked of 6 officials. No official response is recorded on WhyTho as of {as_of}. A missing response here does not show whether an office has seen a question. Read the questions or add your own: https://whytho.us/?utm_source=bluesky&utm_campaign=2026w48-week_note",
+      "links": [
+        "https://whytho.us/?utm_source=bluesky&utm_campaign=2026w48-week_note"
+      ],
+      "status": "approved",
+      "requires": [
+        "Confirm the counts are audience activity, not founder or QA submissions (the generator cannot tell them apart)",
+        "Counts must be refreshed within 24 hours of posting: npm run content:weekly -- --refresh"
+      ],
+      "approved_by": "Garrett",
+      "approved_at": "2026-11-25T22:56:03.763Z"
+    },
+    {
+      "id": "2026-W48-06",
+      "asset": "A6",
+      "channel": "threads",
+      "scheduled_at": "2026-11-27T16:00:00.000Z",
+      "text": "What is one question you want your representative to answer publicly? Make it specific, and check that the office is responsible for the issue. Ask it here: https://whytho.us/?utm_source=threads&utm_campaign=2026w48-a6",
+      "links": [
+        "https://whytho.us/?utm_source=threads&utm_campaign=2026w48-a6"
+      ],
+      "status": "approved",
+      "requires": [],
+      "approved_by": "Garrett",
+      "approved_at": "2026-11-25T22:56:03.763Z"
+    }
+  ]
+}
