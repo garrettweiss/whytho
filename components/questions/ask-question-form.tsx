@@ -38,9 +38,11 @@ interface Props {
   politicianName: string;
   onSubmitted?: () => void;
   appearance?: "default" | "face";
+  /** Politician-specific sample questions offered as editable drafts. Falls back to generic topic starters. */
+  samples?: { id: string; body: string }[];
 }
 
-export function AskQuestionForm({ politicianId, politicianName, onSubmitted, appearance = "default" }: Props) {
+export function AskQuestionForm({ politicianId, politicianName, onSubmitted, appearance = "default", samples = [] }: Props) {
   const { user, isLoading, status: participation, retry, requireConfirmation } = useParticipation();
   const router = useRouter();
   const pathname = usePathname();
@@ -62,6 +64,12 @@ export function AskQuestionForm({ politicianId, politicianName, onSubmitted, app
   const charCount = text.length;
   const isValid = text.trim().length >= MIN && charCount <= MAX;
   const rootClass = face ? styles.ask : "rounded-xl border bg-card p-5 shadow-sm space-y-3";
+  const hasDraft = text.trim().length > 0;
+  function applyDraft(body: string) {
+    setText((current) => current.trim() ? current : body);
+    setError(null);
+    textareaRef.current?.focus();
+  }
   const titleClass = face ? styles.askTitle : "text-sm font-medium";
   const textClass = face ? styles.askHint : "text-sm text-muted-foreground";
   const buttonClass = face ? styles.submitButton : "inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed";
@@ -165,8 +173,8 @@ export function AskQuestionForm({ politicianId, politicianName, onSubmitted, app
 
   if (!user || user.is_anonymous) {
     return <section id="ask-question" className={rootClass} aria-labelledby={`${id}-title`}>
-      <h2 id={`${id}-title`} className={titleClass}>What do you want to know?</h2>
-      <p className={textClass}>Ask {politicianName} something specific. People can vote to bring it to their attention.</p>
+      <h2 id={`${id}-title`} className={titleClass}>Ask {politicianName}</h2>
+      <p className={textClass}>Ask about a decision, a vote, or an issue {politicianName} can act on. People vote to bring it to the top.</p>
       <Link href={signInHref} className={buttonClass}>Sign in to ask</Link>
     </section>;
   }
@@ -179,30 +187,25 @@ export function AskQuestionForm({ politicianId, politicianName, onSubmitted, app
     </section>;
   }
 
-  return <form id="ask-question" className={rootClass} onSubmit={handleSubmit} aria-labelledby={`${id}-title`} aria-busy={isPending}>
-    <h2 id={`${id}-title`} className={titleClass}>What do you want to know?</h2>
-    <p className={textClass}>Ask {politicianName} something specific. People can vote to bring it to their attention.</p>
-    <details className={textClass}>
-      <summary>Question starters</summary>
-      <p>Choose a topic to start a draft you can edit.</p>
-      <div className="flex flex-wrap gap-2">
-        {QUESTION_STARTERS.map(({ topic, body }) => (
-          <button key={topic} type="button" className="min-h-11 rounded-md border px-3"
-            disabled={isPending || text.trim().length > 0}
-            onClick={() => {
-              setText((current) => current.trim() ? current : body);
-              setError(null);
-              textareaRef.current?.focus();
-            }}>
-            {topic}
-          </button>
-        ))}
-      </div>
-      {text.trim().length > 0 && <p>Clear your draft to choose another starter.</p>}
-    </details>
+  const sampleList = <aside className={face ? styles.samples : "space-y-2 text-sm text-muted-foreground"} aria-label="Sample questions">
+    <p className={face ? styles.samplesLabel : undefined}>{samples.length > 0 ? "Try one:" : "Start from a topic:"}</p>
+    {samples.length > 0
+      ? samples.map(({ id: sampleId, body }) => (
+        <button key={sampleId} type="button" className={face ? styles.sampleButton : "block text-left underline underline-offset-2"} disabled={isPending || hasDraft} onClick={() => applyDraft(body)}>{body}</button>
+      ))
+      : QUESTION_STARTERS.map(({ topic, body }) => (
+        <button key={topic} type="button" className={face ? styles.sampleButton : "block text-left underline underline-offset-2"} disabled={isPending || hasDraft} onClick={() => applyDraft(body)}>{topic}</button>
+      ))}
+    {hasDraft && <p>Clear your draft to use a sample.</p>}
+  </aside>;
+
+  return <form id="ask-question" className={`${rootClass} ${face ? styles.askWide : ""}`} onSubmit={handleSubmit} aria-labelledby={`${id}-title`} aria-busy={isPending}>
+    <h2 id={`${id}-title`} className={titleClass}>Ask {politicianName}</h2>
+    <div className={face ? styles.askCols : "space-y-3"}>
+    <div className={face ? styles.askMain : "space-y-3"}>
     <label htmlFor={`${id}-question`} className={face ? styles.inputLabel : "block text-sm font-medium"}>Your question</label>
     <textarea ref={textareaRef} id={`${id}-question`} name="question" value={text} onChange={(event) => setText(event.target.value)}
-      placeholder="What do you want them to answer? Be specific and respectful." rows={4} minLength={MIN} maxLength={MAX} required disabled={isPending}
+      placeholder={`Ask about a decision, a vote, or an issue ${politicianName} can act on. One clear question.`} rows={4} minLength={MIN} maxLength={MAX} required disabled={isPending}
       aria-describedby={`${id}-hint ${id}-count${error ? ` ${id}-error` : ""}`} aria-invalid={!!error && !isValid}
       className={face ? styles.textarea : "w-full resize-y rounded-md border bg-background px-3 py-2 text-base placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-60"} />
     <div className={face ? styles.formMeta : "flex flex-wrap justify-between gap-2 text-xs text-muted-foreground"}>
@@ -236,7 +239,10 @@ export function AskQuestionForm({ politicianId, politicianName, onSubmitted, app
         {canRetryVerification && <button type="button" disabled={isPending} onClick={restartVerification} className={face ? styles.textButton : "min-h-11 text-sm underline underline-offset-2"}>Retry verification</button>}
       </div>
       {error && <p id={`${id}-error`} role="alert" className={face ? styles.error : "text-sm text-destructive"}>{error}</p>}
-      <button type="submit" disabled={!isValid || isPending || !verified} aria-describedby={`${id}-verification-status`} className={buttonClass}>{isPending ? "Submitting…" : "Submit question"} <span aria-hidden="true">↗</span></button>
+      <button type="submit" disabled={!isValid || isPending || !verified} aria-describedby={`${id}-verification-status`} className={buttonClass}>{isPending ? "Submitting…" : "Submit question"}</button>
     </>}
+    </div>
+    {sampleList}
+    </div>
   </form>;
 }
