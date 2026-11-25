@@ -1,0 +1,98 @@
+# Sunday content queue: builds next week's brand posts for Garrett's approval.
+#
+# Posts nothing. It generates content/queue/<week>.json and .md from the approved copy bank and
+# public database facts, pushes them on a content/queue-<week> branch, and opens a pull request
+# (or an issue when the token cannot open PRs) that serves as the approval queue.
+# Publishing stays manual: scripts/content-publish.ts --go-live after Garrett approves.
+name: Weekly content queue
+
+on:
+  schedule:
+    - cron: "0 14 * * 0" # Sunday 14:00 UTC, 6 a.m. Pacific
+  workflow_dispatch:
+    inputs:
+      week:
+        description: "ISO week to build, e.g. 2026-W49 (default: next week)"
+        required: false
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: content-queue
+  cancel-in-progress: false
+
+jobs:
+  queue:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      NEXT_PUBLIC_SITE_URL: https://whytho.us
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Resolve week
+        id: week
+        run: |
+          if [ -n "${{ inputs.week }}" ]; then
+            LABEL=$(npx tsx scripts/content-weekly.ts --week="${{ inputs.week }}" --label-only)
+          else
+            LABEL=$(npx tsx scripts/content-weekly.ts --next --label-only)
+          fi
+          echo "label=$LABEL" >> "$GITHUB_OUTPUT"
+
+      - name: Build queue
+        run: npx tsx scripts/content-weekly.ts --week="${{ steps.week.outputs.label }}"
+
+      - name: Push queue branch
+        id: push
+        run: |
+          LABEL="${{ steps.week.outputs.label }}"
+          BRANCH="content/queue-$LABEL"
+          git config user.name "whytho-content-bot"
+          git config user.email "noreply@whytho.us"
+          git checkout -B "$BRANCH"
+          git add content/queue
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git commit -m "[S11] content: queue $LABEL for approval"
+          git push --force origin "$BRANCH"
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+
+      - name: Open approval queue
+        if: steps.push.outputs.changed == 'true'
+        run: |
+          LABEL="${{ steps.week.outputs.label }}"
+          BRANCH="${{ steps.push.outputs.branch }}"
+          TITLE="Content queue $LABEL: approve this week's posts"
+          BODY_FILE="content/queue/$LABEL.md"
+          if gh pr view "$BRANCH" >/dev/null 2>&1; then
+            gh pr edit "$BRANCH" --title "$TITLE" --body-file "$BODY_FILE"
+            echo "Updated existing PR"
+          elif gh pr create --base main --head "$BRANCH" --title "$TITLE" --body-file "$BODY_FILE" 2>pr.err; then
+            echo "Opened PR"
+          else
+            echo "PR creation unavailable: $(cat pr.err)"
+            EXISTING=$(gh issue list --search "in:title \"$TITLE\"" --state open --json number -q '.[0].number')
+            if [ -n "$EXISTING" ]; then
+              gh issue edit "$EXISTING" --body-file "$BODY_FILE"
+            else
+              gh issue create --title "$TITLE" --body-file "$BODY_FILE"
+            fi
+          fi
