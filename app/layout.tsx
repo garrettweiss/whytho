@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { SiteNav } from "@/components/ui/site-nav";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { PostHogProvider } from "@/components/analytics/posthog-provider";
 import { ChatWidget } from "@/components/chatbot/chat-widget";
 import { ParticipationBanner } from "@/components/auth/participation-banner";
@@ -48,9 +47,6 @@ export default function RootLayout({
             <SiteNav />
             <ParticipationBanner />
             {children}
-            <footer className="mobile-theme-footer">
-              <ThemeToggle placement="footer" />
-            </footer>
             <LegalFooter />
             <ChatWidget />
           </ParticipationProvider>
