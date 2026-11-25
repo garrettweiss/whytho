@@ -1,0 +1,540 @@
+bioguide_id,chamber,seat,name,source,status,profile_slugs,expected_role,stored_role,candidate_flag
+B001323,House,AK00,Nicholas J. Begich III,https://clerk.house.gov/members/B001323,confirmed,nicholas-j-begich-alaska,U.S. Representative,U.S. Representative,False
+M001212,House,AL01,Barry Moore,https://clerk.house.gov/members/M001212,confirmed,barry-moore-alabama,U.S. Representative,U.S. Representative,False
+F000481,House,AL02,Shomari Figures,https://clerk.house.gov/members/F000481,confirmed,shomari-figures-alabama,U.S. Representative,U.S. Representative,False
+R000575,House,AL03,Mike Rogers,https://clerk.house.gov/members/R000575,confirmed,mike-d-rogers-alabama,U.S. Representative,U.S. Representative,False
+A000055,House,AL04,Robert B. Aderholt,https://clerk.house.gov/members/A000055,confirmed,robert-b-aderholt-alabama,U.S. Representative,U.S. Representative,False
+S001220,House,AL05,Dale W. Strong,https://clerk.house.gov/members/S001220,confirmed,dale-w-strong-alabama,U.S. Representative,U.S. Representative,False
+P000609,House,AL06,Gary J. Palmer,https://clerk.house.gov/members/P000609,confirmed,gary-j-palmer-alabama,U.S. Representative,U.S. Representative,False
+S001185,House,AL07,Terri A. Sewell,https://clerk.house.gov/members/S001185,confirmed,terri-a-sewell-alabama,U.S. Representative,U.S. Representative,False
+R000600,House,AQ00,Aumua Amata Coleman Radewagen,https://clerk.house.gov/members/R000600,confirmed_generic_house_role,aumua-amata-coleman-radewagen-american-samoa,Delegate,U.S. Representative,False
+C001087,House,AR01,"Eric A. ""Rick"" Crawford",https://clerk.house.gov/members/C001087,confirmed,eric-a-rick-crawford-arkansas,U.S. Representative,U.S. Representative,False
+H001072,House,AR02,J. French Hill,https://clerk.house.gov/members/H001072,confirmed,j-french-hill-arkansas,U.S. Representative,U.S. Representative,False
+W000809,House,AR03,Steve Womack,https://clerk.house.gov/members/W000809,confirmed,steve-womack-arkansas,U.S. Representative,U.S. Representative,False
+W000821,House,AR04,Bruce Westerman,https://clerk.house.gov/members/W000821,confirmed,bruce-westerman-arkansas,U.S. Representative,U.S. Representative,False
+S001183,House,AZ01,David Schweikert,https://clerk.house.gov/members/S001183,confirmed,david-schweikert-arizona,U.S. Representative,U.S. Representative,False
+C001132,House,AZ02,Elijah Crane,https://clerk.house.gov/members/C001132,confirmed,elijah-crane-arizona,U.S. Representative,U.S. Representative,False
+A000381,House,AZ03,Yassamin Ansari,https://clerk.house.gov/members/A000381,confirmed,yassamin-ansari-arizona,U.S. Representative,U.S. Representative,False
+S001211,House,AZ04,Greg Stanton,https://clerk.house.gov/members/S001211,confirmed,greg-stanton-arizona,U.S. Representative,U.S. Representative,False
+B001302,House,AZ05,Andy Biggs,https://clerk.house.gov/members/B001302,confirmed,andy-biggs-arizona,U.S. Representative,U.S. Representative,False
+C001133,House,AZ06,Juan Ciscomani,https://clerk.house.gov/members/C001133,confirmed,juan-ciscomani-arizona,U.S. Representative,U.S. Representative,False
+G000606,House,AZ07,Adelita S. Grijalva,https://clerk.house.gov/members/G000606,confirmed,adelita-s-grijalva-arizona,U.S. Representative,U.S. Representative,False
+H001098,House,AZ08,Abraham J. Hamadeh,https://clerk.house.gov/members/H001098,confirmed,abraham-j-hamadeh-arizona,U.S. Representative,U.S. Representative,False
+G000565,House,AZ09,Paul A. Gosar,https://clerk.house.gov/members/G000565,confirmed,paul-a-gosar-arizona,U.S. Representative,U.S. Representative,False
+G000607,House,CA01,James Gallagher,https://clerk.house.gov/members/G000607,missing_active_id,,U.S. Representative,,
+H001068,House,CA02,Jared Huffman,https://clerk.house.gov/members/H001068,confirmed,jared-huffman-california,U.S. Representative,U.S. Representative,False
+K000401,House,CA03,Kevin Kiley,https://clerk.house.gov/members/K000401,confirmed,kevin-kiley-california,U.S. Representative,U.S. Representative,False
+T000460,House,CA04,Mike Thompson,https://clerk.house.gov/members/T000460,confirmed,mike-thompson-california,U.S. Representative,U.S. Representative,False
+M001177,House,CA05,Tom McClintock,https://clerk.house.gov/members/M001177,confirmed,tom-mcclintock-california,U.S. Representative,U.S. Representative,False
+B001287,House,CA06,Ami Bera,https://clerk.house.gov/members/B001287,confirmed,ami-bera-california,U.S. Representative,U.S. Representative,False
+M001163,House,CA07,Doris O. Matsui,https://clerk.house.gov/members/M001163,confirmed,doris-o-matsui-california,U.S. Representative,U.S. Representative,False
+G000559,House,CA08,John Garamendi,https://clerk.house.gov/members/G000559,confirmed,john-garamendi-california,U.S. Representative,U.S. Representative,False
+H001090,House,CA09,Josh Harder,https://clerk.house.gov/members/H001090,confirmed,josh-harder-california,U.S. Representative,U.S. Representative,False
+D000623,House,CA10,Mark DeSaulnier,https://clerk.house.gov/members/D000623,confirmed,mark-desaulnier-california,U.S. Representative,U.S. Representative,False
+P000197,House,CA11,Nancy Pelosi,https://clerk.house.gov/members/P000197,confirmed,nancy-pelosi-california,U.S. Representative,U.S. Representative,False
+S001231,House,CA12,Lateefah Simon,https://clerk.house.gov/members/S001231,confirmed,lateefah-simon-california,U.S. Representative,U.S. Representative,False
+G000605,House,CA13,Adam Gray,https://clerk.house.gov/members/G000605,confirmed,adam-gray-california,U.S. Representative,U.S. Representative,False
+W000832,House,CA14,Aisha Wahab,https://clerk.house.gov/members/W000832,missing_active_id,,U.S. Representative,,
+M001225,House,CA15,Kevin Mullin,https://clerk.house.gov/members/M001225,confirmed,kevin-mullin-california,U.S. Representative,U.S. Representative,False
+L000607,House,CA16,Sam T. Liccardo,https://clerk.house.gov/members/L000607,confirmed,sam-t-liccardo-california,U.S. Representative,U.S. Representative,False
+K000389,House,CA17,Ro Khanna,https://clerk.house.gov/members/K000389,confirmed,ro-khanna-california,U.S. Representative,U.S. Representative,False
+L000397,House,CA18,Zoe Lofgren,https://clerk.house.gov/members/L000397,confirmed,zoe-lofgren-california,U.S. Representative,U.S. Representative,False
+P000613,House,CA19,Jimmy Panetta,https://clerk.house.gov/members/P000613,confirmed,jimmy-panetta-california,U.S. Representative,U.S. Representative,False
+F000480,House,CA20,Vince Fong,https://clerk.house.gov/members/F000480,confirmed,vince-fong-california,U.S. Representative,U.S. Representative,False
+C001059,House,CA21,Jim Costa,https://clerk.house.gov/members/C001059,confirmed,jim-costa-california,U.S. Representative,U.S. Representative,False
+V000129,House,CA22,David G. Valadao,https://clerk.house.gov/members/V000129,confirmed,david-g-valadao-california,U.S. Representative,U.S. Representative,False
+O000019,House,CA23,Jay Obernolte,https://clerk.house.gov/members/O000019,confirmed,jay-obernolte-california,U.S. Representative,U.S. Representative,False
+C001112,House,CA24,Salud O. Carbajal,https://clerk.house.gov/members/C001112,confirmed,salud-o-carbajal-california,U.S. Representative,U.S. Representative,False
+R000599,House,CA25,Raul Ruiz,https://clerk.house.gov/members/R000599,confirmed,raul-ruiz-california,U.S. Representative,U.S. Representative,False
+B001285,House,CA26,Julia Brownley,https://clerk.house.gov/members/B001285,confirmed,julia-brownley-california,U.S. Representative,U.S. Representative,False
+W000830,House,CA27,George Whitesides,https://clerk.house.gov/members/W000830,confirmed,george-whitesides-california,U.S. Representative,U.S. Representative,False
+C001080,House,CA28,Judy Chu,https://clerk.house.gov/members/C001080,confirmed,judy-chu-california,U.S. Representative,U.S. Representative,False
+R000620,House,CA29,Luz M. Rivas,https://clerk.house.gov/members/R000620,confirmed,luz-m-rivas-california,U.S. Representative,U.S. Representative,False
+F000483,House,CA30,Laura Friedman,https://clerk.house.gov/members/F000483,confirmed,laura-friedman-california,U.S. Representative,U.S. Representative,False
+C001123,House,CA31,"Gilbert Ray Cisneros, Jr.",https://clerk.house.gov/members/C001123,confirmed,gilbert-ray-cisneros-california,U.S. Representative,U.S. Representative,False
+S000344,House,CA32,Brad Sherman,https://clerk.house.gov/members/S000344,confirmed,brad-sherman-california,U.S. Representative,U.S. Representative,False
+A000371,House,CA33,Pete Aguilar,https://clerk.house.gov/members/A000371,confirmed,pete-aguilar-california,U.S. Representative,U.S. Representative,False
+G000585,House,CA34,Jimmy Gomez,https://clerk.house.gov/members/G000585,confirmed,jimmy-gomez-california,U.S. Representative,U.S. Representative,False
+T000474,House,CA35,Norma J. Torres,https://clerk.house.gov/members/T000474,confirmed,norma-j-torres-california,U.S. Representative,U.S. Representative,False
+L000582,House,CA36,Ted Lieu,https://clerk.house.gov/members/L000582,confirmed,ted-lieu-california,U.S. Representative,U.S. Representative,False
+K000400,House,CA37,Sydney Kamlager-Dove,https://clerk.house.gov/members/K000400,confirmed,sydney-kamlager-dove-california,U.S. Representative,U.S. Representative,False
+S001156,House,CA38,Linda T. Sánchez,https://clerk.house.gov/members/S001156,confirmed,linda-t-snchez-california,U.S. Representative,U.S. Representative,False
+T000472,House,CA39,Mark Takano,https://clerk.house.gov/members/T000472,confirmed,mark-takano-california,U.S. Representative,U.S. Representative,False
+K000397,House,CA40,Young Kim,https://clerk.house.gov/members/K000397,confirmed,young-kim-california,U.S. Representative,U.S. Representative,False
+C000059,House,CA41,Ken Calvert,https://clerk.house.gov/members/C000059,confirmed,ken-calvert-california,U.S. Representative,U.S. Representative,False
+G000598,House,CA42,Robert Garcia,https://clerk.house.gov/members/G000598,confirmed,robert-garcia-california,U.S. Representative,U.S. Representative,False
+W000187,House,CA43,Maxine Waters,https://clerk.house.gov/members/W000187,confirmed,maxine-waters-california,U.S. Representative,U.S. Representative,False
+B001300,House,CA44,Nanette Diaz Barragán,https://clerk.house.gov/members/B001300,confirmed,nanette-diaz-barragn-california,U.S. Representative,U.S. Representative,False
+T000491,House,CA45,Derek Tran,https://clerk.house.gov/members/T000491,confirmed,derek-tran-california,U.S. Representative,U.S. Representative,False
+C001110,House,CA46,J. Luis Correa,https://clerk.house.gov/members/C001110,confirmed,j-luis-correa-california,U.S. Representative,U.S. Representative,False
+M001241,House,CA47,Dave Min,https://clerk.house.gov/members/M001241,confirmed,dave-min-california,U.S. Representative,U.S. Representative,False
+I000056,House,CA48,Darrell Issa,https://clerk.house.gov/members/I000056,confirmed,darrell-issa-california,U.S. Representative,U.S. Representative,False
+L000593,House,CA49,Mike Levin,https://clerk.house.gov/members/L000593,confirmed,mike-levin-california,U.S. Representative,U.S. Representative,False
+P000608,House,CA50,Scott H. Peters,https://clerk.house.gov/members/P000608,confirmed,scott-h-peters-california,U.S. Representative,U.S. Representative,False
+J000305,House,CA51,Sara Jacobs,https://clerk.house.gov/members/J000305,confirmed,sara-jacobs-california,U.S. Representative,U.S. Representative,False
+V000130,House,CA52,Juan Vargas,https://clerk.house.gov/members/V000130,confirmed,juan-vargas-california,U.S. Representative,U.S. Representative,False
+D000197,House,CO01,Diana DeGette,https://clerk.house.gov/members/D000197,confirmed,diana-degette-colorado,U.S. Representative,U.S. Representative,False
+N000191,House,CO02,Joe Neguse,https://clerk.house.gov/members/N000191,confirmed,joe-neguse-colorado,U.S. Representative,U.S. Representative,False
+H001100,House,CO03,Jeff Hurd,https://clerk.house.gov/members/H001100,confirmed,jeff-hurd-colorado,U.S. Representative,U.S. Representative,False
+B000825,House,CO04,Lauren Boebert,https://clerk.house.gov/members/B000825,confirmed,lauren-boebert-colorado,U.S. Representative,U.S. Representative,False
+C001137,House,CO05,Jeff Crank,https://clerk.house.gov/members/C001137,confirmed,jeff-crank-colorado,U.S. Representative,U.S. Representative,False
+C001121,House,CO06,Jason Crow,https://clerk.house.gov/members/C001121,confirmed,jason-crow-colorado,U.S. Representative,U.S. Representative,False
+P000620,House,CO07,Brittany Pettersen,https://clerk.house.gov/members/P000620,confirmed,brittany-pettersen-colorado,U.S. Representative,U.S. Representative,False
+E000300,House,CO08,Gabe Evans,https://clerk.house.gov/members/E000300,confirmed,gabe-evans-colorado,U.S. Representative,U.S. Representative,False
+L000557,House,CT01,John B. Larson,https://clerk.house.gov/members/L000557,confirmed,john-b-larson-connecticut,U.S. Representative,U.S. Representative,False
+C001069,House,CT02,Joe Courtney,https://clerk.house.gov/members/C001069,confirmed,joe-courtney-connecticut,U.S. Representative,U.S. Representative,False
+D000216,House,CT03,Rosa L. DeLauro,https://clerk.house.gov/members/D000216,confirmed,rosa-l-delauro-connecticut,U.S. Representative,U.S. Representative,False
+H001047,House,CT04,James A. Himes,https://clerk.house.gov/members/H001047,confirmed,james-a-himes-connecticut,U.S. Representative,U.S. Representative,False
+H001081,House,CT05,Jahana Hayes,https://clerk.house.gov/members/H001081,confirmed,jahana-hayes-connecticut,U.S. Representative,U.S. Representative,False
+N000147,House,DC00,Eleanor Holmes Norton,https://clerk.house.gov/members/N000147,confirmed_generic_house_role,eleanor-holmes-norton-district-of-columbia,Delegate,U.S. Representative,False
+M001238,House,DE00,Sarah McBride,https://clerk.house.gov/members/M001238,confirmed,sarah-mcbride-delaware,U.S. Representative,U.S. Representative,False
+P000622,House,FL01,Jimmy Patronis,https://clerk.house.gov/members/P000622,confirmed,jimmy-patronis-florida,U.S. Representative,U.S. Representative,False
+D000628,House,FL02,Neal P. Dunn,https://clerk.house.gov/members/D000628,confirmed,neal-p-dunn-florida,U.S. Representative,U.S. Representative,False
+C001039,House,FL03,Kat Cammack,https://clerk.house.gov/members/C001039,confirmed,kat-cammack-florida,U.S. Representative,U.S. Representative,False
+B001314,House,FL04,Aaron Bean,https://clerk.house.gov/members/B001314,confirmed,aaron-bean-florida,U.S. Representative,U.S. Representative,False
+R000609,House,FL05,John H. Rutherford,https://clerk.house.gov/members/R000609,confirmed,john-h-rutherford-florida,U.S. Representative,U.S. Representative,False
+F000484,House,FL06,Randy Fine,https://clerk.house.gov/members/F000484,confirmed,randy-fine-florida,U.S. Representative,U.S. Representative,False
+M001216,House,FL07,Cory Mills,https://clerk.house.gov/members/M001216,confirmed,cory-mills-florida,U.S. Representative,U.S. Representative,False
+H001099,House,FL08,Mike Haridopolos,https://clerk.house.gov/members/H001099,confirmed,mike-haridopolos-florida,U.S. Representative,U.S. Representative,False
+S001200,House,FL09,Darren Soto,https://clerk.house.gov/members/S001200,confirmed,darren-soto-florida,U.S. Representative,U.S. Representative,False
+F000476,House,FL10,Maxwell Frost,https://clerk.house.gov/members/F000476,confirmed,maxwell-frost-florida,U.S. Representative,U.S. Representative,False
+W000806,House,FL11,Daniel Webster,https://clerk.house.gov/members/W000806,confirmed,daniel-webster-florida,U.S. Representative,U.S. Representative,False
+B001257,House,FL12,Gus M. Bilirakis,https://clerk.house.gov/members/B001257,confirmed,gus-m-bilirakis-florida,U.S. Representative,U.S. Representative,False
+L000596,House,FL13,Anna Paulina Luna,https://clerk.house.gov/members/L000596,confirmed,anna-paulina-luna-florida,U.S. Representative,U.S. Representative,False
+C001066,House,FL14,Kathy Castor,https://clerk.house.gov/members/C001066,confirmed,kathy-castor-florida,U.S. Representative,U.S. Representative,False
+L000597,House,FL15,Laurel M. Lee,https://clerk.house.gov/members/L000597,confirmed,laurel-m-lee-florida,U.S. Representative,U.S. Representative,False
+B001260,House,FL16,Vern Buchanan,https://clerk.house.gov/members/B001260,confirmed,vern-buchanan-florida,U.S. Representative,U.S. Representative,False
+S001214,House,FL17,W. Gregory Steube,https://clerk.house.gov/members/S001214,confirmed,w-gregory-steube-florida,U.S. Representative,U.S. Representative,False
+F000472,House,FL18,Scott Franklin,https://clerk.house.gov/members/F000472,confirmed,scott-franklin-florida,U.S. Representative,U.S. Representative,False
+D000032,House,FL19,Byron Donalds,https://clerk.house.gov/members/D000032,confirmed,byron-donalds-florida,U.S. Representative,U.S. Representative,False
+M001199,House,FL21,Brian J. Mast,https://clerk.house.gov/members/M001199,confirmed,brian-j-mast-florida,U.S. Representative,U.S. Representative,False
+F000462,House,FL22,Lois Frankel,https://clerk.house.gov/members/F000462,confirmed,lois-frankel-florida,U.S. Representative,U.S. Representative,False
+M001217,House,FL23,Jared Moskowitz,https://clerk.house.gov/members/M001217,confirmed,jared-moskowitz-florida,U.S. Representative,U.S. Representative,False
+W000808,House,FL24,Frederica S. Wilson,https://clerk.house.gov/members/W000808,confirmed,frederica-s-wilson-florida,U.S. Representative,U.S. Representative,False
+W000797,House,FL25,Debbie Wasserman Schultz,https://clerk.house.gov/members/W000797,confirmed,debbie-wasserman-schultz-florida,U.S. Representative,U.S. Representative,False
+D000600,House,FL26,Mario Diaz-Balart,https://clerk.house.gov/members/D000600,confirmed,mario-diaz-balart-florida,U.S. Representative,U.S. Representative,False
+S000168,House,FL27,Maria Elvira Salazar,https://clerk.house.gov/members/S000168,confirmed,maria-elvira-salazar-florida,U.S. Representative,U.S. Representative,False
+G000593,House,FL28,Carlos A. Gimenez,https://clerk.house.gov/members/G000593,confirmed,carlos-a-gimenez-florida,U.S. Representative,U.S. Representative,False
+C001103,House,GA01,"Earl L. ""Buddy"" Carter",https://clerk.house.gov/members/C001103,confirmed,earl-l-buddy-carter-georgia,U.S. Representative,U.S. Representative,False
+B000490,House,GA02,"Sanford D. Bishop, Jr.",https://clerk.house.gov/members/B000490,confirmed,sanford-d-bishop-georgia,U.S. Representative,U.S. Representative,False
+J000311,House,GA03,Brian Jack,https://clerk.house.gov/members/J000311,confirmed,brian-jack-georgia,U.S. Representative,U.S. Representative,False
+J000288,House,GA04,"Henry C. ""Hank"" Johnson, Jr.",https://clerk.house.gov/members/J000288,confirmed,henry-c-hank-johnson-georgia,U.S. Representative,U.S. Representative,False
+W000788,House,GA05,Nikema Williams,https://clerk.house.gov/members/W000788,confirmed,nikema-williams-georgia,U.S. Representative,U.S. Representative,False
+M001208,House,GA06,Lucy McBath,https://clerk.house.gov/members/M001208,confirmed,lucy-mcbath-georgia,U.S. Representative,U.S. Representative,False
+M001218,House,GA07,Richard McCormick,https://clerk.house.gov/members/M001218,confirmed,richard-mccormick-georgia,U.S. Representative,U.S. Representative,False
+S001189,House,GA08,Austin Scott,https://clerk.house.gov/members/S001189,confirmed,austin-scott-georgia,U.S. Representative,U.S. Representative,False
+C001116,House,GA09,Andrew S. Clyde,https://clerk.house.gov/members/C001116,confirmed,andrew-s-clyde-georgia,U.S. Representative,U.S. Representative,False
+C001129,House,GA10,Mike Collins,https://clerk.house.gov/members/C001129,confirmed,mike-collins-georgia,U.S. Representative,U.S. Representative,False
+L000583,House,GA11,Barry Loudermilk,https://clerk.house.gov/members/L000583,confirmed,barry-loudermilk-georgia,U.S. Representative,U.S. Representative,False
+A000372,House,GA12,Rick W. Allen,https://clerk.house.gov/members/A000372,confirmed,rick-w-allen-georgia,U.S. Representative,U.S. Representative,False
+B001328,House,GA13,Everton Blair Jr.,https://clerk.house.gov/members/B001328,missing_active_id,,U.S. Representative,,
+F000485,House,GA14,Clay Fuller,https://clerk.house.gov/members/F000485,missing_active_id,,U.S. Representative,,
+M001219,House,GU00,James C. Moylan,https://clerk.house.gov/members/M001219,confirmed_generic_house_role,james-c-moylan-guam,Delegate,U.S. Representative,False
+C001055,House,HI01,Ed Case,https://clerk.house.gov/members/C001055,confirmed,ed-case-hawaii,U.S. Representative,U.S. Representative,False
+T000487,House,HI02,Jill N. Tokuda,https://clerk.house.gov/members/T000487,confirmed,jill-n-tokuda-hawaii,U.S. Representative,U.S. Representative,False
+M001215,House,IA01,Mariannette Miller-Meeks,https://clerk.house.gov/members/M001215,confirmed,mariannette-miller-meeks-iowa,U.S. Representative,U.S. Representative,False
+H001091,House,IA02,Ashley Hinson,https://clerk.house.gov/members/H001091,confirmed,ashley-hinson-iowa,U.S. Representative,U.S. Representative,False
+N000193,House,IA03,Zachary Nunn,https://clerk.house.gov/members/N000193,confirmed,zachary-nunn-iowa,U.S. Representative,U.S. Representative,False
+F000446,House,IA04,Randy Feenstra,https://clerk.house.gov/members/F000446,confirmed,randy-feenstra-iowa,U.S. Representative,U.S. Representative,False
+F000469,House,ID01,Russ Fulcher,https://clerk.house.gov/members/F000469,confirmed,russ-fulcher-idaho,U.S. Representative,U.S. Representative,False
+S001148,House,ID02,Michael K. Simpson,https://clerk.house.gov/members/S001148,confirmed,michael-k-simpson-idaho,U.S. Representative,U.S. Representative,False
+J000309,House,IL01,Jonathan L. Jackson,https://clerk.house.gov/members/J000309,confirmed,jonathan-l-jackson-illinois,U.S. Representative,U.S. Representative,False
+K000385,House,IL02,Robin L. Kelly,https://clerk.house.gov/members/K000385,confirmed,robin-l-kelly-illinois,U.S. Representative,U.S. Representative,False
+R000617,House,IL03,Delia C. Ramirez,https://clerk.house.gov/members/R000617,confirmed,delia-c-ramirez-illinois,U.S. Representative,U.S. Representative,False
+G000586,House,IL04,"Jesús G. ""Chuy"" García",https://clerk.house.gov/members/G000586,confirmed,jess-g-chuy-garca-illinois,U.S. Representative,U.S. Representative,False
+Q000023,House,IL05,Mike Quigley,https://clerk.house.gov/members/Q000023,confirmed,mike-quigley-illinois,U.S. Representative,U.S. Representative,False
+C001117,House,IL06,Sean Casten,https://clerk.house.gov/members/C001117,confirmed,sean-casten-illinois,U.S. Representative,U.S. Representative,False
+D000096,House,IL07,Danny K. Davis,https://clerk.house.gov/members/D000096,confirmed,danny-k-davis-illinois,U.S. Representative,U.S. Representative,False
+K000391,House,IL08,Raja Krishnamoorthi,https://clerk.house.gov/members/K000391,confirmed,raja-krishnamoorthi-illinois,U.S. Representative,U.S. Representative,False
+S001145,House,IL09,Janice D. Schakowsky,https://clerk.house.gov/members/S001145,confirmed,janice-d-schakowsky-illinois,U.S. Representative,U.S. Representative,False
+S001190,House,IL10,Bradley Scott Schneider,https://clerk.house.gov/members/S001190,confirmed,bradley-scott-schneider-illinois,U.S. Representative,U.S. Representative,False
+F000454,House,IL11,Bill Foster,https://clerk.house.gov/members/F000454,confirmed,bill-foster-illinois,U.S. Representative,U.S. Representative,False
+B001295,House,IL12,Mike Bost,https://clerk.house.gov/members/B001295,confirmed,mike-bost-illinois,U.S. Representative,U.S. Representative,False
+B001315,House,IL13,Nikki Budzinski,https://clerk.house.gov/members/B001315,confirmed,nikki-budzinski-illinois,U.S. Representative,U.S. Representative,False
+U000040,House,IL14,Lauren Underwood,https://clerk.house.gov/members/U000040,confirmed,lauren-underwood-illinois,U.S. Representative,U.S. Representative,False
+M001211,House,IL15,Mary E. Miller,https://clerk.house.gov/members/M001211,confirmed,mary-e-miller-illinois,U.S. Representative,U.S. Representative,False
+L000585,House,IL16,Darin LaHood,https://clerk.house.gov/members/L000585,confirmed,darin-lahood-illinois,U.S. Representative,U.S. Representative,False
+S001225,House,IL17,Eric Sorensen,https://clerk.house.gov/members/S001225,confirmed,eric-sorensen-illinois,U.S. Representative,U.S. Representative,False
+M001214,House,IN01,Frank J. Mrvan,https://clerk.house.gov/members/M001214,confirmed,frank-j-mrvan-indiana,U.S. Representative,U.S. Representative,False
+Y000067,House,IN02,Rudy Yakym III,https://clerk.house.gov/members/Y000067,confirmed,rudy-yakym-indiana,U.S. Representative,U.S. Representative,False
+S001188,House,IN03,Marlin A. Stutzman,https://clerk.house.gov/members/S001188,confirmed,marlin-a-stutzman-indiana,U.S. Representative,U.S. Representative,False
+B001307,House,IN04,James R. Baird,https://clerk.house.gov/members/B001307,confirmed,james-r-baird-indiana,U.S. Representative,U.S. Representative,False
+S000929,House,IN05,Victoria Spartz,https://clerk.house.gov/members/S000929,confirmed,victoria-spartz-indiana,U.S. Representative,U.S. Representative,False
+S001229,House,IN06,Jefferson Shreve,https://clerk.house.gov/members/S001229,confirmed,jefferson-shreve-indiana,U.S. Representative,U.S. Representative,False
+C001072,House,IN07,André Carson,https://clerk.house.gov/members/C001072,confirmed,andr-carson-indiana,U.S. Representative,U.S. Representative,False
+M001233,House,IN08,Mark B. Messmer,https://clerk.house.gov/members/M001233,confirmed,mark-b-messmer-indiana,U.S. Representative,U.S. Representative,False
+H001093,House,IN09,Erin Houchin,https://clerk.house.gov/members/H001093,confirmed,erin-houchin-indiana,U.S. Representative,U.S. Representative,False
+M000871,House,KS01,Tracey Mann,https://clerk.house.gov/members/M000871,confirmed,tracey-mann-kansas,U.S. Representative,U.S. Representative,False
+S001228,House,KS02,Derek Schmidt,https://clerk.house.gov/members/S001228,confirmed,derek-schmidt-kansas,U.S. Representative,U.S. Representative,False
+D000629,House,KS03,Sharice Davids,https://clerk.house.gov/members/D000629,confirmed,sharice-davids-kansas,U.S. Representative,U.S. Representative,False
+E000298,House,KS04,Ron Estes,https://clerk.house.gov/members/E000298,confirmed,ron-estes-kansas,U.S. Representative,U.S. Representative,False
+C001108,House,KY01,James Comer,https://clerk.house.gov/members/C001108,confirmed,james-comer-kentucky,U.S. Representative,U.S. Representative,False
+G000558,House,KY02,Brett Guthrie,https://clerk.house.gov/members/G000558,confirmed,brett-guthrie-kentucky,U.S. Representative,U.S. Representative,False
+M001220,House,KY03,Morgan McGarvey,https://clerk.house.gov/members/M001220,confirmed,morgan-mcgarvey-kentucky,U.S. Representative,U.S. Representative,False
+M001184,House,KY04,Thomas Massie,https://clerk.house.gov/members/M001184,confirmed,thomas-massie-kentucky,U.S. Representative,U.S. Representative,False
+R000395,House,KY05,Harold Rogers,https://clerk.house.gov/members/R000395,confirmed,harold-rogers-kentucky,U.S. Representative,U.S. Representative,False
+B001282,House,KY06,Andy Barr,https://clerk.house.gov/members/B001282,confirmed,andy-barr-kentucky,U.S. Representative,U.S. Representative,False
+S001176,House,LA01,Steve Scalise,https://clerk.house.gov/members/S001176,confirmed,steve-scalise-louisiana,U.S. Representative,U.S. Representative,False
+C001125,House,LA02,Troy A. Carter,https://clerk.house.gov/members/C001125,confirmed,troy-a-carter-louisiana,U.S. Representative,U.S. Representative,False
+H001077,House,LA03,Clay Higgins,https://clerk.house.gov/members/H001077,confirmed,clay-higgins-louisiana,U.S. Representative,U.S. Representative,False
+J000299,House,LA04,Mike Johnson,https://clerk.house.gov/members/J000299,confirmed,mike-johnson-louisiana,U.S. Representative,U.S. Representative,False
+L000595,House,LA05,Julia Letlow,https://clerk.house.gov/members/L000595,confirmed,julia-letlow-louisiana,U.S. Representative,U.S. Representative,False
+F000110,House,LA06,Cleo Fields,https://clerk.house.gov/members/F000110,confirmed,cleo-fields-louisiana,U.S. Representative,U.S. Representative,False
+N000015,House,MA01,Richard E. Neal,https://clerk.house.gov/members/N000015,confirmed,richard-e-neal-massachusetts,U.S. Representative,U.S. Representative,False
+M000312,House,MA02,James P. McGovern,https://clerk.house.gov/members/M000312,confirmed,james-p-mcgovern-massachusetts,U.S. Representative,U.S. Representative,False
+T000482,House,MA03,Lori Trahan,https://clerk.house.gov/members/T000482,confirmed,lori-trahan-massachusetts,U.S. Representative,U.S. Representative,False
+A000148,House,MA04,Jake Auchincloss,https://clerk.house.gov/members/A000148,confirmed,jake-auchincloss-massachusetts,U.S. Representative,U.S. Representative,False
+C001101,House,MA05,Katherine M. Clark,https://clerk.house.gov/members/C001101,confirmed,katherine-m-clark-massachusetts,U.S. Representative,U.S. Representative,False
+M001196,House,MA06,Seth Moulton,https://clerk.house.gov/members/M001196,confirmed,seth-moulton-massachusetts,U.S. Representative,U.S. Representative,False
+P000617,House,MA07,Ayanna Pressley,https://clerk.house.gov/members/P000617,confirmed,ayanna-pressley-massachusetts,U.S. Representative,U.S. Representative,False
+L000562,House,MA08,Stephen F. Lynch,https://clerk.house.gov/members/L000562,confirmed,stephen-f-lynch-massachusetts,U.S. Representative,U.S. Representative,False
+K000375,House,MA09,William R. Keating,https://clerk.house.gov/members/K000375,confirmed,william-r-keating-massachusetts,U.S. Representative,U.S. Representative,False
+H001052,House,MD01,Andy Harris,https://clerk.house.gov/members/H001052,confirmed,andy-harris-maryland,U.S. Representative,U.S. Representative,False
+O000176,House,MD02,"Johnny Olszewski, Jr.",https://clerk.house.gov/members/O000176,confirmed,johnny-olszewski-maryland,U.S. Representative,U.S. Representative,False
+E000301,House,MD03,Sarah Elfreth,https://clerk.house.gov/members/E000301,confirmed,sarah-elfreth-maryland,U.S. Representative,U.S. Representative,False
+I000058,House,MD04,Glenn Ivey,https://clerk.house.gov/members/I000058,confirmed,glenn-ivey-maryland,U.S. Representative,U.S. Representative,False
+H000874,House,MD05,Steny H. Hoyer,https://clerk.house.gov/members/H000874,confirmed,steny-h-hoyer-maryland,U.S. Representative,U.S. Representative,False
+M001232,House,MD06,April McClain Delaney,https://clerk.house.gov/members/M001232,confirmed,april-mcclain-delaney-maryland,U.S. Representative,U.S. Representative,False
+M000687,House,MD07,Kweisi Mfume,https://clerk.house.gov/members/M000687,confirmed,kweisi-mfume-maryland,U.S. Representative,U.S. Representative,False
+R000606,House,MD08,Jamie Raskin,https://clerk.house.gov/members/R000606,confirmed,jamie-raskin-maryland,U.S. Representative,U.S. Representative,False
+P000597,House,ME01,Chellie Pingree,https://clerk.house.gov/members/P000597,confirmed,chellie-pingree-maine,U.S. Representative,U.S. Representative,False
+G000592,House,ME02,Jared F. Golden,https://clerk.house.gov/members/G000592,confirmed,jared-f-golden-maine,U.S. Representative,U.S. Representative,False
+B001301,House,MI01,Jack Bergman,https://clerk.house.gov/members/B001301,confirmed,jack-bergman-michigan,U.S. Representative,U.S. Representative,False
+M001194,House,MI02,John R. Moolenaar,https://clerk.house.gov/members/M001194,confirmed,john-r-moolenaar-michigan,U.S. Representative,U.S. Representative,False
+S001221,House,MI03,Hillary J. Scholten,https://clerk.house.gov/members/S001221,confirmed,hillary-j-scholten-michigan,U.S. Representative,U.S. Representative,False
+H001058,House,MI04,Bill Huizenga,https://clerk.house.gov/members/H001058,confirmed,bill-huizenga-michigan,U.S. Representative,U.S. Representative,False
+W000798,House,MI05,Tim Walberg,https://clerk.house.gov/members/W000798,confirmed,tim-walberg-michigan,U.S. Representative,U.S. Representative,False
+D000624,House,MI06,Debbie Dingell,https://clerk.house.gov/members/D000624,confirmed,debbie-dingell-michigan,U.S. Representative,U.S. Representative,False
+B001321,House,MI07,Tom Barrett,https://clerk.house.gov/members/B001321,confirmed,tom-barrett-michigan,U.S. Representative,U.S. Representative,False
+M001237,House,MI08,Kristen McDonald Rivet,https://clerk.house.gov/members/M001237,confirmed,kristen-mcdonald-rivet-michigan,U.S. Representative,U.S. Representative,False
+M001136,House,MI09,Lisa C. McClain,https://clerk.house.gov/members/M001136,confirmed,lisa-c-mcclain-michigan,U.S. Representative,U.S. Representative,False
+J000307,House,MI10,John James,https://clerk.house.gov/members/J000307,confirmed,john-james-michigan,U.S. Representative,U.S. Representative,False
+S001215,House,MI11,Haley M. Stevens,https://clerk.house.gov/members/S001215,confirmed,haley-m-stevens-michigan,U.S. Representative,U.S. Representative,False
+T000481,House,MI12,Rashida Tlaib,https://clerk.house.gov/members/T000481,confirmed,rashida-tlaib-michigan,U.S. Representative,U.S. Representative,False
+T000488,House,MI13,Shri Thanedar,https://clerk.house.gov/members/T000488,confirmed,shri-thanedar-michigan,U.S. Representative,U.S. Representative,False
+F000475,House,MN01,Brad Finstad,https://clerk.house.gov/members/F000475,confirmed,brad-finstad-minnesota,U.S. Representative,U.S. Representative,False
+C001119,House,MN02,Angie Craig,https://clerk.house.gov/members/C001119,confirmed,angie-craig-minnesota,U.S. Representative,U.S. Representative,False
+M001234,House,MN03,Kelly Morrison,https://clerk.house.gov/members/M001234,confirmed,kelly-morrison-minnesota,U.S. Representative,U.S. Representative,False
+M001143,House,MN04,Betty McCollum,https://clerk.house.gov/members/M001143,confirmed,betty-mccollum-minnesota,U.S. Representative,U.S. Representative,False
+O000173,House,MN05,Ilhan Omar,https://clerk.house.gov/members/O000173,confirmed,ilhan-omar-minnesota,U.S. Representative,U.S. Representative,False
+E000294,House,MN06,Tom Emmer,https://clerk.house.gov/members/E000294,confirmed,tom-emmer-minnesota,U.S. Representative,U.S. Representative,False
+F000470,House,MN07,Michelle Fischbach,https://clerk.house.gov/members/F000470,confirmed,michelle-fischbach-minnesota,U.S. Representative,U.S. Representative,False
+S001212,House,MN08,Pete Stauber,https://clerk.house.gov/members/S001212,confirmed,pete-stauber-minnesota,U.S. Representative,U.S. Representative,False
+B001324,House,MO01,Wesley Bell,https://clerk.house.gov/members/B001324,confirmed,wesley-bell-missouri,U.S. Representative,U.S. Representative,False
+W000812,House,MO02,Ann Wagner,https://clerk.house.gov/members/W000812,confirmed,ann-wagner-missouri,U.S. Representative,U.S. Representative,False
+O000177,House,MO03,"Robert F. Onder, Jr.",https://clerk.house.gov/members/O000177,confirmed,robert-f-onder-missouri,U.S. Representative,U.S. Representative,False
+A000379,House,MO04,Mark Alford,https://clerk.house.gov/members/A000379,confirmed,mark-alford-missouri,U.S. Representative,U.S. Representative,False
+C001061,House,MO05,Emanuel Cleaver,https://clerk.house.gov/members/C001061,confirmed,emanuel-cleaver-missouri,U.S. Representative,U.S. Representative,False
+G000546,House,MO06,Sam Graves,https://clerk.house.gov/members/G000546,confirmed,sam-graves-missouri,U.S. Representative,U.S. Representative,False
+B001316,House,MO07,Eric Burlison,https://clerk.house.gov/members/B001316,confirmed,eric-burlison-missouri,U.S. Representative,U.S. Representative,False
+S001195,House,MO08,Jason Smith,https://clerk.house.gov/members/S001195,confirmed,jason-smith-missouri,U.S. Representative,U.S. Representative,False
+K000404,House,MP00,Kimberlyn King-Hinds,https://clerk.house.gov/members/K000404,confirmed_generic_house_role,kimberlyn-king-hinds-northern-mariana-islands,Delegate,U.S. Representative,False
+K000388,House,MS01,Trent Kelly,https://clerk.house.gov/members/K000388,confirmed,trent-kelly-mississippi,U.S. Representative,U.S. Representative,False
+T000193,House,MS02,Bennie G. Thompson,https://clerk.house.gov/members/T000193,confirmed,bennie-g-thompson-mississippi,U.S. Representative,U.S. Representative,False
+G000591,House,MS03,Michael Guest,https://clerk.house.gov/members/G000591,confirmed,michael-guest-mississippi,U.S. Representative,U.S. Representative,False
+E000235,House,MS04,Mike Ezell,https://clerk.house.gov/members/E000235,confirmed,mike-ezell-mississippi,U.S. Representative,U.S. Representative,False
+Z000018,House,MT01,Ryan K. Zinke,https://clerk.house.gov/members/Z000018,confirmed,ryan-k-zinke-montana,U.S. Representative,U.S. Representative,False
+D000634,House,MT02,Troy Downing,https://clerk.house.gov/members/D000634,confirmed,troy-downing-montana,U.S. Representative,U.S. Representative,False
+D000230,House,NC01,Donald G. Davis,https://clerk.house.gov/members/D000230,confirmed,donald-g-davis-north-carolina,U.S. Representative,U.S. Representative,False
+R000305,House,NC02,Deborah K. Ross,https://clerk.house.gov/members/R000305,confirmed,deborah-k-ross-north-carolina,U.S. Representative,U.S. Representative,False
+M001210,House,NC03,Gregory F. Murphy,https://clerk.house.gov/members/M001210,confirmed,gregory-f-murphy-north-carolina,U.S. Representative,U.S. Representative,False
+F000477,House,NC04,Valerie P. Foushee,https://clerk.house.gov/members/F000477,confirmed,valerie-p-foushee-north-carolina,U.S. Representative,U.S. Representative,False
+F000450,House,NC05,Virginia Foxx,https://clerk.house.gov/members/F000450,confirmed,virginia-foxx-north-carolina,U.S. Representative,U.S. Representative,False
+M001240,House,NC06,Addison P. McDowell,https://clerk.house.gov/members/M001240,confirmed,addison-p-mcdowell-north-carolina,U.S. Representative,U.S. Representative,False
+R000603,House,NC07,David Rouzer,https://clerk.house.gov/members/R000603,confirmed,david-rouzer-north-carolina,U.S. Representative,U.S. Representative,False
+H001102,House,NC08,Mark Harris,https://clerk.house.gov/members/H001102,confirmed,mark-harris-north-carolina,U.S. Representative,U.S. Representative,False
+H001067,House,NC09,Richard Hudson,https://clerk.house.gov/members/H001067,confirmed,richard-hudson-north-carolina,U.S. Representative,U.S. Representative,False
+H001101,House,NC10,Pat Harrigan,https://clerk.house.gov/members/H001101,confirmed,pat-harrigan-north-carolina,U.S. Representative,U.S. Representative,False
+E000246,House,NC11,Chuck Edwards,https://clerk.house.gov/members/E000246,confirmed,chuck-edwards-north-carolina,U.S. Representative,U.S. Representative,False
+A000370,House,NC12,Alma S. Adams,https://clerk.house.gov/members/A000370,confirmed,alma-s-adams-north-carolina,U.S. Representative,U.S. Representative,False
+K000405,House,NC13,Brad Knott,https://clerk.house.gov/members/K000405,confirmed,brad-knott-north-carolina,U.S. Representative,U.S. Representative,False
+M001236,House,NC14,Tim Moore,https://clerk.house.gov/members/M001236,confirmed,tim-moore-north-carolina,U.S. Representative,U.S. Representative,False
+F000482,House,ND00,Julie Fedorchak,https://clerk.house.gov/members/F000482,confirmed,julie-fedorchak-north-dakota,U.S. Representative,U.S. Representative,False
+F000474,House,NE01,Mike Flood,https://clerk.house.gov/members/F000474,confirmed,mike-flood-nebraska,U.S. Representative,U.S. Representative,False
+B001298,House,NE02,Don Bacon,https://clerk.house.gov/members/B001298,confirmed,don-bacon-nebraska,U.S. Representative,U.S. Representative,False
+S001172,House,NE03,Adrian Smith,https://clerk.house.gov/members/S001172,confirmed,adrian-smith-nebraska,U.S. Representative,U.S. Representative,False
+P000614,House,NH01,Chris Pappas,https://clerk.house.gov/members/P000614,confirmed,chris-pappas-new-hampshire,U.S. Representative,U.S. Representative,False
+G000604,House,NH02,Maggie Goodlander,https://clerk.house.gov/members/G000604,confirmed,maggie-goodlander-new-hampshire,U.S. Representative,U.S. Representative,False
+N000188,House,NJ01,Donald Norcross,https://clerk.house.gov/members/N000188,confirmed,donald-norcross-new-jersey,U.S. Representative,U.S. Representative,False
+V000133,House,NJ02,Jefferson Van Drew,https://clerk.house.gov/members/V000133,confirmed,jefferson-van-drew-new-jersey,U.S. Representative,U.S. Representative,False
+C001136,House,NJ03,"Herbert C. Conaway, Jr.",https://clerk.house.gov/members/C001136,confirmed,herbert-c-conaway-new-jersey,U.S. Representative,U.S. Representative,False
+S000522,House,NJ04,Christopher H. Smith,https://clerk.house.gov/members/S000522,confirmed,christopher-h-smith-new-jersey,U.S. Representative,U.S. Representative,False
+G000583,House,NJ05,Josh Gottheimer,https://clerk.house.gov/members/G000583,confirmed,josh-gottheimer-new-jersey,U.S. Representative,U.S. Representative,False
+P000034,House,NJ06,"Frank Pallone, Jr.",https://clerk.house.gov/members/P000034,confirmed,frank-pallone-new-jersey,U.S. Representative,U.S. Representative,False
+K000398,House,NJ07,"Thomas H. Kean, Jr.",https://clerk.house.gov/members/K000398,confirmed,thomas-h-kean-new-jersey,U.S. Representative,U.S. Representative,False
+M001226,House,NJ08,Robert Menendez,https://clerk.house.gov/members/M001226,confirmed,robert-menendez-new-jersey,U.S. Representative,U.S. Representative,False
+P000621,House,NJ09,Nellie Pou,https://clerk.house.gov/members/P000621,confirmed,nellie-pou-new-jersey,U.S. Representative,U.S. Representative,False
+M001229,House,NJ10,LaMonica McIver,https://clerk.house.gov/members/M001229,confirmed,lamonica-mciver-new-jersey,U.S. Representative,U.S. Representative,False
+M001246,House,NJ11,Analilia Mejia,https://clerk.house.gov/members/M001246,missing_active_id,,U.S. Representative,,
+W000822,House,NJ12,Bonnie Watson Coleman,https://clerk.house.gov/members/W000822,confirmed,bonnie-watson-coleman-new-jersey,U.S. Representative,U.S. Representative,False
+S001218,House,NM01,Melanie A. Stansbury,https://clerk.house.gov/members/S001218,confirmed,melanie-a-stansbury-new-mexico,U.S. Representative,U.S. Representative,False
+V000136,House,NM02,Gabe Vasquez,https://clerk.house.gov/members/V000136,confirmed,gabe-vasquez-new-mexico,U.S. Representative,U.S. Representative,False
+L000273,House,NM03,Teresa Leger Fernandez,https://clerk.house.gov/members/L000273,confirmed,teresa-leger-fernandez-new-mexico,U.S. Representative,U.S. Representative,False
+T000468,House,NV01,Dina Titus,https://clerk.house.gov/members/T000468,confirmed,dina-titus-nevada,U.S. Representative,U.S. Representative,False
+A000369,House,NV02,Mark E. Amodei,https://clerk.house.gov/members/A000369,confirmed,mark-e-amodei-nevada,U.S. Representative,U.S. Representative,False
+L000590,House,NV03,Susie Lee,https://clerk.house.gov/members/L000590,confirmed,susie-lee-nevada,U.S. Representative,U.S. Representative,False
+H001066,House,NV04,Steven Horsford,https://clerk.house.gov/members/H001066,confirmed,steven-horsford-nevada,U.S. Representative,U.S. Representative,False
+L000598,House,NY01,Nick LaLota,https://clerk.house.gov/members/L000598,confirmed,nick-lalota-new-york,U.S. Representative,U.S. Representative,False
+G000597,House,NY02,Andrew R. Garbarino,https://clerk.house.gov/members/G000597,confirmed,andrew-r-garbarino-new-york,U.S. Representative,U.S. Representative,False
+S001201,House,NY03,Thomas R. Suozzi,https://clerk.house.gov/members/S001201,confirmed,thomas-r-suozzi-new-york,U.S. Representative,U.S. Representative,False
+G000602,House,NY04,Laura Gillen,https://clerk.house.gov/members/G000602,confirmed,laura-gillen-new-york,U.S. Representative,U.S. Representative,False
+M001137,House,NY05,Gregory W. Meeks,https://clerk.house.gov/members/M001137,confirmed,gregory-w-meeks-new-york,U.S. Representative,U.S. Representative,False
+M001188,House,NY06,Grace Meng,https://clerk.house.gov/members/M001188,confirmed,grace-meng-new-york,U.S. Representative,U.S. Representative,False
+V000081,House,NY07,Nydia M. Velázquez,https://clerk.house.gov/members/V000081,confirmed,nydia-m-velzquez-new-york,U.S. Representative,U.S. Representative,False
+J000294,House,NY08,Hakeem S. Jeffries,https://clerk.house.gov/members/J000294,confirmed,hakeem-s-jeffries-new-york,U.S. Representative,U.S. Representative,False
+C001067,House,NY09,Yvette D. Clarke,https://clerk.house.gov/members/C001067,confirmed,yvette-d-clarke-new-york,U.S. Representative,U.S. Representative,False
+G000599,House,NY10,Daniel S. Goldman,https://clerk.house.gov/members/G000599,confirmed,daniel-s-goldman-new-york,U.S. Representative,U.S. Representative,False
+M000317,House,NY11,Nicole Malliotakis,https://clerk.house.gov/members/M000317,confirmed,nicole-malliotakis-new-york,U.S. Representative,U.S. Representative,False
+N000002,House,NY12,Jerrold Nadler,https://clerk.house.gov/members/N000002,confirmed,jerrold-nadler-new-york,U.S. Representative,U.S. Representative,False
+E000297,House,NY13,Adriano Espaillat,https://clerk.house.gov/members/E000297,confirmed,adriano-espaillat-new-york,U.S. Representative,U.S. Representative,False
+O000172,House,NY14,Alexandria Ocasio-Cortez,https://clerk.house.gov/members/O000172,confirmed,alexandria-ocasio-cortez-new-york,U.S. Representative,U.S. Representative,False
+T000486,House,NY15,Ritchie Torres,https://clerk.house.gov/members/T000486,confirmed,ritchie-torres-new-york,U.S. Representative,U.S. Representative,False
+L000606,House,NY16,George Latimer,https://clerk.house.gov/members/L000606,confirmed,george-latimer-new-york,U.S. Representative,U.S. Representative,False
+L000599,House,NY17,Michael Lawler,https://clerk.house.gov/members/L000599,confirmed,michael-lawler-new-york,U.S. Representative,U.S. Representative,False
+R000579,House,NY18,Patrick Ryan,https://clerk.house.gov/members/R000579,confirmed,patrick-ryan-new-york,U.S. Representative,U.S. Representative,False
+R000622,House,NY19,Josh Riley,https://clerk.house.gov/members/R000622,confirmed,josh-riley-new-york,U.S. Representative,U.S. Representative,False
+T000469,House,NY20,Paul Tonko,https://clerk.house.gov/members/T000469,confirmed,paul-tonko-new-york,U.S. Representative,U.S. Representative,False
+S001196,House,NY21,Elise M. Stefanik,https://clerk.house.gov/members/S001196,confirmed,elise-m-stefanik-new-york,U.S. Representative,U.S. Representative,False
+M001231,House,NY22,John W. Mannion,https://clerk.house.gov/members/M001231,confirmed,john-w-mannion-new-york,U.S. Representative,U.S. Representative,False
+L000600,House,NY23,Nicholas A. Langworthy,https://clerk.house.gov/members/L000600,confirmed,nicholas-a-langworthy-new-york,U.S. Representative,U.S. Representative,False
+T000478,House,NY24,Claudia Tenney,https://clerk.house.gov/members/T000478,confirmed,claudia-tenney-new-york,U.S. Representative,U.S. Representative,False
+M001206,House,NY25,Joseph D. Morelle,https://clerk.house.gov/members/M001206,confirmed,joseph-d-morelle-new-york,U.S. Representative,U.S. Representative,False
+K000402,House,NY26,Timothy M. Kennedy,https://clerk.house.gov/members/K000402,confirmed,timothy-m-kennedy-new-york,U.S. Representative,U.S. Representative,False
+L000601,House,OH01,Greg Landsman,https://clerk.house.gov/members/L000601,confirmed,greg-landsman-ohio,U.S. Representative,U.S. Representative,False
+T000490,House,OH02,David J. Taylor,https://clerk.house.gov/members/T000490,confirmed,david-j-taylor-ohio,U.S. Representative,U.S. Representative,False
+B001281,House,OH03,Joyce Beatty,https://clerk.house.gov/members/B001281,confirmed,joyce-beatty-ohio,U.S. Representative,U.S. Representative,False
+J000289,House,OH04,Jim Jordan,https://clerk.house.gov/members/J000289,confirmed,jim-jordan-ohio,U.S. Representative,U.S. Representative,False
+L000566,House,OH05,Robert E. Latta,https://clerk.house.gov/members/L000566,confirmed,robert-e-latta-ohio,U.S. Representative,U.S. Representative,False
+R000619,House,OH06,Michael A. Rulli,https://clerk.house.gov/members/R000619,confirmed,michael-a-rulli-ohio,U.S. Representative,U.S. Representative,False
+M001222,House,OH07,Max L. Miller,https://clerk.house.gov/members/M001222,confirmed,max-l-miller-ohio,U.S. Representative,U.S. Representative,False
+D000626,House,OH08,Warren Davidson,https://clerk.house.gov/members/D000626,confirmed,warren-davidson-ohio,U.S. Representative,U.S. Representative,False
+K000009,House,OH09,Marcy Kaptur,https://clerk.house.gov/members/K000009,confirmed,marcy-kaptur-ohio,U.S. Representative,U.S. Representative,False
+T000463,House,OH10,Michael R. Turner,https://clerk.house.gov/members/T000463,confirmed,michael-r-turner-ohio,U.S. Representative,U.S. Representative,False
+B001313,House,OH11,Shontel M. Brown,https://clerk.house.gov/members/B001313,confirmed,shontel-m-brown-ohio,U.S. Representative,U.S. Representative,False
+B001306,House,OH12,Troy Balderson,https://clerk.house.gov/members/B001306,confirmed,troy-balderson-ohio,U.S. Representative,U.S. Representative,False
+S001223,House,OH13,Emilia Strong Sykes,https://clerk.house.gov/members/S001223,confirmed,emilia-strong-sykes-ohio,U.S. Representative,U.S. Representative,False
+J000295,House,OH14,David P. Joyce,https://clerk.house.gov/members/J000295,confirmed,david-p-joyce-ohio,U.S. Representative,U.S. Representative,False
+C001126,House,OH15,Mike Carey,https://clerk.house.gov/members/C001126,confirmed,mike-carey-ohio,U.S. Representative,U.S. Representative,False
+H001082,House,OK01,Kevin Hern,https://clerk.house.gov/members/H001082,confirmed,kevin-hern-oklahoma,U.S. Representative,U.S. Representative,False
+B001317,House,OK02,Josh Brecheen,https://clerk.house.gov/members/B001317,confirmed,josh-brecheen-oklahoma,U.S. Representative,U.S. Representative,False
+L000491,House,OK03,Frank D. Lucas,https://clerk.house.gov/members/L000491,confirmed,frank-d-lucas-oklahoma,U.S. Representative,U.S. Representative,False
+C001053,House,OK04,Tom Cole,https://clerk.house.gov/members/C001053,confirmed,tom-cole-oklahoma,U.S. Representative,U.S. Representative,False
+B000740,House,OK05,Stephanie I. Bice,https://clerk.house.gov/members/B000740,confirmed,stephanie-i-bice-oklahoma,U.S. Representative,U.S. Representative,False
+B001278,House,OR01,Suzanne Bonamici,https://clerk.house.gov/members/B001278,confirmed,suzanne-bonamici-oregon,U.S. Representative,U.S. Representative,False
+B000668,House,OR02,Cliff Bentz,https://clerk.house.gov/members/B000668,confirmed,cliff-bentz-oregon,U.S. Representative,U.S. Representative,False
+D000635,House,OR03,Maxine Dexter,https://clerk.house.gov/members/D000635,confirmed,maxine-dexter-oregon,U.S. Representative,U.S. Representative,False
+H001094,House,OR04,Val T. Hoyle,https://clerk.house.gov/members/H001094,confirmed,val-t-hoyle-oregon,U.S. Representative,U.S. Representative,False
+B001326,House,OR05,Janelle S. Bynum,https://clerk.house.gov/members/B001326,confirmed,janelle-s-bynum-oregon,U.S. Representative,U.S. Representative,False
+S001226,House,OR06,Andrea Salinas,https://clerk.house.gov/members/S001226,confirmed,andrea-salinas-oregon,U.S. Representative,U.S. Representative,False
+F000466,House,PA01,Brian K. Fitzpatrick,https://clerk.house.gov/members/F000466,confirmed,brian-k-fitzpatrick-pennsylvania,U.S. Representative,U.S. Representative,False
+B001296,House,PA02,Brendan F. Boyle,https://clerk.house.gov/members/B001296,confirmed,brendan-f-boyle-pennsylvania,U.S. Representative,U.S. Representative,False
+E000296,House,PA03,Dwight Evans,https://clerk.house.gov/members/E000296,confirmed,dwight-evans-pennsylvania,U.S. Representative,U.S. Representative,False
+D000631,House,PA04,Madeleine Dean,https://clerk.house.gov/members/D000631,confirmed,madeleine-dean-pennsylvania,U.S. Representative,U.S. Representative,False
+S001205,House,PA05,Mary Gay Scanlon,https://clerk.house.gov/members/S001205,confirmed,mary-gay-scanlon-pennsylvania,U.S. Representative,U.S. Representative,False
+H001085,House,PA06,Chrissy Houlahan,https://clerk.house.gov/members/H001085,confirmed,chrissy-houlahan-pennsylvania,U.S. Representative,U.S. Representative,False
+M001230,House,PA07,Ryan Mackenzie,https://clerk.house.gov/members/M001230,confirmed,ryan-mackenzie-pennsylvania,U.S. Representative,U.S. Representative,False
+B001327,House,PA08,"Robert P. Bresnahan, Jr.",https://clerk.house.gov/members/B001327,confirmed,robert-p-bresnahan-pennsylvania,U.S. Representative,U.S. Representative,False
+M001204,House,PA09,Daniel Meuser,https://clerk.house.gov/members/M001204,confirmed,daniel-meuser-pennsylvania,U.S. Representative,U.S. Representative,False
+P000605,House,PA10,Scott Perry,https://clerk.house.gov/members/P000605,confirmed,scott-perry-pennsylvania,U.S. Representative,U.S. Representative,False
+S001199,House,PA11,Lloyd Smucker,https://clerk.house.gov/members/S001199,confirmed,lloyd-smucker-pennsylvania,U.S. Representative,U.S. Representative,False
+L000602,House,PA12,Summer L. Lee,https://clerk.house.gov/members/L000602,confirmed,summer-l-lee-pennsylvania,U.S. Representative,U.S. Representative,False
+J000302,House,PA13,John Joyce,https://clerk.house.gov/members/J000302,confirmed,john-joyce-pennsylvania,U.S. Representative,U.S. Representative,False
+R000610,House,PA14,Guy Reschenthaler,https://clerk.house.gov/members/R000610,confirmed,guy-reschenthaler-pennsylvania,U.S. Representative,U.S. Representative,False
+T000467,House,PA15,Glenn Thompson,https://clerk.house.gov/members/T000467,confirmed,glenn-thompson-pennsylvania,U.S. Representative,U.S. Representative,False
+K000376,House,PA16,Mike Kelly,https://clerk.house.gov/members/K000376,confirmed,mike-kelly-pennsylvania,U.S. Representative,U.S. Representative,False
+D000530,House,PA17,Christopher R. Deluzio,https://clerk.house.gov/members/D000530,confirmed,christopher-r-deluzio-pennsylvania,U.S. Representative,U.S. Representative,False
+H001103,House,PR00,Pablo José Hernández,https://clerk.house.gov/members/H001103,confirmed_generic_house_role,pablo-jose-hernndez-puerto-rico,Resident Commissioner,U.S. Representative,False
+A000380,House,RI01,Gabe Amo,https://clerk.house.gov/members/A000380,confirmed,gabe-amo-rhode-island,U.S. Representative,U.S. Representative,False
+M001223,House,RI02,Seth Magaziner,https://clerk.house.gov/members/M001223,confirmed,seth-magaziner-rhode-island,U.S. Representative,U.S. Representative,False
+M000194,House,SC01,Nancy Mace,https://clerk.house.gov/members/M000194,confirmed,nancy-mace-south-carolina,U.S. Representative,U.S. Representative,False
+W000795,House,SC02,Joe Wilson,https://clerk.house.gov/members/W000795,confirmed,joe-wilson-south-carolina,U.S. Representative,U.S. Representative,False
+B001325,House,SC03,Sheri Biggs,https://clerk.house.gov/members/B001325,confirmed,sheri-biggs-south-carolina,U.S. Representative,U.S. Representative,False
+T000480,House,SC04,William R. Timmons IV,https://clerk.house.gov/members/T000480,confirmed,william-r-timmons-south-carolina,U.S. Representative,U.S. Representative,False
+N000190,House,SC05,Ralph Norman,https://clerk.house.gov/members/N000190,confirmed,ralph-norman-south-carolina,U.S. Representative,U.S. Representative,False
+C000537,House,SC06,James E. Clyburn,https://clerk.house.gov/members/C000537,confirmed,james-e-clyburn-south-carolina,U.S. Representative,U.S. Representative,False
+F000478,House,SC07,Russell Fry,https://clerk.house.gov/members/F000478,confirmed,russell-fry-south-carolina,U.S. Representative,U.S. Representative,False
+J000301,House,SD00,Dusty Johnson,https://clerk.house.gov/members/J000301,confirmed,dusty-johnson-south-dakota,U.S. Representative,U.S. Representative,False
+H001086,House,TN01,Diana Harshbarger,https://clerk.house.gov/members/H001086,confirmed,diana-harshbarger-tennessee,U.S. Representative,U.S. Representative,False
+B001309,House,TN02,Tim Burchett,https://clerk.house.gov/members/B001309,confirmed,tim-burchett-tennessee,U.S. Representative,U.S. Representative,False
+F000459,House,TN03,"Charles J. ""Chuck"" Fleischmann",https://clerk.house.gov/members/F000459,confirmed,charles-j-chuck-fleischmann-tennessee,U.S. Representative,U.S. Representative,False
+D000616,House,TN04,Scott DesJarlais,https://clerk.house.gov/members/D000616,confirmed,scott-desjarlais-tennessee,U.S. Representative,U.S. Representative,False
+O000175,House,TN05,Andrew Ogles,https://clerk.house.gov/members/O000175,confirmed,andrew-ogles-tennessee,U.S. Representative,U.S. Representative,False
+R000612,House,TN06,John W. Rose,https://clerk.house.gov/members/R000612,confirmed,john-w-rose-tennessee,U.S. Representative,U.S. Representative,False
+V000139,House,TN07,Matt Van Epps,https://clerk.house.gov/members/V000139,confirmed,matt-van-epps-tennessee,U.S. Representative,U.S. Representative,False
+K000392,House,TN08,David Kustoff,https://clerk.house.gov/members/K000392,confirmed,david-kustoff-tennessee,U.S. Representative,U.S. Representative,False
+C001068,House,TN09,Steve Cohen,https://clerk.house.gov/members/C001068,confirmed,steve-cohen-tennessee,U.S. Representative,U.S. Representative,False
+M001224,House,TX01,Nathaniel Moran,https://clerk.house.gov/members/M001224,confirmed,nathaniel-moran-texas,U.S. Representative,U.S. Representative,False
+C001120,House,TX02,Dan Crenshaw,https://clerk.house.gov/members/C001120,confirmed,dan-crenshaw-texas,U.S. Representative,U.S. Representative,False
+S001224,House,TX03,Keith Self,https://clerk.house.gov/members/S001224,confirmed,keith-self-texas,U.S. Representative,U.S. Representative,False
+F000246,House,TX04,Pat Fallon,https://clerk.house.gov/members/F000246,confirmed,pat-fallon-texas,U.S. Representative,U.S. Representative,False
+G000589,House,TX05,Lance Gooden,https://clerk.house.gov/members/G000589,confirmed,lance-gooden-texas,U.S. Representative,U.S. Representative,False
+E000071,House,TX06,Jake Ellzey,https://clerk.house.gov/members/E000071,confirmed,jake-ellzey-texas,U.S. Representative,U.S. Representative,False
+F000468,House,TX07,Lizzie Fletcher,https://clerk.house.gov/members/F000468,confirmed,lizzie-fletcher-texas,U.S. Representative,U.S. Representative,False
+L000603,House,TX08,Morgan Luttrell,https://clerk.house.gov/members/L000603,confirmed,morgan-luttrell-texas,U.S. Representative,U.S. Representative,False
+G000553,House,TX09,Al Green,https://clerk.house.gov/members/G000553,confirmed,al-green-texas,U.S. Representative,U.S. Representative,False
+M001157,House,TX10,Michael T. McCaul,https://clerk.house.gov/members/M001157,confirmed,michael-t-mccaul-texas,U.S. Representative,U.S. Representative,False
+P000048,House,TX11,August Pfluger,https://clerk.house.gov/members/P000048,confirmed,august-pfluger-texas,U.S. Representative,U.S. Representative,False
+G000601,House,TX12,Craig A. Goldman,https://clerk.house.gov/members/G000601,confirmed,craig-a-goldman-texas,U.S. Representative,U.S. Representative,False
+J000304,House,TX13,Ronny Jackson,https://clerk.house.gov/members/J000304,confirmed,ronny-jackson-texas,U.S. Representative,U.S. Representative,False
+W000814,House,TX14,"Randy K. Weber, Sr.",https://clerk.house.gov/members/W000814,confirmed,randy-k-sr-weber-texas,U.S. Representative,U.S. Representative,False
+D000594,House,TX15,Monica De La Cruz,https://clerk.house.gov/members/D000594,confirmed,monica-de-la-cruz-texas,U.S. Representative,U.S. Representative,False
+E000299,House,TX16,Veronica Escobar,https://clerk.house.gov/members/E000299,confirmed,veronica-escobar-texas,U.S. Representative,U.S. Representative,False
+S000250,House,TX17,Pete Sessions,https://clerk.house.gov/members/S000250,confirmed,pete-sessions-texas,U.S. Representative,U.S. Representative,False
+M001245,House,TX18,Christian D. Menefee,https://clerk.house.gov/members/M001245,confirmed,christian-d-menefee-texas,U.S. Representative,U.S. Representative,False
+A000375,House,TX19,Jodey C. Arrington,https://clerk.house.gov/members/A000375,confirmed,jodey-c-arrington-texas,U.S. Representative,U.S. Representative,False
+C001091,House,TX20,Joaquin Castro,https://clerk.house.gov/members/C001091,confirmed,joaquin-castro-texas,U.S. Representative,U.S. Representative,False
+R000614,House,TX21,Chip Roy,https://clerk.house.gov/members/R000614,confirmed,chip-roy-texas,U.S. Representative,U.S. Representative,False
+N000026,House,TX22,Troy E. Nehls,https://clerk.house.gov/members/N000026,confirmed,troy-e-nehls-texas,U.S. Representative,U.S. Representative,False
+V000134,House,TX24,Beth Van Duyne,https://clerk.house.gov/members/V000134,confirmed,beth-van-duyne-texas,U.S. Representative,U.S. Representative,False
+W000816,House,TX25,Roger Williams,https://clerk.house.gov/members/W000816,confirmed,roger-williams-texas,U.S. Representative,U.S. Representative,False
+G000603,House,TX26,Brandon Gill,https://clerk.house.gov/members/G000603,confirmed,brandon-gill-texas,U.S. Representative,U.S. Representative,False
+C001115,House,TX27,Michael Cloud,https://clerk.house.gov/members/C001115,confirmed,michael-cloud-texas,U.S. Representative,U.S. Representative,False
+C001063,House,TX28,Henry Cuellar,https://clerk.house.gov/members/C001063,confirmed,henry-cuellar-texas,U.S. Representative,U.S. Representative,False
+G000587,House,TX29,Sylvia R. Garcia,https://clerk.house.gov/members/G000587,confirmed,sylvia-r-garcia-texas,U.S. Representative,U.S. Representative,False
+C001130,House,TX30,Jasmine Crockett,https://clerk.house.gov/members/C001130,confirmed,jasmine-crockett-texas,U.S. Representative,U.S. Representative,False
+C001051,House,TX31,John R. Carter,https://clerk.house.gov/members/C001051,confirmed,john-r-carter-texas,U.S. Representative,U.S. Representative,False
+J000310,House,TX32,Julie Johnson,https://clerk.house.gov/members/J000310,confirmed,julie-johnson-texas,U.S. Representative,U.S. Representative,False
+V000131,House,TX33,Marc A. Veasey,https://clerk.house.gov/members/V000131,confirmed,marc-a-veasey-texas,U.S. Representative,U.S. Representative,False
+G000581,House,TX34,Vicente Gonzalez,https://clerk.house.gov/members/G000581,confirmed,vicente-gonzalez-texas,U.S. Representative,U.S. Representative,False
+C001131,House,TX35,Greg Casar,https://clerk.house.gov/members/C001131,confirmed,greg-casar-texas,U.S. Representative,U.S. Representative,False
+B001291,House,TX36,Brian Babin,https://clerk.house.gov/members/B001291,confirmed,brian-babin-texas,U.S. Representative,U.S. Representative,False
+D000399,House,TX37,Lloyd Doggett,https://clerk.house.gov/members/D000399,confirmed,lloyd-doggett-texas,U.S. Representative,U.S. Representative,False
+H001095,House,TX38,Wesley Hunt,https://clerk.house.gov/members/H001095,confirmed,wesley-hunt-texas,U.S. Representative,U.S. Representative,False
+M001213,House,UT01,Blake D. Moore,https://clerk.house.gov/members/M001213,confirmed,blake-d-moore-utah,U.S. Representative,U.S. Representative,False
+M001228,House,UT02,Celeste Maloy,https://clerk.house.gov/members/M001228,confirmed,celeste-maloy-utah,U.S. Representative,U.S. Representative,False
+K000403,House,UT03,Mike Kennedy,https://clerk.house.gov/members/K000403,confirmed,mike-kennedy-utah,U.S. Representative,U.S. Representative,False
+O000086,House,UT04,Burgess Owens,https://clerk.house.gov/members/O000086,confirmed,burgess-owens-utah,U.S. Representative,U.S. Representative,False
+W000804,House,VA01,Robert J. Wittman,https://clerk.house.gov/members/W000804,confirmed,robert-j-wittman-virginia,U.S. Representative,U.S. Representative,False
+K000399,House,VA02,Jennifer A. Kiggans,https://clerk.house.gov/members/K000399,confirmed,jennifer-a-kiggans-virginia,U.S. Representative,U.S. Representative,False
+S000185,House,VA03,"Robert C. ""Bobby"" Scott",https://clerk.house.gov/members/S000185,confirmed,robert-c-bobby-scott-virginia,U.S. Representative,U.S. Representative,False
+M001227,House,VA04,Jennifer L. McClellan,https://clerk.house.gov/members/M001227,confirmed,jennifer-l-mcclellan-virginia,U.S. Representative,U.S. Representative,False
+M001239,House,VA05,John J. McGuire III,https://clerk.house.gov/members/M001239,confirmed,john-j-mcguire-virginia,U.S. Representative,U.S. Representative,False
+C001118,House,VA06,Ben Cline,https://clerk.house.gov/members/C001118,confirmed,ben-cline-virginia,U.S. Representative,U.S. Representative,False
+V000138,House,VA07,Eugene Simon Vindman,https://clerk.house.gov/members/V000138,confirmed,eugene-simon-vindman-virginia,U.S. Representative,U.S. Representative,False
+B001292,House,VA08,"Donald S. Beyer, Jr.",https://clerk.house.gov/members/B001292,confirmed,donald-s-beyer-virginia,U.S. Representative,U.S. Representative,False
+G000568,House,VA09,H. Morgan Griffith,https://clerk.house.gov/members/G000568,confirmed,h-morgan-griffith-virginia,U.S. Representative,U.S. Representative,False
+S001230,House,VA10,Suhas Subramanyam,https://clerk.house.gov/members/S001230,confirmed,suhas-subramanyam-virginia,U.S. Representative,U.S. Representative,False
+W000831,House,VA11,James R. Walkinshaw,https://clerk.house.gov/members/W000831,confirmed,james-r-walkinshaw-virginia,U.S. Representative,U.S. Representative,False
+P000610,House,VI00,Stacey E. Plaskett,https://clerk.house.gov/members/P000610,confirmed_generic_house_role,stacey-e-plaskett-virgin-islands,Delegate,U.S. Representative,False
+B001318,House,VT00,Becca Balint,https://clerk.house.gov/members/B001318,confirmed,becca-balint-vermont,U.S. Representative,U.S. Representative,False
+D000617,House,WA01,Suzan K. DelBene,https://clerk.house.gov/members/D000617,confirmed,suzan-k-delbene-washington,U.S. Representative,U.S. Representative,False
+L000560,House,WA02,Rick Larsen,https://clerk.house.gov/members/L000560,confirmed,rick-larsen-washington,U.S. Representative,U.S. Representative,False
+G000600,House,WA03,Marie Gluesenkamp Perez,https://clerk.house.gov/members/G000600,confirmed,marie-gluesenkamp-perez-washington,U.S. Representative,U.S. Representative,False
+N000189,House,WA04,Dan Newhouse,https://clerk.house.gov/members/N000189,confirmed,dan-newhouse-washington,U.S. Representative,U.S. Representative,False
+B001322,House,WA05,Michael Baumgartner,https://clerk.house.gov/members/B001322,confirmed,michael-baumgartner-washington,U.S. Representative,U.S. Representative,False
+R000621,House,WA06,Emily Randall,https://clerk.house.gov/members/R000621,confirmed,emily-randall-washington,U.S. Representative,U.S. Representative,False
+J000298,House,WA07,Pramila Jayapal,https://clerk.house.gov/members/J000298,confirmed,pramila-jayapal-washington,U.S. Representative,U.S. Representative,False
+S001216,House,WA08,Kim Schrier,https://clerk.house.gov/members/S001216,confirmed,kim-schrier-washington,U.S. Representative,U.S. Representative,False
+S000510,House,WA09,Adam Smith,https://clerk.house.gov/members/S000510,confirmed,adam-smith-washington,U.S. Representative,U.S. Representative,False
+S001159,House,WA10,Marilyn Strickland,https://clerk.house.gov/members/S001159,confirmed,marilyn-strickland-washington,U.S. Representative,U.S. Representative,False
+S001213,House,WI01,Bryan Steil,https://clerk.house.gov/members/S001213,confirmed,bryan-steil-wisconsin,U.S. Representative,U.S. Representative,False
+P000607,House,WI02,Mark Pocan,https://clerk.house.gov/members/P000607,confirmed,mark-pocan-wisconsin,U.S. Representative,U.S. Representative,False
+V000135,House,WI03,Derrick Van Orden,https://clerk.house.gov/members/V000135,confirmed,derrick-van-orden-wisconsin,U.S. Representative,U.S. Representative,False
+M001160,House,WI04,Gwen Moore,https://clerk.house.gov/members/M001160,confirmed,gwen-moore-wisconsin,U.S. Representative,U.S. Representative,False
+F000471,House,WI05,Scott Fitzgerald,https://clerk.house.gov/members/F000471,confirmed,scott-fitzgerald-wisconsin,U.S. Representative,U.S. Representative,False
+G000576,House,WI06,Glenn Grothman,https://clerk.house.gov/members/G000576,confirmed,glenn-grothman-wisconsin,U.S. Representative,U.S. Representative,False
+T000165,House,WI07,Thomas P. Tiffany,https://clerk.house.gov/members/T000165,confirmed,thomas-p-tiffany-wisconsin,U.S. Representative,U.S. Representative,False
+W000829,House,WI08,Tony Wied,https://clerk.house.gov/members/W000829,confirmed,tony-wied-wisconsin,U.S. Representative,U.S. Representative,False
+M001205,House,WV01,Carol D. Miller,https://clerk.house.gov/members/M001205,confirmed,carol-d-miller-west-virginia,U.S. Representative,U.S. Representative,False
+M001235,House,WV02,Riley M. Moore,https://clerk.house.gov/members/M001235,confirmed,riley-m-moore-west-virginia,U.S. Representative,U.S. Representative,False
+H001096,House,WY00,Harriet M. Hageman,https://clerk.house.gov/members/H001096,confirmed,harriet-m-hageman-wyoming,U.S. Representative,U.S. Representative,False
+S001198,Senate,AK Class II,Dan Sullivan,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,dan-sullivan-alaska,U.S. Senator,U.S. Senator,False
+M001153,Senate,AK Class III,Lisa Murkowski,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,lisa-murkowski-alaska,U.S. Senator,U.S. Senator,False
+T000278,Senate,AL Class II,Tommy Tuberville,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,tommy-tuberville-alabama,U.S. Senator,U.S. Senator,False
+B001319,Senate,AL Class III,Katie Boyd Britt,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,katie-boyd-britt-alabama,U.S. Senator,U.S. Senator,False
+C001095,Senate,AR Class II,Tom Cotton,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,tom-cotton-arkansas,U.S. Senator,U.S. Senator,False
+B001236,Senate,AR Class III,John Boozman,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,john-boozman-arkansas,U.S. Senator,U.S. Senator,False
+G000574,Senate,AZ Class I,Ruben Gallego,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,ruben-gallego-arizona,U.S. Senator,U.S. Senator,False
+K000377,Senate,AZ Class III,Mark Kelly,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,mark-kelly-arizona,U.S. Senator,U.S. Senator,False
+S001150,Senate,CA Class I,Adam B. Schiff,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,adam-b-schiff-california,U.S. Senator,U.S. Senator,False
+P000145,Senate,CA Class III,Alex Padilla,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,alex-padilla-california,U.S. Senator,U.S. Senator,False
+H000273,Senate,CO Class II,John W. Hickenlooper,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,john-w-hickenlooper-colorado,U.S. Senator,U.S. Senator,False
+B001267,Senate,CO Class III,Michael F. Bennet,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,michael-f-bennet-colorado,U.S. Senator,U.S. Senator,False
+M001169,Senate,CT Class I,Christopher Murphy,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,christopher-murphy-connecticut,U.S. Senator,U.S. Senator,False
+B001277,Senate,CT Class III,Richard Blumenthal,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,richard-blumenthal-connecticut,U.S. Senator,U.S. Senator,False
+B001303,Senate,DE Class I,Lisa Blunt Rochester,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,lisa-blunt-rochester-delaware,U.S. Senator,U.S. Senator,False
+C001088,Senate,DE Class II,Christopher A. Coons,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,christopher-a-coons-delaware,U.S. Senator,U.S. Senator,False
+S001217,Senate,FL Class I,Rick Scott,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,rick-scott-florida,U.S. Senator,U.S. Senator,False
+M001244,Senate,FL Class III,Ashley Moody,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,ashley-moody-florida,U.S. Senator,U.S. Senator,False
+O000174,Senate,GA Class II,Jon Ossoff,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,jon-ossoff-georgia,U.S. Senator,U.S. Senator,False
+W000790,Senate,GA Class III,Raphael G. Warnock,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,raphael-g-warnock-georgia,U.S. Senator,U.S. Senator,False
+H001042,Senate,HI Class I,Mazie K. Hirono,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,mazie-k-hirono-hawaii,U.S. Senator,U.S. Senator,False
+S001194,Senate,HI Class III,Brian Schatz,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,brian-schatz-hawaii,U.S. Senator,U.S. Senator,False
+E000295,Senate,IA Class II,Joni Ernst,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,joni-ernst-iowa,U.S. Senator,U.S. Senator,False
+G000386,Senate,IA Class III,Chuck Grassley,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,chuck-grassley-iowa,U.S. Senator,U.S. Senator,False
+R000584,Senate,ID Class II,James E. Risch,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,james-e-risch-idaho,U.S. Senator,U.S. Senator,False
+C000880,Senate,ID Class III,Mike Crapo,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,mike-crapo-idaho,U.S. Senator,U.S. Senator,False
+D000563,Senate,IL Class II,Richard J. Durbin,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,richard-j-durbin-illinois,U.S. Senator,U.S. Senator,False
+D000622,Senate,IL Class III,Tammy Duckworth,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,tammy-duckworth-illinois,U.S. Senator,U.S. Senator,False
+B001299,Senate,IN Class I,Jim Banks,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,jim-banks-indiana,U.S. Senator,U.S. Senator,False
+Y000064,Senate,IN Class III,Todd Young,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,todd-young-indiana,U.S. Senator,U.S. Senator,False
+M001198,Senate,KS Class II,Roger Marshall,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,roger-marshall-kansas,U.S. Senator,U.S. Senator,False
+M000934,Senate,KS Class III,Jerry Moran,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,jerry-moran-kansas,U.S. Senator,U.S. Senator,False
+M000355,Senate,KY Class II,Mitch McConnell,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,mitch-mcconnell-kentucky,U.S. Senator,U.S. Senator,False
+P000603,Senate,KY Class III,Rand Paul,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,rand-paul-kentucky,U.S. Senator,U.S. Senator,False
+C001075,Senate,LA Class II,Bill Cassidy,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,bill-cassidy-louisiana,U.S. Senator,U.S. Senator,False
+K000393,Senate,LA Class III,John Kennedy,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,john-kennedy-louisiana,U.S. Senator,U.S. Senator,False
+W000817,Senate,MA Class I,Elizabeth Warren,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,elizabeth-warren-massachusetts,U.S. Senator,U.S. Senator,False
+M000133,Senate,MA Class II,Edward J. Markey,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,edward-j-markey-massachusetts,U.S. Senator,U.S. Senator,False
+A000382,Senate,MD Class I,Angela D. Alsobrooks,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,angela-d-alsobrooks-maryland,U.S. Senator,U.S. Senator,False
+V000128,Senate,MD Class III,Chris Van Hollen,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,chris-van-hollen-maryland,U.S. Senator,U.S. Senator,False
+K000383,Senate,ME Class I,"Angus S., Jr. King",https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,angus-s-king-maine,U.S. Senator,U.S. Senator,False
+C001035,Senate,ME Class II,Susan M. Collins,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,susan-m-collins-maine,U.S. Senator,U.S. Senator,False
+S001208,Senate,MI Class I,Elissa Slotkin,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,elissa-slotkin-michigan,U.S. Senator,U.S. Senator,False
+P000595,Senate,MI Class II,Gary C. Peters,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,gary-c-peters-michigan,U.S. Senator,U.S. Senator,False
+K000367,Senate,MN Class I,Amy Klobuchar,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,amy-klobuchar-minnesota,U.S. Senator,U.S. Senator,False
+S001203,Senate,MN Class II,Tina Smith,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,tina-smith-minnesota,U.S. Senator,U.S. Senator,False
+H001089,Senate,MO Class I,Josh Hawley,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,josh-hawley-missouri,U.S. Senator,U.S. Senator,False
+S001227,Senate,MO Class III,Eric Schmitt,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,eric-schmitt-missouri,U.S. Senator,U.S. Senator,False
+W000437,Senate,MS Class I,Roger F. Wicker,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,roger-f-wicker-mississippi,U.S. Senator,U.S. Senator,False
+H001079,Senate,MS Class II,Cindy Hyde-Smith,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,cindy-hyde-smith-mississippi,U.S. Senator,U.S. Senator,False
+S001232,Senate,MT Class I,Tim Sheehy,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,tim-sheehy-montana,U.S. Senator,U.S. Senator,False
+D000618,Senate,MT Class II,Steve Daines,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,steve-daines-montana,U.S. Senator,U.S. Senator,False
+T000476,Senate,NC Class II,Thom Tillis,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,thomas-tillis-north-carolina,U.S. Senator,U.S. Senator,False
+B001305,Senate,NC Class III,Ted Budd,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,ted-budd-north-carolina,U.S. Senator,U.S. Senator,False
+C001096,Senate,ND Class I,Kevin Cramer,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,kevin-cramer-north-dakota,U.S. Senator,U.S. Senator,False
+H001061,Senate,ND Class III,John Hoeven,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,john-hoeven-north-dakota,U.S. Senator,U.S. Senator,False
+F000463,Senate,NE Class I,Deb Fischer,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,deb-fischer-nebraska,U.S. Senator,U.S. Senator,False
+R000618,Senate,NE Class II,Pete Ricketts,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,pete-ricketts-nebraska,U.S. Senator,U.S. Senator,False
+S001181,Senate,NH Class II,Jeanne Shaheen,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,jeanne-shaheen-new-hampshire,U.S. Senator,U.S. Senator,False
+H001076,Senate,NH Class III,Margaret Wood Hassan,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,margaret-wood-hassan-new-hampshire,U.S. Senator,U.S. Senator,False
+K000394,Senate,NJ Class I,Andy Kim,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,andy-kim-new-jersey,U.S. Senator,U.S. Senator,False
+B001288,Senate,NJ Class II,Cory A. Booker,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,cory-a-booker-new-jersey,U.S. Senator,U.S. Senator,False
+H001046,Senate,NM Class I,Martin Heinrich,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,martin-heinrich-new-mexico,U.S. Senator,U.S. Senator,False
+L000570,Senate,NM Class II,Ben Ray Luján,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,ben-ray-lujn-new-mexico,U.S. Senator,U.S. Senator,False
+R000608,Senate,NV Class I,Jacky Rosen,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,jacky-rosen-nevada,U.S. Senator,U.S. Senator,False
+C001113,Senate,NV Class III,Catherine Cortez Masto,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,catherine-cortez-masto-nevada,U.S. Senator,U.S. Senator,False
+G000555,Senate,NY Class I,Kirsten E. Gillibrand,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,kirsten-e-gillibrand-new-york,U.S. Senator,U.S. Senator,False
+S000148,Senate,NY Class III,Charles E. Schumer,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,charles-e-schumer-new-york,U.S. Senator,U.S. Senator,False
+M001242,Senate,OH Class I,Bernie Moreno,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,bernie-moreno-ohio,U.S. Senator,U.S. Senator,False
+H001104,Senate,OH Class III,Jon Husted,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,jon-husted-ohio,U.S. Senator,U.S. Senator,False
+A000383,Senate,OK Class II,Alan Armstrong,https://www.senate.gov/general/contact_information/senators_cfm.xml,missing_active_id,,U.S. Senator,,
+L000575,Senate,OK Class III,James Lankford,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,james-lankford-oklahoma,U.S. Senator,U.S. Senator,False
+M001176,Senate,OR Class II,Jeff Merkley,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,jeff-merkley-oregon,U.S. Senator,U.S. Senator,False
+W000779,Senate,OR Class III,Ron Wyden,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,ron-wyden-oregon,U.S. Senator,U.S. Senator,False
+M001243,Senate,PA Class I,David McCormick,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,david-mccormick-pennsylvania,U.S. Senator,U.S. Senator,False
+F000479,Senate,PA Class III,John Fetterman,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,john-fetterman-pennsylvania,U.S. Senator,U.S. Senator,False
+W000802,Senate,RI Class I,Sheldon Whitehouse,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,sheldon-whitehouse-rhode-island,U.S. Senator,U.S. Senator,False
+R000122,Senate,RI Class II,Jack Reed,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,jack-reed-rhode-island,U.S. Senator,U.S. Senator,False
+G000608,Senate,SC Class II,Darline Graham,https://www.senate.gov/general/contact_information/senators_cfm.xml,missing_active_id,,U.S. Senator,,
+S001184,Senate,SC Class III,Tim Scott,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,tim-scott-south-carolina,U.S. Senator,U.S. Senator,False
+R000605,Senate,SD Class II,Mike Rounds,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,mike-rounds-south-dakota,U.S. Senator,U.S. Senator,False
+T000250,Senate,SD Class III,John Thune,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,john-thune-south-dakota,U.S. Senator,U.S. Senator,False
+B001243,Senate,TN Class I,Marsha Blackburn,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,marsha-blackburn-tennessee,U.S. Senator,U.S. Senator,False
+H000601,Senate,TN Class II,Bill Hagerty,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,bill-hagerty-tennessee,U.S. Senator,U.S. Senator,False
+C001098,Senate,TX Class I,Ted Cruz,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,ted-cruz-texas,U.S. Senator,U.S. Senator,False
+C001056,Senate,TX Class II,John Cornyn,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,john-cornyn-texas,U.S. Senator,U.S. Senator,False
+C001114,Senate,UT Class I,John R. Curtis,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,john-r-curtis-utah,U.S. Senator,U.S. Senator,False
+L000577,Senate,UT Class III,Mike Lee,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,mike-lee-utah,U.S. Senator,U.S. Senator,False
+K000384,Senate,VA Class I,Tim Kaine,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,tim-kaine-virginia,U.S. Senator,U.S. Senator,False
+W000805,Senate,VA Class II,Mark R. Warner,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,mark-r-warner-virginia,U.S. Senator,U.S. Senator,False
+S000033,Senate,VT Class I,Bernard Sanders,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,bernard-sanders-vermont,U.S. Senator,U.S. Senator,False
+W000800,Senate,VT Class III,Peter Welch,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,peter-welch-vermont,U.S. Senator,U.S. Senator,False
+C000127,Senate,WA Class I,Maria Cantwell,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,maria-cantwell-washington,U.S. Senator,U.S. Senator,False
+M001111,Senate,WA Class III,Patty Murray,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,patty-murray-washington,U.S. Senator,U.S. Senator,False
+B001230,Senate,WI Class I,Tammy Baldwin,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,tammy-baldwin-wisconsin,U.S. Senator,U.S. Senator,False
+J000293,Senate,WI Class III,Ron Johnson,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,ron-johnson-wisconsin,U.S. Senator,U.S. Senator,False
+J000312,Senate,WV Class I,James C. Justice,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,james-c-justice-west-virginia,U.S. Senator,U.S. Senator,False
+C001047,Senate,WV Class II,Shelley Moore Capito,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,shelley-moore-capito-west-virginia,U.S. Senator,U.S. Senator,False
+B001261,Senate,WY Class I,John Barrasso,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,john-barrasso-wyoming,U.S. Senator,U.S. Senator,False
+L000571,Senate,WY Class II,Cynthia M. Lummis,https://www.senate.gov/general/contact_information/senators_cfm.xml,confirmed,cynthia-m-lummis-wyoming,U.S. Senator,U.S. Senator,False

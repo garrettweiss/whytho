@@ -30,6 +30,7 @@ dotenv.config({ path: ".env.local", override: true });
 import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
+import { canonicalProfile, idChunks, identityMemberIds, loadJackProfiles, type JackProfile } from "./jack-identity";
 
 const supabase = createClient<Database>(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -53,6 +54,7 @@ let rejected = 0;
 let errors = 0;
 let inputTokensTotal = 0;
 let outputTokensTotal = 0;
+let profiles: JackProfile[] = [];
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -101,32 +103,16 @@ async function getPendingPosts(): Promise<PendingPost[]> {
 
   const posts = data ?? [];
 
-  // Enrich with politician info
-  const politicianIds = [...new Set(posts.map((p) => p.politician_id).filter(Boolean))] as string[];
-  const politicianMap = new Map<string, { full_name: string; office: string; state: string }>();
-
-  if (politicianIds.length > 0) {
-    const { data: pols } = await supabase
-      .from("politicians")
-      .select("id, full_name, office, state")
-      .in("id", politicianIds);
-
-    for (const pol of pols ?? []) {
-      politicianMap.set(pol.id, {
-        full_name: pol.full_name,
-        office: pol.office ?? "",
-        state: pol.state ?? "",
-      });
-    }
-  }
+  profiles = await loadJackProfiles(supabase);
 
   return posts.map((p) => {
-    const pol = p.politician_id ? politicianMap.get(p.politician_id) : undefined;
+    const pol = p.politician_id ? canonicalProfile(profiles, p.politician_id) : undefined;
+    if (!pol) throw new Error(`Post ${p.id} has no eligible canonical identity`);
     return {
       ...p,
       politician_name: pol?.full_name,
-      politician_office: pol?.office,
-      politician_state: pol?.state,
+      politician_office: pol.office ?? undefined,
+      politician_state: pol.state ?? undefined,
     };
   });
 }
@@ -134,14 +120,16 @@ async function getPendingPosts(): Promise<PendingPost[]> {
 // ── Fetch existing WhyTho questions for duplicate check ───────────────────────
 
 async function getExistingQuestions(politicianId: string): Promise<string[]> {
-  const { data } = await supabase
-    .from("questions")
-    .select("body")
-    .eq("politician_id", politicianId)
-    .eq("status", "active")
-    .limit(50);
-
-  return (data ?? []).map((q) => q.body);
+  const root = canonicalProfile(profiles, politicianId);
+  if (!root) throw new Error("Question context identity is unavailable");
+  const questions: Array<{ body: string; created_at: string }> = [];
+  for (const ids of idChunks(identityMemberIds(profiles, root.id))) {
+    const { data, error } = await supabase.from("questions").select("body,created_at")
+      .in("politician_id", ids).eq("status", "active").order("created_at", { ascending: false }).order("id").limit(50);
+    if (error) throw error;
+    questions.push(...data);
+  }
+  return questions.sort((a, b) => b.created_at.localeCompare(a.created_at)).slice(0, 50).map(question => question.body);
 }
 
 // ── Claude scoring ────────────────────────────────────────────────────────────

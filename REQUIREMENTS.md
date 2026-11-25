@@ -36,7 +36,7 @@
 
 ### R1.3 Anti-fraud
 - Cloudflare Turnstile on all vote and question submission endpoints
-- Rate limiting: max 30 votes per user per 10 minutes; max 5 question submissions per user per day
+- Rate limiting: max 30 votes per user per 10 minutes. Each user can submit up to five questions to each politician per rolling 24 hours (enforced by a database trigger, canonical-identity aware).
 - One vote per user per question per week (enforced at DB level via UNIQUE constraint)
 - Account age ≥ 24 hours to submit questions (configurable)
 

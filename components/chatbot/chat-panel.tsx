@@ -18,7 +18,7 @@ const SUGGESTED_PROMPTS = [
 export function ChatPanel({ pageContext, onClose }: ChatPanelProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  const [messages, setMessages] = useState<{id:string;role:"assistant"|"user";content:string}[]>([{id:"welcome",role:"assistant",content:"I can help you find politicians, explore public answers, and prepare questions for you to review and submit on their profiles."}]);
+  const [messages, setMessages] = useState<{id:string;role:"assistant"|"user";content:string}[]>([{id:"welcome",role:"assistant",content:"Hi! What can I help you with? I can show you how WhyTho works, help you find a politician, or help you draft a question."}]);
   const [input,setInput]=useState("");
   const [isLoading,setLoading]=useState(false);
   const [error,setError]=useState<string|null>(null);

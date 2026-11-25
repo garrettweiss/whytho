@@ -3,21 +3,23 @@
  * Seed politicians table from Congress.gov + OpenStates
  *
  * Usage:
- *   npx ts-node scripts/seed-politicians.ts
+ *   npx ts-node scripts/seed-politicians.ts             # read-only preview
+ *   npx ts-node scripts/seed-politicians.ts --apply     # explicit writes
  *   npx ts-node scripts/seed-politicians.ts --federal-only
  *   npx ts-node scripts/seed-politicians.ts --states-only
  */
 
 import { createClient } from "@supabase/supabase-js";
-import type { Database, Enums } from "../types/database";
+import type { Database } from "../types/database";
 import { fetchAllMembers } from "../lib/civic/congress";
 import { fetchStateLegislators } from "../lib/civic/openstates";
 import {
   normalizeCongressMember,
   normalizeOpenStatesPerson,
   deduplicatePoliticians,
-  makeSlugUnique,
 } from "../lib/civic/normalize";
+
+import { importCivicObservation, officialObservation, shouldApplyImport } from "../lib/civic/import-observation";
 
 // Load env
 import * as dotenv from "dotenv";
@@ -28,81 +30,38 @@ const supabase = createClient<Database>(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
+const APPLY = shouldApplyImport(process.argv.slice(2));
+
 async function upsertPoliticians(
   normalized: ReturnType<typeof deduplicatePoliticians>
 ) {
-  const existingSlugs = new Set<string>();
   let inserted = 0;
   let updated = 0;
   let errors = 0;
+  let reviewRequired = 0;
+  let photoReviewRequired = 0;
 
-  for (const { politician, aliases } of normalized) {
+  for (const entry of normalized) {
     try {
-      // Ensure slug uniqueness
-      const slug = makeSlugUnique(politician.slug, existingSlugs);
-      existingSlugs.add(slug);
-      politician.slug = slug;
-
-      // Upsert politician
-      const { data, error } = await supabase
-        .from("politicians")
-        .upsert(
-          { ...politician },
-          {
-            onConflict: "bioguide_id",
-            ignoreDuplicates: false,
-          }
-        )
-        .select("id, slug")
-        .single();
-
-      if (error) {
-        // Try upsert by slug if bioguide_id not present
-        const { data: bySlug, error: slugError } = await supabase
-          .from("politicians")
-          .upsert(politician, { onConflict: "slug", ignoreDuplicates: false })
-          .select("id, slug")
-          .single();
-
-        if (slugError) {
-          console.error(`Error upserting ${politician.full_name}:`, slugError.message);
-          errors++;
-          continue;
-        }
-
-        if (bySlug) {
-          // Upsert aliases
-          await upsertAliases(bySlug.id, aliases);
-          updated++;
-        }
-        continue;
-      }
-
-      if (data) {
-        await upsertAliases(data.id, aliases);
+      const result = await importCivicObservation(supabase, officialObservation(entry), APPLY);
+      if (result.photoStatus === "review_required") photoReviewRequired++;
+      if (result.status === "review_required") {
+        reviewRequired++;
+        console.warn(`Review required for ${entry.politician.full_name}: ${result.reason}`);
+      } else if (result.status === "matched") {
+        updated++;
+      } else {
         inserted++;
       }
     } catch (err) {
-      console.error(`Unexpected error for ${politician.full_name}:`, err);
+      console.error(`Import failed for ${entry.politician.full_name}:`, err);
       errors++;
     }
   }
-
+  if (errors) process.exitCode = 1;
+  console.log(`  Identity review required: ${reviewRequired}`);
+  console.log(`  Portrait review required: ${photoReviewRequired} (source evidence retained; public photos unchanged)`);
   return { inserted, updated, errors };
-}
-
-async function upsertAliases(
-  politicianId: string,
-  aliases: Array<{ alias: string; alias_type: Enums<"alias_type"> }>
-) {
-  if (aliases.length === 0) return;
-
-  await supabase
-    .from("politician_aliases")
-    .upsert(
-      aliases.map((a) => ({ ...a, politician_id: politicianId })),
-      { onConflict: "politician_id,alias", ignoreDuplicates: true }
-    );
 }
 
 async function seedFederal() {
@@ -171,6 +130,8 @@ async function main() {
 
   console.log("🌱 WhyTho politician seed script");
   console.log("=================================");
+  console.log(APPLY ? "Mode: APPLY" : "Mode: DRY RUN (no writes); pass --apply to write");
+  console.log("Portrait source evidence is retained for the reviewed portrait pipeline.");
 
   if (specificStates) {
     await seedStates(specificStates);
@@ -184,10 +145,11 @@ async function main() {
   }
 
   // Final count
-  const { count } = await supabase
+  const { count, error } = await supabase
     .from("politicians")
     .select("*", { count: "exact", head: true });
 
+  if (error) throw new Error(`Final count failed: ${error.message}`);
   console.log(`\n✅ Done. Total politicians in DB: ${count}`);
 }
 

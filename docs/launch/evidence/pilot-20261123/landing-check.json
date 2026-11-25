@@ -1,0 +1,251 @@
+{
+  "checkedAt": "2026-11-23T16:54:37.334826+00:00",
+  "browser": {
+    "viewport": "390 × 844",
+    "session": "signed-out fresh Chrome context",
+    "pages": [
+      {
+        "requested": "/",
+        "finalUrl": "https://whytho.us/",
+        "status": 200,
+        "title": "WhyTho? Find a politician. Ask a question.",
+        "heading": "Who do you want an answer from?",
+        "askAnchorFound": false,
+        "askAnchorInViewport": null,
+        "canonical": null,
+        "openGraphImages": [],
+        "twitterImages": [],
+        "robots": [],
+        "guestLink": null
+      },
+      {
+        "requested": "/report",
+        "finalUrl": "https://whytho.us/report",
+        "status": 200,
+        "title": "Report a problem | WhyTho",
+        "heading": "Report a problem",
+        "askAnchorFound": false,
+        "askAnchorInViewport": null,
+        "canonical": null,
+        "openGraphImages": [],
+        "twitterImages": [],
+        "robots": [],
+        "guestLink": null
+      },
+      {
+        "requested": "/robert-b-aderholt-alabama#ask-question",
+        "finalUrl": "https://whytho.us/robert-b-aderholt-alabama#ask-question",
+        "status": 200,
+        "title": "Robert B. Aderholt | WhyTho",
+        "heading": "Robert B. Aderholt",
+        "askAnchorFound": true,
+        "askAnchorInViewport": true,
+        "canonical": "https://whytho.us/robert-b-aderholt-alabama",
+        "openGraphImages": [
+          "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/a0d5155c-d3fc-4d97-bab2-63427ceef2ed.jpg"
+        ],
+        "twitterImages": [
+          "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/a0d5155c-d3fc-4d97-bab2-63427ceef2ed.jpg"
+        ],
+        "robots": [],
+        "guestLink": "/sign-in?redirect=%2Frobert-b-aderholt-alabama%23ask-question"
+      },
+      {
+        "requested": "/eric-burlison-missouri#ask-question",
+        "finalUrl": "https://whytho.us/eric-burlison-missouri#ask-question",
+        "status": 200,
+        "title": "Eric Burlison | WhyTho",
+        "heading": "Eric Burlison",
+        "askAnchorFound": true,
+        "askAnchorInViewport": true,
+        "canonical": "https://whytho.us/eric-burlison-missouri",
+        "openGraphImages": [
+          "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/94766d4a-0040-4778-b077-8931f8c06ee2.jpg"
+        ],
+        "twitterImages": [
+          "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/94766d4a-0040-4778-b077-8931f8c06ee2.jpg"
+        ],
+        "robots": [],
+        "guestLink": "/sign-in?redirect=%2Feric-burlison-missouri%23ask-question"
+      },
+      {
+        "requested": "/elizabeth-warren-massachusetts#ask-question",
+        "finalUrl": "https://whytho.us/elizabeth-warren-massachusetts#ask-question",
+        "status": 200,
+        "title": "Elizabeth Warren | WhyTho",
+        "heading": "Elizabeth Warren",
+        "askAnchorFound": true,
+        "askAnchorInViewport": true,
+        "canonical": "https://whytho.us/elizabeth-warren-massachusetts",
+        "openGraphImages": [
+          "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/d2245f3a-88d5-4caf-95c4-e4d6244f4778.jpg"
+        ],
+        "twitterImages": [
+          "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/d2245f3a-88d5-4caf-95c4-e4d6244f4778.jpg"
+        ],
+        "robots": [],
+        "guestLink": "/sign-in?redirect=%2Felizabeth-warren-massachusetts%23ask-question"
+      },
+      {
+        "requested": "/tim-scott-south-carolina#ask-question",
+        "finalUrl": "https://whytho.us/tim-scott-south-carolina#ask-question",
+        "status": 200,
+        "title": "Tim Scott | WhyTho",
+        "heading": "Tim Scott",
+        "askAnchorFound": true,
+        "askAnchorInViewport": true,
+        "canonical": "https://whytho.us/tim-scott-south-carolina",
+        "openGraphImages": [
+          "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/d95f8192-19fd-48fb-acca-52dff30134f1.jpg"
+        ],
+        "twitterImages": [
+          "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/d95f8192-19fd-48fb-acca-52dff30134f1.jpg"
+        ],
+        "robots": [],
+        "guestLink": "/sign-in?redirect=%2Ftim-scott-south-carolina%23ask-question"
+      }
+    ]
+  },
+  "socialCrawler": {
+    "userAgent": "Twitterbot/1.0",
+    "pages": [
+      {
+        "id": "A000055",
+        "name": "Robert B. Aderholt",
+        "path": "/robert-b-aderholt-alabama",
+        "reviewedSource": "https://commons.wikimedia.org/wiki/File:Robert_Aderholt_official_photo.jpg",
+        "reviewedSha256": "03aa7756ab2c4103871f403f1f2d91f57691c9e195577fc01ba17763f7a1541f",
+        "crawlerImages": [
+          {
+            "field": "og:image",
+            "url": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/a0d5155c-d3fc-4d97-bab2-63427ceef2ed.jpg"
+          },
+          {
+            "field": "twitter:image",
+            "url": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/a0d5155c-d3fc-4d97-bab2-63427ceef2ed.jpg"
+          }
+        ],
+        "comparison": [
+          {
+            "url": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/a0d5155c-d3fc-4d97-bab2-63427ceef2ed.jpg",
+            "sha256": "7c4ff8bb71c0298c12aa2bddfb3224f510a0c99e7cf40e2d9238950f21a0fe73",
+            "dimensions": [
+              175,
+              220
+            ],
+            "exactSourceBytes": false,
+            "exactSourcePixels": false,
+            "meanRgbErrorCenterFit": 46.926,
+            "meanRgbErrorFullResize": 46.202
+          }
+        ]
+      },
+      {
+        "id": "B001316",
+        "name": "Eric Burlison",
+        "path": "/eric-burlison-missouri",
+        "reviewedSource": "https://commons.wikimedia.org/wiki/File:Eric_Burlison_portrait_118th.jpg",
+        "reviewedSha256": "bc0f33c6e5fe6fbbc3c65683855b83bf938d744e19a809feffac590e3e4390b3",
+        "crawlerImages": [
+          {
+            "field": "og:image",
+            "url": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/94766d4a-0040-4778-b077-8931f8c06ee2.jpg"
+          },
+          {
+            "field": "twitter:image",
+            "url": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/94766d4a-0040-4778-b077-8931f8c06ee2.jpg"
+          }
+        ],
+        "comparison": [
+          {
+            "url": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/94766d4a-0040-4778-b077-8931f8c06ee2.jpg",
+            "sha256": "1277e861aa60dfaf225863c885000c3049cfa5256d4125e6ee32c0d994fb0583",
+            "dimensions": [
+              175,
+              219
+            ],
+            "exactSourceBytes": false,
+            "exactSourcePixels": false,
+            "meanRgbErrorCenterFit": 44.019,
+            "meanRgbErrorFullResize": 44.038
+          }
+        ]
+      },
+      {
+        "id": "W000817",
+        "name": "Elizabeth Warren",
+        "path": "/elizabeth-warren-massachusetts",
+        "reviewedSource": "https://commons.wikimedia.org/wiki/File:Elizabeth_Warren,_official_portrait,_114th_Congress.jpg",
+        "reviewedSha256": "183813c5185e1b7548817fa1542552c75eba7a6fc8754a9b5a904469da43d66a",
+        "crawlerImages": [
+          {
+            "field": "og:image",
+            "url": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/d2245f3a-88d5-4caf-95c4-e4d6244f4778.jpg"
+          },
+          {
+            "field": "twitter:image",
+            "url": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/d2245f3a-88d5-4caf-95c4-e4d6244f4778.jpg"
+          }
+        ],
+        "comparison": [
+          {
+            "url": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/d2245f3a-88d5-4caf-95c4-e4d6244f4778.jpg",
+            "sha256": "cc9e861a8e1fa24a9148d72fc85a1f6723c7e595139fef675ac6b29422f0e85d",
+            "dimensions": [
+              180,
+              225
+            ],
+            "exactSourceBytes": false,
+            "exactSourcePixels": false,
+            "meanRgbErrorCenterFit": 56.023,
+            "meanRgbErrorFullResize": 56.023
+          }
+        ]
+      },
+      {
+        "id": "S001184",
+        "name": "Tim Scott",
+        "path": "/tim-scott-south-carolina",
+        "reviewedSource": "https://commons.wikimedia.org/wiki/File:Tim_Scott,_official_portrait,_113th_Congress.jpg",
+        "reviewedSha256": "9db4af25d962b98d2bd43984cb6ab34dcbd6d9c4a58d7f388f2c253e1f4beb98",
+        "crawlerImages": [
+          {
+            "field": "og:image",
+            "url": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/d95f8192-19fd-48fb-acca-52dff30134f1.jpg"
+          },
+          {
+            "field": "twitter:image",
+            "url": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/d95f8192-19fd-48fb-acca-52dff30134f1.jpg"
+          }
+        ],
+        "comparison": [
+          {
+            "url": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/d95f8192-19fd-48fb-acca-52dff30134f1.jpg",
+            "sha256": "20eb5d73914b333bb4cd3910e0e0b527ab48ae1d8b2c7adad3a2bf276cee74c1",
+            "dimensions": [
+              180,
+              225
+            ],
+            "exactSourceBytes": false,
+            "exactSourcePixels": false,
+            "meanRgbErrorCenterFit": 7.501,
+            "meanRgbErrorFullResize": 7.015
+          }
+        ]
+      },
+      {
+        "path": "/",
+        "crawlerImages": []
+      },
+      {
+        "path": "/report",
+        "crawlerImages": []
+      }
+    ]
+  },
+  "limits": [
+    "Checks stopped at the guest call to action. No account, question or email was created.",
+    "Only page metadata is tested. Social platforms can cache previous images or apply other preview rules.",
+    "Pixel distance measures a simple center cover crop and full resize comparison. Approximate resemblance does not establish provenance."
+  ]
+}

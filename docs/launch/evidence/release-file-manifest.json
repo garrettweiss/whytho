@@ -1,0 +1,451 @@
+{
+  "recorded_at_utc": "2026-10-31T05:46:25.022064+00:00",
+  "base": "4e7103bfdf4853f158d837d58e174d5158aecaca",
+  "scope": "Modified and new source/doc files, excluding generated evidence; working tree release candidate, not committed or deployed",
+  "files": [
+    {
+      "path": ".github/workflows/ci.yml",
+      "sha256": "ca7c1e7f2b6310e273546f9acd1dbaafc17826990d9e1da826a5c780dda9040f"
+    },
+    {
+      "path": "app/[slug]/page.tsx",
+      "sha256": "8ab1ce8102973aacb8048279c732b1a2c9acc4bc8f027eb56c9bf10585279781"
+    },
+    {
+      "path": "app/api/admin/politician-weekly-inbox/route.ts",
+      "sha256": "c7e210d1e0ba3ad3336ca8e8fc24583d8e5e9d5185dea2db98f31958369039d3"
+    },
+    {
+      "path": "app/api/ai-analysis/route.ts",
+      "sha256": "0ebd76560021d0f3731b289a07ac1a406d0ec3e302fcc04c9ed9fe65f5db4edf"
+    },
+    {
+      "path": "app/api/answers/[id]/approve/route.ts",
+      "sha256": "00bef6c75877955bd812068f954c0c81d2a2c03bd0ea4d52d00f19190c166fc1"
+    },
+    {
+      "path": "app/api/answers/[id]/route.ts",
+      "sha256": "6785b6a92efef1329cc5adc372594be9c72abd0575bddac259da49d0554c9adb"
+    },
+    {
+      "path": "app/api/answers/route.ts",
+      "sha256": "4f894ee36c769c2cb19ef5ae69894e54fcde4bc6300d0c4d8d9a1c3d8b27b401"
+    },
+    {
+      "path": "app/api/auth/anonymous/route.ts",
+      "sha256": "f97f90eeaeb2c05e8459933d4cc0ca5d5663d82e2e270c725810b4fb3ef2f095"
+    },
+    {
+      "path": "app/api/chat/route.ts",
+      "sha256": "a1dc2bbc246a6290d5b812b64ecf10315f46ee4805583c6be1f46ca3f2d409c2"
+    },
+    {
+      "path": "app/api/dashboard/disconnect/route.ts",
+      "sha256": "a183f24fe2a9abddd457c5e3191297e005a5c1ef6bc4750afa03aaed57e4b7e5"
+    },
+    {
+      "path": "app/api/dashboard/photo/route.ts",
+      "sha256": "9e84240c21c409f6150f6cc3f0e33c1f74838183217baa2d267f28baf32b6247"
+    },
+    {
+      "path": "app/api/dashboard/profile/route.ts",
+      "sha256": "ed6f25f953b64a60c5df41d19759f40120c8fd8931abff536c91e0c21fef5229"
+    },
+    {
+      "path": "app/api/dashboard/team/route.ts",
+      "sha256": "cf3ca2f4a34b7cb6c2b1b2fef5180503c2cc2a6eb2bc2886397f5cba33f592fc"
+    },
+    {
+      "path": "app/api/politicians/[id]/photo-credit/route.ts",
+      "sha256": "3fdbbd9d0a3caacf727196952e91f5551c10414c166eb9b11faeb5b7e9787271"
+    },
+    {
+      "path": "app/api/questions/route.ts",
+      "sha256": "fa91db9c8a81b149e936bf87544a597417b09b3790a82b7727beb928a4218d06"
+    },
+    {
+      "path": "app/api/settings/notifications/route.ts",
+      "sha256": "0d0f6a41e2b192c9ed90940113fa4bec5566967582e6820d61741a0e012b04d3"
+    },
+    {
+      "path": "app/api/verify/claim/route.ts",
+      "sha256": "2d41548d8b2c0ce55608e28065a98f572548513cfcf6406024d737d1bc7ce2f9"
+    },
+    {
+      "path": "app/api/verify/gov-email/route.ts",
+      "sha256": "e7d98db3e82c22c2bb48a4c641e0e97bf2192a47d834377f3d3ac00e6626fb33"
+    },
+    {
+      "path": "app/api/verify/meta-tag/route.ts",
+      "sha256": "e7e5f40ebb3e143595dd07e1b761e95254a42715769980f6082cde57037ba85c"
+    },
+    {
+      "path": "app/dashboard/page.tsx",
+      "sha256": "f70bd439fa32713061cafe5f252e138f05d4689bf4eb7661bed6f36d5d1f6615"
+    },
+    {
+      "path": "components/analytics/posthog-provider.tsx",
+      "sha256": "2f6cc87285d615bba5e34921b49ef4aaa1e3584eed6f485ac90ddcc3d7c49cf7"
+    },
+    {
+      "path": "components/analytics/profile-view-tracker.tsx",
+      "sha256": "0b25b0fe2a36a6c6ecbcdaac68727e3f918a1ae195e05a36e8ec6eccea8fb43f"
+    },
+    {
+      "path": "components/answers/answer-composer.tsx",
+      "sha256": "059c234d7ea03d5d2a330ef7b77433d02f8faa927c075d72116d850d8d54f1d8"
+    },
+    {
+      "path": "components/chatbot/chat-message.tsx",
+      "sha256": "121202c41e7f22e5851bd2a155fa853cbec633be2e715d29563d1bbbd2f3ccc5"
+    },
+    {
+      "path": "components/chatbot/chat-panel.tsx",
+      "sha256": "953212fc778360dc60a8dd6e39f17338440e6506c76024f6157acd8f13d0d0ae"
+    },
+    {
+      "path": "components/dashboard/answer-edit-button.tsx",
+      "sha256": "90d0e1a558f3f225b7bdfe7d863e7a6a9a2f20fdbedd575527b3cc98b47bb60c"
+    },
+    {
+      "path": "components/dashboard/disconnect-button.tsx",
+      "sha256": "ed57724797369d03166dd11a34b932baf69f3f81850c06ab2e4214b6e569cb13"
+    },
+    {
+      "path": "components/dashboard/draft-approve-button.tsx",
+      "sha256": "e94468bc20e7791f188b01a32fc332842d76d18523717e80de721c77b9d02ca3"
+    },
+    {
+      "path": "components/dashboard/photo-editor.tsx",
+      "sha256": "e1825a403630cd31de21f09c121fe38114ff544fb22723fdc382fd29470d0b10"
+    },
+    {
+      "path": "components/dashboard/profile-editor.tsx",
+      "sha256": "051d3fc2b2b05a00903f1a43d77046eda1309eb2c52bb92ebe8428c05910c3e9"
+    },
+    {
+      "path": "components/dashboard/question-inbox.tsx",
+      "sha256": "01926bf148888e3e6980424d3ef399250d69034a078f7c5fe1ec094b334fe1b3"
+    },
+    {
+      "path": "components/dashboard/team-manager.tsx",
+      "sha256": "7fbbcb1b82d0a8feced8cf18a110cf30a9364515fba485b9ab80242440ff4412"
+    },
+    {
+      "path": "components/politician/politician-avatar.tsx",
+      "sha256": "16c11a8363f35f412add633489aa2a0f0162cc677717e3281c25cae12d170d69"
+    },
+    {
+      "path": "components/profile/photo-credit.tsx",
+      "sha256": "c116426d330715b5aacd0ae3e7898cb7ff0802a7bf7c0ee35e4e4fe81d04b430"
+    },
+    {
+      "path": "components/profile/profile-portrait.tsx",
+      "sha256": "e452b9545cd839d40deffaaf13de63e1c5010feda3662d4944b05c1b8359f28c"
+    },
+    {
+      "path": "components/public/public-portrait.tsx",
+      "sha256": "b2bd9249fa2abb60aef732f001f7bef039a39525d6cd262cdcea7bf2deefd167"
+    },
+    {
+      "path": "components/search/search-bar.tsx",
+      "sha256": "65133b181bcfc8074e851deeff8f45c64d4dcb34d37859450162e06289f8d141"
+    },
+    {
+      "path": "docs/launch/ACCOUNT_PERSONA_TESTS.md",
+      "sha256": "4c4952a374ec7200c079ab59c3fe3be5d2ef66d6ec806169826cb4ae025eb593"
+    },
+    {
+      "path": "docs/launch/LAUNCH_READINESS.md",
+      "sha256": "e7a399beb1130d52d97efe3d3800593a5de1c1c48b19067ae2054f3e58248bd5"
+    },
+    {
+      "path": "docs/launch/LEGAL_RISK_REGISTER.md",
+      "sha256": "8923cd5511ea00a186a5e4ef9bf5644e2d745f2f721756dc2a37be93faea26fd"
+    },
+    {
+      "path": "docs/launch/LEGAL_SECOND_REVIEW.md",
+      "sha256": "62ec632bbfbdecd317d910632993ee1bd35233d9f5a20dc6bfb10d1444171f5c"
+    },
+    {
+      "path": "docs/launch/PERSONALIZED_QUESTIONS_PLAN.md",
+      "sha256": "d010096b87c4ef28567e783352f46a7ea499163f19d83946b34ce62f70e1087d"
+    },
+    {
+      "path": "docs/launch/PHOTO_READINESS.md",
+      "sha256": "cb0d161a447f91feca9f1284ef6b5589595d25d1d580587bf87fa05e0460898e"
+    },
+    {
+      "path": "docs/launch/POLITICIAN_NOTIFICATIONS_PLAN.md",
+      "sha256": "a005cc85e5f3b2aa8c884c476b1c52ee615805ea67a6aa051f5dbe02c86583d6"
+    },
+    {
+      "path": "docs/launch/SECURITY_AUDIT.md",
+      "sha256": "f78ff48676c5ca18b8b0b2a5496cb7a28dcf8adaea3f6259f7de63b76e2e7ca8"
+    },
+    {
+      "path": "docs/launch/SECURITY_SECOND_REVIEW.md",
+      "sha256": "1e44fe15ba8f06201e0e43769fdef5dddb99ad2029181336da08702a8a4eda89"
+    },
+    {
+      "path": "docs/launch/SOCIAL_MARKETING_PLAN.md",
+      "sha256": "0dfcbabf8a64e98f310e3a293e64937843e67c76a88d5ccb15ce8e90db2694b3"
+    },
+    {
+      "path": "docs/launch/VERIFICATION_SOURCE_REVIEW.md",
+      "sha256": "d774894f02855301a6efab3df77ef9569129a6289c3487155578cf09414d9bf2"
+    },
+    {
+      "path": "docs/launch/legal/CONTENT_AND_RIGHTS_DRAFT.md",
+      "sha256": "bf9ac266c67cbf83b65e83f82838e648e87b01035a6474f02412efb19cc12d76"
+    },
+    {
+      "path": "docs/launch/legal/OUTREACH_AND_RETENTION_DRAFT.md",
+      "sha256": "2f2acf6b76ea37cd583e40e92ffdc349a9c26d1cd67bbfaad5c1b355c601445a"
+    },
+    {
+      "path": "docs/launch/legal/PHOTO_RIGHTS_POLICY_DRAFT.md",
+      "sha256": "086c53a14eb1672b5a087953343e7cc3598b0872af0822d91afac1f1f7ac3504"
+    },
+    {
+      "path": "docs/launch/legal/PRIVACY_NOTICE_DRAFT.md",
+      "sha256": "e1130bb31be8cc11b7d472f3671ccbeb20ec45dec216a877504b7406b343cb5a"
+    },
+    {
+      "path": "docs/launch/legal/TERMS_DRAFT.md",
+      "sha256": "1463e1a89e2e0100936e6c97accd47e5ae4ed843541d671547e8bc191ccb3aeb"
+    },
+    {
+      "path": "eslint.config.mjs",
+      "sha256": "0f50a1c97f223acd6d82886c9eb9f96862aa85fe3dab610eeb2e187a21d3c30c"
+    },
+    {
+      "path": "lib/accounts/request.ts",
+      "sha256": "5924a2dcc18dd5a210618499e54209c2a655584d61e836585bd1ab1d307394fb"
+    },
+    {
+      "path": "lib/ai/analysis.ts",
+      "sha256": "e77e30cacee8ab97154f3b348fdcad897b08a03d5105a3ea1ae15e46df3a2d84"
+    },
+    {
+      "path": "lib/ai/chatbot-prompt.ts",
+      "sha256": "6b4ad9f4d18d533479de33f68893e868ab9f56a0b7b9876fbe56a861a4d311bc"
+    },
+    {
+      "path": "lib/ai/evidence.test.ts",
+      "sha256": "c6e1876a6aa4062c3cdc5bf6b8027600b1d2e403d19535165d120c011487ade9"
+    },
+    {
+      "path": "lib/ai/evidence.ts",
+      "sha256": "c5434d6c476af50e95a4e8dd4579823ce5c927005f9c5dfe988073dc91d0aa74"
+    },
+    {
+      "path": "lib/ai/seeded-questions.ts",
+      "sha256": "01cb4ed42a7a51efbbe3cad48f543b0506a6727f79324998419a6967e0ebe75a"
+    },
+    {
+      "path": "lib/analytics/posthog-client.ts",
+      "sha256": "d1c4e4395b6de309bc0f868cd25dcb23c70163555336d0f7cd0d49b49110242d"
+    },
+    {
+      "path": "lib/email/resend.ts",
+      "sha256": "a65a21fade4e1943ab627df1f030fab23a842086e4dc749402abc9ca60766511"
+    },
+    {
+      "path": "lib/notifications/outreach-guard.ts",
+      "sha256": "3ee861e664002ebd85f55372205ec7942fd72c05100100e795ccd2a38488c119"
+    },
+    {
+      "path": "lib/notifications/planner.test.ts",
+      "sha256": "7e5615c6d7977ef400c7823528dbb8b31c35c64456fdc9ee8106531683350c27"
+    },
+    {
+      "path": "lib/notifications/planner.ts",
+      "sha256": "cefa74b607ff899a0c55f7b661cfdc86c1dadd6e00f39a3386d0205af9b13e69"
+    },
+    {
+      "path": "lib/photos/download.ts",
+      "sha256": "71d4b805ffe0b742652e5fb05bc8a6a0a488feaa8d2453451d82ea77e9425b71"
+    },
+    {
+      "path": "lib/photos/policy.ts",
+      "sha256": "9edd7a4bfc40cab232e9b1b3a61197b251040a08f9e90e38e23f9e5d466af8cc"
+    },
+    {
+      "path": "lib/photos/portrait.test.ts",
+      "sha256": "df04cbf83c7f75f5100589db7554620cc4e3fd4f2af9312613623d2482255e38"
+    },
+    {
+      "path": "lib/photos/portrait.ts",
+      "sha256": "107d99fc32f4f3d7e3480d022cdb1a8be36bf63cc14c014da5d0c79196b6e036"
+    },
+    {
+      "path": "lib/photos/profile-input.ts",
+      "sha256": "28a343fdd0f40a77afa87320e860a67b75ab5ec71d0ff9a76a362e35add8943e"
+    },
+    {
+      "path": "lib/photos/rights.ts",
+      "sha256": "528b11c0333e533d8550fe0d689bfa540c29241e70c856464dce37aa68b3225f"
+    },
+    {
+      "path": "lib/security/ai-sdk.test.ts",
+      "sha256": "06f1c2de5e14b3db2024fdec4d7afa4b5b243aa58bee086ebd5e725243a7cde9"
+    },
+    {
+      "path": "lib/security/bounded-json.ts",
+      "sha256": "288fa1ddad97e50478dd86f2c81cd8fde0850c9100c2c7422bf0bd5a14822961"
+    },
+    {
+      "path": "lib/security/chat-input.ts",
+      "sha256": "4858f42635ccc85683e13e1efd90a6b422e10efa8f575e7e8e6b9e5809bdd47f"
+    },
+    {
+      "path": "lib/security/durable-rate-limit.ts",
+      "sha256": "b4eeddb918541856e717958c455d020bd18b1961cbda8405e75217e68cf7d44a"
+    },
+    {
+      "path": "lib/security/error-telemetry.ts",
+      "sha256": "70562b5ac86873f828f45c02f30ece1ea9af9e1f85f938424f87e03216deb14c"
+    },
+    {
+      "path": "lib/security/public-url.ts",
+      "sha256": "f0af4999fe4f0e506273e63e2f18f8c9d2af0c63b8df113152f7b2675931615c"
+    },
+    {
+      "path": "lib/security/request-policy.ts",
+      "sha256": "f1366664fd811e1ad63729fc6b48421533fd6084371e631345fbdb747c1cc532"
+    },
+    {
+      "path": "lib/security/security.test.ts",
+      "sha256": "2f0a00d600d0bc841017a5a7ebd2e90a7668303ef3af028e5c38bb9401db5ebb"
+    },
+    {
+      "path": "lib/security/verification-fetch.test.ts",
+      "sha256": "ea7f6a6278dd78e53c92284c0f5de6c2eed57e910de08a960c72e969383513bc"
+    },
+    {
+      "path": "lib/security/verification.ts",
+      "sha256": "4f9a37c8978752f3424e4fc89ee7b93f6a6ea37c59da37a432744334e3b16cd2"
+    },
+    {
+      "path": "middleware.ts",
+      "sha256": "1738f19f5d57ca4802543941d17f08024b15ebc9f135958bcd5c4b87b99f1567"
+    },
+    {
+      "path": "next.config.ts",
+      "sha256": "aaeb691c6452a09e4dcc35323470bf7301b6956d053e7e8422912190be2db7a8"
+    },
+    {
+      "path": "package-lock.json",
+      "sha256": "207490a4beb5670ed88012abc9cebeb886cde3c6158ba892bf56d5a6be354867"
+    },
+    {
+      "path": "package.json",
+      "sha256": "41aa6e4f7166052302ff5c3e1d2c7938cb5f842a94c8e54a8309f9cb12f22d7a"
+    },
+    {
+      "path": "scripts/account-browser-check.mjs",
+      "sha256": "951da897d2507c09819b23a10809a10bdd38c721b37090bbbf6104c955dbfd4b"
+    },
+    {
+      "path": "scripts/ai-evidence-integration.test.ts",
+      "sha256": "167719b40e5430e21f55984ae4b2d1df2ffebd662fc82f303929e54200421a6a"
+    },
+    {
+      "path": "scripts/audit-portrait-quality.ts",
+      "sha256": "e32778eeb054b6a97a0d83fdf6f65072c5321b65eebf0feb65189a4c48c299a5"
+    },
+    {
+      "path": "scripts/build-portrait-review-queue.ts",
+      "sha256": "5531320efb3055b0240f121f7e5226c17f54b238a3264dcb90b67af472309039"
+    },
+    {
+      "path": "scripts/jack-diplomat.ts",
+      "sha256": "cddff7077c35d5b64e3e77297d26e8f1694c970360fe85d910079a21f0279f9f"
+    },
+    {
+      "path": "scripts/jack-herald.ts",
+      "sha256": "131d9bf58e9419de281593252accdad15b97520d471f2e286e20a992c3257ced"
+    },
+    {
+      "path": "scripts/jack-scout.ts",
+      "sha256": "11d507be22577f66020d557cbbf937cab6ac571f4ec820ece9926457253ab798"
+    },
+    {
+      "path": "scripts/photo-integration.test.ts",
+      "sha256": "bc9dd402b962ef0663a94411bbd669948a61ca0ec7b86b5adbedb1a3ce5bb44f"
+    },
+    {
+      "path": "scripts/photo-pipeline.ts",
+      "sha256": "ce36f27f676a8785a0857c07f56aee22779a6c227422c19dfde006bbd1598fa6"
+    },
+    {
+      "path": "scripts/release-integration.test.ts",
+      "sha256": "0b7b7f2b35787fbb98964761b575bd8f72f0e563891f2b316e2c724e2b36cc23"
+    },
+    {
+      "path": "scripts/scan-source-secrets.py",
+      "sha256": "e57558f6afb67b1da1aea5399e19341414e9b25ddf6c626d8e0c74f3f85e9f68"
+    },
+    {
+      "path": "scripts/security-integration.test.ts",
+      "sha256": "3b89dc40e2ef2323446e7e41dd50307abf456e544e5b4a55c4e35c8d36946db1"
+    },
+    {
+      "path": "scripts/seed-all-questions.ts",
+      "sha256": "317f65c6513e63f5d6dfbccd7edb4963ed7177dd0a882822fb0158f5ae47ce10"
+    },
+    {
+      "path": "scripts/seed-candidates-federal.ts",
+      "sha256": "18fd4218ef848c684673e0c77156796d5883496339c47b56a51c5e1e01850002"
+    },
+    {
+      "path": "scripts/test-account-concurrency.py",
+      "sha256": "97ec0b15ca3f6099f21745a101834f3250656c1c78c1e60481059127fe1928c9"
+    },
+    {
+      "path": "scripts/test-account-database.sh",
+      "sha256": "3c8d089b9933f545971866d3aa506a238eb67b50a30ac57f750c8a14d31d9a9a"
+    },
+    {
+      "path": "scripts/test-launch-security.sh",
+      "sha256": "b0856a94e7c152d415ffad94d76f50db91dd09136fa587737ed38aab5c4428d0"
+    },
+    {
+      "path": "scripts/test-security-concurrency.py",
+      "sha256": "c584e14eee240248b71cf537cdee2fced4f82d565ea2923abd85369154b8c60a"
+    },
+    {
+      "path": "sentry.client.config.ts",
+      "sha256": "d97a581d15b66111479ab382ed727dbe67f3b647b8fd22731aaaec60d8ca621c"
+    },
+    {
+      "path": "sentry.server.config.ts",
+      "sha256": "2502b3fdca081e6e6e3910cb721d3410a5f5569a16effd0b22287942d57a8cf9"
+    },
+    {
+      "path": "supabase/migrations/20261031060000_account_transitions.sql",
+      "sha256": "f5df48774cae0e7430c3d32a35108ca9a5ae4a51db1fab00326c3ab8eff9755b"
+    },
+    {
+      "path": "supabase/migrations/20261031063000_launch_security.sql",
+      "sha256": "a7728e5f7eca2f174bdb4b60df453b5646df7384e3405f4c48ce1892365c0dd8"
+    },
+    {
+      "path": "supabase/migrations/20261031070000_portrait_permissions.sql",
+      "sha256": "3b1ae09962081030086bdc1956c126be5a1eb0a2b5d5bfc646e82204f87eba98"
+    },
+    {
+      "path": "supabase/tests/account-personas.sql",
+      "sha256": "ddcffc28bb6b020c629f510ec45f51393b4f818e585e5f72b5defb0d3822087f"
+    },
+    {
+      "path": "supabase/tests/security/launch_security.test.sql",
+      "sha256": "d0dbb5de1ae25f773eee1ccc3f953204e3c1b38549a510a64d6f7133105644b8"
+    },
+    {
+      "path": "types/database.ts",
+      "sha256": "c93608ba8296e2168c7004a37a1e72a02dbc136672876aff4560e3a80a8edf95"
+    }
+  ]
+}

@@ -1,0 +1,401 @@
+CREATE ROLE
+CREATE ROLE
+CREATE ROLE
+CREATE SCHEMA
+CREATE SCHEMA
+GRANT
+CREATE FUNCTION
+CREATE FUNCTION
+CREATE FUNCTION
+CREATE TYPE
+CREATE TYPE
+CREATE TYPE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+GRANT
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE FUNCTION
+CREATE FUNCTION
+CREATE TRIGGER
+GRANT
+CREATE TABLE
+ALTER TABLE
+GRANT
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+ALTER TABLE
+CREATE POLICY
+CREATE POLICY
+ALTER DEFAULT PRIVILEGES
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+CREATE TABLE
+ALTER TABLE
+GRANT
+GRANT
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE TABLE
+ALTER TABLE
+GRANT
+CREATE POLICY
+CREATE FUNCTION
+CREATE TRIGGER
+DO
+ALTER POLICY
+ALTER POLICY
+ALTER POLICY
+ALTER POLICY
+ALTER POLICY
+ALTER POLICY
+ALTER POLICY
+INSERT 0 1
+ALTER POLICY
+ALTER POLICY
+ALTER POLICY
+REVOKE
+REVOKE
+GRANT
+CREATE FUNCTION
+REVOKE
+GRANT
+CREATE FUNCTION
+REVOKE
+GRANT
+CREATE TRIGGER
+CREATE FUNCTION
+REVOKE
+GRANT
+NOTIFY
+BEGIN
+CREATE TABLE
+ALTER TABLE
+REVOKE
+GRANT
+ALTER TABLE
+CREATE FUNCTION
+ALTER FUNCTION
+REVOKE
+GRANT
+CREATE FUNCTION
+ALTER FUNCTION
+REVOKE
+GRANT
+NOTIFY
+CREATE FUNCTION
+ALTER FUNCTION
+REVOKE
+GRANT
+NOTIFY
+COMMIT
+BEGIN
+DO
+REVOKE
+DO
+DO
+CREATE TABLE
+ALTER TABLE
+REVOKE
+GRANT
+CREATE TABLE
+ALTER TABLE
+REVOKE
+GRANT
+CREATE FUNCTION
+REVOKE
+GRANT
+CREATE FUNCTION
+REVOKE
+GRANT
+CREATE TRIGGER
+CREATE FUNCTION
+REVOKE
+GRANT
+DO
+REVOKE
+DO
+NOTIFY
+COMMIT
+BEGIN
+DO
+REVOKE
+DO
+DO
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/migrations/20261031205619_launch_security.sql:42: NOTICE:  relation "politician_verification_sources" already exists, skipping
+CREATE TABLE
+ALTER TABLE
+REVOKE
+GRANT
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/migrations/20261031205619_launch_security.sql:51: NOTICE:  relation "security_rate_limits" already exists, skipping
+CREATE TABLE
+ALTER TABLE
+REVOKE
+GRANT
+CREATE FUNCTION
+REVOKE
+GRANT
+CREATE FUNCTION
+REVOKE
+GRANT
+CREATE TRIGGER
+CREATE FUNCTION
+REVOKE
+GRANT
+DO
+REVOKE
+DO
+NOTIFY
+COMMIT
+BEGIN
+ALTER TABLE
+ALTER TABLE
+CREATE TABLE
+ALTER TABLE
+REVOKE
+GRANT
+CREATE FUNCTION
+REVOKE
+GRANT
+CREATE FUNCTION
+REVOKE
+GRANT
+NOTIFY
+COMMIT
+CREATE FUNCTION
+CREATE FUNCTION
+INSERT 0 3
+INSERT 0 1
+INSERT 0 1
+INSERT 0 2
+INSERT 0 3
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/security/launch_security.test.sql:50: NOTICE:  PASS: all production public tables keep RLS
+ check_launch 
+--------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/security/launch_security.test.sql:51: NOTICE:  PASS: sensitive column update grant revoked
+ check_launch 
+--------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/security/launch_security.test.sql:52: NOTICE:  PASS: maintenance privileges revoked
+ check_launch 
+--------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/security/launch_security.test.sql:53: NOTICE:  PASS: browser cannot reset shared quotas
+ check_launch 
+--------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/security/launch_security.test.sql:54: NOTICE:  PASS: browser cannot impersonate photo actor
+ check_launch 
+--------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/security/launch_security.test.sql:55: NOTICE:  PASS: both ledgers narrow default service grants to read and append
+ check_launch 
+--------------
+ 
+(1 row)
+
+SET
+SET
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/security/launch_security.test.sql:58: NOTICE:  PASS: own-row admin escalation denied
+ expect_launch_error 
+---------------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/security/launch_security.test.sql:59: NOTICE:  PASS: preexisting editable is_admin flag gives no admin access
+ check_launch 
+--------------
+ 
+(1 row)
+
+SET
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/security/launch_security.test.sql:61: NOTICE:  PASS: server-managed admin claim retains access
+ check_launch 
+--------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/security/launch_security.test.sql:62: NOTICE:  PASS: verification source anchors are private
+ expect_launch_error 
+---------------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/security/launch_security.test.sql:63: NOTICE:  PASS: portrait uploader history is private
+ expect_launch_error 
+---------------------
+ 
+(1 row)
+
+RESET
+SET
+SET
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/security/launch_security.test.sql:67: NOTICE:  PASS: shared quota first request accepted
+ check_launch 
+--------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/security/launch_security.test.sql:68: NOTICE:  PASS: shared quota second request accepted
+ check_launch 
+--------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/security/launch_security.test.sql:69: NOTICE:  PASS: shared quota third request rejected
+ check_launch 
+--------------
+ 
+(1 row)
+
+UPDATE 1
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/security/launch_security.test.sql:71: NOTICE:  PASS: expired shared quota resets
+ check_launch 
+--------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/security/launch_security.test.sql:72: NOTICE:  PASS: completion fails without independent source
+ expect_launch_error 
+---------------------
+ 
+(1 row)
+
+INSERT 0 1
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/security/launch_security.test.sql:74: NOTICE:  PASS: government email from unrelated office cannot verify
+ expect_launch_error 
+---------------------
+ 
+(1 row)
+
+INSERT 0 1
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/security/launch_security.test.sql:76: NOTICE:  PASS: one verified method does not raise tier
+ check_launch 
+--------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/security/launch_security.test.sql:77: NOTICE:  PASS: claimant-controlled website cannot verify
+ expect_launch_error 
+---------------------
+ 
+(1 row)
+
+INSERT 0 1
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/security/launch_security.test.sql:79: NOTICE:  PASS: two reviewed methods raise tier
+ check_launch 
+--------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/security/launch_security.test.sql:80: NOTICE:  PASS: editor cannot complete identity verification
+ expect_launch_error 
+---------------------
+ 
+(1 row)
+
+INSERT 0 3
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/security/launch_security.test.sql:82: NOTICE:  PASS: per-profile daily question quota enforced in DB
+ expect_launch_error 
+---------------------
+ 
+(1 row)
+
+INSERT 0 2
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/security/launch_security.test.sql:84: NOTICE:  PASS: global daily question quota enforced in DB
+ expect_launch_error 
+---------------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/security/launch_security.test.sql:85: NOTICE:  PASS: editor cannot replace portrait
+ expect_launch_error 
+---------------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/security/launch_security.test.sql:86: NOTICE:  PASS: verified admin replaces portrait
+ check_launch 
+--------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/security/launch_security.test.sql:87: NOTICE:  PASS: portrait replacement keeps attribution history
+ check_launch 
+--------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/security/launch_security.test.sql:88: NOTICE:  PASS: service role cannot rewrite portrait history
+ expect_launch_error 
+---------------------
+ 
+(1 row)
+
+RESET
+PASS: concurrent quota requests complete
+PASS: only three of ten concurrent shared-counter requests accepted
+PASS: local concurrency actor created
+PASS: only three of eight concurrent questions for a profile accepted
+PASS: quota rejects fail with the expected boundary
+PASS: security migration tested and repeated; scratch retained at /tmp/wt-launch-security.HdmJbe

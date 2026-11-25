@@ -11,9 +11,17 @@ import {
   safeJsonLd,
   safeWebUrl,
   sanitizeSources,
+  shouldSortUnvotedQuestionsByNewest,
   toPublicAnswers,
   type RawProfileAnswer,
 } from "./helpers";
+
+test("vote ranking falls back to newest for a nonempty list with all zero scores", () => {
+  assert.equal(shouldSortUnvotedQuestionsByNewest([]), false);
+  assert.equal(shouldSortUnvotedQuestionsByNewest([{ net_upvotes: 0 }, { net_upvotes: 0 }]), true);
+  assert.equal(shouldSortUnvotedQuestionsByNewest([{ net_upvotes: 0 }, { net_upvotes: 1 }]), false);
+  assert.equal(shouldSortUnvotedQuestionsByNewest([{ net_upvotes: 0 }, { net_upvotes: -1 }]), false);
+});
 
 test("archives accept real ISO weeks and reject partial, invalid and future weeks", () => {
   assert.equal(isValidIsoWeek(202053), true);
@@ -64,6 +72,10 @@ test("public answer mapping drops draft bodies, private fields and unsafe media"
     id: "answer-1", answer_type: "direct", body: "Published text", is_ai_generated: false,
     is_draft: false, ai_confidence: null, sources: [], is_disputed: false,
     created_at: "2026-10-30T12:00:00.000Z", published_by: "private-user-id",
+    answer_corrections: [
+      { id: "later", body: "Second correction", created_at: "2026-11-02T12:00:00Z" },
+      { id: "earlier", body: "First correction", created_at: "2026-11-01T12:00:00Z" },
+    ],
     answer_media: [
       { id: "image", media_type: "image", public_url: "https://example.com/image.jpg", file_name: "image.jpg" },
       { id: "unsafe", media_type: "image", public_url: "javascript:alert(1)", file_name: null },
@@ -79,6 +91,8 @@ test("public answer mapping drops draft bodies, private fields and unsafe media"
   assert.equal(serialized.includes("is_draft"), false);
   assert.equal(publicAnswers[0]?.answer_media.length, 1);
   assert.equal(publicAnswers[0]?.answer_media[0]?.media_type, "image");
+  assert.equal(publicAnswers[0]?.body, "Published text");
+  assert.deepEqual(publicAnswers[0]?.answer_corrections?.map(({ id }) => id), ["earlier", "later"]);
 });
 
 test("public AI analysis stays distinct and its sources retain safe citations", () => {

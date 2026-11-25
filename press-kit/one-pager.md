@@ -1,5 +1,7 @@
 # WhyTho — Press One-Pager
 
+[Download the WhyTho square logo (240 × 240 PNG)](../public/assets/brand/whytho-square.png)
+
 **The platform where political silence is on the record.**
 
 ---

@@ -1,0 +1,818 @@
+
+> whytho@0.1.0 test
+> node --import tsx --test lib/directory/*.test.ts lib/profile/*.test.ts lib/leaderboard/*.test.ts lib/elections/*.test.ts lib/photos/*.test.ts lib/ai/evidence.test.ts lib/security/*.test.ts lib/notifications/*.test.ts components/questions/*.test.ts components/auth/*.test.ts components/answers/*.test.ts components/verify/*.test.ts scripts/*integration.test.ts
+
+TAP version 13
+# Subtest: reads the API's top-level answer ID and explicit publication state
+ok 1 - reads the API's top-level answer ID and explicit publication state
+  ---
+  duration_ms: 0.723292
+  type: 'test'
+  ...
+# Subtest: unknown or malformed success cannot imply a published answer
+ok 2 - unknown or malformed success cannot imply a published answer
+  ---
+  duration_ms: 0.319
+  type: 'test'
+  ...
+# Subtest: authentication preserves local paths, queries, and question anchors
+ok 3 - authentication preserves local paths, queries, and question anchors
+  ---
+  duration_ms: 0.472333
+  type: 'test'
+  ...
+# Subtest: callback destinations reject external URLs and URL userinfo tricks
+ok 4 - callback destinations reject external URLs and URL userinfo tricks
+  ---
+  duration_ms: 0.074833
+  type: 'test'
+  ...
+# Subtest: normalization cannot turn a local path into a protocol-relative redirect
+ok 5 - normalization cannot turn a local path into a protocol-relative redirect
+  ---
+  duration_ms: 0.075208
+  type: 'test'
+  ...
+# Subtest: only published human direct or team responses receive the official label
+ok 6 - only published human direct or team responses receive the official label
+  ---
+  duration_ms: 0.414333
+  type: 'test'
+  ...
+# Subtest: AI type is authoritative even when the legacy generation flag is false
+ok 7 - AI type is authoritative even when the legacy generation flag is false
+  ---
+  duration_ms: 0.073417
+  type: 'test'
+  ...
+# Subtest: drafts are hidden while already-filtered public answer shapes remain compatible
+ok 8 - drafts are hidden while already-filtered public answer shapes remain compatible
+  ---
+  duration_ms: 0.07975
+  type: 'test'
+  ...
+# Subtest: sources allow only absolute HTTP links and handle mixed legacy source shapes
+ok 9 - sources allow only absolute HTTP links and handle mixed legacy source shapes
+  ---
+  duration_ms: 0.397125
+  type: 'test'
+  ...
+# Subtest: aggregate periods never reopen voting on previous weeks
+ok 10 - aggregate periods never reopen voting on previous weeks
+  ---
+  duration_ms: 0.048208
+  type: 'test'
+  ...
+# Subtest: a successful vote wins over a hydration read that started before it saved
+ok 11 - a successful vote wins over a hydration read that started before it saved
+  ---
+  duration_ms: 0.074292
+  type: 'test'
+  ...
+# Subtest: vote hydration rejects unexpected values and unrelated question IDs
+ok 12 - vote hydration rejects unexpected values and unrelated question IDs
+  ---
+  duration_ms: 0.088042
+  type: 'test'
+  ...
+# Subtest: verification is visible in both form layouts and gates valid questions until success
+ok 13 - verification is visible in both form layouts and gates valid questions until success
+  ---
+  duration_ms: 8.490083
+  type: 'test'
+  ...
+# Subtest: blocked script times out visibly and retry preserves the question while reloading verification
+ok 14 - blocked script times out visibly and retry preserves the question while reloading verification
+  ---
+  duration_ms: 1.565
+  type: 'test'
+  ...
+# Subtest: a mounted but silent challenge still times out and retries without losing the question
+ok 15 - a mounted but silent challenge still times out and retries without losing the question
+  ---
+  duration_ms: 1.767958
+  type: 'test'
+  ...
+# Subtest: loading watchdog never interrupts an interactive challenge or completed verification
+ok 16 - loading watchdog never interrupts an interactive challenge or completed verification
+  ---
+  duration_ms: 2.713125
+  type: 'test'
+  ...
+# Subtest: expiry, timeout, and widget failures revoke tokens and allow a fresh challenge
+ok 17 - expiry, timeout, and widget failures revoke tokens and allow a fresh challenge
+  ---
+  duration_ms: 5.859583
+  type: 'test'
+  ...
+# Subtest: missing configuration and unsupported browsers fail closed with honest guidance
+ok 18 - missing configuration and unsupported browsers fail closed with honest guidance
+  ---
+  duration_ms: 3.0865
+  type: 'test'
+  ...
+# Subtest: server and transport failures preserve the question and cannot reuse the consumed token
+ok 19 - server and transport failures preserve the question and cannot reuse the consumed token
+  ---
+  duration_ms: 5.125584
+  type: 'test'
+  ...
+# Subtest: a successful question starts another form with a fresh verification
+ok 20 - a successful question starts another form with a fresh verification
+  ---
+  duration_ms: 1.282291
+  type: 'test'
+  ...
+# Subtest: signed-out visitors receive the sign-in path without starting verification
+ok 21 - signed-out visitors receive the sign-in path without starting verification
+  ---
+  duration_ms: 0.5395
+  type: 'test'
+  ...
+# Subtest: existing team members resume completed identity methods without reclaiming
+ok 22 - existing team members resume completed identity methods without reclaiming
+  ---
+  duration_ms: 0.917709
+  type: 'test'
+  ...
+# Subtest: resume data rejects another account, unknown roles, and unrelated verification rows
+ok 23 - resume data rejects another account, unknown roles, and unrelated verification rows
+  ---
+  duration_ms: 0.255208
+  type: 'test'
+  ...
+# Subtest: verified status comes from the stored tier, not method count or serialized secrets
+ok 24 - verified status comes from the stored tier, not method count or serialized secrets
+  ---
+  duration_ms: 0.219333
+  type: 'test'
+  ...
+# Subtest: evidence requires reviewed excerpts and an authentic date
+ok 25 - evidence requires reviewed excerpts and an authentic date
+  ---
+  duration_ms: 2.450666
+  type: 'test'
+  ...
+# Subtest: search distinguishes federal and state offices and combined jurisdictions
+ok 26 - search distinguishes federal and state offices and combined jurisdictions
+  ---
+  duration_ms: 6.063417
+  type: 'test'
+  ...
+# Subtest: people, aliases, names with punctuation and state codes survive interpretation
+ok 27 - people, aliases, names with punctuation and state codes survive interpretation
+  ---
+  duration_ms: 4.559417
+  type: 'test'
+  ...
+# Subtest: validation rejects overlong, control, unknown state and unknown office filters
+ok 28 - validation rejects overlong, control, unknown state and unknown office filters
+  ---
+  duration_ms: 0.248333
+  type: 'test'
+  ...
+# Subtest: cursor round trips names safely and is tied to all active filters
+ok 29 - cursor round trips names safely and is tied to all active filters
+  ---
+  duration_ms: 0.499083
+  type: 'test'
+  ...
+# Subtest: pagination preserves its question cohort across weekly resets and rejects malformed weeks
+ok 30 - pagination preserves its question cohort across weekly resets and rejects malformed weeks
+  ---
+  duration_ms: 0.26625
+  type: 'test'
+  ...
+# Subtest: PostgREST grammar and SQL wildcards are escaped independently
+ok 31 - PostgREST grammar and SQL wildcards are escaped independently
+  ---
+  duration_ms: 0.063416
+  type: 'test'
+  ...
+# Subtest: unknown or partial metrics fail closed instead of claiming no response
+ok 32 - unknown or partial metrics fail closed instead of claiming no response
+  ---
+  duration_ms: 0.113041
+  type: 'test'
+  ...
+# Subtest: portrait presentation keeps every person, preserves group order and leaves source order unchanged
+ok 33 - portrait presentation keeps every person, preserves group order and leaves source order unchanged
+  ---
+  duration_ms: 0.096333
+  type: 'test'
+  ...
+# Subtest: scoped search and clearing preserve route geography and office level
+ok 34 - scoped search and clearing preserve route geography and office level
+  ---
+  duration_ms: 2.700542
+  type: 'test'
+  ...
+# Subtest: region scope retains both state and federal offices without allowing another state
+ok 35 - region scope retains both state and federal offices without allowing another state
+  ---
+  duration_ms: 0.258584
+  type: 'test'
+  ...
+# Subtest: U.S. officials preserves Cabinet, vice president, governors and legacy chamber links
+ok 36 - U.S. officials preserves Cabinet, vice president, governors and legacy chamber links
+  ---
+  duration_ms: 0.4735
+  type: 'test'
+  ...
+# Subtest: scope is validated and cursors cannot cross directory populations
+ok 37 - scope is validated and cursors cannot cross directory populations
+  ---
+  duration_ms: 1.690541
+  type: 'test'
+  ...
+# Subtest: executive search does not mistake vice president for president
+ok 38 - executive search does not mistake vice president for president
+  ---
+  duration_ms: 18.657208
+  type: 'test'
+  ...
+# Subtest: full executive titles resolve as offices, including combined state searches
+ok 39 - full executive titles resolve as offices, including combined state searches
+  ---
+  duration_ms: 1.210708
+  type: 'test'
+  ...
+# Subtest: changing office retains the selected state and election period
+ok 40 - changing office retains the selected state and election period
+  ---
+  duration_ms: 1.600209
+  type: 'test'
+  ...
+# Subtest: page and filter parsing keeps arbitrary user input out of database filters
+ok 41 - page and filter parsing keeps arbitrary user input out of database filters
+  ---
+  duration_ms: 0.118334
+  type: 'test'
+  ...
+# Subtest: election dates stay date-only and respect real calendar dates
+ok 42 - election dates stay date-only and respect real calendar dates
+  ---
+  duration_ms: 12.904792
+  type: 'test'
+  ...
+# Subtest: day boundaries use the U.S. Eastern calendar rather than the server timezone
+ok 43 - day boundaries use the U.S. Eastern calendar rather than the server timezone
+  ---
+  duration_ms: 0.848583
+  type: 'test'
+  ...
+# Subtest: a past date does not establish election completion or a winner
+ok 44 - a past date does not establish election completion or a winner
+  ---
+  duration_ms: 0.829709
+  type: 'test'
+  ...
+# Subtest: exact aggregate counts are not limited by the returned candidate row limit
+ok 45 - exact aggregate counts are not limited by the returned candidate row limit
+  ---
+  duration_ms: 0.670667
+  type: 'test'
+  ...
+# Subtest: missing or malformed counts are failures, never fabricated empty results
+ok 46 - missing or malformed counts are failures, never fabricated empty results
+  ---
+  duration_ms: 0.973
+  type: 'test'
+  ...
+# Subtest: ranking counts distinct qualifying questions and only matching published official answers
+ok 47 - ranking counts distinct qualifying questions and only matching published official answers
+  ---
+  duration_ms: 1.715209
+  type: 'test'
+  ...
+# Subtest: eligibility excludes low-vote, removed, other-week, inactive and test records
+ok 48 - eligibility excludes low-vote, removed, other-week, inactive and test records
+  ---
+  duration_ms: 0.549333
+  type: 'test'
+  ...
+# Subtest: equal rates share competition rank and volume only changes display order
+ok 49 - equal rates share competition rank and volume only changes display order
+  ---
+  duration_ms: 0.3035
+  type: 'test'
+  ...
+# Subtest: all-zero rates share a rank without creating a false most-responsive ordering
+ok 50 - all-zero rates share a rank without creating a false most-responsive ordering
+  ---
+  duration_ms: 8.247542
+  type: 'test'
+  ...
+# Subtest: complete paging includes eligible politicians beyond the first 1,000
+ok 51 - complete paging includes eligible politicians beyond the first 1,000
+  ---
+  duration_ms: 3.451125
+  type: 'test'
+  ...
+# Subtest: paging proves the end of an exact full page and rejects incomplete or non-advancing scans
+ok 52 - paging proves the end of an exact full page and rejects incomplete or non-advancing scans
+  ---
+  duration_ms: 0.366542
+  type: 'test'
+  ...
+# Subtest: display pagination does not alter ranks or accept unbounded page values
+ok 53 - display pagination does not alter ranks or accept unbounded page values
+  ---
+  duration_ms: 0.113125
+  type: 'test'
+  ...
+# Subtest: a new human question queues only for a verified opted-in team member after debounce
+ok 54 - a new human question queues only for a verified opted-in team member after debounce
+  ---
+  duration_ms: 2.27425
+  type: 'test'
+  ...
+# Subtest: seeded and imported questions never masquerade as new constituent demand
+ok 55 - seeded and imported questions never masquerade as new constituent demand
+  ---
+  duration_ms: 0.149209
+  type: 'test'
+  ...
+# Subtest: hidden, archived and already answered questions are suppressed
+ok 56 - hidden, archived and already answered questions are suppressed
+  ---
+  duration_ms: 0.123
+  type: 'test'
+  ...
+# Subtest: pending or removed staff, unrelated teams and unverified profiles cannot receive
+ok 57 - pending or removed staff, unrelated teams and unverified profiles cannot receive
+  ---
+  duration_ms: 0.064625
+  type: 'test'
+  ...
+# Subtest: missing, future, obsolete, revoked and suppressed consent all fail closed
+ok 58 - missing, future, obsolete, revoked and suppressed consent all fail closed
+  ---
+  duration_ms: 0.056708
+  type: 'test'
+  ...
+# Subtest: daily batching and the 24-hour contact cap combine without dropping the event
+ok 59 - daily batching and the 24-hour contact cap combine without dropping the event
+  ---
+  duration_ms: 0.121333
+  type: 'test'
+  ...
+# Subtest: already delivered events cannot send again
+ok 60 - already delivered events cannot send again
+  ---
+  duration_ms: 0.050125
+  type: 'test'
+  ...
+# Subtest: malformed ids and clocks fail closed
+ok 61 - malformed ids and clocks fail closed
+  ---
+  duration_ms: 0.043083
+  type: 'test'
+  ...
+# Subtest: provider acceptance ends retries; ambiguous sends retain the same key within its retention window
+ok 62 - provider acceptance ends retries; ambiguous sends retain the same key within its retention window
+  ---
+  duration_ms: 0.1715
+  type: 'test'
+  ...
+# Subtest: legacy outreach defaults to preview and rejects every live override
+ok 63 - legacy outreach defaults to preview and rejects every live override
+  ---
+  duration_ms: 0.471375
+  type: 'test'
+  ...
+# Subtest: portrait encoding produces bounded JPEG without embedded metadata
+ok 64 - portrait encoding produces bounded JPEG without embedded metadata
+  ---
+  duration_ms: 26.971083
+  type: 'test'
+  ...
+# Subtest: rejects tiny images, active formats, invalid bytes and oversized files
+ok 65 - rejects tiny images, active formats, invalid bytes and oversized files
+  ---
+  duration_ms: 3.583958
+  type: 'test'
+  ...
+# Subtest: profile validation rejects unsafe URLs, prototype keys and malformed payloads
+ok 66 - profile validation rejects unsafe URLs, prototype keys and malformed payloads
+  ---
+  duration_ms: 2.058542
+  type: 'test'
+  ...
+# Subtest: photo rights require exact identity, reviewed rights and source binding
+ok 67 - photo rights require exact identity, reviewed rights and source binding
+  ---
+  duration_ms: 0.927334
+  type: 'test'
+  ...
+# Subtest: archives accept real ISO weeks and reject partial, invalid and future weeks
+ok 68 - archives accept real ISO weeks and reject partial, invalid and future weeks
+  ---
+  duration_ms: 0.683042
+  type: 'test'
+  ...
+# Subtest: rolling scopes are exactly 28 days and 365 days, with no date cutoff for week/all
+ok 69 - rolling scopes are exactly 28 days and 365 days, with no date cutoff for week/all
+  ---
+  duration_ms: 1.067292
+  type: 'test'
+  ...
+# Subtest: response rates use exact qualifying totals independently of visible list limits
+ok 70 - response rates use exact qualifying totals independently of visible list limits
+  ---
+  duration_ms: 0.138084
+  type: 'test'
+  ...
+# Subtest: only published direct and team responses count as official
+ok 71 - only published direct and team responses count as official
+  ---
+  duration_ms: 0.067667
+  type: 'test'
+  ...
+# Subtest: public answer mapping drops draft bodies, private fields and unsafe media
+ok 72 - public answer mapping drops draft bodies, private fields and unsafe media
+  ---
+  duration_ms: 0.973458
+  type: 'test'
+  ...
+# Subtest: public AI analysis stays distinct and its sources retain safe citations
+ok 73 - public AI analysis stays distinct and its sources retain safe citations
+  ---
+  duration_ms: 0.682583
+  type: 'test'
+  ...
+# Subtest: web URLs and embedded JSON-LD cannot introduce active script URLs or closing script tags
+ok 74 - web URLs and embedded JSON-LD cannot introduce active script URLs or closing script tags
+  ---
+  duration_ms: 0.155542
+  type: 'test'
+  ...
+# Subtest: invalid or missing aggregate responses fail rather than becoming a zero rate
+ok 75 - invalid or missing aggregate responses fail rather than becoming a zero rate
+  ---
+  duration_ms: 0.08925
+  type: 'test'
+  ...
+# Subtest: vote writes and removals require an active question in the actual current week
+ok 76 - vote writes and removals require an active question in the actual current week
+  ---
+  duration_ms: 0.155791
+  type: 'test'
+  ...
+# Subtest: patched AI SDK and Anthropic provider stream plain text with validated tool schema
+ok 77 - patched AI SDK and Anthropic provider stream plain text with validated tool schema
+  ---
+  duration_ms: 54.797709
+  type: 'test'
+  ...
+# Subtest: untrusted chat roles, tool results and excessive context are rejected
+ok 78 - untrusted chat roles, tool results and excessive context are rejected
+  ---
+  duration_ms: 0.999792
+  type: 'test'
+  ...
+# Subtest: verification URLs reject internal hosts, literals, credentials and protocols
+ok 79 - verification URLs reject internal hosts, literals, credentials and protocols
+  ---
+  duration_ms: 3.267083
+  type: 'test'
+  ...
+# Subtest: DNS pinning accepts only public IPv4
+ok 80 - DNS pinning accepts only public IPv4
+  ---
+  duration_ms: 0.277417
+  type: 'test'
+  ...
+# Subtest: government email is bound to the reviewed office domain
+ok 81 - government email is bound to the reviewed office domain
+  ---
+  duration_ms: 0.151167
+  type: 'test'
+  ...
+# Subtest: only a real verification meta tag in head is accepted
+ok 82 - only a real verification meta tag in head is accepted
+  ---
+  duration_ms: 0.774
+  type: 'test'
+  ...
+# Subtest: cross-origin browser mutations are blocked while same-origin and server calls work
+ok 83 - cross-origin browser mutations are blocked while same-origin and server calls work
+  ---
+  duration_ms: 8.058375
+  type: 'test'
+  ...
+# Subtest: error telemetry omits identity, URLs, civic choices and breadcrumbs
+ok 84 - error telemetry omits identity, URLs, civic choices and breadcrumbs
+  ---
+  duration_ms: 18.142875
+  type: 'test'
+  ...
+# Subtest: chunked JSON is bounded before parsing
+ok 85 - chunked JSON is bounded before parsing
+  ---
+  duration_ms: 12.4125
+  type: 'test'
+  ...
+# Subtest: missing or malformed reviewed evidence never invokes generation
+ok 86 - missing or malformed reviewed evidence never invokes generation
+  ---
+  duration_ms: 80.562375
+  type: 'test'
+  ...
+# Subtest: zero-source prose and model-invented URLs cannot become analysis
+ok 87 - zero-source prose and model-invented URLs cannot become analysis
+  ---
+  duration_ms: 53.849542
+  type: 'test'
+  ...
+# Subtest: analysis citations are canonical reviewed sources and confidence reflects unique sources
+ok 88 - analysis citations are canonical reviewed sources and confidence reflects unique sources
+  ---
+  duration_ms: 23.726541
+  type: 'test'
+  ...
+# Subtest: visitor and anonymous sessions cannot upload
+ok 89 - visitor and anonymous sessions cannot upload
+  ---
+  duration_ms: 154.310458
+  type: 'test'
+  ...
+# Subtest: ordinary user, editor, responder, removed member and self-claimed admin cannot upload
+ok 90 - ordinary user, editor, responder, removed member and self-claimed admin cannot upload
+  ---
+  duration_ms: 65.396584
+  type: 'test'
+  ...
+# Subtest: rights refusal and missing credit block publication before upload
+ok 91 - rights refusal and missing credit block publication before upload
+  ---
+  duration_ms: 33.13175
+  type: 'test'
+  ...
+# Subtest: invalid bytes and quota failure leave storage untouched
+ok 92 - invalid bytes and quota failure leave storage untouched
+  ---
+  duration_ms: 38.777083
+  type: 'test'
+  ...
+# Subtest: storage failure and revoked-at-publication actor never report success
+ok 93 - storage failure and revoked-at-publication actor never report success
+  ---
+  duration_ms: 46.579875
+  type: 'test'
+  ...
+# Subtest: verified admin upload reencodes, versions, records permission and refreshes views
+ok 94 - verified admin upload reencodes, versions, records permission and refreshes views
+  ---
+  duration_ms: 18.922917
+  type: 'test'
+  ...
+# Subtest: profile rejects malformed or unsafe fields and uses the atomic verified-admin RPC
+ok 95 - profile rejects malformed or unsafe fields and uses the atomic verified-admin RPC
+  ---
+  duration_ms: 19.001458
+  type: 'test'
+  ...
+# Subtest: sign-in page and real callback preserve safe local return paths and reject open redirects
+ok 96 - sign-in page and real callback preserve safe local return paths and reject open redirects
+  ---
+  duration_ms: 134.6975
+  type: 'test'
+  ...
+# Subtest: account gates anonymous sessions before querying private records
+ok 97 - account gates anonymous sessions before querying private records
+  ---
+  duration_ms: 37.277834
+  type: 'test'
+  ...
+# Subtest: account reads are bounded and user-scoped, with honest failures
+ok 98 - account reads are bounded and user-scoped, with honest failures
+  ---
+  duration_ms: 20.530208
+  type: 'test'
+  ...
+# Subtest: dashboard role branches preserve claims, verification, draft review and admin-only controls
+ok 99 - dashboard role branches preserve claims, verification, draft review and admin-only controls
+  ---
+  duration_ms: 167.257583
+  type: 'test'
+  ...
+# Subtest: answer route rejects anonymous/nonteam/direct responder requests without writes
+ok 100 - answer route rejects anonymous/nonteam/direct responder requests without writes
+  ---
+  duration_ms: 27.656542
+  type: 'test'
+  ...
+# Subtest: verification reload restores only the current user's completed methods without exposing private codes
+ok 101 - verification reload restores only the current user's completed methods without exposing private codes
+  ---
+  duration_ms: 5.588042
+  type: 'test'
+  ...
+# Subtest: real answer response contract feeds authorized media upload for draft and publishing roles
+ok 102 - real answer response contract feeds authorized media upload for draft and publishing roles
+  ---
+  duration_ms: 48.799166
+  type: 'test'
+  ...
+# Subtest: media denies wrong ownership, published responder changes, AI, and unsupported types before storage
+ok 103 - media denies wrong ownership, published responder changes, AI, and unsupported types before storage
+  ---
+  duration_ms: 24.919375
+  type: 'test'
+  ...
+# Subtest: media delivery never signs an unreadable or unauthorized draft, even with permissive fixture reads
+ok 104 - media delivery never signs an unreadable or unauthorized draft, even with permissive fixture reads
+  ---
+  duration_ms: 14.428833
+  type: 'test'
+  ...
+# Subtest: media delivery signs only authorized matching paths with short expiry and no shared cache
+ok 105 - media delivery signs only authorized matching paths with short expiry and no shared cache
+  ---
+  duration_ms: 8.9905
+  type: 'test'
+  ...
+# Subtest: approval is publishing-role only and changes draft visibility
+ok 106 - approval is publishing-role only and changes draft visibility
+  ---
+  duration_ms: 11.996459
+  type: 'test'
+  ...
+# Subtest: upload uses atomic attachment guard and handles an approval or role change during transfer
+ok 107 - upload uses atomic attachment guard and handles an approval or role change during transfer
+  ---
+  duration_ms: 4.321584
+  type: 'test'
+  ...
+# Subtest: media over the shared hosting limit is refused and delivery failures are private
+ok 108 - media over the shared hosting limit is refused and delivery failures are private
+  ---
+  duration_ms: 10.767792
+  type: 'test'
+  ...
+# Subtest: controlled media URL survives public normalization and rendering while unsafe paths are discarded
+ok 109 - controlled media URL survives public normalization and rendering while unsafe paths are discarded
+  ---
+  duration_ms: 11.697791
+  type: 'test'
+  ...
+# Subtest: answer editing permits publishing roles and only a responder's own pending draft
+ok 110 - answer editing permits publishing roles and only a responder's own pending draft
+  ---
+  duration_ms: 16.134083
+  type: 'test'
+  ...
+# Subtest: answer editing denies published or another responder's draft and preserves the edit window
+ok 111 - answer editing denies published or another responder's draft and preserves the edit window
+  ---
+  duration_ms: 19.713875
+  type: 'test'
+  ...
+# Subtest: answer edit atomically rejects approval during the request and validates malformed payloads
+ok 112 - answer edit atomically rejects approval during the request and validates malformed payloads
+  ---
+  duration_ms: 21.367458
+  type: 'test'
+  ...
+# Subtest: unverified profile teams can edit drafts but cannot edit published official responses
+ok 113 - unverified profile teams can edit drafts but cannot edit published official responses
+  ---
+  duration_ms: 22.2585
+  type: 'test'
+  ...
+# Subtest: only verified publishing roles publish or approve official responses
+ok 114 - only verified publishing roles publish or approve official responses
+  ---
+  duration_ms: 109.431042
+  type: 'test'
+  ...
+# Subtest: verification lookup failures do not publish, approve, or edit answers
+ok 115 - verification lookup failures do not publish, approve, or edit answers
+  ---
+  duration_ms: 10.138125
+  type: 'test'
+  ...
+# Subtest: claim and disconnect require nonanonymous authentication before any privileged client
+ok 116 - claim and disconnect require nonanonymous authentication before any privileged client
+  ---
+  duration_ms: 23.9485
+  type: 'test'
+  ...
+# Subtest: claim forwards the session actor, resumes without repeat welcome, and contains DB errors
+ok 117 - claim forwards the session actor, resumes without repeat welcome, and contains DB errors
+  ---
+  duration_ms: 4.64675
+  type: 'test'
+  ...
+# Subtest: team mutation routes bind target profile and actor, validate roles, and preserve DB refusal
+ok 118 - team mutation routes bind target profile and actor, validate roles, and preserve DB refusal
+  ---
+  duration_ms: 5.718083
+  type: 'test'
+  ...
+# Subtest: team directory exposes other staff email only to admins and fails closed on read errors
+ok 119 - team directory exposes other staff email only to admins and fails closed on read errors
+  ---
+  duration_ms: 24.328042
+  type: 'test'
+  ...
+# Subtest: notification preferences are scoped to session identity and reject malformed requests
+ok 120 - notification preferences are scoped to session identity and reject malformed requests
+  ---
+  duration_ms: 4.767917
+  type: 'test'
+  ...
+# Subtest: answer submission rejects invalid types and unsafe or excessive sources
+ok 121 - answer submission rejects invalid types and unsafe or excessive sources
+  ---
+  duration_ms: 6.224417
+  type: 'test'
+  ...
+# Subtest: new claim throttling fails closed while existing admins can resume
+ok 122 - new claim throttling fails closed while existing admins can resume
+  ---
+  duration_ms: 13.791792
+  type: 'test'
+  ...
+# Subtest: verified admin and editor can deliberately save a private draft
+ok 123 - verified admin and editor can deliberately save a private draft
+  ---
+  duration_ms: 9.422
+  type: 'test'
+  ...
+# Subtest: platform admin status alone does not grant a politician team voice
+ok 124 - platform admin status alone does not grant a politician team voice
+  ---
+  duration_ms: 10.4275
+  type: 'test'
+  ...
+# Subtest: visitor, anonymous and responder cannot initiate politician verification
+ok 125 - visitor, anonymous and responder cannot initiate politician verification
+  ---
+  duration_ms: 234.747667
+  type: 'test'
+  ...
+# Subtest: a generic .gov address and an unreviewed profile do not establish authority
+ok 126 - a generic .gov address and an unreviewed profile do not establish authority
+  ---
+  duration_ms: 11.801291
+  type: 'test'
+  ...
+# Subtest: approved office OTP has a cryptographic six-digit code, expiry and no response disclosure
+ok 127 - approved office OTP has a cryptographic six-digit code, expiry and no response disclosure
+  ---
+  duration_ms: 16.746834
+  type: 'test'
+  ...
+# Subtest: verification rate store and mail delivery fail closed
+ok 128 - verification rate store and mail delivery fail closed
+  ---
+  duration_ms: 22.027709
+  type: 'test'
+  ...
+# Subtest: expired, wrong and exhausted OTPs cannot complete verification
+ok 129 - expired, wrong and exhausted OTPs cannot complete verification
+  ---
+  duration_ms: 12.119041
+  type: 'test'
+  ...
+# Subtest: successful OTP completion clears secret and expiry
+ok 130 - successful OTP completion clears secret and expiry
+  ---
+  duration_ms: 7.116083
+  type: 'test'
+  ...
+# Subtest: meta verification fetches only the reviewed URL, ignores claimant input
+ok 131 - meta verification fetches only the reviewed URL, ignores claimant input
+  ---
+  duration_ms: 5.506334
+  type: 'test'
+  ...
+# Subtest: old claimant-defined verification cannot resume against a reviewed source
+ok 132 - old claimant-defined verification cannot resume against a reviewed source
+  ---
+  duration_ms: 7.003292
+  type: 'test'
+  ...
+# Subtest: source review changes invalidate pending and completed email proofs
+ok 133 - source review changes invalidate pending and completed email proofs
+  ---
+  duration_ms: 28.108
+  type: 'test'
+  ...
+# Subtest: meta proof cannot resume after its reviewed evidence changes
+ok 134 - meta proof cannot resume after its reviewed evidence changes
+  ---
+  duration_ms: 11.43975
+  type: 'test'
+  ...
+1..134
+# tests 134
+# suites 0
+# pass 134
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2406.544625

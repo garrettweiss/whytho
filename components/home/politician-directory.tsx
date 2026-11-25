@@ -33,7 +33,7 @@ function PortraitCard({ person, index }: { person: DirectoryPerson; index: numbe
   const state = stateByCode(person.state ?? "")?.name ?? person.state;
   const initials = person.full_name.split(/\s+/).map(p => p[0]).slice(0, 2).join("");
   return <li className={styles.personItem}>
-    <Link href={`/${person.slug}`} prefetch={false} className={`${styles.person} ${responded ? styles.responded : ""}`} data-person-id={person.id}>
+    <Link href={person.questionCount > 0 ? `/${person.slug}` : `/${person.slug}#ask-question`} prefetch={false} className={`${styles.person} ${responded ? styles.responded : ""}`} data-person-id={person.id}>
       <div className={styles.photo}>
         {/* Native images avoid proxying arbitrary civic-photo hosts through our server. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -42,16 +42,16 @@ function PortraitCard({ person, index }: { person: DirectoryPerson; index: numbe
       <div className={styles.personMeta}>
         <p className={styles.office}>{person.is_candidate ? `${person.incumbent_challenge === "I" ? "Incumbent · " : ""}Candidate · ` : ""}{person.office || "Public official"}</p>
         <h3>{person.full_name}</h3>
-        <p className={styles.place}>{[state, person.party].filter(Boolean).join(" · ")}</p>
+        <p className={styles.place}>{[person.office === "Mayor" ? person.district : null, person.state === "DC" && person.district ? null : state, person.party].filter(Boolean).join(" · ")}</p>
         <div className={styles.record}>{responded ? <Check size={16} aria-hidden="true" /> : <span aria-hidden="true">○</span>}<span>{responded ? "Official response recorded" : person.questionCount > 0 ? "No official response recorded" : "No questions yet"}</span></div>
-        <p className={styles.recordDetail}>{person.questionCount} {person.questionCount === 1 ? "question" : "questions"} in this week’s record</p>
-        <span className={styles.cardAction}>View questions <ArrowRight size={17} aria-hidden="true" /></span>
+        {person.questionCount > 0 && <p className={styles.recordDetail}>{person.questionCount} {person.questionCount === 1 ? "question" : "questions"} in this week’s record</p>}
+        <span className={styles.cardAction}>{person.questionCount > 0 ? "View questions" : "Be the first to ask"} <ArrowRight size={17} aria-hidden="true" /></span>
       </div>
     </Link>
   </li>;
 }
 
-export function PoliticianDirectory({ initialPage, context }: { initialPage: DirectoryPage; context?: DirectoryContext }) {
+export function PoliticianDirectory({ initialPage, context, homepage = false }: { initialPage: DirectoryPage; context?: DirectoryContext; homepage?: boolean }) {
   const defaults = useMemo(() => directoryContextDefaults(context), [context]);
   const officeOptions = OFFICES.filter(office => !allowedOfficeValues(context?.scope) || allowedOfficeValues(context?.scope)?.includes(office.value));
   const [page, setPage] = useState(initialPage);
@@ -99,9 +99,13 @@ export function PoliticianDirectory({ initialPage, context }: { initialPage: Dir
     if (!cursor) { setFilters(nextFilters); setPage(previous => ({ ...previous, people: [], nextCursor: null })); }
     const params = new URLSearchParams();
     for (const [key, value] of Object.entries(nextFilters)) if (value) params.set(key, value);
+    if (homepage) params.set("homepage", "1");
     if (cursor) params.set("cursor", cursor);
     try {
       const response = await fetch(`/api/politicians/directory?${params}`, { signal: request.signal });
+      if (response.status === 400 && cursor && homepage && requestId === generation.current) {
+        lastRequest.current = { filters: nextFilters };
+      }
       if (!response.ok) throw new Error("Directory unavailable");
       const next: DirectoryPage = await response.json();
       if (requestId !== generation.current) return;
@@ -115,7 +119,7 @@ export function PoliticianDirectory({ initialPage, context }: { initialPage: Dir
     } finally {
       if (requestId === generation.current) { loading.current = false; setBusy(false); }
     }
-  }, []);
+  }, [homepage]);
 
   useEffect(() => {
     const restore = (event?: PopStateEvent) => {
@@ -198,13 +202,13 @@ export function PoliticianDirectory({ initialPage, context }: { initialPage: Dir
     window.history.pushState({ ...window.history.state, whythoDirectoryId: activeEntry.current }, "", params.size ? `${context?.basePath ?? "/"}?${params}` : context?.basePath ?? "/");
     setChoices([]); setInputError(""); void fetchPage(nextFilters);
   }
-  function search(value: string) {
+  function search(value: string, previousFilters = filters) {
     setText(value); setInputError(""); setNameAlternative("");
     try {
       const parsed = parseDirectorySearch(value);
       const availableChoices = parsed.officeChoices.filter(value => officeOptions.some(office => office.value === value));
       if (availableChoices.length === 1) {
-        apply({ ...parsed.filters, state: parsed.filters.state || filters.state, office: availableChoices[0]! }); return;
+        apply({ ...parsed.filters, state: parsed.filters.state || previousFilters.state, office: availableChoices[0]! }); return;
       }
       if (availableChoices.length) {
         setChoices(availableChoices);
@@ -212,7 +216,7 @@ export function PoliticianDirectory({ initialPage, context }: { initialPage: Dir
         return;
       }
       if (parsed.filters.state && !parsed.filters.office && !parsed.filters.q) setNameAlternative(value.trim());
-      apply({ q: parsed.filters.q, state: parsed.filters.state || filters.state, office: parsed.filters.office || filters.office });
+      apply({ q: parsed.filters.q, state: parsed.filters.state || previousFilters.state, office: parsed.filters.office || previousFilters.office });
     } catch {
       setInputError("Use a name, state, or office of 100 characters or fewer.");
     }
@@ -228,7 +232,7 @@ export function PoliticianDirectory({ initialPage, context }: { initialPage: Dir
         <button type="submit" aria-label="Find politicians"><span className={styles.submitLabel}>Find politicians</span><ArrowRight size={24} aria-hidden="true" /></button>
       </form>
       {inputError && <p id="search-error" role="alert" className={styles.inputError}>{inputError}</p>}
-      <div className={styles.examples}><span>Try</span>{(context ? (context.scope === "state" ? ["State Senate", "State House", "Governor"] : context.state ? ["U.S. Senate", "State Senate", "Governor"] : ["U.S. Senate", "U.S. House", "Cabinet", "Governor"]) : ["AOC", "California", "Congress Senate", "California state senator"]).map(example => <button key={example} onClick={() => search(example)}>{example}</button>)}</div>
+      <div className={styles.examples}><span>Try</span>{(context ? (context.scope === "state" ? ["State Senate", "State House", "Governor"] : context.state ? ["U.S. Senate", "State Senate", "Governor"] : ["U.S. Senate", "U.S. House", "Cabinet", "Governor"]) : ["AOC", "California", "Congress Senate", "Mayors"]).map(example => <button key={example} onClick={() => search(example, defaults)}>{example}</button>)}</div>
       {choices.length > 0 && <div ref={choiceGroup} className={styles.officeChoices} role="group" aria-label="Which office do you mean?" onKeyDown={event => { if (event.key === "Escape") { setChoices([]); input.current?.focus(); } }}><p>Which office do you mean?</p>{choices.map(value => <button key={value} onClick={() => { const parsed = parseDirectorySearch(text); apply({ ...parsed.filters, state: parsed.filters.state || filters.state, office: value }); }}>{OFFICES.find(office => office.value === value)?.label ?? value}{parseDirectorySearch(text).filters.state ? ` · ${stateByCode(parseDirectorySearch(text).filters.state)?.name}` : ""}</button>)}</div>}
       {nameAlternative && <button className={styles.nameAlternative} onClick={() => { const name = nameAlternative; setNameAlternative(""); apply({ q: name, state: "", office: "" }); }}>Looking for a person? Search names for “{nameAlternative}”</button>}
       <div className={styles.filters}>
@@ -236,19 +240,20 @@ export function PoliticianDirectory({ initialPage, context }: { initialPage: Dir
         <label>Office<select aria-label="Filter by office" value={filters.office} onChange={event => apply({ ...filters, office: event.target.value })}><option value="">All offices</option>{officeOptions.map(office => <option key={office.value} value={office.value}>{office.label}</option>)}</select></label>
         {(activeFilters || inputError) && <button className={styles.clearFilters} onClick={() => { setText(""); apply(defaults); }}>Clear filters <span aria-hidden="true">×</span></button>}
         {context && <Link className={styles.clearFilters} href="/#find-politician">All politicians ↗</Link>}
-        {filters.q && <span className={styles.searchTerm}>Name: {filters.q}</span>}
+        {filters.q && <span className={styles.searchTerm}>{filters.office === "mayor" ? "Name or city" : "Name"}: {filters.q}</span>}
+        {filters.office === "mayor" && <Link className={styles.clearFilters} href="/suggest-mayor">Suggest a mayor</Link>}
       </div>
     </section>
     <section className={styles.directory} aria-labelledby="directory-title">
       <div className={styles.directoryHead}>
-        <div><h2 id="directory-title">{activeFilters ? "Your search results" : "Politicians on the record"}</h2><p>Questions for {periodLabel(page.weekNumber)}</p></div>
+        <div><h2 id="directory-title">{filters.office === "mayor" ? "Mayors on the record" : activeFilters ? "Your search results" : "Politicians on the record"}</h2><p>Questions for {periodLabel(page.weekNumber)}</p></div>
         <div className={styles.directoryTools}><label className={styles.autoLoad}><input type="checkbox" checked={automatic} onChange={event => setAutomatic(event.target.checked)} /> Load as I scroll</label><button className={styles.colorToggle} aria-pressed={colors} onClick={() => setColors(!colors)}>{colors ? "Hide portrait colors" : "Show portrait colors"}</button></div>
       </div>
       <p className={styles.srOnly} role="status" aria-live="polite" aria-atomic="true">{announcement}</p>
       <ul className={`${styles.people} ${colors ? styles.showColors : ""}`} aria-label="Politicians" aria-busy={busy} onClick={savePosition} onKeyDown={event => { if (event.key === "Enter") savePosition(); }}>
         {page.people.map((person, index) => <PortraitCard key={person.id} person={person} index={index} />)}
       </ul>
-      {!busy && !error && page.people.length === 0 && <div className={styles.emptyState}><h3>No politicians match these filters.</h3><p>Try a different name, state, or office.</p><button onClick={() => { setText(""); apply(defaults); }}>{context ? "Reset this directory" : "Show all politicians"}</button></div>}
+      {!busy && !error && page.people.length === 0 && <div className={styles.emptyState}><h3>No politicians match these filters.</h3><p>Try a different name, state, or office.</p><button onClick={() => { setText(""); apply(defaults); }}>{context ? "Reset this directory" : "Show all politicians"}</button>{!context && filters.office !== "mayor" && <Link className={styles.clearFilters} href="/suggest-mayor">Suggest a missing mayor</Link>}</div>}
       <div className={styles.loadArea} onFocusCapture={() => { automaticRef.current = false; setAutomatic(false); }}>
         <p>{error || (busy ? "Loading politicians…" : page.nextCursor ? `${page.people.length} politicians loaded. Keep exploring.` : "You’ve reached the end of these results.")}</p>
         {error ? <button onClick={() => void fetchPage(lastRequest.current.filters, lastRequest.current.cursor)}>Try again</button> : page.nextCursor && <button disabled={busy} onClick={() => void fetchPage(filters, page.nextCursor ?? undefined, true)}>Load more politicians</button>}

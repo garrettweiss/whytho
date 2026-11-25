@@ -1,16 +1,13 @@
+import { resolvePoliticianIdentity } from "@/lib/identity/server";
 import { NextRequest, NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
+import { profileQuestionCacheTag } from "@/lib/profile/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/server";
-import {
-  containsProfanity,
-  exceedsSpamThreshold,
-  SPAM_SAME_POLITICIAN_LIMIT,
-  SPAM_WINDOW_HOURS,
-} from "@/lib/moderation/filter";
+import { containsProfanity } from "@/lib/moderation/filter";
 
 const MIN_LENGTH = 10;
 const MAX_LENGTH = 500;
-const DAILY_LIMIT = 5;
 
 async function verifyTurnstile(token: string): Promise<boolean> {
   const secret = process.env.CLOUDFLARE_TURNSTILE_SECRET_KEY;
@@ -82,48 +79,14 @@ export async function POST(request: NextRequest) {
     }
 
     const admin = createAdminClient();
-
-    // ── Rate limit: 5 questions / user / 24h (global) ────────────────────────
-    const { count: dailyCount } = await admin
-      .from("questions")
-      .select("*", { count: "exact", head: true })
-      .eq("submitted_by", user.id)
-      .eq("is_seeded", false)
-      .gte("created_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
-
-    if ((dailyCount ?? 0) >= DAILY_LIMIT) {
-      return NextResponse.json(
-        { error: `You can submit up to ${DAILY_LIMIT} questions per day` },
-        { status: 429 }
-      );
-    }
-
-    // ── Spam detection: max 3 questions per user per politician per 24h ───────
-    const { count: politicianCount } = await admin
-      .from("questions")
-      .select("*", { count: "exact", head: true })
-      .eq("submitted_by", user.id)
-      .eq("politician_id", politician_id)
-      .eq("is_seeded", false)
-      .gte(
-        "created_at",
-        new Date(Date.now() - SPAM_WINDOW_HOURS * 60 * 60 * 1000).toISOString()
-      );
-
-    if (exceedsSpamThreshold(politicianCount ?? 0)) {
-      return NextResponse.json(
-        {
-          error: `You can submit up to ${SPAM_SAME_POLITICIAN_LIMIT} questions per representative per day`,
-        },
-        { status: 429 }
-      );
-    }
+    const identity = await resolvePoliticianIdentity(politician_id, admin);
+    if (!identity) return NextResponse.json({ error: "Politician not found" }, { status: 404 });
 
     // ── Verify politician exists ─────────────────────────────────────────────
     const { data: politician } = await admin
       .from("politicians")
-      .select("id")
-      .eq("id", politician_id)
+      .select("id,slug")
+      .eq("id", identity.canonicalId)
       .eq("is_active", true)
       .single();
 
@@ -139,7 +102,7 @@ export async function POST(request: NextRequest) {
     const { data: question, error } = await admin
       .from("questions")
       .insert({
-        politician_id,
+        politician_id: identity.canonicalId,
         body: trimmed,
         submitted_by: user.id,
         week_number,
@@ -150,9 +113,19 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      return NextResponse.json({ error: error.code === "P0001" ? "You have reached the daily question limit." : "Question could not be saved. Please try again." }, { status: error.code === "P0001" ? 429 : 503 });
+      if (error.code === "P0001" && error.message === "Question submission limit reached") {
+        return NextResponse.json(
+          { error: "You’ve reached your limit of 5 questions for this politician today. Try again in 24 hours." },
+          { status: 429 }
+        );
+      }
+      return NextResponse.json(
+        { error: "Question could not be saved. Please try again." },
+        { status: 503 }
+      );
     }
 
+    revalidateTag(profileQuestionCacheTag(politician.slug));
     return NextResponse.json({ question }, { status: 201 });
   } catch {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

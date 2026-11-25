@@ -1,0 +1,52 @@
+TAP version 13
+# Subtest: visitor and anonymous sessions cannot upload
+ok 1 - visitor and anonymous sessions cannot upload
+  ---
+  duration_ms: 162.239292
+  type: 'test'
+  ...
+# Subtest: ordinary user, editor, responder, removed member and self-claimed admin cannot upload
+ok 2 - ordinary user, editor, responder, removed member and self-claimed admin cannot upload
+  ---
+  duration_ms: 69.969458
+  type: 'test'
+  ...
+# Subtest: rights refusal and missing credit block publication before upload
+ok 3 - rights refusal and missing credit block publication before upload
+  ---
+  duration_ms: 27.961417
+  type: 'test'
+  ...
+# Subtest: invalid bytes and quota failure leave storage untouched
+ok 4 - invalid bytes and quota failure leave storage untouched
+  ---
+  duration_ms: 43.579166
+  type: 'test'
+  ...
+# Subtest: storage failure and revoked-at-publication actor never report success
+ok 5 - storage failure and revoked-at-publication actor never report success
+  ---
+  duration_ms: 39.625709
+  type: 'test'
+  ...
+# Subtest: verified admin upload reencodes, versions, records permission and refreshes views
+ok 6 - verified admin upload reencodes, versions, records permission and refreshes views
+  ---
+  duration_ms: 18.759292
+  type: 'test'
+  ...
+# Subtest: profile rejects malformed or unsafe fields and uses the atomic verified-admin RPC
+ok 7 - profile rejects malformed or unsafe fields and uses the atomic verified-admin RPC
+  ---
+  duration_ms: 13.765666
+  type: 'test'
+  ...
+1..7
+# tests 7
+# suites 0
+# pass 7
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 906.052375

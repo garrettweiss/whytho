@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { faceBody, faceDisplay } from "./fonts";
 import styles from "./home.module.css";
 
@@ -34,7 +35,7 @@ export function HomeNavigation({ loggedIn, loading, politicianMode, canUsePoliti
         <nav className={styles.desktopNav} aria-label="Main navigation">
           <a href={searchHref} aria-current={isHome ? "page" : undefined}>Find a politician</a>
           <a href={howHref}>How it works</a>
-          <Link href="/verify">For politicians <span aria-hidden="true">↗</span></Link>
+          <Link href="/verify">For politicians</Link>
         </nav>
         <div className={styles.headerRight}>
           <Link className={styles.accountLink} href={loggedIn ? "/account" : "/sign-in"} aria-busy={loading}>{loading ? "Account" : loggedIn ? "My account" : "Sign in"}</Link>
@@ -47,6 +48,7 @@ export function HomeNavigation({ loggedIn, loading, politicianMode, canUsePoliti
               {loggedIn && <a href="/auth/sign-out">Sign out</a>}
             </nav>}
           </div>
+          <ThemeToggle placement="header" />
         </div>
       </div>
     </header>

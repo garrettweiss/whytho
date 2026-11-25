@@ -1,0 +1,17 @@
+{
+  "checked_at": "2026-10-30 America/Los_Angeles",
+  "project_ref": "jjwdxjqsnwieksubkkkf",
+  "access": "read-only catalog and aggregate queries; before launch migrations",
+  "findings": {
+    "all_public_tables_have_rls": true,
+    "authenticated_can_update_own_user_profiles_is_admin_before_remediation": true,
+    "jack_policies_trust_profile_is_admin_before_remediation": 5,
+    "profile_admin_flags": 1,
+    "server_managed_admin_claims": 2,
+    "profile_admin_flag_without_server_managed_claim": 0,
+    "service_role_auth_schema_usage": true,
+    "service_role_auth_users_select": false,
+    "service_role_politicians_update": true,
+    "service_role_politician_team_mutations": true
+  }
+}

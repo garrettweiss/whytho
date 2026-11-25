@@ -1,15 +1,7 @@
-/**
- * GET /api/politicians/search-index
- *
- * Returns a lightweight index of all active politicians for client-side search caching.
- * Prefetched once after page load and cached in module memory — not called per-keystroke.
- *
- * Response is ~150KB gzipped for 6,600+ politicians.
- * Cache-Control: 1 hour at CDN, 2 hours stale-while-revalidate.
- */
+/** Complete canonical public profile index, read in bounded pages and cached for five minutes. */
 
 import { NextResponse } from "next/server";
-import { createAdminClient } from "@/lib/supabase/server";
+import { loadPoliticianIndex } from "@/lib/search/politician-index.server";
 import { STATES } from "@/lib/search/states";
 
 // Build a full-name → 2-letter-code lookup once at module level.
@@ -26,7 +18,7 @@ function normalizeState(raw: string | null): string | null {
   return STATE_NAME_TO_CODE[raw.toLowerCase()] ?? raw;
 }
 
-export const revalidate = 3600;
+export const revalidate = 300;
 
 export type SearchIndexEntry = {
   n: string;        // full_name
@@ -37,30 +29,19 @@ export type SearchIndexEntry = {
 };
 
 export async function GET() {
-  const admin = createAdminClient();
-
-  const { data, error } = await admin
-    .from("politicians")
-    .select("full_name, slug, state, office, party")
-    .eq("is_active", true)
-    .eq("is_test", false)
-    .order("full_name");
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  try {
+    const rows = await loadPoliticianIndex();
+    const index: SearchIndexEntry[] = rows.map(([, name, slug, state, office, party]) => ({
+      n: name,
+      s: slug,
+      st: normalizeState(state),
+      o: office,
+      p: party,
+    }));
+    return NextResponse.json(index, {
+      headers: { "Cache-Control": "public, s-maxage=300, stale-while-revalidate=300" },
+    });
+  } catch {
+    return NextResponse.json({ error: "Search index unavailable" }, { status: 503 });
   }
-
-  const index: SearchIndexEntry[] = (data ?? []).map((p) => ({
-    n: p.full_name,
-    s: p.slug,
-    st: normalizeState(p.state),
-    o: p.office,
-    p: p.party,
-  }));
-
-  return NextResponse.json(index, {
-    headers: {
-      "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=7200",
-    },
-  });
 }

@@ -9,8 +9,7 @@ export function DashboardShell({ children, loading = false }: { children: ReactN
       <header className={styles.pageHeader}>
         <div>
           <p className={styles.eyebrow}>Your team workspace</p>
-          <h1>Make your answer count.</h1>
-          <p className={styles.intro}>Respond to questions, review drafts, and manage your public profile.</p>
+          <h1>Respond to questions, review drafts, and manage your public profile.</h1>
         </div>
         {!loading && <Link href="/verify" className={styles.secondaryButton}>Manage verification <span aria-hidden="true">↗</span></Link>}
       </header>

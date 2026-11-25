@@ -13,6 +13,7 @@ export type DirectoryPerson = {
   is_candidate: boolean;
   incumbent_challenge: string | null;
   office: string | null;
+  district?: string | null;
   state: string | null;
   party: string | null;
   photo_url: string | null;

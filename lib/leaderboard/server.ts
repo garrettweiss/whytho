@@ -1,5 +1,6 @@
 import "server-only";
 
+import { loadCanonicalPeople } from "@/lib/identity/public";
 import { unstable_cache } from "next/cache";
 import { createPublicClient } from "@/lib/supabase/server";
 import { isValidIsoWeek } from "@/lib/profile/helpers";
@@ -24,7 +25,6 @@ export const getLeaderboard = unstable_cache(async (): Promise<LeaderboardData> 
         .eq("status", "active")
         .eq("week_number", weekNumber)
         .gte("net_upvotes", 10)
-        .eq("politicians.is_active", true)
         .eq("politicians.is_test", false)
         .order("id", { ascending: true })
         .limit(LEADERBOARD_QUERY_PAGE_SIZE);
@@ -44,7 +44,6 @@ export const getLeaderboard = unstable_cache(async (): Promise<LeaderboardData> 
         .eq("question.week_number", weekNumber)
         .eq("question.status", "active")
         .gte("question.net_upvotes", 10)
-        .eq("question.politician.is_active", true)
         .eq("question.politician.is_test", false)
         .order("id", { ascending: true })
         .limit(LEADERBOARD_QUERY_PAGE_SIZE);
@@ -62,7 +61,8 @@ export const getLeaderboard = unstable_cache(async (): Promise<LeaderboardData> 
     }) : [];
 
     if (controller.signal.aborted) throw new Error("Leaderboard read timed out");
-    const entries = rankOfficialResponses(questions, answers, weekNumber);
+    const canonicalPeople = await loadCanonicalPeople(supabase, questions.map(question => question.politician_id), controller.signal);
+    const entries = rankOfficialResponses(questions, answers, weekNumber, canonicalPeople);
     return {
       weekNumber,
       entries,
@@ -73,4 +73,4 @@ export const getLeaderboard = unstable_cache(async (): Promise<LeaderboardData> 
   } finally {
     clearTimeout(timer);
   }
-}, ["public-official-response-leaderboard-v1"], { revalidate: 300, tags: ["politician-profile"] });
+}, ["public-official-response-leaderboard-identity-v2"], { revalidate: 300, tags: ["politician-profile"] });

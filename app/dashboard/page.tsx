@@ -1,9 +1,9 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { cookies } from "next/headers";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { TeamManager } from "@/components/dashboard/team-manager";
+import { QuestionEmailPreferences } from "@/components/dashboard/question-email-preferences";
 import { ProfileEditor } from "@/components/dashboard/profile-editor";
 import { DisconnectButton } from "@/components/dashboard/disconnect-button";
 import { AnswerEditButton } from "@/components/dashboard/answer-edit-button";
@@ -12,6 +12,7 @@ import { DashboardQuestionInbox } from "@/components/dashboard/question-inbox";
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
 import { AnswerMediaDisplay } from "@/components/answers/answer-media-display";
 import { safeAnswerMediaUrl } from "@/components/answers/media-url";
+import { PORTRAIT_RIGHTS_VERSION } from "@/lib/photos/policy";
 import { isValidIsoWeek, safeWebUrl } from "@/lib/profile/helpers";
 import styles from "@/components/dashboard/dashboard.module.css";
 
@@ -72,12 +73,8 @@ export default async function DashboardPage() {
     redirect("/sign-in?redirect=/dashboard");
   }
 
-  // Respect the view mode toggle — citizens (or politicians in citizen mode) cannot access dashboard
-  const cookieStore = await cookies();
-  const viewMode = cookieStore.get("whytho-view-mode")?.value;
-  if (viewMode === "citizen") {
-    redirect("/");
-  }
+  // Visiting /dashboard is explicit intent, so the citizen view-mode cookie does not block it.
+  // Membership checks below still decide what the user can see.
 
   const { data: weekData, error: weekError } = await supabase.rpc("current_week_number").abortSignal(AbortSignal.timeout(8_000));
   if (weekError || typeof weekData !== "number" || !isValidIsoWeek(weekData)) return <DashboardUnavailable />;
@@ -95,6 +92,9 @@ export default async function DashboardPage() {
         state,
         party,
         photo_url,
+        photo_source_url,
+        photo_credit,
+        photo_rights_basis,
         website_url,
         bio,
         verification_tier,
@@ -126,6 +126,9 @@ export default async function DashboardPage() {
       state: string | null;
       party: string | null;
       photo_url: string | null;
+      photo_source_url: string | null;
+      photo_credit: string | null;
+      photo_rights_basis: string | null;
       website_url: string | null;
       bio: string | null;
       verification_tier: string;
@@ -230,6 +233,10 @@ export default async function DashboardPage() {
   return <DashboardShell>
     {politiciansData.map(({ politician, role, isOnlyAdmin, questions, drafts, pendingDrafts, stats }) => {
       const photoUrl = safeWebUrl(politician.photo_url);
+      const teamPhoto = politician.photo_rights_basis === PORTRAIT_RIGHTS_VERSION;
+      const photoCredit = politician.photo_credit?.trim();
+      const sourcePage = politician.photo_rights_basis?.split("; ")[1];
+      const photoSource = safeWebUrl(sourcePage) ?? safeWebUrl(politician.photo_source_url);
       const profileVerified = ["2", "3"].includes(politician.verification_tier);
       const canPublish = profileVerified && ["admin", "editor"].includes(role);
       return <section key={politician.id} className={styles.politician} aria-labelledby={`name-${politician.id}`}>
@@ -244,6 +251,12 @@ export default async function DashboardPage() {
             <div className={styles.badgeRow}><TierBadge tier={politician.verification_tier} /><span className={styles.eyebrow}>{role} access</span></div>
             <h2 id={`name-${politician.id}`}><Link href={`/${politician.slug}`}>{politician.full_name}</Link></h2>
             <p className={styles.identityMeta}>{[politician.office, politician.state, politician.party].filter(Boolean).join(" · ")}</p>
+            {photoUrl && <p className={`${styles.identityMeta} ${styles.photoAttribution}`}>
+              {teamPhoto ? "Photo supplied by the verified profile team" : photoSource ? (
+                <a href={photoSource} rel="noreferrer">Original photo source</a>
+              ) : "Photo source unavailable"}
+              {photoCredit && <> · Credit to {photoCredit}</>}
+            </p>}
           </div>
           <Link href={!profileVerified ? `/verify?prefill=${politician.id}` : `/${politician.slug}`} className={styles.secondaryButton}>
             {!profileVerified ? "Verify your identity" : "View public profile"} <span aria-hidden="true">↗</span>
@@ -287,6 +300,7 @@ export default async function DashboardPage() {
             <p className={styles.meta}>Your access: {role}. Changes here apply to {politician.full_name}.</p>
             {role === "admin" && profileVerified && <ProfileEditor currentPhotoUrl={politician.photo_url} politicianId={politician.id} currentWebsiteUrl={politician.website_url} currentBio={politician.bio} currentSocialHandles={politician.social_handles as Record<string, string> | null} />}
             <TeamManager politicianId={politician.id} callerRole={role} />
+            <QuestionEmailPreferences politicianId={politician.id} profileVerified={profileVerified} />
             <div className={styles.panel}><DisconnectButton politicianId={politician.id} politicianName={politician.full_name} isOnlyAdmin={isOnlyAdmin} /></div>
           </aside>
         </div>

@@ -15,6 +15,7 @@ dotenv.config({ path: ".env.local", override: true });
 
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
+import { handleOf, identityMemberIds, loadJackProfiles, normalizedJackName, normalizedJackState, uniqueCanonicalMatch } from "./jack-identity";
 
 const supabase = createClient<Database>(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -94,23 +95,24 @@ async function main() {
   let updated = 0;
   let skipped = 0;
   let notFound = 0;
+  const profiles = await loadJackProfiles(supabase, ["Governor"]);
 
   for (const gov of GOVERNOR_HANDLES) {
-    const { data: politicians } = await supabase
-      .from("politicians")
-      .select("id, full_name, social_handles")
-      .eq("state", gov.state)
-      .eq("office", "Governor")
-      .ilike("full_name", `%${gov.name.split(" ")[1] ?? gov.name}%`)
-      .eq("is_active", true);
-
-    if (!politicians || politicians.length === 0) {
-      console.log(`  ⚠️  Not found in DB: ${gov.name} (${gov.state})`);
+    const profile = uniqueCanonicalMatch(profiles, profiles.filter(row => row.office === "Governor"
+      && normalizedJackState(row.state) === gov.state && normalizedJackName(row.full_name) === normalizedJackName(gov.name)));
+    if (!profile) {
+      console.log(`  Not found or ambiguous identity: ${gov.name} (${gov.state})`);
       notFound++;
       continue;
     }
 
-    for (const p of politicians) {
+    for (const p of [profile]) {
+      const members = new Set(identityMemberIds(profiles, p.id));
+      if (profiles.some(row => members.has(row.id) && handleOf(row) && handleOf(row)!.toLowerCase() !== gov.twitter.toLowerCase())) {
+        console.log(`  Skipping ${p.full_name}: conflicting handle requires review`);
+        skipped++;
+        continue;
+      }
       const existing = (p.social_handles ?? {}) as Record<string, string>;
       if (existing.twitter) {
         skipped++;
@@ -120,7 +122,7 @@ async function main() {
       if (DRY_RUN) {
         console.log(`  [preview] ${p.full_name} (${gov.state}) → @${gov.twitter} (${gov.confidence})`);
       } else {
-        await supabase
+        const { error } = await supabase
           .from("politicians")
           .update({
             social_handles: {
@@ -129,7 +131,10 @@ async function main() {
               twitter_confidence: gov.confidence,
             },
           })
-          .eq("id", p.id);
+          .eq("id", p.id).is("canonical_politician_id", null)
+          .eq("is_active", true).eq("is_test", false).select("id").single();
+        if (error) throw error;
+        p.social_handles = { ...existing, twitter: gov.twitter, twitter_confidence: gov.confidence };
         console.log(`  ✅ ${p.full_name} (${gov.state}) → @${gov.twitter} (${gov.confidence})`);
       }
       updated++;
@@ -137,11 +142,7 @@ async function main() {
   }
 
   console.log(`\n📊 Coverage report...`);
-  const { data } = await supabase
-    .from("politicians")
-    .select("social_handles")
-    .eq("office", "Governor")
-    .eq("is_active", true);
+  const data = profiles.filter(row => !row.canonical_politician_id);
 
   const total = data?.length ?? 0;
   const withHandle = data?.filter((p) => {

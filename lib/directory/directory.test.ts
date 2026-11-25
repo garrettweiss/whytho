@@ -1,9 +1,26 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { decodeDirectoryCursor, encodeDirectoryCursor, readEmbeddedCount } from "./cursor";
+import { decodeDirectoryCursor, DIRECTORY_SNAPSHOT_MAX_AGE_MS, DIRECTORY_SNAPSHOT_MS, encodeDirectoryCursor, readEmbeddedCount } from "./cursor";
 import { arrangeDirectoryPeople } from "./presentation";
 import { escapeLike, normalizeDirectoryFilters, parseDirectorySearch, quoteFilterValue, stateRecordValues } from "./search";
+import { politicianNameRank, preparePoliticianName } from "../search/politician-name";
 import { DirectoryInputError, type DirectoryFilters } from "./types";
+
+test("politician search ranks literal, omitted-initial and typo matches in that order", () => {
+  const rank = (name: string, query: string) =>
+    politicianNameRank(preparePoliticianName(name), preparePoliticianName(query));
+  assert.ok(rank("John Curtis", "John Curtis") < rank("John R. Curtis", "John Curtis"));
+  assert.ok(rank("John R. Curtis", "John Curtis") < rank("John R. Curtis", "John Curits"));
+  assert.ok(Number.isFinite(rank("John R. Curtis", "John Curits")));
+  assert.ok(Number.isFinite(rank("John R. Curtis", "Jon Curtis")));
+  assert.ok(Number.isFinite(rank("John R. Curtis", "John Cu")));
+  assert.ok(Number.isFinite(rank("John R. Curtis", "john r curtis")));
+  assert.ok(Number.isFinite(rank("José O’Rourke", "jose o'rourke")));
+  assert.equal(rank("John R. Curtis", "Joan Curits"), Infinity);
+  assert.equal(rank("John Michael Curtis", "John Curits"), Infinity);
+  assert.equal(rank("John R. Curtis", "Jim Curits"), Infinity);
+  assert.equal(rank("John R. Curtis", "Jhn"), Infinity);
+});
 
 test("search distinguishes federal and state offices and combined jurisdictions", () => {
   assert.deepEqual(parseDirectorySearch("California state senator").filters, { q: "", state: "CA", office: "state-senate" });
@@ -25,6 +42,25 @@ test("people, aliases, names with punctuation and state codes survive interpreta
   assert.equal(parseDirectorySearch("new-york").filters.state, "NY");
   assert.equal(parseDirectorySearch("CA").filters.state, "CA");
   assert.deepEqual(stateRecordValues("CA"), ["CA", "California"]);
+});
+
+test("mayor search keeps the city and supports commonly used NYC wording", () => {
+  assert.deepEqual(parseDirectorySearch("Mayors").filters, { q: "", state: "", office: "mayor" });
+  assert.deepEqual(parseDirectorySearch("Mayor of New York City").filters, { q: "New York City", state: "", office: "mayor" });
+  assert.deepEqual(parseDirectorySearch("NYC mayor").filters, { q: "New York City", state: "", office: "mayor" });
+  assert.deepEqual(parseDirectorySearch("California mayors").filters, { q: "", state: "CA", office: "mayor" });
+});
+
+test("mayor pagination preserves its position before and after the ranked roster", () => {
+  const filters = { q: "", state: "", office: "mayor" };
+  const position = { name: "Zohran Mamdani", id: "127cdf41-9370-4aa7-82fc-c31936aac111", weekNumber: 202648 };
+  for (const population of [8584629, null]) {
+    const cursor = { ...position, population };
+    assert.deepEqual(decodeDirectoryCursor(encodeDirectoryCursor(cursor, filters), filters), cursor);
+  }
+  for (const population of [undefined, 0, -1, 1.5, 2147483648]) {
+    assert.throws(() => decodeDirectoryCursor(encodeDirectoryCursor({ ...position, population }, filters), filters), DirectoryInputError);
+  }
 });
 
 test("validation rejects overlong, control, unknown state and unknown office filters", () => {
@@ -54,6 +90,16 @@ test("pagination preserves its question cohort across weekly resets and rejects 
   assert.equal(decodeDirectoryCursor(encodeDirectoryCursor(cursor, filters), filters)?.weekNumber, 202653);
   for (const weekNumber of [0, 202600, 202654, 202601.5, 999999]) {
     assert.throws(() => decodeDirectoryCursor(encodeDirectoryCursor({ ...cursor, weekNumber }, filters), filters), DirectoryInputError);
+  }
+});
+
+test("homepage continuation pins the ranking snapshot and rejects invalid timestamps", () => {
+  const filters: DirectoryFilters = { q: "", state: "", office: "" };
+  const snapshot = Math.floor(Date.now() / DIRECTORY_SNAPSHOT_MS) * DIRECTORY_SNAPSHOT_MS;
+  const cursor = { name: "Same Name", id: "127cdf41-9370-4aa7-82fc-c31936aac111", weekNumber: 202653, snapshot };
+  assert.deepEqual(decodeDirectoryCursor(encodeDirectoryCursor(cursor, filters), filters), cursor);
+  for (const invalid of [snapshot + 1, snapshot + DIRECTORY_SNAPSHOT_MS, snapshot - DIRECTORY_SNAPSHOT_MAX_AGE_MS - DIRECTORY_SNAPSHOT_MS]) {
+    assert.throws(() => decodeDirectoryCursor(encodeDirectoryCursor({ ...cursor, snapshot: invalid }, filters), filters), DirectoryInputError);
   }
 });
 

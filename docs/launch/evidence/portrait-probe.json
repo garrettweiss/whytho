@@ -1,0 +1,16 @@
+{
+  "checked_at": "2026-10-31T05:33:03.118Z",
+  "scope": "read-only live photo fetch and dimension audit; not likeness/rights certification",
+  "profiles": 11513,
+  "non_test_profiles": 11511,
+  "with_photo": 7615,
+  "source_recorded": 0,
+  "checked": 8,
+  "counts": {
+    "too_small": 3,
+    "timeout": 1,
+    "http_403": 1,
+    "small_portrait": 1,
+    "usable_dimensions": 2
+  }
+}

@@ -10,7 +10,7 @@ const sections = [
   ]},
   { title: "Questions and votes", questions: [
     ["What should I ask?", "Ask a specific, civil question about the person’s public responsibilities, policies, or public statements. Use the report control on a question to flag spam, harassment, or other concerns."],
-    ["How many questions can I submit?", "The current limit is five questions per user in a rolling 24-hour window, with at most three for the same politician in that window."],
+    ["How many questions can I submit?", "You can submit up to five questions to each politician per day. The limit is a rolling 24-hour window, so it frees up as your earlier questions age past a day."],
     ["What makes a question qualifying?", "At least ten net votes, meaning upvotes minus downvotes. Qualifying questions determine the response-rate denominator. Current-week questions can receive votes; archived questions are read-only."],
     ["What are suggested questions?", "Some questions are generated from public records. They are labeled as AI-generated suggested questions and can be voted on like other current-week questions."],
   ]},

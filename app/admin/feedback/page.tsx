@@ -1,7 +1,7 @@
 /**
- * /admin/feedback: Chatbot feedback queue
+ * /admin/feedback: Feedback and mayor suggestion queue
  *
- * Shows user feedback collected by the chatbot assistant.
+ * Shows user feedback collected by the chatbot assistant and mayor suggestions.
  * Team can review, action, or dismiss items.
  * Protected by ?secret=ADMIN_SECRET
  */
@@ -31,6 +31,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   ux: "🎨 UX",
   content: "📝 Content",
   other: "💬 Other",
+  mayor_request: "Mayor suggestion",
 };
 
 export default async function FeedbackPage({ searchParams }: Props) {
@@ -69,10 +70,8 @@ export default async function FeedbackPage({ searchParams }: Props) {
             <span>/</span>
             <span>Feedback</span>
           </div>
-          <h1 className="text-2xl font-bold">Chatbot Feedback</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            User feedback and product suggestions collected by the WhyTho Assistant
-          </p>
+          <h1 className="text-2xl font-bold">Feedback and mayor suggestions</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">Review submissions from WhyTho users.</p>
         </div>
 
         {/* Status tabs */}
@@ -111,7 +110,7 @@ export default async function FeedbackPage({ searchParams }: Props) {
               {activeStatus === "new" ? "No new feedback" : `No ${activeStatus} items`}
             </p>
             <p className="text-sm text-muted-foreground mt-1">
-              Feedback is collected automatically when users interact with the chatbot.
+              Feedback and mayor suggestions will appear here as people submit them.
             </p>
           </div>
         ) : (
@@ -141,7 +140,11 @@ export default async function FeedbackPage({ searchParams }: Props) {
                   </div>
 
                   {/* Raw feedback */}
-                  <p className="text-sm">{item.raw_message}</p>
+                  <p className="whitespace-pre-line break-words text-sm [overflow-wrap:anywhere]">{item.raw_message}</p>
+
+                  {item.category === "mayor_request" && (
+                    <p className="text-xs text-muted-foreground">Confirm the current officeholder on the official city site and check that their profile is missing before adding it.</p>
+                  )}
 
                   {/* Claude recommendation */}
                   {item.recommendation && (
@@ -153,9 +156,9 @@ export default async function FeedbackPage({ searchParams }: Props) {
                 </div>
 
                 {/* Actions */}
-                {activeStatus === "new" && (
-                  <div className="px-4 py-2 border-t flex items-center gap-2">
-                    <FeedbackActions feedbackId={item.id} adminSecret={secret ?? ""} />
+                {(activeStatus === "new" || (activeStatus === "reviewed" && item.category === "mayor_request")) && (
+                  <div className="px-4 py-2 border-t flex flex-wrap items-center gap-2">
+                    <FeedbackActions feedbackId={item.id} adminSecret={secret ?? ""} isMayorSuggestion={item.category === "mayor_request"} isReviewed={activeStatus === "reviewed"} />
                   </div>
                 )}
               </div>

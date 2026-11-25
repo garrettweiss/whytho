@@ -1,3 +1,4 @@
+import { resolvePoliticianIdentity } from "@/lib/identity/server";
 import { NextRequest, NextResponse } from "next/server";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { getResend, FROM_EMAIL } from "@/lib/email/resend";
@@ -12,13 +13,19 @@ export async function POST(request: NextRequest) {
   if (!user || user.is_anonymous) return NextResponse.json({ error: "Authentication required" }, { status: 401 });
   const body = await readAccountBody(request);
   if (!body || !isUuid(body.politician_id)) return NextResponse.json({ error: "A valid politician_id is required" }, { status: 400 });
-  const { data: membership, error: membershipError } = await supabase.from("politician_team").select("role").eq("politician_id", body.politician_id).eq("user_id", user.id).maybeSingle();
+  let canonicalId: string;
+  try {
+    const identity = await resolvePoliticianIdentity(body.politician_id, createAdminClient());
+    if (!identity) return NextResponse.json({ error: "Profile not found" }, { status: 404 });
+    canonicalId = identity.canonicalId;
+  } catch { return NextResponse.json({ error: "Profile identity unavailable" }, { status: 503 }); }
+  const { data: membership, error: membershipError } = await supabase.from("politician_team").select("role").eq("politician_id", canonicalId).eq("user_id", user.id).maybeSingle();
   if (membershipError) return accountError(membershipError);
   if (!membership) {
     const limit = await durableRateLimit(rateLimitKey("profile-claim", user.id), 5, 3600);
     if (limit !== "allowed") return NextResponse.json({ error: limit === "limited" ? "Too many new claim attempts. Try again in an hour." : "Claim verification is temporarily unavailable." }, { status: limit === "limited" ? 429 : 503 });
   }
-  const { data, error } = await createAdminClient().rpc("claim_politician_profile", { p_actor_id: user.id, p_politician_id: body.politician_id });
+  const { data, error } = await createAdminClient().rpc("claim_politician_profile", { p_actor_id: user.id, p_politician_id: canonicalId });
   if (error) return accountError(error);
   const claim = data as { resumed: boolean; politician_name: string; politician_slug: string };
   if (!claim.resumed && user.email) {

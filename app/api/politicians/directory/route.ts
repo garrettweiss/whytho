@@ -17,12 +17,14 @@ export async function GET(request: NextRequest) {
 
   try {
     const params = request.nextUrl.searchParams;
-    const allowed = ["q", "state", "office", "scope", "cursor"];
+    const allowed = ["q", "state", "office", "scope", "cursor", "homepage"];
     if (params.toString().length > 2000 || [...params.keys()].some((key) => !allowed.includes(key) || params.getAll(key).length !== 1)) {
       throw new DirectoryInputError("Use a valid directory search.");
     }
     const filters = normalizeDirectoryFilters({ q: params.get("q") ?? "", state: params.get("state") ?? "", office: params.get("office") ?? "", scope: params.get("scope") ?? "" });
-    const page = await getDirectoryPage(filters, params.get("cursor") ?? undefined);
+    const homepage = params.get("homepage");
+    if (homepage !== null && (homepage !== "1" || filters.scope)) throw new DirectoryInputError("Use a valid directory search.");
+    const page = await getDirectoryPage(filters, params.get("cursor") ?? undefined, homepage === "1");
     return NextResponse.json(page, { headers: { "Cache-Control": PUBLIC_CACHE } });
   } catch (error) {
     if (error instanceof DirectoryInputError) {

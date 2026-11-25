@@ -625,7 +625,7 @@ Account must be unambiguously WhyTho's brand, not the politician's:
 ### Security
 
 - Supabase RLS: `auth.uid()` wrapped in `(SELECT auth.uid())` subselect for per-statement caching
-- Rate limiting: `db_pre_request` function; max 30 votes/user/minute; max 5 questions/user/day
+- Rate limiting: `db_pre_request` function for votes, max 30 votes/user/minute. A database trigger caps question submissions at five per user per politician.
 - Vote fraud: `UNIQUE(user_id, question_id, week_number)` constraint at DB level
 - Bot prevention: Cloudflare Turnstile on all POST endpoints
 - AI guardrails: strict prompt constraints; no speculation beyond public record; full audit logging

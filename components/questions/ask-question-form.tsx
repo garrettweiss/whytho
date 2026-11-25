@@ -13,7 +13,7 @@ const SITE_KEY = process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY ?? "";
 const VERIFICATION_LOAD_TIMEOUT_MS = 15_000;
 const VERIFICATION_MESSAGES = {
   loading: "Loading verification…",
-  ready: "Complete the verification check below. It may finish automatically.",
+  ready: "Complete the check below to submit your question.",
   verified: "Verification complete.",
   error: "Verification could not load or finish. Retry below. If it keeps failing, allow this site in your content blocker or try another browser.",
   expired: "Verification expired. Retry the check before submitting.",
@@ -22,6 +22,15 @@ const VERIFICATION_MESSAGES = {
 } as const;
 type VerificationStatus = keyof typeof VERIFICATION_MESSAGES;
 type VerificationState = { status: VerificationStatus; token: string | null };
+
+const QUESTION_STARTERS = [
+  { topic: "Housing", body: "Which housing-cost measures within your office’s authority will you prioritize, and how can residents track progress?" },
+  { topic: "Transportation", body: "How does your office decide which transportation needs to prioritize, and where can residents review the criteria?" },
+  { topic: "Public services", body: "How can residents track a request for help from your office, and what response time should they expect?" },
+  { topic: "Transparency", body: "Where can residents find your office’s public updates, and how can they submit questions about them?" },
+  { topic: "Health care", body: "Which health-care access priorities fall within your office’s responsibilities, and what action do you plan to take?" },
+  { topic: "Emergency readiness", body: "How does your office help residents find reliable emergency-preparedness information?" },
+] as const;
 
 interface Props {
   politicianId: string;
@@ -55,6 +64,7 @@ export function AskQuestionForm({ politicianId, politicianName, onSubmitted, app
   const signInHref = `/sign-in?redirect=${encodeURIComponent(`${pathname}#ask-question`)}`;
   const verified = verification.status === "verified" && !!verification.token;
   const canRetryVerification = verification.status === "error" || verification.status === "expired";
+  const showVerification = verification.status !== "loading" && !verified;
 
   useEffect(() => {
     if (success) successRef.current?.focus();
@@ -136,9 +146,9 @@ export function AskQuestionForm({ politicianId, politicianName, onSubmitted, app
 
   if (!user || user.is_anonymous) {
     return <section id="ask-question" className={rootClass} aria-labelledby={`${id}-title`}>
-      <h2 id={`${id}-title`} className={titleClass}>Your question belongs here.</h2>
+      <h2 id={`${id}-title`} className={titleClass}>What do you want to know?</h2>
       <p className={textClass}>Ask {politicianName} something specific. People can vote to bring it to their attention.</p>
-      <Link href={signInHref} className={buttonClass}>Sign in to ask <span aria-hidden="true">↗</span></Link>
+      <Link href={signInHref} className={buttonClass}>Sign in to ask</Link>
     </section>;
   }
 
@@ -151,21 +161,41 @@ export function AskQuestionForm({ politicianId, politicianName, onSubmitted, app
   }
 
   return <form id="ask-question" className={rootClass} onSubmit={handleSubmit} aria-labelledby={`${id}-title`} aria-busy={isPending}>
-    <h2 id={`${id}-title`} className={titleClass}>Ask {politicianName}.</h2>
+    <h2 id={`${id}-title`} className={titleClass}>What do you want to know?</h2>
+    <p className={textClass}>Ask {politicianName} something specific. People can vote to bring it to their attention.</p>
+    <details className={textClass}>
+      <summary>Question starters</summary>
+      <p>Choose a topic to start a draft you can edit.</p>
+      <div className="flex flex-wrap gap-2">
+        {QUESTION_STARTERS.map(({ topic, body }) => (
+          <button key={topic} type="button" className="min-h-11 rounded-md border px-3"
+            disabled={isPending || text.trim().length > 0}
+            onClick={() => {
+              setText((current) => current.trim() ? current : body);
+              setError(null);
+              textareaRef.current?.focus();
+            }}>
+            {topic}
+          </button>
+        ))}
+      </div>
+      {text.trim().length > 0 && <p>Clear your draft to choose another starter.</p>}
+    </details>
     <label htmlFor={`${id}-question`} className={face ? styles.inputLabel : "block text-sm font-medium"}>Your question</label>
     <textarea ref={textareaRef} id={`${id}-question`} name="question" value={text} onChange={(event) => setText(event.target.value)}
       placeholder="What do you want them to answer? Be specific and respectful." rows={4} minLength={MIN} maxLength={MAX} required disabled={isPending}
       aria-describedby={`${id}-hint ${id}-count${error ? ` ${id}-error` : ""}`} aria-invalid={!!error}
       className={face ? styles.textarea : "w-full resize-y rounded-md border bg-background px-3 py-2 text-base placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-60"} />
     <div className={face ? styles.formMeta : "flex flex-wrap justify-between gap-2 text-xs text-muted-foreground"}>
-      <p id={`${id}-hint`}>10–500 characters. Up to 5 questions per day.</p>
+      <p id={`${id}-hint`}>10–500 characters. You can ask each politician up to 5 questions per day.</p>
       <span id={`${id}-count`} aria-label={`${charCount} of ${MAX} characters`}>{charCount}/{MAX}</span>
     </div>
-    <div ref={verificationRef} role="group" tabIndex={-1} aria-labelledby={`${id}-verification-title`} aria-describedby={`${id}-verification-status`} className="space-y-2">
-      <p id={`${id}-verification-title`} className={face ? styles.inputLabel : "text-sm font-medium"}>Security verification</p>
+    <div ref={verificationRef} role="group" tabIndex={-1} aria-label="Security verification" aria-describedby={`${id}-verification-status`} className={showVerification ? "space-y-2" : "sr-only"}>
+      {showVerification && <p className={face ? styles.inputLabel : "text-sm font-medium"}>Security verification</p>}
       <p id={`${id}-verification-status`} role="status" className={canRetryVerification || verification.status === "unavailable" || verification.status === "unsupported" ? (face ? styles.error : "text-sm text-destructive") : textClass}>{VERIFICATION_MESSAGES[verification.status]}</p>
       {SITE_KEY && <Turnstile key={verificationAttempt} id={`${id}-turnstile`} siteKey={SITE_KEY}
-        options={{ size: "compact", appearance: "always", theme: face ? "dark" : "auto", retry: "never", refreshExpired: "manual", refreshTimeout: "manual" }}
+        style={verified ? { display: "none" } : undefined}
+        options={{ size: "compact", appearance: "interaction-only", theme: face ? "dark" : "auto", retry: "never", refreshExpired: "manual", refreshTimeout: "manual" }}
         onBeforeInteractive={() => setVerification({ status: "ready", token: null })}
         onSuccess={(token) => setVerification({ status: token ? "verified" : "error", token: token || null })}
         onExpire={() => setVerification({ status: "expired", token: null })}

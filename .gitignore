@@ -41,3 +41,8 @@ yarn-error.log*
 next-env.d.ts
 diagnostics/
 supabase/.temp/
+.scratch/
+
+# generated artifacts and data snapshots
+/outputs/
+__pycache__/

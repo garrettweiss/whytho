@@ -1,0 +1,15 @@
+{
+  "observed_date_local": "2026-10-30",
+  "timezone": "America/Los_Angeles",
+  "url": "https://whytho.us/aaron-aylward-sd",
+  "method": "Existing Chrome tab, reloaded through UI, inspected accessibility tree",
+  "result": "Security verification displayed failure and Submit question was disabled",
+  "visible_message": "Verification could not load or finish. Retry below. If it keeps failing, allow this site in your content blocker or try another browser.",
+  "prior_console_evidence": {
+    "code": "110200",
+    "timestamp_utc": "2026-10-31T05:40:12.745Z",
+    "meaning": "Domain not authorized",
+    "source": "https://developers.cloudflare.com/turnstile/troubleshooting/client-side-errors/error-codes/"
+  },
+  "limits": "The visible refreshed failure is confirmed. The logged error is historical to this tab, not claimed as a new post-reload console event. No CAPTCHA solved, question submitted, third party contacted or Cloudflare setting changed."
+}

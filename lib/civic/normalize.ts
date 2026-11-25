@@ -12,6 +12,23 @@ import {
 } from "./congress";
 import { mapPartyName, mapChamberTitle } from "./openstates";
 
+// Keep importer normalization aligned with the transactional identity contract.
+export { normalizeIdentityState as normalizeStateCode, normalizeIdentityDistrict as normalizeDistrict } from "../identity/normalize";
+import { normalizeIdentityState as normalizeStateCode, normalizeIdentityDistrict as normalizeDistrict } from "../identity/normalize";
+
+/** Preserve middle names and suffixes. They are evidence, not disposable decoration. */
+export function normalizeFecName(raw: string): string {
+  const parts = raw.trim().split(",").map((part) => part.trim()).filter(Boolean);
+  const ordered = parts.length > 1
+    ? [parts[1], parts[0], ...parts.slice(2)].join(" ")
+    : parts[0] ?? "";
+  return ordered.split(/\s+/).filter(Boolean).map((word) => {
+    if (/^(II|III|IV|VI|VII|VIII|IX)$/i.test(word)) return word.toUpperCase();
+    if (/^[a-z]\.?$/i.test(word)) return `${word[0]!.toUpperCase()}.`;
+    return word.toLowerCase().replace(/(^|[-'])\p{L}/gu, (part) => part.toUpperCase());
+  }).join(" ");
+}
+
 /** Extract 2-letter state code from OCD jurisdiction ID.
  *  e.g. "ocd-jurisdiction/country:us/state:ca/legislature" → "CA"
  */
@@ -53,7 +70,8 @@ export function normalizeCongressMember(
   const firstName = nameParts[1] ?? "";
   const displayName = firstName ? `${firstName} ${lastName}` : fullName;
 
-  const slug = generateSlug(displayName, member.state);
+  const state = normalizeStateCode(member.state);
+  const slug = generateSlug(displayName, state);
 
   // Congress.gov list endpoint doesn't include top-level chamber — derive from most recent term
   const sortedTerms = [...(member.terms?.item ?? [])].sort(
@@ -84,8 +102,8 @@ export function normalizeCongressMember(
     full_name: displayName,
     aliases: [displayName, `${titlePrefix} ${displayName}`, lastName].filter(Boolean),
     office: mapChamberToOffice(currentChamber),
-    state: member.state,
-    district: member.district ? String(member.district) : null,
+    state,
+    district: currentChamber === "Senate" ? null : normalizeDistrict(member.district),
     party: member.party === "D" ? "Democrat" : member.party === "R" ? "Republican" : member.party,
     photo_url: member.bioguideId ? getBioguidePhotoUrl(member.bioguideId) : null,
     bioguide_id: member.bioguideId ?? null,
@@ -108,7 +126,7 @@ export function normalizeOpenStatesPerson(
   const stateFromJurisdiction = person.jurisdiction?.id
     ? extractStateFromJurisdiction(person.jurisdiction.id)
     : "";
-  const state = (stateFromRole || stateFromJurisdiction).toLowerCase();
+  const state = normalizeStateCode(stateFromRole || stateFromJurisdiction);
   const slug = generateSlug(fullName, state);
 
   const aliases: Omit<AliasInsert, "politician_id">[] = [];
@@ -136,7 +154,7 @@ export function normalizeOpenStatesPerson(
       ? mapChamberTitle(role.org_classification, role.title)
       : null,
     state: state.toUpperCase(),
-    district: role?.district ?? null,
+    district: normalizeDistrict(role?.district),
     party: mapPartyName(person.party),
     photo_url: person.image ?? null,
     openstates_id: person.id ?? null,
@@ -157,8 +175,16 @@ export function deduplicatePoliticians(
   const deduped: NormalizedPolitician[] = [];
 
   for (const p of politicians) {
-    // Deduplicate by bioguide_id first (most reliable), then by slug
-    const key = p.politician.bioguide_id ?? p.politician.slug;
+    // Names and slugs can collide between different people. Only exact repeated
+    // provider observations are dropped. Later, richer source evidence survives.
+    const providerKey = p.politician.openstates_id
+      ? `openstates.person:${p.politician.openstates_id}`
+      : p.politician.bioguide_id ? `congress.bioguide:${p.politician.bioguide_id}` : null;
+    if (providerKey === null) {
+      deduped.push(p);
+      continue;
+    }
+    const key = `${providerKey}:${JSON.stringify(p)}`;
     if (!seen.has(key)) {
       seen.add(key);
       deduped.push(p);

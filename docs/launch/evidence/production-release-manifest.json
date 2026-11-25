@@ -1,0 +1,54 @@
+{
+  "commit": "e33ee8278c0fa0363d955bffbc932512129703d8",
+  "site": "https://whytho.us",
+  "deployment": "CpA3Bd7jhRZCu5Mtgmykw85fBUNg",
+  "production_ready_at": "2026-10-31T21:02:33Z",
+  "migrations": [
+    {
+      "path": "supabase/migrations/20261031205615_account_transitions.sql",
+      "sha256": "96bf3325a020d185c223bf580a42334f071092523222707284bb6dacdc740d87"
+    },
+    {
+      "path": "supabase/migrations/20261031205619_launch_security.sql",
+      "sha256": "a7728e5f7eca2f174bdb4b60df453b5646df7384e3405f4c48ce1892365c0dd8"
+    },
+    {
+      "path": "supabase/migrations/20261031205623_portrait_permissions.sql",
+      "sha256": "55fd0bd9c66674958ccb85ff7e53030d5a2975fa5a70c7443feb315e38465384"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "docs/launch/evidence/release-production-http.json",
+      "sha256": "eac92b082eb5f5630a9a864be0c81a601f5622998edba30ebfc74b7b34b12c76"
+    },
+    {
+      "path": "docs/launch/evidence/release-production-security-http.json",
+      "sha256": "36313c0c7cc7b6488ff55e2ad8c2f6d90c750a3bddd8b06828039b843b4356c1"
+    },
+    {
+      "path": "docs/launch/evidence/release-combined-postconditions.json",
+      "sha256": "29c5e333769ce07b86603cb1ac28374111205e2a767a08b65de2bb36c759c1ed"
+    },
+    {
+      "path": "docs/launch/evidence/release-live-rpc-checks.json",
+      "sha256": "5e55ba96161613f6658165af7d9805526ee1bfee1c95391fa7a2a7264c8d374c"
+    },
+    {
+      "path": "docs/launch/evidence/release-final-account-db.log",
+      "sha256": "1d8012f376aea2248754b2dec2f65d567a406f9c7038f5b6704b84d9759683a2"
+    },
+    {
+      "path": "docs/launch/evidence/release-final-security-db.log",
+      "sha256": "55be7aa5777cc569b131eece7ac7e196ce49b200a1b74150cb4eea6cab289e03"
+    },
+    {
+      "path": "docs/launch/evidence/release-github-ci.log",
+      "sha256": "5b921ce17147a365ee754aa70b2f0f19a3b3f2b643c93cad8235b55d57464694"
+    },
+    {
+      "path": "docs/launch/evidence/release-advisors-after-security.json",
+      "sha256": "b08facb43756dd71c8cb375ca73c83c5278f1f4b47ba7431058b9dd510cbbe4e"
+    }
+  ]
+}

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { AnswerComposer } from "@/components/answers/answer-composer";
-import { AnswerEditButton } from "@/components/dashboard/answer-edit-button";
+import { AnswerCorrectionButton } from "@/components/dashboard/answer-edit-button";
 import { DisputeClientButton } from "@/components/dashboard/dispute-button";
 import styles from "./dashboard.module.css";
 
@@ -67,7 +67,7 @@ function QuestionCard({
           {isNew && <span className={styles.badge}>New</span>}
           {isQualifying ? <span className={styles.badge}>Qualifying question</span> : <span className={styles.meta}>Below 10 net upvotes</span>}
         </div>
-        {question.is_seeded && <p className={styles.meta}>📋 Suggested Question — AI-generated from public record</p>}
+        {question.is_seeded && <p className={styles.meta}>📋 Suggested Question: AI-generated from public record</p>}
         <p className={styles.questionBody}>{question.body}</p>
       </div>
       <div className={styles.questionAside}>
@@ -79,16 +79,19 @@ function QuestionCard({
     {officialAnswer && <div className={styles.answer}>
       <p className={`${styles.eyebrow} ${styles.success}`}>Official response</p>
       <p className={styles.answerBody}>{officialAnswer.body}</p>
-      {canPublish && <AnswerEditButton answerId={officialAnswer.id} initialBody={officialAnswer.body} createdAt={officialAnswer.published_at ?? officialAnswer.created_at} />}
+      {canPublish && <AnswerCorrectionButton answerId={officialAnswer.id} />}
     </div>}
     {aiAnswer && <div className={styles.analysis}>
       <p className={styles.eyebrow}>🤖 AI Analysis of Public Record</p>
       <p className={styles.analysisBody}>{aiAnswer.body}</p>
       <DisputeClientButton answerId={aiAnswer.id} />
     </div>}
-    {!officialAnswer && <div className={styles.composer}>
-      <AnswerComposer questionId={question.id} questionBody={question.body} politicianSlug={politicianSlug} politicianName={politicianName} isAdmin={isAdmin} profileVerified={profileVerified} canPublish={canPublish} />
-    </div>}
+    {!officialAnswer && <details className={styles.respond}>
+      <summary>Respond</summary>
+      <div className={styles.composer}>
+        <AnswerComposer questionId={question.id} questionBody={question.body} politicianSlug={politicianSlug} politicianName={politicianName} isAdmin={isAdmin} profileVerified={profileVerified} canPublish={canPublish} />
+      </div>
+    </details>}
   </article>;
 }
 
@@ -116,7 +119,7 @@ export function DashboardQuestionInbox({
   politicianName: string;
   cutoff48h: string;
 }) {
-  const [filter, setFilter] = useState<Filter>("all");
+  const [filter, setFilter] = useState<Filter>(() => (questions.some((q) => !hasOfficialAnswer(q)) ? "unanswered" : "all"));
   const isAdmin = role === "admin";
   const canPublish = profileVerified && ["admin", "editor"].includes(role);
 
@@ -137,10 +140,8 @@ export function DashboardQuestionInbox({
   return <div>
     <div className={styles.inboxHeader}>
       <h3 className={styles.sectionTitle}>This week’s questions</h3>
-      <p className={styles.meta}>{isLimited ? `Showing the top ${questions.length} of ${totalQuestions} active questions by net upvotes.` : `${questions.length} active question${questions.length !== 1 ? "s" : ""} this week.`}</p>
-      <p className={styles.meta}>{qualifying.length} {isLimited ? "shown " : ""}question{qualifying.length !== 1 ? "s have" : " has"} at least 10 net upvotes. {unansweredQualifying.length} of those have no published official response.</p>
-      <p className={styles.meta}>Questions with 10+ net upvotes count toward the public response rate. AI analysis and unpublished drafts do not count as official responses.</p>
-      {isLimited && <p className={styles.meta}>Filters apply to these {questions.length} loaded questions.</p>}
+      <p className={styles.meta}>{isLimited ? `Showing the top ${questions.length} of ${totalQuestions} active questions by net upvotes.` : `${questions.length} active question${questions.length !== 1 ? "s" : ""} this week.`} {qualifying.length} {qualifying.length === 1 ? "has" : "have"} 10+ net upvotes and {qualifying.length === 1 ? "counts" : "count"} toward your public response rate, {unansweredQualifying.length} of {unansweredQualifying.length === 1 ? "which is" : "which are"} unanswered.</p>
+      <details className={styles.methodology}><summary>How the rate is counted</summary><p className={styles.meta}>Only questions with 10+ net upvotes count toward the public response rate. AI analysis and unpublished drafts do not count as official responses.{isLimited ? ` Filters apply to the ${questions.length} loaded questions.` : ""}</p></details>
     </div>
     <div className={styles.filters} role="group" aria-label="Filter loaded questions">
       {FILTERS.map(({ key, label }) => {

@@ -1,0 +1,49 @@
+{
+  "origin": "https://whytho.us",
+  "checkedAt": "2026-10-31T21:03:07.940Z",
+  "passed": 10,
+  "total": 10,
+  "scope": "Signed-out requests and authorization rejection only; no authenticated writes, uploads, messages or CAPTCHA solves",
+  "results": [
+    {
+      "name": "Production security headers",
+      "passed": true
+    },
+    {
+      "name": "Signed-out POST /api/dashboard/photo rejected",
+      "passed": true
+    },
+    {
+      "name": "Signed-out PATCH /api/dashboard/profile rejected",
+      "passed": true
+    },
+    {
+      "name": "Signed-out POST /api/dashboard/team rejected",
+      "passed": true
+    },
+    {
+      "name": "Signed-out POST /api/verify/claim rejected",
+      "passed": true
+    },
+    {
+      "name": "Signed-out POST /api/verify/gov-email rejected",
+      "passed": true
+    },
+    {
+      "name": "Signed-out POST /api/verify/meta-tag rejected",
+      "passed": true
+    },
+    {
+      "name": "Cross-origin mutation rejected before handler",
+      "passed": true
+    },
+    {
+      "name": "Portrait credit endpoint reads migrated metadata safely",
+      "passed": true
+    },
+    {
+      "name": "Homepage remains publicly cached",
+      "passed": true
+    }
+  ]
+}

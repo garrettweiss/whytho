@@ -17,6 +17,7 @@ export type ProfileAnswerMedia = {
 };
 
 export type ProfileSource = { url?: string; title?: string; date?: string };
+export type ProfileAnswerCorrection = { id: string; body: string; created_at: string };
 
 export type ProfileAnswer = {
   id: string;
@@ -27,11 +28,14 @@ export type ProfileAnswer = {
   sources: ProfileSource[];
   is_disputed: boolean;
   created_at: string;
+  published_at?: string | null;
   answer_media: ProfileAnswerMedia[];
+  answer_corrections?: ProfileAnswerCorrection[];
 };
 
 export type ProfileQuestion = {
   id: string;
+  politician_id: string;
   body: string;
   net_upvotes: number;
   is_seeded: boolean;
@@ -45,11 +49,13 @@ export type ProfileQuestion = {
 
 export type PublicProfileData = {
   politician: PublicProfilePolitician;
+  memberIds: string[];
   currentWeekNumber: number;
   isHistoricalView: boolean;
   viewingWeekNumber: number;
   period: ProfilePeriod;
   questions: ProfileQuestion[];
+  latestQuestion?: ProfileQuestion;
   totalQuestions: number;
   qualifyingQuestions: number;
   answeredQualifying: number;
@@ -64,5 +70,5 @@ export type ProfileView = Pick<PublicProfileData,
 >;
 
 export type ProfileMetadata = Pick<PublicProfilePolitician,
-  "full_name" | "office" | "state" | "party" | "photo_url" | "bio" | "is_test"
+  "slug" | "full_name" | "office" | "state" | "party" | "photo_url" | "bio" | "is_active" | "is_test"
 >;

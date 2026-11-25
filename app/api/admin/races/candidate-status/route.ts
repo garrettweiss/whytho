@@ -4,9 +4,7 @@
  *
  * Body: { secret, candidateId, raceId, status: 'won' | 'lost' | 'active' }
  *
- * - won: candidate_status='won', politician_type='elected', is_active=true
- * - lost: candidate_status='lost', is_active=false
- * - active: reset to candidate_status='active', is_active=true
+ * Records the outcome on the source race membership without deactivating a person.
  */
 
 import { NextRequest, NextResponse } from "next/server";
@@ -51,20 +49,9 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: "Candidate not found in this race" }, { status: 404 });
   }
 
-  const update: Record<string, unknown> = { candidate_status: status };
-
-  if (status === "won") {
-    // Winner becomes elected official
-    update.politician_type = "elected";
-    update.is_active = true;
-  } else if (status === "lost" || status === "withdrew") {
-    // Loser is hidden but preserved
-    update.is_active = false;
-  } else if (status === "active") {
-    // Reset
-    update.politician_type = "candidate";
-    update.is_active = true;
-  }
+  // A race outcome does not revoke a person's other office or public history.
+  // This legacy field remains bound to the source record's explicit race.
+  const update = { candidate_status: status };
 
   const { error } = await supabase
     .from("politicians")
@@ -79,6 +66,6 @@ export async function PATCH(req: NextRequest) {
     success: true,
     candidateId,
     newStatus: status,
-    politician_type: update.politician_type ?? candidate.politician_type,
+    politician_type: candidate.politician_type,
   });
 }

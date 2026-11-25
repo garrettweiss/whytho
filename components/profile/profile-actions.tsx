@@ -7,7 +7,7 @@ import styles from "./profile.module.css";
 export function AskQuestionLink() {
   return <a className={styles.primaryAction} href="#ask-question" onClick={() => {
     requestAnimationFrame(() => document.querySelector<HTMLElement>('#ask-question textarea, #ask-question a, #ask-question button')?.focus());
-  }}>Ask a question <span aria-hidden="true">↗</span></a>;
+  }}>Ask a question <span aria-hidden="true">↓</span></a>;
 }
 
 export function QuestionAnchorNotice({ slug, displayedIds }: { slug: string; displayedIds: string[] }) {

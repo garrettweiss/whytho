@@ -1,0 +1,57 @@
+{
+  "vote_sources": [
+    "https://clerk.house.gov/evs/2026/roll224.xml",
+    "https://www.govinfo.gov/content/pkg/CREC-2026-06-18/pdf/CREC-2026-06-18-pt1-PgS2917.pdf",
+    "https://www.govinfo.gov/content/pkg/PLAW-119publ101/html/PLAW-119publ101.htm"
+  ],
+  "officials": [
+    {
+      "id": "A000055",
+      "name": "Robert B. Aderholt",
+      "vote": "Yea",
+      "source": "https://commons.wikimedia.org/wiki/File:Robert_Aderholt_official_photo.jpg",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/f/ff/Robert_Aderholt_official_photo.jpg",
+      "credit": "US House Office of Photography",
+      "width": 1147,
+      "height": 1363,
+      "bytes": 119365,
+      "sha256": "03aa7756ab2c4103871f403f1f2d91f57691c9e195577fc01ba17763f7a1541f"
+    },
+    {
+      "id": "B001316",
+      "name": "Eric Burlison",
+      "vote": "Nay",
+      "source": "https://commons.wikimedia.org/wiki/File:Eric_Burlison_portrait_118th.jpg",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/0/00/Eric_Burlison_portrait_118th.jpg",
+      "credit": "House Creative Services",
+      "width": 3360,
+      "height": 4200,
+      "bytes": 2027218,
+      "sha256": "bc0f33c6e5fe6fbbc3c65683855b83bf938d744e19a809feffac590e3e4390b3"
+    },
+    {
+      "id": "W000817",
+      "name": "Elizabeth Warren",
+      "vote": "Yea",
+      "source": "https://commons.wikimedia.org/wiki/File:Elizabeth_Warren,_official_portrait,_114th_Congress.jpg",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/6/6a/Elizabeth_Warren,_official_portrait,_114th_Congress.jpg",
+      "credit": "United States Senate",
+      "width": 1908,
+      "height": 2385,
+      "bytes": 2928918,
+      "sha256": "183813c5185e1b7548817fa1542552c75eba7a6fc8754a9b5a904469da43d66a"
+    },
+    {
+      "id": "S001184",
+      "name": "Tim Scott",
+      "vote": "Yea",
+      "source": "https://commons.wikimedia.org/wiki/File:Tim_Scott,_official_portrait,_113th_Congress.jpg",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/9/9e/Tim_Scott,_official_portrait,_113th_Congress.jpg",
+      "credit": "U.S. Senate Photographic Studio / Renee Bouchard",
+      "width": 2400,
+      "height": 3040,
+      "bytes": 4359232,
+      "sha256": "9db4af25d962b98d2bd43984cb6ab34dcbd6d9c4a58d7f388f2c253e1f4beb98"
+    }
+  ]
+}

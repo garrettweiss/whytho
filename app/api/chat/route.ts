@@ -1,3 +1,5 @@
+import { resolvePoliticianIdentity } from "@/lib/identity/server";
+import { stateRecordValues } from "@/lib/directory/search";
 /**
  * /api/chat — WhyTho chatbot streaming endpoint
  *
@@ -99,11 +101,11 @@ export async function POST(req: Request) {
           let q = publicData
             .from("politicians")
             .select("id, full_name, slug, office, state, verification_tier, party")
-            .eq("is_active", true).eq("is_test", false)
+            .eq("is_active", true).eq("is_test", false).is("canonical_politician_id", null)
             .ilike("full_name", `%${query.replace(/[%_]/g, "")}%`)
             .limit(8);
 
-          if (state) q = q.eq("state", state.toUpperCase());
+          if (state) q = q.in("state", stateRecordValues(state.toUpperCase()));
           if (office) q = q.ilike("office", `%${office}%`);
 
           const { data, error } = await q;
@@ -129,6 +131,8 @@ export async function POST(req: Request) {
         }),
         execute: async ({ politician_id, period, limit }) => {
           const admin2 = createPublicClient();
+          const identity = await resolvePoliticianIdentity(politician_id, admin2);
+          if (!identity) return { error: "Profile not found" };
 
           // Build time filter
           let since: string | null = null;
@@ -142,7 +146,7 @@ export async function POST(req: Request) {
                 id, body, net_upvotes, week_number, is_seeded, created_at,
                 answers (id, body, answer_type, is_ai_generated, is_draft, ai_confidence, created_at)
               `)
-              .eq("politician_id", politician_id)
+              .in("politician_id", identity.memberIds)
               .eq("answers.is_draft", false)
               .eq("status", "active")
               .eq("week_number", weekNum)
@@ -160,7 +164,7 @@ export async function POST(req: Request) {
               id, body, net_upvotes, week_number, is_seeded, created_at,
               answers (id, body, answer_type, is_ai_generated, is_draft, ai_confidence, created_at)
             `)
-            .eq("politician_id", politician_id)
+            .in("politician_id", identity.memberIds)
               .eq("answers.is_draft", false)
             .eq("status", "active")
             .order("net_upvotes", { ascending: false })
@@ -205,7 +209,7 @@ export async function POST(req: Request) {
               { count: totalAnswers },
               { data: weekData },
             ] = await Promise.all([
-              admin2.from("politicians").select("*", { count: "exact", head: true }).eq("is_active", true).eq("is_test", false),
+              admin2.from("politicians").select("*", { count: "exact", head: true }).eq("is_active", true).eq("is_test", false).is("canonical_politician_id", null),
               admin2.from("questions").select("*", { count: "exact", head: true }).eq("status", "active"),
               admin2.from("answers").select("*", { count: "exact", head: true }).eq("is_ai_generated", false).eq("is_draft", false).in("answer_type", ["direct", "team_statement"]),
               admin2.rpc("current_week_number"),
@@ -231,7 +235,7 @@ export async function POST(req: Request) {
       // ── Search the FAQ knowledge base ────────────────────────────────────
       search_knowledge_base: tool({
         description:
-          "Search the WhyTho FAQ and team-answered questions knowledge base. Call this before answering any question about how WhyTho works.",
+          "Look up WhyTho product guidance and team answers for internal reference. Call this silently before answering questions about how WhyTho works.",
         inputSchema: z.object({
           query: z.string().max(200).describe("The question or topic to search for"),
         }),
@@ -243,10 +247,7 @@ export async function POST(req: Request) {
             .ilike("question", `%${query.replace(/[%_]/g, "").slice(0,200)}%`)
             .limit(5);
 
-          if (!data || data.length === 0) {
-            return { results: [], message: "No matching entries in knowledge base." };
-          }
-          return { results: data };
+          return { results: data ?? [] };
         },
       }),
 
