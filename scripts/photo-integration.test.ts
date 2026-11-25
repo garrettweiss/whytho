@@ -80,7 +80,7 @@ test("storage failure and revoked-at-publication actor never report success",asy
 test("verified admin upload reencodes, versions, records permission and refreshes views",async()=>{
   const f=fixture();const response=await f.photo.POST(await uploadRequest());assert.equal(response.status,200);assert.equal((await response.json()).success,true);
   assert.match(f.uploads[0]!.path,new RegExp(`^${person}/[a-f0-9-]+\\.jpg$`));assert.equal(f.uploads[0]?.options.upsert,false);
-  const metadata=await sharp(f.uploads[0]!.bytes).metadata();assert.equal(metadata.width,400);assert.equal(metadata.height,500);assert.equal(metadata.exif,undefined);
+  const metadata=await sharp(f.uploads[0]!.bytes).metadata();assert.equal(metadata.width,800);assert.equal(metadata.height,1000);assert.equal(metadata.exif,undefined);
   assert.equal(f.calls[0]?.args.p_actor,userId);assert.equal(f.calls[0]?.args.p_rights_version,"whytho-portrait-permission-v1");assert.ok(f.cache.includes("/fixture-politician"));
 });
 test("profile rejects malformed or unsafe fields and uses the atomic verified-admin RPC",async()=>{
