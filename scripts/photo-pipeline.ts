@@ -4,6 +4,7 @@
  * npx tsx scripts/photo-pipeline.ts --rights-manifest=reviewed.json --dry-run
  * npx tsx scripts/photo-pipeline.ts --rights-manifest=reviewed.json --apply --limit=5
  * Every asset is versioned, bounded and conditionally published. Old objects remain.
+ * --revalidate asks the live site to drop profile/directory caches after an apply run.
  */
 import { readFileSync } from "node:fs";
 import { createClient } from "@supabase/supabase-js";
@@ -21,6 +22,12 @@ const path=args.find(a=>a.startsWith("--rights-manifest="))?.slice("--rights-man
 const rights=path?photoRightsManifest.parse(JSON.parse(readFileSync(path,"utf8"))):[];
 const db=createClient<Database>(process.env.NEXT_PUBLIC_SUPABASE_URL!,process.env.SUPABASE_SERVICE_ROLE_KEY!,{auth:{persistSession:false,autoRefreshToken:false}});
 const BUCKET="politician-photos";
+const SITE_URL=(value=>!value||value.includes("localhost")?"https://whytho.us":value.replace(/\/$/,""))(process.env.NEXT_PUBLIC_SITE_URL);
+async function revalidateSite(){
+  if(!process.env.ADMIN_SECRET){console.error("ADMIN_SECRET missing; caches not revalidated");return;}
+  const res=await fetch(`${SITE_URL}/api/admin/identities/revalidate`,{method:"POST",headers:{"x-admin-secret":process.env.ADMIN_SECRET}});
+  console.log(JSON.stringify({revalidate:SITE_URL,status:res.status}));
+}
 type Person={id:string;full_name:string;photo_url:string|null;photo_source_url:string|null;office:string|null;is_test:boolean};
 async function people():Promise<Person[]>{
   const rows:Person[]=[];
@@ -39,7 +46,8 @@ async function publish(p:Person,permission:PhotoRights){
   const {error:uploadError}=await db.storage.from(BUCKET).upload(objectPath,bytes,{contentType:"image/jpeg",upsert:false,cacheControl:"31536000"});if(uploadError)throw new Error(uploadError.message);
   const url=db.storage.from(BUCKET).getPublicUrl(objectPath).data.publicUrl;
   let query=db.from("politicians").update({photo_url:url,photo_source_url:permission.source_url,photo_credit:permission.creator,photo_rights_basis:`${permission.license}: ${permission.license_url}; ${permission.source_page}; ${permission.changes}`}).eq("id",p.id);
-  query=p.photo_url?query.eq("photo_url",p.photo_url):query.is("photo_url",null);
+  // Some legacy rows hold an empty string rather than NULL; only a true NULL takes the IS NULL guard.
+  query=p.photo_url===null?query.is("photo_url",null):query.eq("photo_url",p.photo_url);
   const {data,error}=await query.select("id");if(error)throw new Error(error.message);
   console.log(JSON.stringify({politician_id:p.id,status:data.length?"published":"changed_since_preview",new_url:url,old_url:p.photo_url,license:permission.license,reviewer:permission.reviewed_by}));
 }
@@ -58,6 +66,7 @@ async function main(){
     }).slice(0,LIMIT);
     console.log(`${APPLY?"Apply":"Preview"}: ${plans.length} reviewed replacements. Unreviewed discovery is excluded.`);
     for(let i=0;i<plans.length;i+=CONCURRENCY){const batch=await Promise.allSettled(plans.slice(i,i+CONCURRENCY).map(({p,permission})=>publish(p,permission)));for(const result of batch)if(result.status==="rejected"){process.exitCode=1;console.error(String(result.reason));}}
+    if(APPLY&&plans.length&&args.includes("--revalidate"))await revalidateSite();
   }
   if(phases.includes(4)){const nonTest=rows.filter(p=>!p.is_test);console.log(JSON.stringify({scope:"pre-run inventory",total:nonTest.length,with_photo:nonTest.filter(p=>p.photo_url).length,with_source:nonTest.filter(p=>p.photo_source_url).length,rights_manifest_entries:rights.length}));}
 }

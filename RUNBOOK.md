@@ -204,6 +204,10 @@ npx tsx scripts/photo-pipeline.ts --reprocess --dry-run   # samples 10, projects
 npx tsx scripts/photo-pipeline.ts --reprocess             # shrinks all 5,784 in place
 ```
 
+**November 2026.** In-place reprocessing is retired. Imports are versioned and need a rights manifest;
+stored portraits are capped at 800x1000 (about 100 KB) and never enlarged. See
+`docs/launch/PHOTO_RESOLUTION_20261125.md`.
+
 Both need the Storage API reachable, so they run after the restriction lifts.
 
 **Outcome, 30 October 2026.** First pass: 1,225.7 MB to 57.1 MB, 5,159 shrunk,

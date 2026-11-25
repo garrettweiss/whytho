@@ -1,0 +1,370 @@
+{
+  "summary": {
+    "checked_at": "2026-11-25T21:42:45.071Z",
+    "scope": "governors",
+    "key": "position",
+    "note": "office-and-state keyed Wikidata match (living current holder, full name, unique, district-consistent); Commons extmetadata license; no database or storage change",
+    "profiles": 33,
+    "counts": {
+      "source_too_small": 3,
+      "no_wikidata_match": 13,
+      "manifest": 16,
+      "license_unresolved": 1
+    },
+    "licenses": {
+      "US-state-public-record": 5,
+      "US-federal-official-duty": 11
+    },
+    "unresolved": {
+      "public domain claim without a recognised basis (public domain)": 1
+    },
+    "manifest": "docs/launch/evidence/photos/pass2/commons-manifest-governors-position-20261125.json"
+  },
+  "rows": [
+    {
+      "politician_id": "006b34a4-7ac0-4a0b-a6b3-2d79ee203916",
+      "slug": "kim-reynolds-ia-governor",
+      "office": "Governor",
+      "key": "position:IA/governor",
+      "status": "source_too_small",
+      "detail": "shared with duplicate profile(s): kim-reynolds-iowa, kim-reynolds-ia",
+      "wikidata": "Q6409269",
+      "file": "File:Kim Reynolds - Official Portrait - 83rd GA.jpg",
+      "width": 300,
+      "height": 420
+    },
+    {
+      "politician_id": "04c54e12-8867-4da9-8a3d-42300f010cc1",
+      "slug": "sarah-huckabee-sanders-arkansas",
+      "office": "Governor",
+      "key": "position:AR/governor",
+      "status": "no_wikidata_match"
+    },
+    {
+      "politician_id": "0eb80c3e-f211-4da9-a6b3-02f9eaf7b0db",
+      "slug": "dan-mckee-ri-governor",
+      "office": "Governor",
+      "key": "position:RI/governor",
+      "status": "no_wikidata_match"
+    },
+    {
+      "politician_id": "0f5acded-bf04-4dde-b139-e4a19a85dfc1",
+      "slug": "maura-healey-ma-governor",
+      "office": "Governor",
+      "key": "position:MA/governor",
+      "status": "manifest",
+      "detail": "shared with duplicate profile(s): maura-healey-massachusetts, maura-healey-ma",
+      "wikidata": "Q16205062",
+      "file": "File:Maura Healey official photo (3x4a).jpg",
+      "width": 1445,
+      "height": 1925,
+      "license": "US-state-public-record"
+    },
+    {
+      "politician_id": "0fee523c-b559-4a8c-b325-c7d07880f229",
+      "slug": "maura-healey-massachusetts",
+      "office": "Governor",
+      "key": "position:MA/governor",
+      "status": "manifest",
+      "detail": "shared with duplicate profile(s): maura-healey-ma-governor, maura-healey-ma",
+      "wikidata": "Q16205062",
+      "file": "File:Maura Healey official photo (3x4a).jpg",
+      "width": 1445,
+      "height": 1925,
+      "license": "US-state-public-record"
+    },
+    {
+      "politician_id": "10904e74-2383-43ed-8a59-72099624da7b",
+      "slug": "tina-kotek-or",
+      "office": "Governor",
+      "key": "position:OR/governor",
+      "status": "no_wikidata_match"
+    },
+    {
+      "politician_id": "15c80803-9703-4fa5-ad88-f4d3481ad65d",
+      "slug": "brian-kemp-ga",
+      "office": "Governor",
+      "key": "position:GA/governor",
+      "status": "manifest",
+      "wikidata": "Q4964973",
+      "file": "File:Brian Kemp portrait, 2024 (cropped) (cropped).jpg",
+      "width": 541,
+      "height": 685,
+      "license": "US-state-public-record"
+    },
+    {
+      "politician_id": "1d162bdb-408e-4455-8ea8-398e1f3a740c",
+      "slug": "maura-healey-ma",
+      "office": "Governor",
+      "key": "position:MA/governor",
+      "status": "manifest",
+      "detail": "shared with duplicate profile(s): maura-healey-ma-governor, maura-healey-massachusetts",
+      "wikidata": "Q16205062",
+      "file": "File:Maura Healey official photo (3x4a).jpg",
+      "width": 1445,
+      "height": 1925,
+      "license": "US-state-public-record"
+    },
+    {
+      "politician_id": "26c10335-ed70-4faa-9c73-822a495050a4",
+      "slug": "henry-mcmaster-sc-governor",
+      "office": "Governor",
+      "key": "position:SC/governor",
+      "status": "manifest",
+      "detail": "shared with duplicate profile(s): henry-mcmaster-sc, henry-mcmaster-south-carolina",
+      "wikidata": "Q5725737",
+      "file": "File:SC Governor Henry McMaster 2019 (cropped).jpg",
+      "width": 999,
+      "height": 1317,
+      "license": "US-federal-official-duty"
+    },
+    {
+      "politician_id": "39a5a993-f21a-4b31-9b11-1087c48b2e2e",
+      "slug": "sarah-huckabee-sanders-ar-governor",
+      "office": "Governor",
+      "key": "position:AR/governor",
+      "status": "no_wikidata_match"
+    },
+    {
+      "politician_id": "3b1a46cc-381b-45c9-9778-e8a3b478b44b",
+      "slug": "sarah-huckabee-sanders-ar",
+      "office": "Governor",
+      "key": "position:AR/governor",
+      "status": "no_wikidata_match"
+    },
+    {
+      "politician_id": "45f9e25f-75b9-4748-ae63-a9062cf7c9c1",
+      "slug": "kim-reynolds-iowa",
+      "office": "Governor",
+      "key": "position:IA/governor",
+      "status": "source_too_small",
+      "detail": "shared with duplicate profile(s): kim-reynolds-ia-governor, kim-reynolds-ia",
+      "wikidata": "Q6409269",
+      "file": "File:Kim Reynolds - Official Portrait - 83rd GA.jpg",
+      "width": 300,
+      "height": 420
+    },
+    {
+      "politician_id": "47fb01c9-4ac4-4fd6-8530-7a433c955dca",
+      "slug": "jb-pritzker-illinois",
+      "office": "Governor",
+      "key": "position:IL/governor",
+      "status": "no_wikidata_match"
+    },
+    {
+      "politician_id": "4df22bc2-dec5-41cc-981f-7ef3af5bd5a4",
+      "slug": "jim-pillen-ne",
+      "office": "Governor",
+      "key": "position:NE/governor",
+      "status": "manifest",
+      "detail": "shared with duplicate profile(s): jim-pillen-nebraska",
+      "wikidata": "Q111961602",
+      "file": "File:Jim Pillen 2023.jpg",
+      "width": 1447,
+      "height": 1930,
+      "license": "US-federal-official-duty"
+    },
+    {
+      "politician_id": "4e83c020-b411-4c19-8643-a44ac124f849",
+      "slug": "kevin-stitt-ok-governor",
+      "office": "Governor",
+      "key": "position:OK/governor",
+      "status": "manifest",
+      "detail": "shared with duplicate profile(s): kevin-stitt-ok, kevin-stitt-oklahoma",
+      "wikidata": "Q58322517",
+      "file": "File:Kevin Stitt 2020.jpg",
+      "width": 900,
+      "height": 1216,
+      "license": "US-federal-official-duty"
+    },
+    {
+      "politician_id": "50bb7c25-ae98-4d22-9685-01f7a2c0d06e",
+      "slug": "henry-mcmaster-sc",
+      "office": "Governor",
+      "key": "position:SC/governor",
+      "status": "manifest",
+      "detail": "shared with duplicate profile(s): henry-mcmaster-sc-governor, henry-mcmaster-south-carolina",
+      "wikidata": "Q5725737",
+      "file": "File:SC Governor Henry McMaster 2019 (cropped).jpg",
+      "width": 999,
+      "height": 1317,
+      "license": "US-federal-official-duty"
+    },
+    {
+      "politician_id": "56390f64-364d-4e17-96f7-9f901f4e0061",
+      "slug": "josh-stein-north-carolina",
+      "office": "Governor",
+      "key": "position:NC/governor",
+      "status": "manifest",
+      "wikidata": "Q6289402",
+      "file": "File:Josh Stein.jpg",
+      "width": 2130,
+      "height": 2903,
+      "license": "US-state-public-record"
+    },
+    {
+      "politician_id": "5ba208e7-b830-43bb-a825-69ceafe52de5",
+      "slug": "mikie-sherrill-new-jersey",
+      "office": "Governor",
+      "key": "position:NJ/governor",
+      "status": "license_unresolved",
+      "wikidata": "Q47087146",
+      "file": "File:Governor of New Jersey Rebecca Michelle \"Mikie\" Sherrill.jpg",
+      "width": 2400,
+      "height": 3000,
+      "detail": "public domain claim without a recognised basis (public domain)"
+    },
+    {
+      "politician_id": "5d46f631-3d27-49ff-843c-8cd68cd5baa9",
+      "slug": "mike-dunleavy-ak-governor",
+      "office": "Governor",
+      "key": "position:AK/governor",
+      "status": "no_wikidata_match"
+    },
+    {
+      "politician_id": "64cd1868-1428-403f-a32f-e9c8be553b4e",
+      "slug": "mark-gordon-wyoming",
+      "office": "Governor",
+      "key": "position:WY/governor",
+      "status": "manifest",
+      "detail": "shared with duplicate profile(s): mark-gordon-wy-governor, mark-gordon-wy",
+      "wikidata": "Q6767775",
+      "file": "File:Wyoming Governor Mark Gordon expands partnership with Tunisia to enhance agriculture and civil protection (4) (cropped).jpg",
+      "width": 1236,
+      "height": 1649,
+      "license": "US-federal-official-duty"
+    },
+    {
+      "politician_id": "64cf6a1b-6f9b-4af9-80e9-a3a9c3a79fe1",
+      "slug": "dan-mckee-rhode-island",
+      "office": "Governor",
+      "key": "position:RI/governor",
+      "status": "no_wikidata_match"
+    },
+    {
+      "politician_id": "6723a1be-d841-4f5d-9691-be00eac15300",
+      "slug": "greg-abbott-tx",
+      "office": "Governor",
+      "key": "position:TX/governor",
+      "status": "no_wikidata_match"
+    },
+    {
+      "politician_id": "67f5d578-c920-47dd-83f4-a62332e23b53",
+      "slug": "dan-mckee-ri",
+      "office": "Governor",
+      "key": "position:RI/governor",
+      "status": "no_wikidata_match"
+    },
+    {
+      "politician_id": "7363119d-ea2f-447b-98f1-bbff12abca20",
+      "slug": "jim-pillen-nebraska",
+      "office": "Governor",
+      "key": "position:NE/governor",
+      "status": "manifest",
+      "detail": "shared with duplicate profile(s): jim-pillen-ne",
+      "wikidata": "Q111961602",
+      "file": "File:Jim Pillen 2023.jpg",
+      "width": 1447,
+      "height": 1930,
+      "license": "US-federal-official-duty"
+    },
+    {
+      "politician_id": "79e96711-f24f-44eb-b930-cf93390b6914",
+      "slug": "tina-kotek-oregon",
+      "office": "Governor",
+      "key": "position:OR/governor",
+      "status": "no_wikidata_match"
+    },
+    {
+      "politician_id": "88483884-dd8b-40c9-a7c3-60fa1fee7423",
+      "slug": "kim-reynolds-ia",
+      "office": "Governor",
+      "key": "position:IA/governor",
+      "status": "source_too_small",
+      "detail": "shared with duplicate profile(s): kim-reynolds-ia-governor, kim-reynolds-iowa",
+      "wikidata": "Q6409269",
+      "file": "File:Kim Reynolds - Official Portrait - 83rd GA.jpg",
+      "width": 300,
+      "height": 420
+    },
+    {
+      "politician_id": "99575bac-bbd0-44a7-a835-40a56d8c91c1",
+      "slug": "kevin-stitt-ok",
+      "office": "Governor",
+      "key": "position:OK/governor",
+      "status": "manifest",
+      "detail": "shared with duplicate profile(s): kevin-stitt-ok-governor, kevin-stitt-oklahoma",
+      "wikidata": "Q58322517",
+      "file": "File:Kevin Stitt 2020.jpg",
+      "width": 900,
+      "height": 1216,
+      "license": "US-federal-official-duty"
+    },
+    {
+      "politician_id": "a3a31558-36c1-4363-92bf-5440f016f62d",
+      "slug": "tina-kotek-or-governor",
+      "office": "Governor",
+      "key": "position:OR/governor",
+      "status": "no_wikidata_match"
+    },
+    {
+      "politician_id": "ade545b2-f24d-448c-bb09-5026cfffc983",
+      "slug": "j-b-pritzker-il",
+      "office": "Governor",
+      "key": "position:IL/governor",
+      "status": "no_wikidata_match"
+    },
+    {
+      "politician_id": "bb952566-86cf-476b-90cd-a1a69b2c584e",
+      "slug": "mark-gordon-wy-governor",
+      "office": "Governor",
+      "key": "position:WY/governor",
+      "status": "manifest",
+      "detail": "shared with duplicate profile(s): mark-gordon-wyoming, mark-gordon-wy",
+      "wikidata": "Q6767775",
+      "file": "File:Wyoming Governor Mark Gordon expands partnership with Tunisia to enhance agriculture and civil protection (4) (cropped).jpg",
+      "width": 1236,
+      "height": 1649,
+      "license": "US-federal-official-duty"
+    },
+    {
+      "politician_id": "c72ddebc-c099-47dd-a6b9-99383317ae49",
+      "slug": "henry-mcmaster-south-carolina",
+      "office": "Governor",
+      "key": "position:SC/governor",
+      "status": "manifest",
+      "detail": "shared with duplicate profile(s): henry-mcmaster-sc-governor, henry-mcmaster-sc",
+      "wikidata": "Q5725737",
+      "file": "File:SC Governor Henry McMaster 2019 (cropped).jpg",
+      "width": 999,
+      "height": 1317,
+      "license": "US-federal-official-duty"
+    },
+    {
+      "politician_id": "defeb3b2-dad5-442c-8abc-112f8fef16e9",
+      "slug": "mark-gordon-wy",
+      "office": "Governor",
+      "key": "position:WY/governor",
+      "status": "manifest",
+      "detail": "shared with duplicate profile(s): mark-gordon-wyoming, mark-gordon-wy-governor",
+      "wikidata": "Q6767775",
+      "file": "File:Wyoming Governor Mark Gordon expands partnership with Tunisia to enhance agriculture and civil protection (4) (cropped).jpg",
+      "width": 1236,
+      "height": 1649,
+      "license": "US-federal-official-duty"
+    },
+    {
+      "politician_id": "fba1ae9b-2269-49c8-b29b-0eddfdda87aa",
+      "slug": "kevin-stitt-oklahoma",
+      "office": "Governor",
+      "key": "position:OK/governor",
+      "status": "manifest",
+      "detail": "shared with duplicate profile(s): kevin-stitt-ok-governor, kevin-stitt-ok",
+      "wikidata": "Q58322517",
+      "file": "File:Kevin Stitt 2020.jpg",
+      "width": 900,
+      "height": 1216,
+      "license": "US-federal-official-duty"
+    }
+  ]
+}

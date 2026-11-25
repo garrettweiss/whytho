@@ -1,0 +1,1178 @@
+{
+  "mode": "preview",
+  "counts": {
+    "would_revert": 195
+  },
+  "results": [
+    {
+      "politician_id": "00fe6e96-4bd0-4fc3-a7cd-03fa5f1d810c",
+      "slug": "laurie-davies-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/00fe6e96-4bd0-4fc3-a7cd-03fa5f1d810c.jpg"
+    },
+    {
+      "politician_id": "01a3cf56-74e8-4103-b81f-0088e3900358",
+      "slug": "cottie-petrie-norris-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/01a3cf56-74e8-4103-b81f-0088e3900358.jpg"
+    },
+    {
+      "politician_id": "0414095a-48ab-42c4-8e3d-78d9bd345934",
+      "slug": "heath-flora-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/0414095a-48ab-42c4-8e3d-78d9bd345934.jpg"
+    },
+    {
+      "politician_id": "050b5f6c-86c1-4dfb-b3ba-f5e8026428c7",
+      "slug": "ryan-eaves-ok",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/050b5f6c-86c1-4dfb-b3ba-f5e8026428c7.jpg"
+    },
+    {
+      "politician_id": "0540844f-827c-4cef-96e8-d55bf2c3128d",
+      "slug": "ross-ford-ok",
+      "status": "would_revert",
+      "restore": "https://www.okhouse.gov/Members/Pictures/HiRes/Ford,%20Ross.jpg"
+    },
+    {
+      "politician_id": "06bdc4cd-32fb-4b45-ac5b-9514d95ac2dc",
+      "slug": "brian-guthrie-ok",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/06bdc4cd-32fb-4b45-ac5b-9514d95ac2dc.jpg"
+    },
+    {
+      "politician_id": "073da95a-39fa-46e6-a939-407a4ad1d467",
+      "slug": "john-harabedian-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/073da95a-39fa-46e6-a939-407a4ad1d467.jpg"
+    },
+    {
+      "politician_id": "08d61129-cacf-48a4-8ced-3af137a8f36f",
+      "slug": "lena-gonzalez-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/08d61129-cacf-48a4-8ced-3af137a8f36f.jpg"
+    },
+    {
+      "politician_id": "096ca798-2480-4fb0-927b-dc3b44d80adc",
+      "slug": "annie-menz-ok",
+      "status": "would_revert",
+      "restore": "https://www.okhouse.gov/Members/Pictures/HiRes/Menz,%20Annie.jpg"
+    },
+    {
+      "politician_id": "09de6bda-db4b-4eef-a10b-7c7d22aa3cbb",
+      "slug": "juan-alanis-ca",
+      "status": "would_revert",
+      "restore": "https://www.assembly.ca.gov/sites/assembly.ca.gov/files/memberphotos/alanis_a25i1397_resized.png"
+    },
+    {
+      "politician_id": "0a8ca948-39c5-40f3-8b72-c577f19a41f4",
+      "slug": "david-bullard-ok",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/0a8ca948-39c5-40f3-8b72-c577f19a41f4.jpg"
+    },
+    {
+      "politician_id": "0be9cdd4-d495-4a2c-bf04-fb8c667e0609",
+      "slug": "dick-lowe-ok",
+      "status": "would_revert",
+      "restore": "https://www.okhouse.gov/Members/Pictures/HiRes/Lowe,%20Dick.jpg"
+    },
+    {
+      "politician_id": "0da027d5-4cfc-49d2-a10b-a852e85729b0",
+      "slug": "buffy-wicks-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/0da027d5-4cfc-49d2-a10b-a852e85729b0.jpg"
+    },
+    {
+      "politician_id": "0e4d1ffd-ce45-4193-81ea-f5b652c19b2c",
+      "slug": "mark-gonzlez-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/0e4d1ffd-ce45-4193-81ea-f5b652c19b2c.jpg"
+    },
+    {
+      "politician_id": "0eef6078-6daa-4058-85b1-a882480d1e3c",
+      "slug": "trey-caldwell-ok",
+      "status": "would_revert",
+      "restore": "https://www.okhouse.gov/Members/Pictures/HiRes/Caldwell,%20Trey.jpg"
+    },
+    {
+      "politician_id": "0f5acded-bf04-4dde-b139-e4a19a85dfc1",
+      "slug": "maura-healey-ma-governor",
+      "status": "would_revert",
+      "restore": null
+    },
+    {
+      "politician_id": "0fee523c-b559-4a8c-b325-c7d07880f229",
+      "slug": "maura-healey-massachusetts",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/0fee523c-b559-4a8c-b325-c7d07880f229.jpg"
+    },
+    {
+      "politician_id": "10cdc673-f58d-48c2-a10c-50946ed6aa85",
+      "slug": "ronny-johns-ok",
+      "status": "would_revert",
+      "restore": "https://www.okhouse.gov/Members/Pictures/HiRes/Johns,%20Ronny.jpg"
+    },
+    {
+      "politician_id": "1108e3c2-368f-4b46-81b6-12a282d4c381",
+      "slug": "adrianne-ramos-ma",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/1108e3c2-368f-4b46-81b6-12a282d4c381.jpg"
+    },
+    {
+      "politician_id": "1122d25d-f600-4605-9ca6-36411e8f940c",
+      "slug": "bob-archuleta-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/1122d25d-f600-4605-9ca6-36411e8f940c.jpg"
+    },
+    {
+      "politician_id": "11382334-f897-431a-8800-b6d13378b3e8",
+      "slug": "rosilicie-ochoa-bogh-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/11382334-f897-431a-8800-b6d13378b3e8.jpg"
+    },
+    {
+      "politician_id": "11b3c8a7-8074-49cf-a602-dacfc9ececc4",
+      "slug": "collin-duel-ok",
+      "status": "would_revert",
+      "restore": "https://www.okhouse.gov/Members/Pictures/HiRes/Duel,%20Collin.jpg"
+    },
+    {
+      "politician_id": "11bb257f-e9cd-45b5-8553-60ed82df7738",
+      "slug": "caroline-menjivar-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/11bb257f-e9cd-45b5-8553-60ed82df7738.jpg"
+    },
+    {
+      "politician_id": "122516d9-327b-43a8-b7f2-b72a17e7191f",
+      "slug": "nick-archer-ok",
+      "status": "would_revert",
+      "restore": "https://www.okhouse.gov/Members/Pictures/HiRes/Archer,%20Nick.jpg"
+    },
+    {
+      "politician_id": "13afd728-5f59-45db-a88f-e550e36a24c1",
+      "slug": "monroe-nichols",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/13afd728-5f59-45db-a88f-e550e36a24c1/7fc62b77-c7e3-401c-a7c3-5404a32713c7.jpg"
+    },
+    {
+      "politician_id": "1494718b-b56c-473f-95c4-1611f79e094a",
+      "slug": "chris-banning-ok",
+      "status": "would_revert",
+      "restore": "https://www.okhouse.gov/Members/Pictures/HiRes/Banning,%20Chris.jpg"
+    },
+    {
+      "politician_id": "1494b5e6-e04f-4944-ab56-fd88b524afdc",
+      "slug": "joaquin-arambula-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/1494b5e6-e04f-4944-ab56-fd88b524afdc.jpg"
+    },
+    {
+      "politician_id": "14eb13fb-cf55-4354-ba4a-1106a0a234ca",
+      "slug": "michelle-rodriguez-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/14eb13fb-cf55-4354-ba4a-1106a0a234ca.jpg"
+    },
+    {
+      "politician_id": "15c80803-9703-4fa5-ad88-f4d3481ad65d",
+      "slug": "brian-kemp-ga",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/15c80803-9703-4fa5-ad88-f4d3481ad65d.jpg"
+    },
+    {
+      "politician_id": "164ba577-fbb7-4e76-b43d-7ff078c22cae",
+      "slug": "shawn-still-ga",
+      "status": "would_revert",
+      "restore": "https://www.legis.ga.gov/api/images/default-source/portraits/still-shawn-5016.jpg"
+    },
+    {
+      "politician_id": "1a9cfabc-935a-4051-bb2e-d66f724db3e3",
+      "slug": "mike-fong-ca",
+      "status": "would_revert",
+      "restore": "https://www.assembly.ca.gov/sites/assembly.ca.gov/files/memberphotos/ad-49_fong_m._037_2022_resized.jpg"
+    },
+    {
+      "politician_id": "1aaca3a6-c742-4840-bf96-71db3a91d224",
+      "slug": "megan-dahle-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/1aaca3a6-c742-4840-bf96-71db3a91d224.jpg"
+    },
+    {
+      "politician_id": "1b325293-d063-4c3f-96d8-2a0f98e38ebc",
+      "slug": "juan-carrillo-ca",
+      "status": "would_revert",
+      "restore": "https://www.assembly.ca.gov/sites/assembly.ca.gov/files/memberphotos/carrillo_001_11-30-29_resized.jpg"
+    },
+    {
+      "politician_id": "1b95f4ed-650f-4f6e-8f95-9b113954b86f",
+      "slug": "avery-frix-ok",
+      "status": "would_revert",
+      "restore": "https://www.okhouse.gov/Members/Pictures/HiRes/Frix,%20Avery.jpg"
+    },
+    {
+      "politician_id": "1c609abd-6df1-48c8-9683-9c0b685e29fc",
+      "slug": "molly-jenkins-ok",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/1c609abd-6df1-48c8-9683-9c0b685e29fc.jpg"
+    },
+    {
+      "politician_id": "1d162bdb-408e-4455-8ea8-398e1f3a740c",
+      "slug": "maura-healey-ma",
+      "status": "would_revert",
+      "restore": "https://www.mass.gov/files/styles/570x/public/2023-01/PRINTFINAL-Shopper-Maura_Healey_201R_0.jpg?itok=SjMD6nD2"
+    },
+    {
+      "politician_id": "1db00166-d504-471e-8ad0-58935aee819f",
+      "slug": "ron-mariano-ma",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/1db00166-d504-471e-8ad0-58935aee819f.jpg"
+    },
+    {
+      "politician_id": "1e59b9bb-1585-49fb-a15e-fccbb4a783f2",
+      "slug": "kyle-hilbert-ok",
+      "status": "would_revert",
+      "restore": "https://www.okhouse.gov/Members/Pictures/HiRes/Hilbert,%20Kyle.jpg"
+    },
+    {
+      "politician_id": "21530985-11e6-42ef-9fc9-61585b70d49f",
+      "slug": "blanca-pacheco-ca",
+      "status": "would_revert",
+      "restore": "https://www.assembly.ca.gov/sites/assembly.ca.gov/files/memberphotos/pachecho_007_11-30-22_resized.jpg"
+    },
+    {
+      "politician_id": "21a1b275-1f26-492f-8ce1-fbbf2b3a79dd",
+      "slug": "julian-cyr-ma",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/21a1b275-1f26-492f-8ce1-fbbf2b3a79dd.jpg"
+    },
+    {
+      "politician_id": "22a39dc2-cda5-4c63-b7b6-363521c6a8a6",
+      "slug": "george-burns-ok",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/22a39dc2-cda5-4c63-b7b6-363521c6a8a6.jpg"
+    },
+    {
+      "politician_id": "2469c6fd-0932-4ec1-8863-fae127b312d9",
+      "slug": "steve-bennett-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/2469c6fd-0932-4ec1-8863-fae127b312d9.jpg"
+    },
+    {
+      "politician_id": "261e4e1f-e4ee-4c4c-964e-12df88e18964",
+      "slug": "david-hardin-ok",
+      "status": "would_revert",
+      "restore": "https://www.okhouse.gov/Members/Pictures/HiRes/Hardin,%20David.jpg"
+    },
+    {
+      "politician_id": "29150d31-9254-4336-b5b1-2a1c75e2c0dd",
+      "slug": "anna-caballero-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/29150d31-9254-4336-b5b1-2a1c75e2c0dd.jpg"
+    },
+    {
+      "politician_id": "29687401-802b-4f54-b176-5349bed0de7d",
+      "slug": "alex-lee-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/29687401-802b-4f54-b176-5349bed0de7d.jpg"
+    },
+    {
+      "politician_id": "2abecee0-df45-42f4-be5b-df3140066cfc",
+      "slug": "brenda-stanley-ok",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/2abecee0-df45-42f4-be5b-df3140066cfc.jpg"
+    },
+    {
+      "politician_id": "2d124449-cd35-4526-8315-ea2fbb98908c",
+      "slug": "david-tangipa-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/2d124449-cd35-4526-8315-ea2fbb98908c.jpg"
+    },
+    {
+      "politician_id": "2e7df0a5-71de-4f0e-9ccc-d1357da5bfbf",
+      "slug": "esmeralda-soria-ca",
+      "status": "would_revert",
+      "restore": "https://www.assembly.ca.gov/sites/assembly.ca.gov/files/memberphotos/soria_025_edit_11-29-22_resized_0.jpg"
+    },
+    {
+      "politician_id": "2ef8b2eb-0123-45a2-9ac7-7a7691466874",
+      "slug": "erick-harris-ok",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/2ef8b2eb-0123-45a2-9ac7-7a7691466874.jpg"
+    },
+    {
+      "politician_id": "309b8a09-e4d6-42af-9ca9-899456697bda",
+      "slug": "gabe-woolley-ok",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/309b8a09-e4d6-42af-9ca9-899456697bda.jpg"
+    },
+    {
+      "politician_id": "339b2820-1100-487d-add4-00762cf1dfac",
+      "slug": "cody-maynard-ok",
+      "status": "would_revert",
+      "restore": "https://www.okhouse.gov/Members/Pictures/HiRes/Maynard,%20Cody.jpg"
+    },
+    {
+      "politician_id": "33aca7ee-5644-4a61-bd98-4c783ea28c23",
+      "slug": "ron-stewart-ok",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/33aca7ee-5644-4a61-bd98-4c783ea28c23.jpg"
+    },
+    {
+      "politician_id": "347263b5-0d56-4ae4-b7c7-aa0ce907e808",
+      "slug": "catherine-blakespear-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/347263b5-0d56-4ae4-b7c7-aa0ce907e808.jpg"
+    },
+    {
+      "politician_id": "3782e96e-8025-4258-8bb5-138ddc87a22d",
+      "slug": "marc-berman-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/3782e96e-8025-4258-8bb5-138ddc87a22d.jpg"
+    },
+    {
+      "politician_id": "390912ff-46a2-4db3-a9d8-174b5758cd95",
+      "slug": "ally-seifried-ok",
+      "status": "would_revert",
+      "restore": "https://oksenate.gov/sites/default/files/Seifried%2C%20Ally%20Flags%202022.jpg"
+    },
+    {
+      "politician_id": "39f64b0d-ad44-431a-9671-fece18a29a24",
+      "slug": "karen-bass",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/39f64b0d-ad44-431a-9671-fece18a29a24/374a8b61-8b7e-47b5-b086-d0cc3d876ffd.jpg"
+    },
+    {
+      "politician_id": "3af4f6f2-2847-48a5-90df-36ea91e39c2d",
+      "slug": "adam-pugh-ok",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/3af4f6f2-2847-48a5-90df-36ea91e39c2d.jpg"
+    },
+    {
+      "politician_id": "3c303b75-1973-408a-a2af-e1494c38d222",
+      "slug": "raymond-hull-ri",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/3c303b75-1973-408a-a2af-e1494c38d222.jpg"
+    },
+    {
+      "politician_id": "3db0b0f7-b19a-4315-b4a5-21035a9943f5",
+      "slug": "marie-alvarado-gil-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/3db0b0f7-b19a-4315-b4a5-21035a9943f5.jpg"
+    },
+    {
+      "politician_id": "3f10fd3a-640c-4210-aa32-1fa4be66d956",
+      "slug": "christopher-cabaldon-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/3f10fd3a-640c-4210-aa32-1fa4be66d956.jpg"
+    },
+    {
+      "politician_id": "3f8800ca-708c-4059-8f29-562a36fbea9b",
+      "slug": "lori-wilson-ca",
+      "status": "would_revert",
+      "restore": "https://www.assembly.ca.gov/sites/assembly.ca.gov/files/memberphotos/ad11-wilson_006_portraits_resized.jpg"
+    },
+    {
+      "politician_id": "4109cfd9-6550-42ea-ad22-358d2be16b59",
+      "slug": "heather-hadwick-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/4109cfd9-6550-42ea-ad22-358d2be16b59.jpg"
+    },
+    {
+      "politician_id": "442981c6-49d5-4f43-a7ea-eca6e0feeb9e",
+      "slug": "neil-hays-ok",
+      "status": "would_revert",
+      "restore": "https://www.okhouse.gov/Members/Pictures/HiRes/Hays,%20Neil.jpg"
+    },
+    {
+      "politician_id": "45f5baf0-e99b-4ea6-bdf4-d06a50e0caba",
+      "slug": "jo-comerford-ma",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/45f5baf0-e99b-4ea6-bdf4-d06a50e0caba.jpg"
+    },
+    {
+      "politician_id": "463bd77f-d96c-4110-88dd-e2063a3cddce",
+      "slug": "danny-sterling-ok",
+      "status": "would_revert",
+      "restore": "https://www.okhouse.gov/Members/Pictures/HiRes/Danny-Sterling.jpg"
+    },
+    {
+      "politician_id": "471ed5e3-0312-417d-bea6-8e27cb460519",
+      "slug": "bill-coleman-ok",
+      "status": "would_revert",
+      "restore": "https://oksenate.gov/sites/default/files/Coleman%2C%20Bill%20Flags%202022.jpg"
+    },
+    {
+      "politician_id": "4949d658-d385-415f-83b7-5a3c78f3ba56",
+      "slug": "kelly-seyarto-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/4949d658-d385-415f-83b7-5a3c78f3ba56.jpg"
+    },
+    {
+      "politician_id": "4e793be0-2ba8-4120-8985-bb0b28e3fabf",
+      "slug": "amanda-clinton-ok",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/4e793be0-2ba8-4120-8985-bb0b28e3fabf.jpg"
+    },
+    {
+      "politician_id": "4eebf718-8a7b-4cf8-afda-ab75aed97c1b",
+      "slug": "john-george-ok",
+      "status": "would_revert",
+      "restore": "https://www.okhouse.gov/Members/Pictures/HiRes/George,%20John.jpg"
+    },
+    {
+      "politician_id": "4fe17b36-8edf-41db-a04c-985af2001b88",
+      "slug": "rex-richardson",
+      "status": "would_revert",
+      "restore": null
+    },
+    {
+      "politician_id": "50cdc190-b6fd-4da9-a855-635854bcb65a",
+      "slug": "rhodesia-ransom-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/50cdc190-b6fd-4da9-a855-635854bcb65a.jpg"
+    },
+    {
+      "politician_id": "529b64e2-6039-4104-adc1-38f9576517bc",
+      "slug": "stephanie-nguyen-ca",
+      "status": "would_revert",
+      "restore": "https://www.assembly.ca.gov/sites/assembly.ca.gov/files/memberphotos/nguyen_515_11-30-22_resized.jpg"
+    },
+    {
+      "politician_id": "5347431d-9757-4103-8991-a6a14b90daba",
+      "slug": "bud-williams-ma",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/5347431d-9757-4103-8991-a6a14b90daba.jpg"
+    },
+    {
+      "politician_id": "57fa9df0-f955-4fc8-8562-c303e2b036bb",
+      "slug": "josh-west-ok",
+      "status": "would_revert",
+      "restore": "https://www.okhouse.gov/Members/Pictures/HiRes/West,%20Josh.jpg"
+    },
+    {
+      "politician_id": "5aca8fa7-9829-477f-afbe-cc08d8de1478",
+      "slug": "catherine-stefani-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/5aca8fa7-9829-477f-afbe-cc08d8de1478.jpg"
+    },
+    {
+      "politician_id": "5c900e7c-e58f-4945-b14b-598d561c3341",
+      "slug": "corey-jackson-ca",
+      "status": "would_revert",
+      "restore": "https://www.assembly.ca.gov/sites/assembly.ca.gov/files/memberphotos/jackson_027_11-30-22_resized.jpg"
+    },
+    {
+      "politician_id": "5d837fe5-3c60-4966-bbe8-c43021b1ca32",
+      "slug": "patrick-ahrens-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/5d837fe5-3c60-4966-bbe8-c43021b1ca32.jpg"
+    },
+    {
+      "politician_id": "5f44879b-8fcf-4441-b004-1e12d607efa4",
+      "slug": "jonathan-wingard-ok",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/5f44879b-8fcf-4441-b004-1e12d607efa4.jpg"
+    },
+    {
+      "politician_id": "5f9e1a90-01b8-431b-8c1a-e23b1241c721",
+      "slug": "gail-pellerin-ca",
+      "status": "would_revert",
+      "restore": "https://www.assembly.ca.gov/sites/assembly.ca.gov/files/memberphotos/pellerin_502_11-30-22_resized.jpg"
+    },
+    {
+      "politician_id": "5fb86e37-e8f0-4162-b525-86dcfdb41987",
+      "slug": "kelly-hines-ok",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/5fb86e37-e8f0-4162-b525-86dcfdb41987.jpg"
+    },
+    {
+      "politician_id": "5fbe3ec3-05cb-49d8-986f-be50cd321faa",
+      "slug": "denise-crosswhite-hader-ok",
+      "status": "would_revert",
+      "restore": "https://www.okhouse.gov/Members/Pictures/HiRes/Crosswhite%20Hader,%20Denise.jpg"
+    },
+    {
+      "politician_id": "5fbef712-4153-4317-89d5-331a098f3135",
+      "slug": "tom-lackey-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/5fbef712-4153-4317-89d5-331a098f3135.jpg"
+    },
+    {
+      "politician_id": "6007e6c8-de88-4102-9165-43f4a00392ff",
+      "slug": "will-brownsberger-ma",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/6007e6c8-de88-4102-9165-43f4a00392ff.jpg"
+    },
+    {
+      "politician_id": "600c256e-6010-4413-853e-9debbfa0954c",
+      "slug": "avelino-valencia-ca",
+      "status": "would_revert",
+      "restore": "https://www.assembly.ca.gov/sites/assembly.ca.gov/files/memberphotos/valencia_518_11-30-22_resized.jpg"
+    },
+    {
+      "politician_id": "6324fb1f-eeec-43fe-9178-bd1551deeacc",
+      "slug": "mike-kelley-ok",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/6324fb1f-eeec-43fe-9178-bd1551deeacc.jpg"
+    },
+    {
+      "politician_id": "64f32c55-3938-410c-8241-49df7785d89b",
+      "slug": "nicole-miller-ok",
+      "status": "would_revert",
+      "restore": "https://www.okhouse.gov/Members/Pictures/HiRes/Nicole-Miller.jpg"
+    },
+    {
+      "politician_id": "65dae7ff-b526-4fc8-969e-7a2b4ae69051",
+      "slug": "michelle-mccane-ok",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/65dae7ff-b526-4fc8-969e-7a2b4ae69051.jpg"
+    },
+    {
+      "politician_id": "673c4353-3853-4d26-b66e-55fbed5a8355",
+      "slug": "rob-hall-ok",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/673c4353-3853-4d26-b66e-55fbed5a8355.jpg"
+    },
+    {
+      "politician_id": "68909188-c454-4c12-9840-3bf3513a23aa",
+      "slug": "christi-gillespie-ok",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/68909188-c454-4c12-9840-3bf3513a23aa.jpg"
+    },
+    {
+      "politician_id": "698078dc-2baa-48a1-ac4f-394bf5e19019",
+      "slug": "monique-limn-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/698078dc-2baa-48a1-ac4f-394bf5e19019.jpg"
+    },
+    {
+      "politician_id": "6af11cbc-a58e-4524-97d2-003e7b5663c6",
+      "slug": "josh-lowenthal-ca",
+      "status": "would_revert",
+      "restore": "https://www.assembly.ca.gov/sites/assembly.ca.gov/files/memberphotos/lowenthal_009_11-30-22_resized.jpg"
+    },
+    {
+      "politician_id": "6b6bf11a-ac06-46b6-b6e9-4b77ab751e21",
+      "slug": "brendan-crighton-ma",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/6b6bf11a-ac06-46b6-b6e9-4b77ab751e21.jpg"
+    },
+    {
+      "politician_id": "6bb0d020-6663-438b-8235-1d45baf386b7",
+      "slug": "sheikh-rahman-ga",
+      "status": "would_revert",
+      "restore": "https://www.legis.ga.gov/api/images/default-source/portraits/rahman-sheikh-4924.jpg"
+    },
+    {
+      "politician_id": "6c6df79e-d626-478e-87ff-b0b3ee9825c5",
+      "slug": "karen-spilka-ma",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/6c6df79e-d626-478e-87ff-b0b3ee9825c5.jpg"
+    },
+    {
+      "politician_id": "6cad9bc5-5101-43fc-8b4f-35e35170429a",
+      "slug": "melissa-hurtado-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/6cad9bc5-5101-43fc-8b4f-35e35170429a.jpg"
+    },
+    {
+      "politician_id": "6ccabff5-9fca-4248-b5ee-6092c2f7f658",
+      "slug": "clay-staires-ok",
+      "status": "would_revert",
+      "restore": "https://www.okhouse.gov/Members/Pictures/HiRes/Staires,%20Clay.jpg"
+    },
+    {
+      "politician_id": "6dbc388b-5dd4-40ca-b763-014f0300acbc",
+      "slug": "randy-grellner-ok",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/6dbc388b-5dd4-40ca-b763-014f0300acbc.jpg"
+    },
+    {
+      "politician_id": "7235f993-d296-49c4-bcfd-b0f52a8db250",
+      "slug": "josh-cantrell-ok",
+      "status": "would_revert",
+      "restore": "https://www.okhouse.gov/Members/Pictures/HiRes/Cantrell,%20Josh.jpg"
+    },
+    {
+      "politician_id": "72ce524f-fb7a-42f7-872f-a238fdf19e8f",
+      "slug": "gregg-hart-ca",
+      "status": "would_revert",
+      "restore": "https://www.assembly.ca.gov/sites/assembly.ca.gov/files/memberphotos/hart_027_11-30-22_resized.jpg"
+    },
+    {
+      "politician_id": "743992d1-e061-49f7-abe8-a50c3e7af13c",
+      "slug": "bob-culver-ok",
+      "status": "would_revert",
+      "restore": "https://www.okhouse.gov/Members/Pictures/HiRes/Culver,%20BobEd.jpg"
+    },
+    {
+      "politician_id": "777bd787-7518-47b1-9efb-04172e913029",
+      "slug": "suzette-valladares-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/777bd787-7518-47b1-9efb-04172e913029.jpg"
+    },
+    {
+      "politician_id": "796f9071-97ea-4806-ba69-ca6716346247",
+      "slug": "jimmy-gomez-california",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/796f9071-97ea-4806-ba69-ca6716346247.jpg"
+    },
+    {
+      "politician_id": "79a5a3a4-7fd8-4c09-8f06-73fb97f8b951",
+      "slug": "brian-jones-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/79a5a3a4-7fd8-4c09-8f06-73fb97f8b951.jpg"
+    },
+    {
+      "politician_id": "7b2436c7-154d-4f78-8ab5-0c856029bf83",
+      "slug": "todd-gollihare-ok",
+      "status": "would_revert",
+      "restore": "https://oksenate.gov/sites/default/files/Gollihare%2C%20Todd%20Flags%202022.jpg"
+    },
+    {
+      "politician_id": "7fd6264e-e3ba-4e8d-996c-a9b5f665cda5",
+      "slug": "patrick-oconnor-ma",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/7fd6264e-e3ba-4e8d-996c-a9b5f665cda5.jpg"
+    },
+    {
+      "politician_id": "80370a5d-2a76-489e-b87f-a13206a2d33a",
+      "slug": "tasha-boerner-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/80370a5d-2a76-489e-b87f-a13206a2d33a.jpg"
+    },
+    {
+      "politician_id": "82e92bd8-375c-4a87-af58-e0da6d005269",
+      "slug": "tammy-townley-ok",
+      "status": "would_revert",
+      "restore": "https://www.okhouse.gov/Members/Pictures/HiRes/Townley,%20Tammy.jpg"
+    },
+    {
+      "politician_id": "852e92bc-ce1a-473f-a7ec-4236c6673419",
+      "slug": "nikki-merritt-ga",
+      "status": "would_revert",
+      "restore": "https://www.legis.ga.gov/api/images/default-source/portraits/merritt-nikki-4978.jpg"
+    },
+    {
+      "politician_id": "85ef8d5f-2176-4672-ba26-8b0f95c1b4c5",
+      "slug": "lashae-sharp-collins-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/85ef8d5f-2176-4672-ba26-8b0f95c1b4c5.jpg"
+    },
+    {
+      "politician_id": "86496cee-517f-4d85-8a8e-4fb6d7e2fd69",
+      "slug": "kristen-thompson-ok",
+      "status": "would_revert",
+      "restore": "https://oksenate.gov/sites/default/files/Thompson%2C%20Kristen%20Flags%202022.jpg"
+    },
+    {
+      "politician_id": "88a7796c-b590-460a-b7ac-c3696f0c2cb8",
+      "slug": "maggy-krell-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/88a7796c-b590-460a-b7ac-c3696f0c2cb8.jpg"
+    },
+    {
+      "politician_id": "8b2be75e-f3d5-46c5-bd48-9aa2aa46b0de",
+      "slug": "sade-elhawary-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/8b2be75e-f3d5-46c5-bd48-9aa2aa46b0de.jpg"
+    },
+    {
+      "politician_id": "8b3acbdc-59fe-434f-92b8-e4dc0e2dbc37",
+      "slug": "liz-ortega-ca",
+      "status": "would_revert",
+      "restore": "https://www.assembly.ca.gov/sites/assembly.ca.gov/files/memberphotos/ortega_004_11-30-22_resized.jpg"
+    },
+    {
+      "politician_id": "8caf70a8-d58f-4565-83b2-f8b638c70307",
+      "slug": "ben-allen-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/8caf70a8-d58f-4565-83b2-f8b638c70307.jpg"
+    },
+    {
+      "politician_id": "8d38745a-a7db-4c8f-9805-934d80b5c9a9",
+      "slug": "jacob-rosecrants-ok",
+      "status": "would_revert",
+      "restore": "https://www.okhouse.gov/Members/Pictures/HiRes/Rosecrants,%20Jacob.jpg"
+    },
+    {
+      "politician_id": "8f7d4634-ce97-425c-b245-499763d0e009",
+      "slug": "jared-deck-ok",
+      "status": "would_revert",
+      "restore": "https://www.okhouse.gov/Members/Pictures/HiRes/Deck,%20Jared.jpg"
+    },
+    {
+      "politician_id": "90d2aec7-ceee-4c6f-befa-653b866fd4b7",
+      "slug": "anthony-moore-ok",
+      "status": "would_revert",
+      "restore": "https://www.okhouse.gov/Members/Pictures/HiRes/Moore,%20Anthony.jpg"
+    },
+    {
+      "politician_id": "9170d974-95e9-4238-84be-3a9880aa511e",
+      "slug": "tri-ta-ca",
+      "status": "would_revert",
+      "restore": "https://www.assembly.ca.gov/sites/assembly.ca.gov/files/memberphotos/tri_ta_a25i1353_resized.png"
+    },
+    {
+      "politician_id": "91c37140-f923-4cf5-be1c-8691c92d98ed",
+      "slug": "micheal-bergstrom-ok",
+      "status": "would_revert",
+      "restore": "https://oksenate.gov/sites/default/files/Bergstrom%2C%20Micheal%202022%20flags.jpg"
+    },
+    {
+      "politician_id": "91cbe815-77c7-4506-a953-023e3fafbfac",
+      "slug": "michelle-wu",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/91cbe815-77c7-4506-a953-023e3fafbfac/9fadf4cd-d884-4c2b-8f11-cba1e9886c43.jpg"
+    },
+    {
+      "politician_id": "91d40a55-a9ec-48f0-a7c2-c15a6e31ceec",
+      "slug": "karen-goh",
+      "status": "would_revert",
+      "restore": null
+    },
+    {
+      "politician_id": "9277c545-b4fa-4f0a-88eb-755eefc4043f",
+      "slug": "rick-zbur-ca",
+      "status": "would_revert",
+      "restore": "https://www.assembly.ca.gov/sites/assembly.ca.gov/files/memberphotos/chavez-zbur_510_11-30-22_resized.jpg"
+    },
+    {
+      "politician_id": "934c9b74-1153-4e26-bb69-ed7b428461a4",
+      "slug": "carl-newton-ok",
+      "status": "would_revert",
+      "restore": "https://www.okhouse.gov/Members/Pictures/HiRes/Newton,%20Carl.jpg"
+    },
+    {
+      "politician_id": "934fa90a-8877-4012-aa9b-ab66904d5429",
+      "slug": "stacy-adams-ok",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/934fa90a-8877-4012-aa9b-ab66904d5429.jpg"
+    },
+    {
+      "politician_id": "939fcd3d-84d0-417e-8c80-9dc75856ef5b",
+      "slug": "derrick-hildebrant-ok",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/939fcd3d-84d0-417e-8c80-9dc75856ef5b.jpg"
+    },
+    {
+      "politician_id": "9613ab43-6a18-4430-b862-45f448211a28",
+      "slug": "ellyn-hefner-ok",
+      "status": "would_revert",
+      "restore": "https://www.okhouse.gov/Members/Pictures/HiRes/Hefner,%20Ellyn.jpg"
+    },
+    {
+      "politician_id": "973e6682-6477-410d-a36a-c4df5d1ff79a",
+      "slug": "stan-ellis-ca",
+      "status": "would_revert",
+      "restore": ""
+    },
+    {
+      "politician_id": "9c17b993-a368-460c-9d7b-e1cab4b6643f",
+      "slug": "gavin-newsom-california",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/9c17b993-a368-460c-9d7b-e1cab4b6643f.jpg"
+    },
+    {
+      "politician_id": "9c414f81-5a4b-4959-8109-b6776e49bd47",
+      "slug": "shannon-grove-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/9c414f81-5a4b-4959-8109-b6776e49bd47.jpg"
+    },
+    {
+      "politician_id": "9c705c3d-8f28-4008-8729-328429f02581",
+      "slug": "mara-elena-durazo-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/9c705c3d-8f28-4008-8729-328429f02581.jpg"
+    },
+    {
+      "politician_id": "9cb6f6dc-a177-4e3c-80a3-90a8a7ca5261",
+      "slug": "jim-olsen-ok",
+      "status": "would_revert",
+      "restore": "https://www.okhouse.gov/Members/Pictures/HiRes/Olsen,%20Jim.jpg"
+    },
+    {
+      "politician_id": "9da85bd2-6d55-4c42-8f49-3f00fcc2eff4",
+      "slug": "jim-shaw-ok",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/9da85bd2-6d55-4c42-8f49-3f00fcc2eff4.jpg"
+    },
+    {
+      "politician_id": "9eceb4b9-a1ab-440e-80ba-368f5383a59c",
+      "slug": "greg-wallis-ca",
+      "status": "would_revert",
+      "restore": "https://www.assembly.ca.gov/sites/assembly.ca.gov/files/memberphotos/wallis_greg_0.jpg"
+    },
+    {
+      "politician_id": "9eea12d7-b362-404a-b813-25ba2dc81d05",
+      "slug": "jos-solache-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/9eea12d7-b362-404a-b813-25ba2dc81d05.jpg"
+    },
+    {
+      "politician_id": "a0e56135-04f9-4fb8-b874-e0c871f7da1f",
+      "slug": "carri-hicks-ok",
+      "status": "would_revert",
+      "restore": "https://oksenate.gov/sites/default/files/Hicks%2C%20Carri%20Flags%202022.jpg"
+    },
+    {
+      "politician_id": "a485ad97-8984-4e88-9789-f9b3ef8c322c",
+      "slug": "chuck-hall-ok",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/a485ad97-8984-4e88-9789-f9b3ef8c322c.jpg"
+    },
+    {
+      "politician_id": "a544a72d-009f-4ead-85db-93b55e56c455",
+      "slug": "julie-daniels-ok",
+      "status": "would_revert",
+      "restore": "https://oksenate.gov/sites/default/files/Daniels%2C%20Julie%202022.jpg"
+    },
+    {
+      "politician_id": "a6a4afc2-5ff2-4e55-a4bc-7791de265551",
+      "slug": "jay-livingstone-ma",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/a6a4afc2-5ff2-4e55-a4bc-7791de265551.jpg"
+    },
+    {
+      "politician_id": "aacf75bf-255c-4829-8c25-b60f16004d41",
+      "slug": "meloyde-blancett-ok",
+      "status": "would_revert",
+      "restore": "https://www.okhouse.gov/Members/Pictures/HiRes/Blancett,%20Meloyde.jpg"
+    },
+    {
+      "politician_id": "ab65df51-1251-42a7-b3c8-8f9adc2729aa",
+      "slug": "aletia-timmons-ok",
+      "status": "would_revert",
+      "restore": ""
+    },
+    {
+      "politician_id": "abfca10f-88f5-4f38-b593-22a1dfa996aa",
+      "slug": "tim-turner-ok",
+      "status": "would_revert",
+      "restore": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSdKW8Yps28Qqd_HZ-KGr8HDljGbqjeswJrSA&s"
+    },
+    {
+      "politician_id": "ac9f1a21-a1e1-4d93-b0a9-54e9751def0f",
+      "slug": "shirley-weber-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/ac9f1a21-a1e1-4d93-b0a9-54e9751def0f.jpg"
+    },
+    {
+      "politician_id": "add1a955-d665-41cc-a5c3-f37a03ba2acc",
+      "slug": "pilar-schiavo-ca",
+      "status": "would_revert",
+      "restore": "https://www.assembly.ca.gov/sites/assembly.ca.gov/files/memberphotos/schiavo_030_11-29-22_resized.jpg"
+    },
+    {
+      "politician_id": "aff4d789-e97a-48a7-8e94-c6a4f2fd704b",
+      "slug": "david-smith-ok",
+      "status": "would_revert",
+      "restore": "https://www.okhouse.gov/Members/Pictures/HiRes/Smith,%20David.jpg"
+    },
+    {
+      "politician_id": "b0cded2d-83f2-4692-a97b-091bb9f75617",
+      "slug": "mary-boren-ok",
+      "status": "would_revert",
+      "restore": "https://oksenate.gov/sites/default/files/Boren%2C%20Mary%20Flags%202022.jpg"
+    },
+    {
+      "politician_id": "b2386aea-70dd-476a-b1cf-0ccf6c459985",
+      "slug": "robert-rivas-ca",
+      "status": "would_revert",
+      "restore": "https://www.assembly.ca.gov/sites/assembly.ca.gov/files/memberphotos/ad-29_rivas_r19_resized.jpg"
+    },
+    {
+      "politician_id": "b39a6ba2-f1bb-471a-bce7-bcd89b8f556a",
+      "slug": "trish-ranson-ok",
+      "status": "would_revert",
+      "restore": "https://www.okhouse.gov/Members/Pictures/HiRes/Ranson,%20Trish.jpg"
+    },
+    {
+      "politician_id": "b5167385-6100-42a2-a346-540aa2f48e8c",
+      "slug": "mark-mann-ok",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/b5167385-6100-42a2-a346-540aa2f48e8c.jpg"
+    },
+    {
+      "politician_id": "b6109e9a-b7f4-4f12-99c3-404c4bf0f497",
+      "slug": "anamarie-avila-farias-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/b6109e9a-b7f4-4f12-99c3-404c4bf0f497.jpg"
+    },
+    {
+      "politician_id": "b73f6bda-dafe-4716-aa12-c84d766f595d",
+      "slug": "rebecca-bauer-kahan-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/b73f6bda-dafe-4716-aa12-c84d766f595d.jpg"
+    },
+    {
+      "politician_id": "b7e18503-b960-4555-a22d-80c1c9b2f953",
+      "slug": "julia-kirt-ok",
+      "status": "would_revert",
+      "restore": "https://oksenate.gov/sites/default/files/Kirt%2C%20Julia%202023%20Flags%20S.jpg"
+    },
+    {
+      "politician_id": "b81353ee-051f-4b3e-b002-264f8d1e0904",
+      "slug": "mike-dobrinski-ok",
+      "status": "would_revert",
+      "restore": "https://www.okhouse.gov/Members/Pictures/HiRes/Dobrinski,%20Mike.jpg"
+    },
+    {
+      "politician_id": "b9c0daa8-3981-4034-8538-79ebd9251c0c",
+      "slug": "kim-jackson-ga",
+      "status": "would_revert",
+      "restore": "https://www.legis.ga.gov/api/images/default-source/portraits/jackson-kim-4981.jpg"
+    },
+    {
+      "politician_id": "ba47bdb4-b54e-4b25-9c00-cf7c1f1b4398",
+      "slug": "russ-goodman-ga",
+      "status": "would_revert",
+      "restore": "https://www.legis.ga.gov/api/images/default-source/portraits/goodman-russ-4977.jpg"
+    },
+    {
+      "politician_id": "bbc8a8e3-e115-477e-9d98-728b37b464e3",
+      "slug": "natasha-johnson-ca",
+      "status": "would_revert",
+      "restore": ""
+    },
+    {
+      "politician_id": "bffc73d6-ecd9-44af-8caf-d51d208d3816",
+      "slug": "jason-blair-ok",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/bffc73d6-ecd9-44af-8caf-d51d208d3816.jpg"
+    },
+    {
+      "politician_id": "c36a5611-890c-4f7b-95e0-22841db79c9e",
+      "slug": "ellen-pogemiller-ok",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/c36a5611-890c-4f7b-95e0-22841db79c9e.jpg"
+    },
+    {
+      "politician_id": "c5b57a80-9980-413b-8c45-9f1a8a001b0b",
+      "slug": "aaron-michlewitz-ma",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/c5b57a80-9980-413b-8c45-9f1a8a001b0b.jpg"
+    },
+    {
+      "politician_id": "c5c19649-b4e7-4982-91f9-3418d564d9de",
+      "slug": "celeste-rodriguez-ca",
+      "status": "would_revert",
+      "restore": "https://ci.san-fernando.ca.us/wp-content/uploads/2021/07/Rodriguez-Celeste-2021-267x300.png"
+    },
+    {
+      "politician_id": "c86954cf-d947-4ac8-89dc-dac458730d3e",
+      "slug": "jessica-caloza-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/c86954cf-d947-4ac8-89dc-dac458730d3e.jpg"
+    },
+    {
+      "politician_id": "cf332eac-1c9a-4f4a-921b-28663d8b3d62",
+      "slug": "john-kane-ok",
+      "status": "would_revert",
+      "restore": "https://www.okhouse.gov/Members/Pictures/HiRes/Kane,%20John.jpg"
+    },
+    {
+      "politician_id": "d04a1ba3-0e99-4970-9fec-ad7d0713e444",
+      "slug": "sasha-prez-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/d04a1ba3-0e99-4970-9fec-ad7d0713e444.jpg"
+    },
+    {
+      "politician_id": "d097d19b-5b46-4ee3-973b-927b454a7e5a",
+      "slug": "isaac-bryan-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/d097d19b-5b46-4ee3-973b-927b454a7e5a.jpg"
+    },
+    {
+      "politician_id": "d347b210-3683-404a-ba7a-ec56d2c39fc9",
+      "slug": "michael-brooks-ok",
+      "status": "would_revert",
+      "restore": "https://oksenate.gov/sites/default/files/Brooks%2C%20Michael%20Flags%202022.jpg"
+    },
+    {
+      "politician_id": "d40d3153-e404-4989-8f08-2700a14f9147",
+      "slug": "julie-mcintosh-ok",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/d40d3153-e404-4989-8f08-2700a14f9147.jpg"
+    },
+    {
+      "politician_id": "d7e7f476-dbae-4bbd-8754-b1ef44e766dd",
+      "slug": "warren-hamilton-ok",
+      "status": "would_revert",
+      "restore": "https://oksenate.gov/sites/default/files/Hamilton%2C%20Warren%202022%20flags.jpg"
+    },
+    {
+      "politician_id": "dd04a7cc-323a-42cc-a2d5-888239d26cab",
+      "slug": "preston-stinson-ok",
+      "status": "would_revert",
+      "restore": "https://www.okhouse.gov/Members/Pictures/HiRes/Stinson,%20Preston.jpg"
+    },
+    {
+      "politician_id": "dd228f7a-c340-4804-a9bc-6b02298d827a",
+      "slug": "jim-grego-ok",
+      "status": "would_revert",
+      "restore": "https://www.okhouse.gov/Members/Pictures/HiRes/Grego,%20Jim.jpg"
+    },
+    {
+      "politician_id": "de6470a0-95d8-4d84-8ac5-b5fdf2d3e300",
+      "slug": "suzanne-schreiber-ok",
+      "status": "would_revert",
+      "restore": "https://www.okhouse.gov/Members/Pictures/HiRes/Schreiber,%20Suzanne.jpg"
+    },
+    {
+      "politician_id": "de7387c1-ec16-40a4-b51c-045cbf052b56",
+      "slug": "luz-m-rivas-california",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/de7387c1-ec16-40a4-b51c-045cbf052b56.jpg"
+    },
+    {
+      "politician_id": "dec3688d-5ac7-4d45-9d46-aec80f84ee39",
+      "slug": "lisa-calderon-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/dec3688d-5ac7-4d45-9d46-aec80f84ee39.jpg"
+    },
+    {
+      "politician_id": "e30b8bdd-3f68-46ba-a4c0-f852fc2a176b",
+      "slug": "mike-lay-ok",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/e30b8bdd-3f68-46ba-a4c0-f852fc2a176b.jpg"
+    },
+    {
+      "politician_id": "e657fa52-a75b-4f52-a002-ab7145db6287",
+      "slug": "nikki-nice-ok",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/e657fa52-a75b-4f52-a002-ab7145db6287.jpg"
+    },
+    {
+      "politician_id": "e659a742-803d-4600-94a1-e2019af28d95",
+      "slug": "john-laird-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/e659a742-803d-4600-94a1-e2019af28d95.jpg"
+    },
+    {
+      "politician_id": "e66b8f0e-31b7-4190-ac90-ac534f0f8015",
+      "slug": "russell-holmes-ma",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/e66b8f0e-31b7-4190-ac90-ac534f0f8015.jpg"
+    },
+    {
+      "politician_id": "e78bdb13-2b14-4c0c-980c-e73536632015",
+      "slug": "tom-gann-ok",
+      "status": "would_revert",
+      "restore": "https://www.okhouse.gov/Members/Pictures/HiRes/Gann,%20Tom.jpg"
+    },
+    {
+      "politician_id": "e9b9748a-72ea-43e4-9335-f94657c30dea",
+      "slug": "matt-haney-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/e9b9748a-72ea-43e4-9335-f94657c30dea.jpg"
+    },
+    {
+      "politician_id": "e9bec054-d53f-44aa-932b-d79876ac5b5d",
+      "slug": "mia-bonta-ca",
+      "status": "would_revert",
+      "restore": "https://www.assembly.ca.gov/sites/assembly.ca.gov/files/memberphotos/ad-18_bonta_m._portraits_edit_155_11-5-21_resized.jpg"
+    },
+    {
+      "politician_id": "ea9b68c0-3519-4b73-9c08-c0a38ddd0aa5",
+      "slug": "grant-green-ok",
+      "status": "would_revert",
+      "restore": "https://oksenate.gov/sites/default/files/Green%2C%20Grant%20Flags%202022.jpg"
+    },
+    {
+      "politician_id": "ed892e23-f96f-46c9-b450-ffecd1604e53",
+      "slug": "casey-murdock-ok",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/ed892e23-f96f-46c9-b450-ffecd1604e53.jpg"
+    },
+    {
+      "politician_id": "ef9e36ae-5aa8-424f-af9e-8224b5148abb",
+      "slug": "nick-schultz-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/ef9e36ae-5aa8-424f-af9e-8224b5148abb.jpg"
+    },
+    {
+      "politician_id": "f1a0cafd-7fd0-4f37-b4bb-d168d6279ea2",
+      "slug": "kevin-norwood-ok",
+      "status": "would_revert",
+      "restore": ""
+    },
+    {
+      "politician_id": "f1a8b5c2-d901-4b5d-82ca-2052df80a868",
+      "slug": "melissa-provenzano-ok",
+      "status": "would_revert",
+      "restore": "https://www.okhouse.gov/Members/Pictures/HiRes/Melissa-Provenzano.jpg"
+    },
+    {
+      "politician_id": "f2c9dc2b-1b19-4390-9143-b4c7a2fee12a",
+      "slug": "chris-ward-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/f2c9dc2b-1b19-4390-9143-b4c7a2fee12a.jpg"
+    },
+    {
+      "politician_id": "f2ca3576-ac6a-4080-b012-6690d053b5ad",
+      "slug": "blanca-rubio-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/f2ca3576-ac6a-4080-b012-6690d053b5ad.jpg"
+    },
+    {
+      "politician_id": "f2f1e01a-fa9c-41fc-bf7d-829f4297791d",
+      "slug": "emily-gise-ok",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/f2f1e01a-fa9c-41fc-bf7d-829f4297791d.jpg"
+    },
+    {
+      "politician_id": "f3b960fc-1dec-412e-a9f5-b20e4076e5a5",
+      "slug": "jo-anna-dossett-ok",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/f3b960fc-1dec-412e-a9f5-b20e4076e5a5.jpg"
+    },
+    {
+      "politician_id": "f4b99b56-9f02-4655-92b7-99f33a22cc59",
+      "slug": "jason-lewis-ma",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/f4b99b56-9f02-4655-92b7-99f33a22cc59.jpg"
+    },
+    {
+      "politician_id": "f5f5e9b1-0d94-48c5-b1d8-aeabfd6b0560",
+      "slug": "john-haste-ok",
+      "status": "would_revert",
+      "restore": "https://oksenate.gov/sites/default/files/Haste%2C%20John%202022%20Flags.jpg"
+    },
+    {
+      "politician_id": "f5fc478e-7c84-47ea-be4a-fdfc13297828",
+      "slug": "henry-stern-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/f5fc478e-7c84-47ea-be4a-fdfc13297828.jpg"
+    },
+    {
+      "politician_id": "f6ed7ee3-36cc-42f1-82e8-3c57932b2029",
+      "slug": "dawn-addis-ca",
+      "status": "would_revert",
+      "restore": "https://www.assembly.ca.gov/sites/assembly.ca.gov/files/memberphotos/addis_003_11-30-22_resized.jpg"
+    },
+    {
+      "politician_id": "fd946cbc-1e2d-4d0a-8777-be07665b0594",
+      "slug": "tina-mckinnor-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/fd946cbc-1e2d-4d0a-8777-be07665b0594.jpg"
+    },
+    {
+      "politician_id": "fe926c00-1422-433a-a7ca-4c96dfe60ef2",
+      "slug": "chris-rogers-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/fe926c00-1422-433a-a7ca-4c96dfe60ef2.jpg"
+    },
+    {
+      "politician_id": "febecd60-0294-4dfc-92fa-dcfef285e802",
+      "slug": "damon-connolly-ca",
+      "status": "would_revert",
+      "restore": "https://www.assembly.ca.gov/sites/assembly.ca.gov/files/memberphotos/connolly_509_11-30-22_resized.jpg"
+    },
+    {
+      "politician_id": "fed4cc20-8d66-4851-8f49-f4749586f82e",
+      "slug": "tony-strickland-ca",
+      "status": "would_revert",
+      "restore": "https://jjwdxjqsnwieksubkkkf.supabase.co/storage/v1/object/public/politician-photos/fed4cc20-8d66-4851-8f49-f4749586f82e.jpg"
+    }
+  ]
+}

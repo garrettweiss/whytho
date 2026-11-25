@@ -1,0 +1,41 @@
+[
+  {
+    "politician_id": "4866dd30-dbe8-411c-a443-63456f002315",
+    "source_url": "https://bioguide.congress.gov/photo/H000273.jpg",
+    "source_page": "https://bioguide.congress.gov/search/bio/H000273",
+    "creator": "Courtesy U.S. Senate Historical Office",
+    "license": "US-federal-official-duty",
+    "license_url": "https://www.usa.gov/government-copyright",
+    "evidence": "Congress.gov API member record for H000273 (checked 2026-11-25T20:41:37.117Z) lists depiction.attribution \"Courtesy U.S. Senate Historical Office\", an official photograph produced by Senate or House staff. Works of United States government employees in the course of official duties are not subject to US copyright (https://www.usa.gov/government-copyright). Photo served by the Biographical Directory of the U.S. Congress at https://bioguide.congress.gov/photo/H000273.jpg (720x900).",
+    "identity_verified": true,
+    "reviewed_by": "scripts/build-federal-photo-manifest.ts (Congress.gov API attribution + Biographical Directory photo, automated check)",
+    "reviewed_at": "2026-11-25T20:41:37.117Z",
+    "changes": "Centre-cropped to 4:5, resized to at most 800x1000 JPEG, embedded metadata removed."
+  },
+  {
+    "politician_id": "55987b9b-54a7-426b-b8e5-a622fb2bb7a1",
+    "source_url": "https://bioguide.congress.gov/photo/T000278.jpg",
+    "source_page": "https://bioguide.congress.gov/search/bio/T000278",
+    "creator": "Courtesy U.S. Senate Historical Office",
+    "license": "US-federal-official-duty",
+    "license_url": "https://www.usa.gov/government-copyright",
+    "evidence": "Congress.gov API member record for T000278 (checked 2026-11-25T20:41:37.117Z) lists depiction.attribution \"Courtesy U.S. Senate Historical Office\", an official photograph produced by Senate or House staff. Works of United States government employees in the course of official duties are not subject to US copyright (https://www.usa.gov/government-copyright). Photo served by the Biographical Directory of the U.S. Congress at https://bioguide.congress.gov/photo/T000278.jpg (720x900).",
+    "identity_verified": true,
+    "reviewed_by": "scripts/build-federal-photo-manifest.ts (Congress.gov API attribution + Biographical Directory photo, automated check)",
+    "reviewed_at": "2026-11-25T20:41:37.117Z",
+    "changes": "Centre-cropped to 4:5, resized to at most 800x1000 JPEG, embedded metadata removed."
+  },
+  {
+    "politician_id": "d7b80f16-0dc9-49a8-897e-fc5349a12e4f",
+    "source_url": "https://bioguide.congress.gov/photo/H000601.jpg",
+    "source_page": "https://bioguide.congress.gov/search/bio/H000601",
+    "creator": "Courtesy U.S. Senate Historical Office",
+    "license": "US-federal-official-duty",
+    "license_url": "https://www.usa.gov/government-copyright",
+    "evidence": "Congress.gov API member record for H000601 (checked 2026-11-25T20:41:37.117Z) lists depiction.attribution \"Courtesy U.S. Senate Historical Office\", an official photograph produced by Senate or House staff. Works of United States government employees in the course of official duties are not subject to US copyright (https://www.usa.gov/government-copyright). Photo served by the Biographical Directory of the U.S. Congress at https://bioguide.congress.gov/photo/H000601.jpg (720x900).",
+    "identity_verified": true,
+    "reviewed_by": "scripts/build-federal-photo-manifest.ts (Congress.gov API attribution + Biographical Directory photo, automated check)",
+    "reviewed_at": "2026-11-25T20:41:37.117Z",
+    "changes": "Centre-cropped to 4:5, resized to at most 800x1000 JPEG, embedded metadata removed."
+  }
+]

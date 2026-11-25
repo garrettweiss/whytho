@@ -1,5 +1,7 @@
 # Portrait readiness and replacement queue
 
+> **November 25 update:** 557 federal and governor portraits were replaced with licensed images at up to 800x1000; see [portrait resolution pass](PHOTO_RESOLUTION_20261125.md) for sources, rights bases, held manifests and the plan for state legislators.
+
 > **October 31 release update:** The approved database and application release is now live at whytho.us. See [production release and acceptance evidence](PRODUCTION_RELEASE.md) for the current status, final migration versions, 50 account database scenarios, and remaining launch gates. The assessment below records the pre-release work; references to undeployed/local-only fixes describe that earlier checkpoint.
 
 Assessment completed October 30, 2026, America/Los_Angeles. This combines a read-only live inventory, an HTTP/image-metadata check of every recorded non-test portrait and implemented local upload/import safeguards. No live portrait, database row or storage object was changed or deleted.

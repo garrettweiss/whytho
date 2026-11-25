@@ -1,0 +1,547 @@
+{
+  "summary": {
+    "checked_at": "2026-11-25T21:58:54.650Z",
+    "scope": "mayors",
+    "key": "position",
+    "note": "office-and-state keyed Wikidata match (living current holder, full name, unique, district-consistent); Commons extmetadata license; no database or storage change",
+    "profiles": 50,
+    "counts": {
+      "manifest": 28,
+      "source_too_small": 7,
+      "no_wikidata_match": 15
+    },
+    "licenses": {
+      "CC-BY-3.0": 3,
+      "CC-BY-2.0": 4,
+      "CC-BY-SA-4.0": 4,
+      "US-state-public-record": 6,
+      "CC0-1.0": 1,
+      "US-federal-official-duty": 6,
+      "CC-BY-SA-2.0": 1,
+      "public-domain-dedication": 2,
+      "CC-BY-4.0": 1
+    },
+    "unresolved": {},
+    "manifest": "docs/launch/evidence/photos/pass2/commons-manifest-mayors-position-20261125.json"
+  },
+  "rows": [
+    {
+      "politician_id": "0615fb39-51b0-42b3-a8c7-7419b477e270",
+      "slug": "yemi-mobolade",
+      "office": "Mayor",
+      "key": "position:CO/mayor",
+      "status": "manifest",
+      "wikidata": "Q118431275",
+      "file": "File:Yemi Mobolade Subscriber of the Month (cropped).png",
+      "width": 566,
+      "height": 707,
+      "license": "CC-BY-3.0"
+    },
+    {
+      "politician_id": "09d0dce8-5c3b-40e1-a059-01aaeb973e64",
+      "slug": "brandon-scott",
+      "office": "Mayor",
+      "key": "position:MD/mayor",
+      "status": "manifest",
+      "wikidata": "Q66363416",
+      "file": "File:Brandon Scott in 2024 (cropped).jpg",
+      "width": 1614,
+      "height": 2155,
+      "license": "CC-BY-2.0"
+    },
+    {
+      "politician_id": "0f11ad74-c790-4eec-81c0-334cd36dc105",
+      "slug": "eric-johnson",
+      "office": "Mayor",
+      "key": "position:TX/mayor",
+      "status": "source_too_small",
+      "wikidata": "Q5386829",
+      "file": "File:Eric Johnson (51239403937).jpg",
+      "width": 395,
+      "height": 527
+    },
+    {
+      "politician_id": "129fccec-8978-4f97-b8e2-154dbf8cbd67",
+      "slug": "freddie-o-connell",
+      "office": "Mayor",
+      "key": "position:TN/mayor",
+      "status": "manifest",
+      "wikidata": "Q121177357",
+      "file": "File:Freddie O'Connell (cropped).png",
+      "width": 1854,
+      "height": 2317,
+      "license": "CC-BY-SA-4.0"
+    },
+    {
+      "politician_id": "13afd728-5f59-45db-a88f-e550e36a24c1",
+      "slug": "monroe-nichols",
+      "office": "Mayor",
+      "key": "position:OK/mayor",
+      "status": "manifest",
+      "wikidata": "Q61971024",
+      "file": "File:Nichols, Monroe.jpg",
+      "width": 2400,
+      "height": 3000,
+      "license": "US-state-public-record"
+    },
+    {
+      "politician_id": "20760582-83b0-4ac4-b969-66795d79b172",
+      "slug": "janet-cowell",
+      "office": "Mayor",
+      "key": "position:NC/mayor",
+      "status": "manifest",
+      "wikidata": "Q6153268",
+      "file": "File:Janet Cowell Headshot.jpg",
+      "width": 5304,
+      "height": 5304,
+      "license": "CC0-1.0"
+    },
+    {
+      "politician_id": "2d1b0cf9-1722-4f5e-8621-60aede0574a4",
+      "slug": "barbara-lee",
+      "office": "Mayor",
+      "key": "position:CA/mayor",
+      "status": "manifest",
+      "wikidata": "Q289317",
+      "file": "File:Barbara Lee official portrait.jpg",
+      "width": 2832,
+      "height": 4256,
+      "license": "US-federal-official-duty"
+    },
+    {
+      "politician_id": "2ff06ce4-f75e-4931-8516-02fe0528ab47",
+      "slug": "john-whitmire",
+      "office": "Mayor",
+      "key": "position:TX/mayor",
+      "status": "source_too_small",
+      "wikidata": "Q6263891",
+      "file": "File:2025 John Whitmire (cropped).jpg",
+      "width": 270,
+      "height": 352
+    },
+    {
+      "politician_id": "32391986-589f-4539-8364-6f142be6446c",
+      "slug": "matt-mahan",
+      "office": "Mayor",
+      "key": "position:CA/mayor",
+      "status": "manifest",
+      "wikidata": "Q107299118",
+      "file": "File:Matt Mahan Farmer's Market 4 April 2026.jpg",
+      "width": 3840,
+      "height": 5519,
+      "license": "CC-BY-SA-4.0"
+    },
+    {
+      "politician_id": "371f69dc-5e06-49c0-8f2b-2ff0aa227a71",
+      "slug": "mike-coffman",
+      "office": "Mayor",
+      "key": "position:CO/mayor",
+      "status": "manifest",
+      "wikidata": "Q547218",
+      "file": "File:Mike Coffman.jpg",
+      "width": 478,
+      "height": 720,
+      "license": "US-federal-official-duty"
+    },
+    {
+      "politician_id": "39f64b0d-ad44-431a-9671-fece18a29a24",
+      "slug": "karen-bass",
+      "office": "Mayor",
+      "key": "position:CA/mayor",
+      "status": "manifest",
+      "wikidata": "Q461739",
+      "file": "File:Mayor Karen Bass official portrait.jpg",
+      "width": 3870,
+      "height": 3870,
+      "license": "US-state-public-record"
+    },
+    {
+      "politician_id": "430f0acf-d4d8-4f08-8910-f1d56f77303b",
+      "slug": "todd-gloria",
+      "office": "Mayor",
+      "key": "position:CA/mayor",
+      "status": "source_too_small",
+      "wikidata": "Q7812385",
+      "file": "File:Mayor Todd Gloria at Comic-Con 2026 (3x4 cropped).jpg",
+      "width": 387,
+      "height": 516
+    },
+    {
+      "politician_id": "4fe17b36-8edf-41db-a04c-985af2001b88",
+      "slug": "rex-richardson",
+      "office": "Mayor",
+      "key": "position:CA/mayor",
+      "status": "manifest",
+      "wikidata": "Q115522274",
+      "file": "File:Rex-headshot.jpg",
+      "width": 570,
+      "height": 800,
+      "license": "US-state-public-record"
+    },
+    {
+      "politician_id": "50295c0a-92ac-47ff-9f66-c62c91ca6a0f",
+      "slug": "renard-johnson",
+      "office": "Mayor",
+      "key": "position:TX/mayor",
+      "status": "manifest",
+      "wikidata": "Q132180975",
+      "file": "File:El Paso Mayor Renard Johnson.jpg",
+      "width": 411,
+      "height": 552,
+      "license": "US-federal-official-duty"
+    },
+    {
+      "politician_id": "535a8b4d-24c6-4df3-9adc-6e4caddd1e71",
+      "slug": "kate-gallego",
+      "office": "Mayor",
+      "key": "position:AZ/mayor",
+      "status": "manifest",
+      "wikidata": "Q62050652",
+      "file": "File:Kate Gallego (52613746097) (cropped).jpg",
+      "width": 2531,
+      "height": 3363,
+      "license": "CC-BY-SA-2.0"
+    },
+    {
+      "politician_id": "54ea8159-fa3f-4ad6-ad0d-a49cddad4820",
+      "slug": "mark-freeman",
+      "office": "Mayor",
+      "key": "position:AZ/mayor",
+      "status": "no_wikidata_match"
+    },
+    {
+      "politician_id": "56f90e69-b491-4fbb-bf27-e3ac216d3359",
+      "slug": "muriel-bowser",
+      "office": "Mayor",
+      "key": "position:DC/mayor",
+      "status": "no_wikidata_match"
+    },
+    {
+      "politician_id": "5d532d07-c4e1-431f-a79d-3a537da50c58",
+      "slug": "joe-hogsett",
+      "office": "Mayor",
+      "key": "position:IN/mayor",
+      "status": "source_too_small",
+      "wikidata": "Q6210362",
+      "file": "File:JoeHogsett-USAttorney.jpg",
+      "width": 198,
+      "height": 250
+    },
+    {
+      "politician_id": "6b2f7316-422a-4d2b-84e5-8e585ff2ca0f",
+      "slug": "kirk-watson",
+      "office": "Mayor",
+      "key": "position:TX/mayor",
+      "status": "no_wikidata_match"
+    },
+    {
+      "politician_id": "6b923a25-f44f-425c-8f40-95e8b2f678cc",
+      "slug": "keith-wilson",
+      "office": "Mayor",
+      "key": "position:OR/mayor",
+      "status": "manifest",
+      "wikidata": "Q131125533",
+      "file": "File:Keith Wilson acceptance speech-17 (alt crop).jpg",
+      "width": 1580,
+      "height": 1975,
+      "license": "CC-BY-2.0"
+    },
+    {
+      "politician_id": "6f26fca8-18c5-4999-9e8f-c952d9527429",
+      "slug": "kevin-mccarty",
+      "office": "Mayor",
+      "key": "position:CA/mayor",
+      "status": "no_wikidata_match"
+    },
+    {
+      "politician_id": "72831d40-9741-4ad0-b9e8-4b9ebeb1a161",
+      "slug": "john-ewing-jr",
+      "office": "Mayor",
+      "key": "position:NE/mayor",
+      "status": "manifest",
+      "wikidata": "Q134463488",
+      "file": "File:John Ewing 2018 (alt crop).jpg",
+      "width": 2604,
+      "height": 3255,
+      "license": "CC-BY-SA-4.0"
+    },
+    {
+      "politician_id": "7454a8dd-d746-4a17-9f1c-b4f51666c707",
+      "slug": "zohran-mamdani",
+      "office": "Mayor",
+      "key": "position:NY/mayor",
+      "status": "no_wikidata_match"
+    },
+    {
+      "politician_id": "793a4c3a-029a-46b5-b862-5afcff3701f0",
+      "slug": "katie-wilson",
+      "office": "Mayor",
+      "key": "position:WA/mayor",
+      "status": "manifest",
+      "wikidata": "Q135927619",
+      "file": "File:Katie Wilson Seattle mayoral candidate (cropped).jpg",
+      "width": 4272,
+      "height": 5350,
+      "license": "CC-BY-SA-4.0"
+    },
+    {
+      "politician_id": "7e6c3737-5a01-4da5-8762-f53883f6e62e",
+      "slug": "donna-deegan",
+      "office": "Mayor",
+      "key": "position:FL/mayor",
+      "status": "no_wikidata_match"
+    },
+    {
+      "politician_id": "7ed5a8dd-5b8b-4344-bea3-786d45e92e37",
+      "slug": "craig-greenberg",
+      "office": "Mayor",
+      "key": "position:KY/mayor",
+      "status": "source_too_small",
+      "wikidata": "Q115180671",
+      "file": "File:Louisville mayor and mandala (cropped).jpg",
+      "width": 230,
+      "height": 228
+    },
+    {
+      "politician_id": "911cb50f-adc8-4d42-b58c-8cde4dd0d303",
+      "slug": "jane-castor",
+      "office": "Mayor",
+      "key": "position:FL/mayor",
+      "status": "no_wikidata_match"
+    },
+    {
+      "politician_id": "91cbe815-77c7-4506-a953-023e3fafbfac",
+      "slug": "michelle-wu",
+      "office": "Mayor",
+      "key": "position:MA/mayor",
+      "status": "manifest",
+      "wikidata": "Q16202473",
+      "file": "File:Michelle Wu at Roxbury Community College in January 2024 (5435592).jpg",
+      "width": 1622,
+      "height": 2162,
+      "license": "US-state-public-record"
+    },
+    {
+      "politician_id": "91d40a55-a9ec-48f0-a7c2-c15a6e31ceec",
+      "slug": "karen-goh",
+      "office": "Mayor",
+      "key": "position:CA/mayor",
+      "status": "manifest",
+      "wikidata": "Q28006789",
+      "file": "File:Mayor of Bakersfield Karen K. Goh.jpg",
+      "width": 3486,
+      "height": 5228,
+      "license": "US-state-public-record"
+    },
+    {
+      "politician_id": "971b4ec1-fb1d-44d4-8fcd-88a6b15b60e9",
+      "slug": "gina-ortiz-jones",
+      "office": "Mayor",
+      "key": "position:TX/mayor",
+      "status": "no_wikidata_match"
+    },
+    {
+      "politician_id": "a4a464e0-b543-4008-a998-be34057efc6d",
+      "slug": "mike-johnston",
+      "office": "Mayor",
+      "key": "position:CO/mayor",
+      "status": "no_wikidata_match"
+    },
+    {
+      "politician_id": "a6b2f472-cde0-4f46-8aef-8fc0f117841b",
+      "slug": "daniel-lurie",
+      "office": "Mayor",
+      "key": "position:CA/mayor",
+      "status": "no_wikidata_match"
+    },
+    {
+      "politician_id": "a7003fc4-9c66-49d2-9632-d91435660d5d",
+      "slug": "eileen-higgins",
+      "office": "Mayor",
+      "key": "position:FL/mayor",
+      "status": "manifest",
+      "wikidata": "Q136708810",
+      "file": "File:Eileen Higgins (Miami–Dade County Commissioner) official headshot with white background.jpg",
+      "width": 1200,
+      "height": 1307,
+      "license": "US-state-public-record"
+    },
+    {
+      "politician_id": "a819bf1c-f003-417a-91b7-9f8786089a98",
+      "slug": "brandon-johnson",
+      "office": "Mayor",
+      "key": "position:IL/mayor",
+      "status": "manifest",
+      "wikidata": "Q73917865",
+      "file": "File:Brandon Johnson 2024.jpg",
+      "width": 1205,
+      "height": 1665,
+      "license": "public-domain-dedication"
+    },
+    {
+      "politician_id": "a98c5190-b417-49e1-83e4-86ab12318102",
+      "slug": "regina-romero",
+      "office": "Mayor",
+      "key": "position:AZ/mayor",
+      "status": "manifest",
+      "wikidata": "Q73981288",
+      "file": "File:Regina Romero - 2020 01.jpg",
+      "width": 700,
+      "height": 928,
+      "license": "US-federal-official-duty"
+    },
+    {
+      "politician_id": "ad21fc82-86cc-4a3d-a0a2-5db62e9679a9",
+      "slug": "shelley-berkley",
+      "office": "Mayor",
+      "key": "position:NV/mayor",
+      "status": "no_wikidata_match"
+    },
+    {
+      "politician_id": "ad4f7502-d1a8-47be-a0f3-66001e2e38d4",
+      "slug": "mary-sheffield",
+      "office": "Mayor",
+      "key": "position:MI/mayor",
+      "status": "manifest",
+      "wikidata": "Q131761007",
+      "file": "File:Mary Sheffield 2026 (cropped).jpg",
+      "width": 2014,
+      "height": 2684,
+      "license": "public-domain-dedication"
+    },
+    {
+      "politician_id": "ad6d47bb-d1ed-448d-a529-679ddcfe94c4",
+      "slug": "andy-ginther",
+      "office": "Mayor",
+      "key": "position:OH/mayor",
+      "status": "no_wikidata_match"
+    },
+    {
+      "politician_id": "b148ecab-53dd-461a-a2e6-8cb99fbb54d4",
+      "slug": "bobby-dyer",
+      "office": "Mayor",
+      "key": "position:VA/mayor",
+      "status": "manifest",
+      "wikidata": "Q61068382",
+      "file": "File:NAS Oceana Thanks City of Virginia Beach (1) (cropped).jpg",
+      "width": 549,
+      "height": 733,
+      "license": "US-federal-official-duty"
+    },
+    {
+      "politician_id": "bd42db0b-7e37-480a-9271-0b5d95aec987",
+      "slug": "cavalier-johnson",
+      "office": "Mayor",
+      "key": "position:WI/mayor",
+      "status": "manifest",
+      "wikidata": "Q110244176",
+      "file": "File:Cavalier Johnson.jpg",
+      "width": 581,
+      "height": 718,
+      "license": "CC-BY-3.0"
+    },
+    {
+      "politician_id": "be4cf56d-b123-4d7e-96ca-b37555880366",
+      "slug": "rob-harrington",
+      "office": "Mayor",
+      "key": "position:NC/mayor",
+      "status": "no_wikidata_match"
+    },
+    {
+      "politician_id": "c8133ab7-b3a4-43c8-bd70-9567c6e37fbb",
+      "slug": "paul-young",
+      "office": "Mayor",
+      "key": "position:TN/mayor",
+      "status": "source_too_small",
+      "wikidata": "Q123134325",
+      "file": "File:Paul Young 2023.jpg",
+      "width": 370,
+      "height": 413
+    },
+    {
+      "politician_id": "ce077a3f-1107-4173-ae39-1dcbf8ec9fa8",
+      "slug": "andre-dickens",
+      "office": "Mayor",
+      "key": "position:GA/mayor",
+      "status": "manifest",
+      "wikidata": "Q109845767",
+      "file": "File:Andre Dickens.jpg",
+      "width": 2559,
+      "height": 3840,
+      "license": "CC-BY-2.0"
+    },
+    {
+      "politician_id": "d3b90070-01d9-47ec-8e6d-af4866454566",
+      "slug": "jerry-dyer",
+      "office": "Mayor",
+      "key": "position:CA/mayor",
+      "status": "source_too_small",
+      "wikidata": "Q88288825",
+      "file": "File:Jerry Dyer 2021 official portrait.jpg",
+      "width": 300,
+      "height": 300
+    },
+    {
+      "politician_id": "de8e687f-5745-48a4-ae8d-5fe5b8e580c8",
+      "slug": "david-holt",
+      "office": "Mayor",
+      "key": "position:OK/mayor",
+      "status": "no_wikidata_match"
+    },
+    {
+      "politician_id": "e00fa820-f109-4b5e-af0e-02f7ee64d61c",
+      "slug": "mattie-parker",
+      "office": "Mayor",
+      "key": "position:TX/mayor",
+      "status": "manifest",
+      "wikidata": "Q107304138",
+      "file": "File:Mattie Parker.jpg",
+      "width": 681,
+      "height": 892,
+      "license": "CC-BY-3.0"
+    },
+    {
+      "politician_id": "e2d56dc1-7dc9-48b9-b486-222e129a73c5",
+      "slug": "quinton-lucas",
+      "office": "Mayor",
+      "key": "position:MO/mayor",
+      "status": "manifest",
+      "wikidata": "Q60751235",
+      "file": "File:Educators, Key Leaders Attend Marine Corps Workshop (4497695).jpg",
+      "width": 3840,
+      "height": 5760,
+      "license": "US-federal-official-duty"
+    },
+    {
+      "politician_id": "ea0258f4-136b-4400-80d6-296e5a1edfa2",
+      "slug": "jacob-frey",
+      "office": "Mayor",
+      "key": "position:MN/mayor",
+      "status": "manifest",
+      "wikidata": "Q28203630",
+      "file": "File:Jacob Frey at Nicollet Mall reopening 2017-11-16 - 1.jpg",
+      "width": 4906,
+      "height": 6133,
+      "license": "CC-BY-4.0"
+    },
+    {
+      "politician_id": "f0433178-8ad2-4689-abce-bf5be7fab98f",
+      "slug": "tim-keller",
+      "office": "Mayor",
+      "key": "position:NM/mayor",
+      "status": "no_wikidata_match"
+    },
+    {
+      "politician_id": "fe146002-c0eb-4873-9408-74f6271a8806",
+      "slug": "cherelle-parker",
+      "office": "Mayor",
+      "key": "position:PA/mayor",
+      "status": "manifest",
+      "wikidata": "Q5091873",
+      "file": "File:Councilmember Cherelle Parker.jpg",
+      "width": 1022,
+      "height": 1512,
+      "license": "CC-BY-2.0"
+    }
+  ]
+}

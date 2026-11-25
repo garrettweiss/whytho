@@ -1,0 +1,497 @@
+{
+  "summary": {
+    "checked_at": "2026-11-25T21:43:52.775Z",
+    "scope": "executives",
+    "key": "position",
+    "note": "office-and-state keyed Wikidata match (living current holder, full name, unique, district-consistent); Commons extmetadata license; no database or storage change",
+    "profiles": 45,
+    "counts": {
+      "no_wikidata_match": 14,
+      "manifest": 29,
+      "source_too_small": 2
+    },
+    "licenses": {
+      "US-federal-official-duty": 19,
+      "CC-BY-3.0": 1,
+      "copyrighted-free-use": 1,
+      "CC-BY-4.0": 1,
+      "CC-BY-SA-2.0": 1,
+      "CC-BY-2.0": 1,
+      "CC-BY-SA-3.0": 1,
+      "US-state-public-record": 1,
+      "CC-BY-SA-4.0": 3
+    },
+    "unresolved": {},
+    "manifest": "docs/launch/evidence/photos/pass2/commons-manifest-executives-position-20261125.json"
+  },
+  "rows": [
+    {
+      "politician_id": "04416a65-a212-462f-be04-cd659aa4d0e7",
+      "slug": "michael-howe-nd",
+      "office": "Secretary Of State",
+      "key": "position:ND/named",
+      "status": "no_wikidata_match"
+    },
+    {
+      "politician_id": "0c9f205a-beda-4fd7-8228-ed67efb2a4ec",
+      "slug": "lee-zeldin-us",
+      "office": "EPA Administrator",
+      "key": "position:DC/named",
+      "status": "manifest",
+      "wikidata": "Q16221257",
+      "file": "File:Lee-Zeldin-EPA-Official-Portrait.jpg",
+      "width": 1639,
+      "height": 2048,
+      "license": "US-federal-official-duty"
+    },
+    {
+      "politician_id": "0dcc7d7f-c302-4f23-88ef-254d75aa55f7",
+      "slug": "monae-johnson-sd",
+      "office": "Secretary Of State",
+      "key": "position:SD/named",
+      "status": "no_wikidata_match"
+    },
+    {
+      "politician_id": "12355b6c-4eb9-4d1e-98d7-1776a0360d0a",
+      "slug": "jd-vance-us",
+      "office": "Vice President",
+      "key": "position:DC/named",
+      "status": "manifest",
+      "wikidata": "Q28935729",
+      "file": "File:March 2026 Official Vice Presidential Portrait of JD Vance.jpg",
+      "width": 2000,
+      "height": 3000,
+      "license": "US-federal-official-duty"
+    },
+    {
+      "politician_id": "16f9fb6a-43bd-414a-bb8b-ff109a1e4ccb",
+      "slug": "susie-wiles-us",
+      "office": "White House Chief of Staff",
+      "key": "position:DC/named",
+      "status": "no_wikidata_match"
+    },
+    {
+      "politician_id": "1badcd97-2618-4f27-b6a0-cb45324f5475",
+      "slug": "scott-schwab-ks",
+      "office": "Secretary Of State",
+      "key": "position:KS/named",
+      "status": "source_too_small",
+      "wikidata": "Q7437215",
+      "file": "File:Scott Schwab (SomethingDifferentKC interview).jpg",
+      "width": 380,
+      "height": 496
+    },
+    {
+      "politician_id": "1fbc7adc-c8aa-4f58-8d88-9ddba8262c66",
+      "slug": "marco-rubio-us",
+      "office": "Secretary of State",
+      "key": "position:DC/named",
+      "status": "manifest",
+      "wikidata": "Q324546",
+      "file": "File:Official portrait of Secretary Marco Rubio.jpg",
+      "width": 4438,
+      "height": 6101,
+      "license": "US-federal-official-duty"
+    },
+    {
+      "politician_id": "20710669-81ff-4a9c-b879-ef0c9008f191",
+      "slug": "howard-lutnick-us",
+      "office": "Secretary of Commerce",
+      "key": "position:DC/named",
+      "status": "manifest",
+      "wikidata": "Q16194176",
+      "file": "File:Howard Lutnick 2025.jpg",
+      "width": 2550,
+      "height": 3300,
+      "license": "US-federal-official-duty"
+    },
+    {
+      "politician_id": "2224c9b1-3599-44be-a431-2861c8e2ceda",
+      "slug": "sarah-l-copeland-hanzas-vt",
+      "office": "Secretary Of State",
+      "key": "position:VT/named",
+      "status": "manifest",
+      "wikidata": "Q18685503",
+      "file": "File:Sarah Copeland-Hanzas at Secretary of State Democratic Party Primary Forum (cropped).jpg",
+      "width": 583,
+      "height": 728,
+      "license": "CC-BY-3.0"
+    },
+    {
+      "politician_id": "272bfb8a-f85d-48c4-b14d-9f73f979afd2",
+      "slug": "doug-burgum-us",
+      "office": "Secretary of the Interior",
+      "key": "position:DC/named",
+      "status": "manifest",
+      "wikidata": "Q22095395",
+      "file": "File:Doug Burgum 2025 DOI portrait.jpg",
+      "width": 3226,
+      "height": 4840,
+      "license": "US-federal-official-duty"
+    },
+    {
+      "politician_id": "2e544f1c-3015-4b49-9a87-35b69af65d41",
+      "slug": "paul-pate-ia",
+      "office": "Secretary Of State",
+      "key": "position:IA/named",
+      "status": "no_wikidata_match"
+    },
+    {
+      "politician_id": "2f03abf8-fcd5-4f95-9d2e-42cfbb25de31",
+      "slug": "scott-bessent-us",
+      "office": "Secretary of the Treasury",
+      "key": "position:DC/named",
+      "status": "manifest",
+      "wikidata": "Q7435987",
+      "file": "File:Official portrait of Treasury Secretary Scott Bessent.jpg",
+      "width": 1500,
+      "height": 2100,
+      "license": "US-federal-official-duty"
+    },
+    {
+      "politician_id": "30d821f2-b447-4116-97cd-cb7be49b28a5",
+      "slug": "linda-mcmahon-us",
+      "office": "Secretary of Education",
+      "key": "position:DC/named",
+      "status": "manifest",
+      "wikidata": "Q233905",
+      "file": "File:ED Sec Linda McMahon (cropped).jpg",
+      "width": 981,
+      "height": 1280,
+      "license": "US-federal-official-duty"
+    },
+    {
+      "politician_id": "36609d95-aae8-40ad-88d9-0742e6990a61",
+      "slug": "robert-kennedy-jr-us",
+      "office": "Secretary of Health and Human Services",
+      "key": "position:DC/named",
+      "status": "manifest",
+      "wikidata": "Q1352872",
+      "file": "File:Robert F. Kennedy Jr., official portrait (2025) (cropped 3-4).jpg",
+      "width": 1221,
+      "height": 1627,
+      "license": "US-federal-official-duty"
+    },
+    {
+      "politician_id": "3cc3ee2d-a36d-4f86-b5bb-378a9fcbfa2e",
+      "slug": "sean-duffy-us",
+      "office": "Secretary of Transportation",
+      "key": "position:DC/named",
+      "status": "manifest",
+      "wikidata": "Q1729888",
+      "file": "File:Secretary of Transportation Sean Duffy Official Portrait.jpg",
+      "width": 2549,
+      "height": 3200,
+      "license": "US-federal-official-duty"
+    },
+    {
+      "politician_id": "5494f960-fdac-4031-9901-d1f1f947200e",
+      "slug": "brooke-rollins-us",
+      "office": "Secretary of Agriculture",
+      "key": "position:DC/named",
+      "status": "manifest",
+      "wikidata": "Q4974474",
+      "file": "File:Second Portrait of Secretary Rollins.jpg",
+      "width": 1600,
+      "height": 2000,
+      "license": "US-federal-official-duty"
+    },
+    {
+      "politician_id": "56ef252a-e5ee-4639-b973-b4a8de7493f8",
+      "slug": "jane-nelson-tx",
+      "office": "Secretary Of State",
+      "key": "position:TX/named",
+      "status": "no_wikidata_match"
+    },
+    {
+      "politician_id": "5713553d-35b2-49cd-946c-e9eeb7dcee79",
+      "slug": "gregg-amore-ri",
+      "office": "Secretary Of State",
+      "key": "position:RI/named",
+      "status": "no_wikidata_match"
+    },
+    {
+      "politician_id": "6402db7b-3c4e-4b9e-8c9e-8b13afe05d64",
+      "slug": "markwayne-mullin-us-dhs",
+      "office": "Secretary of Homeland Security",
+      "key": "position:DC/named",
+      "status": "manifest",
+      "wikidata": "Q3448772",
+      "file": "File:DHS Secretary Markwayne Mullin Official Portrait (55166865268).jpg",
+      "width": 4299,
+      "height": 5563,
+      "license": "US-federal-official-duty"
+    },
+    {
+      "politician_id": "6578bd38-c0ff-41b0-b2ea-ad4fd82aac42",
+      "slug": "steve-hobbs-wa",
+      "office": "Secretary Of State",
+      "key": "position:WA/named",
+      "status": "manifest",
+      "wikidata": "Q16729857",
+      "file": "File:Steve Hobbs.jpg",
+      "width": 900,
+      "height": 1200,
+      "license": "copyrighted-free-use"
+    },
+    {
+      "politician_id": "67dd0503-88d5-4100-9dd3-3ed33f7fa34f",
+      "slug": "jena-griswold-co",
+      "office": "Secretary Of State",
+      "key": "position:CO/named",
+      "status": "manifest",
+      "wikidata": "Q58333633",
+      "file": "File:Jena Griswold.JPG",
+      "width": 2326,
+      "height": 2050,
+      "license": "CC-BY-4.0"
+    },
+    {
+      "politician_id": "692decd1-ac93-4a2d-a72b-0d27d20abfbc",
+      "slug": "brad-raffensperger-ga",
+      "office": "Secretary Of State",
+      "key": "position:GA/named",
+      "status": "manifest",
+      "wikidata": "Q55314981",
+      "file": "File:Brad Raffensperger 2022.jpg",
+      "width": 2491,
+      "height": 3321,
+      "license": "CC-BY-SA-2.0"
+    },
+    {
+      "politician_id": "702f3cf1-316f-4083-95d4-a1ae13c228d7",
+      "slug": "wes-allen-al",
+      "office": "Secretary Of State",
+      "key": "position:AL/named",
+      "status": "source_too_small",
+      "wikidata": "Q106920123",
+      "file": "File:Jerry Carl with Wes Allen (cropped).jpg",
+      "width": 367,
+      "height": 489
+    },
+    {
+      "politician_id": "7d2fc726-d331-479a-ad84-a4c96bfd1fdb",
+      "slug": "cord-byrd-fl",
+      "office": "Secretary Of State",
+      "key": "position:FL/named",
+      "status": "no_wikidata_match"
+    },
+    {
+      "politician_id": "820efa61-48d6-4937-b8d2-4755b13b0955",
+      "slug": "steve-simon-mn",
+      "office": "Secretary Of State",
+      "key": "position:MN/named",
+      "status": "manifest",
+      "wikidata": "Q7613930",
+      "file": "File:Steve Simon 2015.jpg",
+      "width": 952,
+      "height": 1192,
+      "license": "CC-BY-2.0"
+    },
+    {
+      "politician_id": "8855c359-8107-4051-8752-e0679948f89d",
+      "slug": "phil-mcgrane-id",
+      "office": "Secretary Of State",
+      "key": "position:ID/named",
+      "status": "no_wikidata_match"
+    },
+    {
+      "politician_id": "8ebc27ba-9f8f-4e8c-a92c-905f86bfb8b2",
+      "slug": "adrian-fontes-az",
+      "office": "Secretary Of State",
+      "key": "position:AZ/named",
+      "status": "manifest",
+      "wikidata": "Q115177238",
+      "file": "File:Adrian Fontes by Gage Skidmore 2.jpg",
+      "width": 2417,
+      "height": 3300,
+      "license": "CC-BY-SA-3.0"
+    },
+    {
+      "politician_id": "8f4ed414-bea7-4e8b-a02e-4d7b2c64044b",
+      "slug": "robert-evnen-ne",
+      "office": "Secretary Of State",
+      "key": "position:NE/named",
+      "status": "no_wikidata_match"
+    },
+    {
+      "politician_id": "8f7cc2b4-e7d7-4b6e-9151-647b9f7df70d",
+      "slug": "al-schmidt-pa",
+      "office": "Secretary Of State",
+      "key": "position:PA/named",
+      "status": "no_wikidata_match"
+    },
+    {
+      "politician_id": "96c14ac9-1550-4a57-b206-fdec33fa152a",
+      "slug": "doug-collins-us",
+      "office": "Secretary of Veterans Affairs",
+      "key": "position:DC/named",
+      "status": "manifest",
+      "wikidata": "Q3162841",
+      "file": "File:Official portrait of Douglas Collins, U.S. Secretary of Veterans Affairs (cropped).jpeg",
+      "width": 576,
+      "height": 720,
+      "license": "US-federal-official-duty"
+    },
+    {
+      "politician_id": "9a6b8f16-d8fa-4918-8375-fb273cab0b3a",
+      "slug": "jocelyn-benson-mi",
+      "office": "Secretary Of State",
+      "key": "position:MI/named",
+      "status": "no_wikidata_match"
+    },
+    {
+      "politician_id": "9c07f886-36a8-494c-8a75-c6579c694640",
+      "slug": "russell-vought-us",
+      "office": "OMB Director",
+      "key": "position:DC/named",
+      "status": "manifest",
+      "wikidata": "Q29963497",
+      "file": "File:Russell Vought, official portrait (2025) (cropped1).jpg",
+      "width": 465,
+      "height": 579,
+      "license": "US-federal-official-duty"
+    },
+    {
+      "politician_id": "a75a6b1a-576d-4a23-b198-13637ff3ba0c",
+      "slug": "keith-sonderling-us",
+      "office": "Secretary of Labor",
+      "key": "position:DC/named",
+      "status": "manifest",
+      "wikidata": "Q73030183",
+      "file": "File:2025 Keith Sonderling (cropped).jpg",
+      "width": 607,
+      "height": 807,
+      "license": "US-federal-official-duty"
+    },
+    {
+      "politician_id": "ac9f1a21-a1e1-4d93-b0a9-54e9751def0f",
+      "slug": "shirley-weber-ca",
+      "office": "Secretary Of State",
+      "key": "position:CA/named",
+      "status": "manifest",
+      "wikidata": "Q7498880",
+      "file": "File:Shirley Weber, California State Assembly (2012).jpg",
+      "width": 2832,
+      "height": 3965,
+      "license": "US-state-public-record"
+    },
+    {
+      "politician_id": "b1a7f246-1db5-4a8c-9176-334f72b8876c",
+      "slug": "scott-turner-us",
+      "office": "Secretary of Housing and Urban Development",
+      "key": "position:DC/named",
+      "status": "manifest",
+      "wikidata": "Q7437419",
+      "file": "File:Scott Turner, official portrait (2025).jpg",
+      "width": 800,
+      "height": 1000,
+      "license": "US-federal-official-duty"
+    },
+    {
+      "politician_id": "bd2a40d7-c38b-49a2-890d-f3206348e623",
+      "slug": "stephanie-thomas-ct",
+      "office": "Secretary Of State",
+      "key": "position:CT/named",
+      "status": "no_wikidata_match"
+    },
+    {
+      "politician_id": "c5e7d79b-2935-4c8a-a3ca-280fbefae6fa",
+      "slug": "john-thurston-ar",
+      "office": "Treasurer",
+      "key": "position:AR/named",
+      "status": "manifest",
+      "wikidata": "Q21258911",
+      "file": "File:AR Secretary of State John Thurston.jpg",
+      "width": 2400,
+      "height": 2400,
+      "license": "CC-BY-SA-4.0"
+    },
+    {
+      "politician_id": "c98eb8f4-c4c9-40d4-9ec9-9924bcf6f169",
+      "slug": "chuck-gray-wy",
+      "office": "Secretary Of State",
+      "key": "position:WY/named",
+      "status": "manifest",
+      "wikidata": "Q28132603",
+      "file": "File:Chuck Gray - Wyoming Secretary of State - Cody Stampede Parade.jpg",
+      "width": 8654,
+      "height": 5587,
+      "license": "CC-BY-SA-4.0"
+    },
+    {
+      "politician_id": "cb2f0fd7-f050-4251-8211-c4ec20671f22",
+      "slug": "todd-blanche-us",
+      "office": "Attorney General",
+      "key": "position:DC/named",
+      "status": "manifest",
+      "wikidata": "Q125628262",
+      "file": "File:AG Todd Blanche Official Portrait.jpg",
+      "width": 4333,
+      "height": 5416,
+      "license": "US-federal-official-duty"
+    },
+    {
+      "politician_id": "cbab4a33-d6ff-4e03-bbee-321742fb4c1f",
+      "slug": "francisco-v-aguilar-nv",
+      "office": "Secretary Of State",
+      "key": "position:NV/named",
+      "status": "no_wikidata_match"
+    },
+    {
+      "politician_id": "da9f2c98-ddbf-4b5b-8dc2-03b550a764b2",
+      "slug": "frank-larose-oh",
+      "office": "Secretary Of State",
+      "key": "position:OH/named",
+      "status": "manifest",
+      "wikidata": "Q5487827",
+      "file": "File:LaRose-6 (cropped).JPG",
+      "width": 912,
+      "height": 1144,
+      "license": "CC-BY-SA-4.0"
+    },
+    {
+      "politician_id": "e3ffbe19-a6ef-48e9-a031-3e6c4eb23a7a",
+      "slug": "pete-hegseth-us",
+      "office": "Secretary of Defense",
+      "key": "position:DC/named",
+      "status": "manifest",
+      "wikidata": "Q7172014",
+      "file": "File:Pete Hegseth Official Portrait (cropped).jpg",
+      "width": 2707,
+      "height": 3608,
+      "license": "US-federal-official-duty"
+    },
+    {
+      "politician_id": "ebec6b86-bbab-47cd-84e7-37b3bb6945f0",
+      "slug": "chris-wright-us",
+      "office": "Secretary of Energy",
+      "key": "position:DC/named",
+      "status": "manifest",
+      "wikidata": "Q131225840",
+      "file": "File:Secretary Chris Wright Official Portrait.jpg",
+      "width": 3079,
+      "height": 3849,
+      "license": "US-federal-official-duty"
+    },
+    {
+      "politician_id": "f3244aa2-12c8-44b3-893a-d2277116a4d7",
+      "slug": "john-ratcliffe-us",
+      "office": "CIA Director",
+      "key": "position:DC/named",
+      "status": "manifest",
+      "wikidata": "Q16980175",
+      "file": "File:John Ratcliffe official photo.jpg",
+      "width": 1440,
+      "height": 1800,
+      "license": "US-federal-official-duty"
+    },
+    {
+      "politician_id": "f3a77a2c-562d-49ee-a7fd-10a887f8315f",
+      "slug": "diego-morales-in",
+      "office": "Secretary Of State",
+      "key": "position:IN/named",
+      "status": "no_wikidata_match"
+    }
+  ]
+}
