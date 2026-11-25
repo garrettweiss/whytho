@@ -5,7 +5,7 @@ import { PostHogProvider } from "@/components/analytics/posthog-provider";
 import { ChatWidget } from "@/components/chatbot/chat-widget";
 import { ParticipationBanner } from "@/components/auth/participation-banner";
 import { ParticipationProvider } from "@/components/auth/participation-provider";
-import { LegalFooter } from "@/components/legal/legal-footer";
+import { SiteFooter } from "@/components/legal/legal-footer";
 import { THEME_STORAGE_KEY } from "@/lib/theme";
 import "./globals.css";
 
@@ -47,7 +47,7 @@ export default function RootLayout({
             <SiteNav />
             <ParticipationBanner />
             {children}
-            <LegalFooter />
+            <SiteFooter />
             <ChatWidget />
           </ParticipationProvider>
         </PostHogProvider>

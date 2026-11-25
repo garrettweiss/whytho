@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { PoliticianDirectory } from "@/components/home/politician-directory";
 import { faceBody, faceDisplay } from "@/components/home/fonts";
 import { getDirectoryPage } from "@/lib/directory/server";
@@ -28,7 +27,6 @@ export default async function HomePage() {
           <div><h3>03. Follow the response</h3><p>Read official replies and clearly labeled AI analysis. Past weeks stay on the record.</p></div>
         </div>
       </section>
-      <footer className={styles.footer}><p>whytho? · Questions deserve answers.</p><nav aria-label="Footer navigation"><Link href="/leaderboard">Leaderboard</Link><Link href="/races">Elections</Link><Link href="/verify">For politicians</Link><a href="#find-politician">Back to search</a></nav></footer>
     </div>
   </main>;
 }

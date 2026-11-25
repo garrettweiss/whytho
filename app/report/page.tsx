@@ -21,7 +21,7 @@ export default function ReportPage() {
   return (
     <PublicPage
       title="Report a problem"
-      description="Anyone can contact WhyTho. Include the page link and enough detail for us to find the issue."
+      description="Anyone can contact WhyTho, with or without an account. Urgent intimate-image removal requests come first below. For anything else, include the page link and enough detail for us to find the issue."
     >
       <div className={styles.reading}>
         <section id="intimate-images" className="scroll-mt-24">
