@@ -75,7 +75,7 @@ const loadCurrentWeek = unstable_cache(async (): Promise<number> => boundedRead(
 }), ["public-profile-week-v1"], CACHE_OPTIONS);
 
 function loadProfile(politician: PublicProfilePolitician, view: ProfileView, sort: "votes" | "newest" | "unanswered", questionLimit = view.period === "week" ? 50 : 200) {
-  return unstable_cache(readProfile, ["public-profile-record-identity-v3"], {
+  return unstable_cache(readProfile, ["public-profile-record-identity-v4"], {
     ...CACHE_OPTIONS,
     tags: [...CACHE_OPTIONS.tags, profileQuestionCacheTag(politician.slug)],
   })(politician, view, sort, questionLimit);
@@ -113,15 +113,23 @@ async function readProfile(politician: PublicProfilePolitician, view: ProfileVie
 
     if (view.period === "week") questionsQuery = questionsQuery.eq("week_number", view.viewingWeekNumber);
     else if (cutoff) questionsQuery = questionsQuery.gte("created_at", cutoff);
-    const [questionsResult, summaryResult] = await Promise.all([
+    const [questionsResult, summaryResult, samplesResult] = await Promise.all([
       questionsQuery.abortSignal(signal),
       supabase.rpc("identity_profile_summary", {
         p_id: politician.id, p_period: view.period, p_week: view.viewingWeekNumber,
         p_cutoff: cutoff ?? undefined,
       }).abortSignal(signal),
+      // Seeded questions double as editable sample drafts in the ask box.
+      supabase.from("questions").select("id,body")
+        .in("politician_id", memberIds).eq("is_seeded", true).eq("status", "active")
+        .order("net_upvotes", { ascending: false }).order("created_at", { ascending: false }).limit(3)
+        .abortSignal(signal),
     ]);
     if (questionsResult.error || !questionsResult.data || summaryResult.error || !summaryResult.data ||
         typeof summaryResult.data !== "object" || Array.isArray(summaryResult.data)) throw new Error("Public profile records unavailable");
+    const sampleQuestions = (samplesResult.error ? [] : samplesResult.data ?? [])
+      .filter((row) => typeof row.body === "string" && row.body.trim().length > 0)
+      .map((row) => ({ id: row.id, body: row.body }));
     const summary = summaryResult.data as Record<string, unknown>;
     const count = (key: string): number => {
       const value = summary[key];
@@ -170,6 +178,7 @@ async function readProfile(politician: PublicProfilePolitician, view: ProfileVie
       responseRate,
       archiveWeeks,
       questionLimit,
+      sampleQuestions,
     };
   });
 }
