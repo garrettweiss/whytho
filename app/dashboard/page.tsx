@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { cookies } from "next/headers";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { TeamManager } from "@/components/dashboard/team-manager";
 import { QuestionEmailPreferences } from "@/components/dashboard/question-email-preferences";
@@ -74,12 +73,8 @@ export default async function DashboardPage() {
     redirect("/sign-in?redirect=/dashboard");
   }
 
-  // Respect the view mode toggle — citizens (or politicians in citizen mode) cannot access dashboard
-  const cookieStore = await cookies();
-  const viewMode = cookieStore.get("whytho-view-mode")?.value;
-  if (viewMode === "citizen") {
-    redirect("/");
-  }
+  // Visiting /dashboard is explicit intent, so the citizen view-mode cookie does not block it.
+  // Membership checks below still decide what the user can see.
 
   const { data: weekData, error: weekError } = await supabase.rpc("current_week_number").abortSignal(AbortSignal.timeout(8_000));
   if (weekError || typeof weekData !== "number" || !isValidIsoWeek(weekData)) return <DashboardUnavailable />;

@@ -1,0 +1,52 @@
+{
+  "scope": "Real Chrome component interactions; mocked HTTP/auth/router; not provider E2E",
+  "checked_at": "2026-10-31T05:36:19.492Z",
+  "results": [
+    {
+      "name": "Admin changes staff roles, adds and removes a member",
+      "status": "passed",
+      "duration_ms": 513
+    },
+    {
+      "name": "Team read failure shows retry and recovers",
+      "status": "passed",
+      "duration_ms": 361
+    },
+    {
+      "name": "Responder edits an old own draft and saves a new private draft",
+      "status": "passed",
+      "duration_ms": 426
+    },
+    {
+      "name": "Verified editor deliberately saves privately and can approve a draft",
+      "status": "passed",
+      "duration_ms": 340
+    },
+    {
+      "name": "Verified editor publishes and sees confirmed share controls",
+      "status": "passed",
+      "duration_ms": 259
+    },
+    {
+      "name": "Pending admin remains in private draft flow",
+      "status": "passed",
+      "duration_ms": 157
+    },
+    {
+      "name": "Last admin is prevented from leaving; an editor can leave",
+      "status": "passed",
+      "duration_ms": 419
+    },
+    {
+      "name": "Admin photo picker requires permission and credit before upload",
+      "status": "passed",
+      "duration_ms": 316
+    },
+    {
+      "name": "Revoked access and ambiguous publication do not show success",
+      "status": "passed",
+      "duration_ms": 522
+    }
+  ],
+  "browser_errors": []
+}

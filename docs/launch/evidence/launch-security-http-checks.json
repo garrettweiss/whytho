@@ -1,0 +1,25 @@
+{
+  "origin": "http://localhost:8775",
+  "checkedAt": "2026-10-31T05:45:57.006Z",
+  "passed": 4,
+  "total": 4,
+  "results": [
+    {
+      "name": "Production security headers",
+      "passed": true
+    },
+    {
+      "name": "Signed-out POST /api/dashboard/photo rejected",
+      "passed": true
+    },
+    {
+      "name": "Signed-out PATCH /api/dashboard/profile rejected",
+      "passed": true
+    },
+    {
+      "name": "Cross-origin mutation rejected before handler",
+      "passed": true
+    }
+  ],
+  "note": "Next start normalizes its request URL to localhost. Earlier127.0.0.1 alias received403 as an origin mismatch; preserved separately. Deployed proxy/hostname acceptance remains required."
+}

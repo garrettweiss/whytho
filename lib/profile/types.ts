@@ -70,5 +70,5 @@ export type ProfileView = Pick<PublicProfileData,
 >;
 
 export type ProfileMetadata = Pick<PublicProfilePolitician,
-  "slug" | "full_name" | "office" | "state" | "party" | "photo_url" | "bio" | "is_test"
+  "slug" | "full_name" | "office" | "state" | "party" | "photo_url" | "bio" | "is_active" | "is_test"
 >;

@@ -42,9 +42,10 @@
 .ownerComposer textarea, .ownerComposer input { font-size: 16px; }
 .empty { padding: 30px 0; border-top: 1px solid light-dark(#b1b3ba, #45474d); font-size: 19px; line-height: 1.5; }
 .empty .meta { margin-top: 12px; }
+.empty a { color: inherit; text-decoration: underline; text-underline-offset: 4px; }
 .profilePrompt { display: flex; gap: 20px; justify-content: space-between; align-items: center; margin-bottom: 28px; padding: 15px 0; border-block: 1px solid light-dark(#b1b3ba, #45474d); font-size: 14px; line-height: 1.6; }
 .dismiss { flex: 0 0 44px; width: 44px; min-height: 44px; border: 1px solid light-dark(#858891, #60626a); color: inherit; background: transparent; cursor: pointer; font-size: 24px; }
-.ask { scroll-margin-top: 100px; display: grid; gap: 16px; padding-block: 28px; border-block: 1px solid light-dark(#767982, #777980); font-family: var(--font-face-body), Arial, sans-serif; color: light-dark(#151619, #f6f5f1); min-width: 0; }
+.ask { scroll-margin-top: 100px; display: grid; gap: 16px; padding: 24px; border: 2px solid light-dark(#767982, #777980); font-family: var(--font-face-body), Arial, sans-serif; color: light-dark(#151619, #f6f5f1); min-width: 0; }
 .askTitle { margin: 0; font-size: clamp(23px, 2.5vw, 30px); line-height: 1.2; font-weight: 750; letter-spacing: -.04em; overflow-wrap: anywhere; }
 .askHint { margin: 0; color: light-dark(#565a62, #bfc0c6); font-size: 14px; line-height: 1.7; }
 .submitButton { display: inline-flex; justify-content: space-between; align-items: center; gap: 24px; width: fit-content; min-height: 48px; padding: 12px 18px; border: 1px solid light-dark(#151619, #f6f5f1); background: light-dark(#151619, #f6f5f1); color: var(--editorial-paper); font-family: inherit; font-size: 14px; font-weight: 750; line-height: 1.4; cursor: pointer; text-decoration: none; }
@@ -66,7 +67,7 @@
   .questionActions { gap: 4px 14px; }
   .questionActions > span { flex-basis: 100%; }
   .answerBody { font-size: 14px; }
-  .ask { padding-block: 24px; }
+  .ask { padding: 20px; }
   .submitButton { width: 100%; }
 }
 @media (prefers-reduced-motion: reduce) {

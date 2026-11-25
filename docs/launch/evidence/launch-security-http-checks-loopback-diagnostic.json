@@ -1,0 +1,26 @@
+{
+  "origin": "http://127.0.0.1:8775",
+  "checkedAt": "2026-10-31T05:45:35.564Z",
+  "passed": 2,
+  "total": 4,
+  "results": [
+    {
+      "name": "Production security headers",
+      "passed": true
+    },
+    {
+      "name": "Signed-out POST /api/dashboard/photo rejected",
+      "passed": false,
+      "error": "Expected values to be strictly equal:\n\n403 !== 401\n"
+    },
+    {
+      "name": "Signed-out PATCH /api/dashboard/profile rejected",
+      "passed": false,
+      "error": "Expected values to be strictly equal:\n\n403 !== 401\n"
+    },
+    {
+      "name": "Cross-origin mutation rejected before handler",
+      "passed": true
+    }
+  ]
+}

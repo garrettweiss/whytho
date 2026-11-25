@@ -159,7 +159,7 @@ Complete Q&A loop: users can submit questions, upvote, and see real-time counts.
 - [ ] Build `/api/questions` POST endpoint:
   - Validate input (length, content)
   - Run Turnstile verification
-  - Check user rate limit (5/day)
+  - Enforce the five-question limit per user per politician
   - Insert question with week_number
   - Return created question
 - [ ] Implement AI deduplication check:

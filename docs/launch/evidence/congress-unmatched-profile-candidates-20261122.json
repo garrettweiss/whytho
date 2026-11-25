@@ -1,0 +1,131 @@
+[
+  {
+    "name": "James Gallagher",
+    "seat": "CA01",
+    "official_id": "G000607",
+    "candidate_profiles": [
+      {
+        "slug": "james-gallagher-ca",
+        "full_name": "James Gallagher",
+        "office": "State Representative",
+        "state": "CA",
+        "district": "3",
+        "bioguide_id": null,
+        "is_active": true
+      }
+    ]
+  },
+  {
+    "name": "Aisha Wahab",
+    "seat": "CA14",
+    "official_id": "W000832",
+    "candidate_profiles": [
+      {
+        "slug": "aisha-wahab-ca",
+        "full_name": "Aisha Wahab",
+        "office": "State Senator",
+        "state": "CA",
+        "district": "10",
+        "bioguide_id": null,
+        "is_active": true
+      },
+      {
+        "slug": "dr-aisha-wahab-ca-district-14",
+        "full_name": "Dr. Aisha Wahab",
+        "office": "U.S. Representative",
+        "state": "CA",
+        "district": "14",
+        "bioguide_id": null,
+        "is_active": true
+      }
+    ]
+  },
+  {
+    "name": "Everton Blair Jr.",
+    "seat": "GA13",
+    "official_id": "B001328",
+    "candidate_profiles": [
+      {
+        "slug": "everton-blair-ga-district-13",
+        "full_name": "Everton Blair",
+        "office": "U.S. Representative",
+        "state": "GA",
+        "district": "13",
+        "bioguide_id": null,
+        "is_active": true
+      }
+    ]
+  },
+  {
+    "name": "Clay Fuller",
+    "seat": "GA14",
+    "official_id": "F000485",
+    "candidate_profiles": [
+      {
+        "slug": "clay-fuller-ga-district-14",
+        "full_name": "Clay Fuller",
+        "office": "U.S. Representative",
+        "state": "GA",
+        "district": "14",
+        "bioguide_id": null,
+        "is_active": true
+      }
+    ]
+  },
+  {
+    "name": "Analilia Mejia",
+    "seat": "NJ11",
+    "official_id": "M001246",
+    "candidate_profiles": [
+      {
+        "slug": "analilia-mejia-nj-district-11",
+        "full_name": "Analilia Mejia",
+        "office": "U.S. Representative",
+        "state": "NJ",
+        "district": "11",
+        "bioguide_id": null,
+        "is_active": true
+      }
+    ]
+  },
+  {
+    "name": "Alan Armstrong",
+    "seat": "OK Class II",
+    "official_id": "A000383",
+    "candidate_profiles": []
+  },
+  {
+    "name": "Darline Graham",
+    "seat": "SC Class II",
+    "official_id": "G000608",
+    "candidate_profiles": [
+      {
+        "slug": "lindsey-o-graham-sc-senator",
+        "full_name": "Lindsey O. Graham",
+        "office": "U.S. Senator",
+        "state": "SC",
+        "district": "0",
+        "bioguide_id": null,
+        "is_active": true
+      },
+      {
+        "slug": "jeffrey-graham-sc",
+        "full_name": "Jeffrey Graham",
+        "office": "State Senator",
+        "state": "SC",
+        "district": "35",
+        "bioguide_id": null,
+        "is_active": true
+      },
+      {
+        "slug": "jaquelyn-graham-sc-district-7",
+        "full_name": "Jaquelyn Graham",
+        "office": "U.S. Representative",
+        "state": "SC",
+        "district": "7",
+        "bioguide_id": null,
+        "is_active": true
+      }
+    ]
+  }
+]

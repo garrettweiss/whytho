@@ -1,0 +1,27 @@
+{
+  "checked_at": "2026-10-31T05:30:23.992Z",
+  "scope": "read-only live photo fetch and dimension audit; not likeness/rights certification",
+  "profiles": 11513,
+  "non_test_profiles": 11511,
+  "with_photo": 7615,
+  "source_recorded": 0,
+  "checked": 7615,
+  "counts": {
+    "connection_error": 7348,
+    "unsafe_or_insecure_url": 250,
+    "getaddrinfo ENOTFOUND swww.gencourt.state.nh.us": 1,
+    "getaddrinfo ENOTFOUND frost.mainecandidate.com": 1,
+    "getaddrinfo ENOTFOUND dougd42.com": 1,
+    "non_public_address": 6,
+    "getaddrinfo ENOTFOUND mccabe.mainecandidate.com": 1,
+    "getaddrinfo ENOTFOUND www.electgaryfriedmann.com": 1,
+    "getaddrinfo ENOTFOUND parnellterry.mainecandidate.com": 1,
+    "getaddrinfo ENOTFOUND boyer.mainecandidate.com": 1,
+    "getaddrinfo ENOTFOUND assets.indianahousedemocrats.org": 1,
+    "getaddrinfo ENOTFOUND dedepoulin.com": 1,
+    "getaddrinfo ENOTFOUND mitchell.mainecandidate.com": 1,
+    "getaddrinfo ENOTFOUND www.sos.state.oh.us": 1
+  },
+  "valid_quality_result": false,
+  "diagnostic": "Initial auditor used a Node22-incompatible pinned DNS callback. Most connection_error outcomes reflect the audit client, not the live images. Superseded by portrait-quality-v2.json. Retained for transparency; do not use as broken-image count."
+}

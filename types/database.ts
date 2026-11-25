@@ -720,6 +720,13 @@ export type Database = {
         Relationships: [
           { foreignKeyName: "politicians_canonical_politician_id_fkey"; columns: ["canonical_politician_id"]; isOneToOne: false; referencedRelation: "politicians"; referencedColumns: ["id"] },
           {
+            foreignKeyName: "politicians_canonical_politician_id_fkey"
+            columns: ["canonical_politician_id"]
+            isOneToOne: false
+            referencedRelation: "politicians"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "politicians_race_id_fkey"
             columns: ["race_id"]
             isOneToOne: false

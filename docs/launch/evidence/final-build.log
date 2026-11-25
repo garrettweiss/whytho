@@ -1,0 +1,118 @@
+
+> whytho@0.1.0 build
+> next build
+
+[@sentry/nextjs] Importing `withSentryConfig` from `@sentry/nextjs` is deprecated and will stop working in v11. Import it from `@sentry/nextjs/config` instead:
+  import { withSentryConfig } from '@sentry/nextjs/config';
+[@sentry/nextjs] DEPRECATION WARNING: disableLogger is deprecated and will be removed in a future version. Use webpack.treeshake.removeDebugLogging instead.
+   ▲ Next.js 15.5.28
+   - Environments: .env.local
+   - Experiments (use with caution):
+     · clientTraceMetadata
+
+   Creating an optimized production build ...
+[@sentry/nextjs] It seems like you don't have a global error handler set up. It is recommended that you add a 'global-error.js' file with Sentry instrumentation so that React rendering errors are reported to Sentry. Read more: https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/#react-render-errors-in-app-router (you can suppress this warning by setting SENTRY_SUPPRESS_GLOBAL_ERROR_HANDLER_FILE_WARNING=1 as environment variable)
+[@sentry/nextjs] DEPRECATION WARNING: It is recommended renaming your `sentry.client.config.ts` file, or moving its content to `instrumentation-client.ts`. When using Turbopack `sentry.client.config.ts` will no longer work. Read more about the `instrumentation-client.ts` file: https://nextjs.org/docs/app/api-reference/file-conventions/instrumentation-client
+ ✓ Compiled successfully in 4.9s
+   Linting and checking validity of types ...
+   Collecting page data ...
+ ⚠ Using edge runtime on a page currently disables static generation for that page
+   Generating static pages (0/1111) ...
+   Generating static pages (277/1111) 
+   Generating static pages (555/1111) 
+   Generating static pages (833/1111) 
+ ✓ Generating static pages (1111/1111)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                         Size  First Load JS  Revalidate  Expire
+┌ ○ /                                              382 B         172 kB          5m      1y
+├ ○ /_not-found                                   1.1 kB         160 kB
+├ ● /[slug]                                      13.5 kB         237 kB
+├   ├ /andrew-rankin-guyton-sneed-al-district-5
+├   ├ /chas-cannon-ga
+├   ├ /nick-melvoin-ca-district-30
+├   └ [+997 more paths]
+├ ○ /about                                       1.43 kB         164 kB
+├ ƒ /account                                     4.99 kB         168 kB
+├ ƒ /admin                                         354 B         163 kB
+├ ƒ /admin/feedback                                879 B         164 kB
+├ ƒ /admin/forwarded                             1.19 kB         164 kB
+├ ƒ /admin/metrics                                 354 B         163 kB
+├ ƒ /admin/moderation                            1.03 kB         160 kB
+├ ƒ /admin/races                                 1.22 kB         164 kB
+├ ƒ /admin/test-accounts                         1.53 kB         164 kB
+├ ƒ /admin/x-queue                               1.09 kB         164 kB
+├ ƒ /api/admin/bypass-verification                 445 B         160 kB
+├ ƒ /api/admin/feedback                            444 B         160 kB
+├ ƒ /api/admin/forwarded                           444 B         160 kB
+├ ƒ /api/admin/moderation                          445 B         160 kB
+├ ƒ /api/admin/politician-weekly-inbox             445 B         160 kB
+├ ƒ /api/admin/races/candidate-status              445 B         160 kB
+├ ƒ /api/admin/races/complete                      445 B         160 kB
+├ ƒ /api/admin/reset-test-politician               445 B         160 kB
+├ ƒ /api/admin/seed-questions                      444 B         160 kB
+├ ƒ /api/admin/weekly-digest                       446 B         160 kB
+├ ƒ /api/admin/x-queue                             445 B         160 kB
+├ ƒ /api/ai-analysis                               445 B         160 kB
+├ ƒ /api/answer-media/[id]                         445 B         160 kB
+├ ƒ /api/answers                                   445 B         160 kB
+├ ƒ /api/answers/[id]                              445 B         160 kB
+├ ƒ /api/answers/[id]/approve                      445 B         160 kB
+├ ƒ /api/answers/[id]/media                        445 B         160 kB
+├ ƒ /api/answers/dispute                           445 B         160 kB
+├ ƒ /api/auth/anonymous                            444 B         160 kB
+├ ƒ /api/chat                                      445 B         160 kB
+├ ƒ /api/dashboard/disconnect                      445 B         160 kB
+├ ƒ /api/dashboard/photo                           445 B         160 kB
+├ ƒ /api/dashboard/profile                         445 B         160 kB
+├ ƒ /api/dashboard/team                            445 B         160 kB
+├ ƒ /api/health                                    445 B         160 kB
+├ ƒ /api/og/answer/[id]                            445 B         160 kB
+├ ƒ /api/politicians/[id]/photo-credit             444 B         160 kB
+├ ƒ /api/politicians/directory                     445 B         160 kB
+├ ƒ /api/politicians/prefill                       445 B         160 kB
+├ ƒ /api/politicians/search                        445 B         160 kB
+├ ○ /api/politicians/search-index                  445 B         160 kB          1h      1y
+├ ƒ /api/questions                                 445 B         160 kB
+├ ƒ /api/questions/[id]/report                     445 B         160 kB
+├ ƒ /api/settings/notifications                    445 B         160 kB
+├ ƒ /api/settings/profile                          445 B         160 kB
+├ ƒ /api/verify/claim                              445 B         160 kB
+├ ƒ /api/verify/gov-email                          445 B         160 kB
+├ ƒ /api/verify/meta-tag                           445 B         160 kB
+├ ƒ /api/verify/request-profile                    445 B         160 kB
+├ ƒ /api/votes                                     446 B         160 kB
+├ ƒ /auth/callback                                 444 B         160 kB
+├ ƒ /auth/login/google                             445 B         160 kB
+├ ƒ /auth/sign-out                                 444 B         160 kB
+├ ƒ /dashboard                                   7.24 kB         176 kB
+├ ○ /faq                                         1.45 kB         164 kB
+├ ƒ /federal                                     1.33 kB         173 kB
+├ ○ /how-it-works                                1.43 kB         164 kB
+├ ƒ /leaderboard                                 1.43 kB         164 kB
+├ ƒ /races                                       1.43 kB         164 kB
+├ ƒ /races/[slug]                                1.43 kB         164 kB
+├ ƒ /region/[state]                              1.33 kB         173 kB
+├ ○ /robots.txt                                    445 B         160 kB
+├ ○ /settings/notifications                      2.88 kB         166 kB
+├ ƒ /sign-in                                     3.85 kB         221 kB
+├ ○ /sitemap.xml                                   445 B         160 kB
+├ ● /state/[code]                                1.33 kB         173 kB          5m      1y
+├   ├ /state/al                                                                  5m      1y
+├   ├ /state/ak                                                                  5m      1y
+├   ├ /state/az                                                                  5m      1y
+├   └ [+48 more paths]
+└ ƒ /verify                                      8.33 kB         226 kB
++ First Load JS shared by all                     159 kB
+  ├ chunks/1945-5eb4662b5f88f90e.js               101 kB
+  ├ chunks/4bd1b696-5ed9d09a7050e8e7.js          54.4 kB
+  └ other shared chunks (total)                  3.52 kB
+
+
+ƒ Middleware                                      155 kB
+
+○  (Static)   prerendered as static content
+●  (SSG)      prerendered as static HTML (uses generateStaticParams)
+ƒ  (Dynamic)  server-rendered on demand
+

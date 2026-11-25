@@ -1,0 +1,24 @@
+{
+  "checkedAt": "2026-10-31T20:58:25.533Z",
+  "scope": "Actual PostgREST RPC schema availability and rejected nonexistent-actor calls. No civic or account records written.",
+  "results": [
+    {
+      "name": "claim rejects nonexistent actor",
+      "passed": true,
+      "status": 403,
+      "code": "42501"
+    },
+    {
+      "name": "profile rejects nonexistent actor",
+      "passed": true,
+      "status": 403,
+      "code": "42501"
+    },
+    {
+      "name": "portrait rejects nonexistent actor",
+      "passed": true,
+      "status": 403,
+      "code": "42501"
+    }
+  ]
+}

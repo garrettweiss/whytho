@@ -293,6 +293,20 @@ test("signed-out visitors receive the sign-in path without starting verification
   assert.match(String(f.find((node) => node.type === "a").props.href), /sign-in\?redirect=/);
 });
 
+test("a question starter fills an editable draft without submitting or replacing later edits", () => {
+  const f = fixture();
+  const housing = () => f.find((node) => node.type === "button" && node.props.children === "Housing");
+  assert.equal(housing().props.type, "button");
+  f.invoke(housing(), "onClick");
+  assert.match(String(f.textarea().props.value), /housing-cost measures/);
+  assert.equal(f.requests.length, 0);
+  assert.equal(f.submit().props.disabled, true);
+  f.write("What public housing data is available for this district?");
+  assert.equal(housing().props.disabled, true);
+  f.invoke(housing(), "onClick");
+  assert.equal(f.textarea().props.value, "What public housing data is available for this district?");
+});
+
 test("age and Terms confirmation blocks submission before security verification and preserves the draft", () => {
   const f = fixture({ participation: "required" });
   const draft = "What will you do about this issue?";

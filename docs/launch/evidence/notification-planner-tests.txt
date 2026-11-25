@@ -1,0 +1,70 @@
+TAP version 13
+# Subtest: a new human question queues only for a verified opted-in team member after debounce
+ok 1 - a new human question queues only for a verified opted-in team member after debounce
+  ---
+  duration_ms: 1.212875
+  type: 'test'
+  ...
+# Subtest: seeded and imported questions never masquerade as new constituent demand
+ok 2 - seeded and imported questions never masquerade as new constituent demand
+  ---
+  duration_ms: 0.073333
+  type: 'test'
+  ...
+# Subtest: hidden, archived and already answered questions are suppressed
+ok 3 - hidden, archived and already answered questions are suppressed
+  ---
+  duration_ms: 0.085333
+  type: 'test'
+  ...
+# Subtest: pending or removed staff, unrelated teams and unverified profiles cannot receive
+ok 4 - pending or removed staff, unrelated teams and unverified profiles cannot receive
+  ---
+  duration_ms: 0.052417
+  type: 'test'
+  ...
+# Subtest: missing, future, obsolete, revoked and suppressed consent all fail closed
+ok 5 - missing, future, obsolete, revoked and suppressed consent all fail closed
+  ---
+  duration_ms: 0.0485
+  type: 'test'
+  ...
+# Subtest: daily batching and the 24-hour contact cap combine without dropping the event
+ok 6 - daily batching and the 24-hour contact cap combine without dropping the event
+  ---
+  duration_ms: 0.115041
+  type: 'test'
+  ...
+# Subtest: already delivered events cannot send again
+ok 7 - already delivered events cannot send again
+  ---
+  duration_ms: 0.042041
+  type: 'test'
+  ...
+# Subtest: malformed ids and clocks fail closed
+ok 8 - malformed ids and clocks fail closed
+  ---
+  duration_ms: 0.039667
+  type: 'test'
+  ...
+# Subtest: provider acceptance ends retries; ambiguous sends retain the same key within its retention window
+ok 9 - provider acceptance ends retries; ambiguous sends retain the same key within its retention window
+  ---
+  duration_ms: 0.634
+  type: 'test'
+  ...
+# Subtest: legacy outreach defaults to preview and rejects every live override
+ok 10 - legacy outreach defaults to preview and rejects every live override
+  ---
+  duration_ms: 0.451125
+  type: 'test'
+  ...
+1..10
+# tests 10
+# suites 0
+# pass 10
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 113.877916

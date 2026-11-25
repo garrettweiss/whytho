@@ -35,7 +35,7 @@ export function HomeNavigation({ loggedIn, loading, politicianMode, canUsePoliti
         <nav className={styles.desktopNav} aria-label="Main navigation">
           <a href={searchHref} aria-current={isHome ? "page" : undefined}>Find a politician</a>
           <a href={howHref}>How it works</a>
-          <Link href="/verify">For politicians <span aria-hidden="true">↗</span></Link>
+          <Link href="/verify">For politicians</Link>
         </nav>
         <div className={styles.headerRight}>
           <Link className={styles.accountLink} href={loggedIn ? "/account" : "/sign-in"} aria-busy={loading}>{loading ? "Account" : loggedIn ? "My account" : "Sign in"}</Link>

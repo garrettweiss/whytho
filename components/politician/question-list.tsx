@@ -539,7 +539,7 @@ export function QuestionList({ questions, latestQuestion, politicianId, memberId
         {renderQuestion(shownFallback, true)}
       </div> : sorted.length === 0 ? <div className={face ? styles.empty : "rounded-xl border bg-card p-8 space-y-2"}>
         <p>{questionSort === "unanswered" ? "No unanswered questions in this view." : isHistorical ? `No questions recorded for the week of ${formatWeekStart(weekNumber)}.` : emptyMessages[period]}</p>
-        <p className={face ? styles.meta : "text-sm text-muted-foreground"}>{isHistorical || period !== "week" ? "Choose another period to explore the record." : "Have something to ask? Add your question for this week."}</p>
+        <p className={face ? styles.meta : "text-sm text-muted-foreground"}>{isHistorical || period !== "week" ? "Choose another period to explore the record." : <>Have something to ask? <a href="#ask-question">Add your question for this week.</a></>}</p>
       </div> : <div className={face ? styles.group : "space-y-2"}>
         {sorted.map((question, index) => <div key={question.id}>
           {questionSort !== "newest" && (period === "week" || isHistorical) && qualifying.length > 0 && (index === 0 || index === qualifying.length) &&

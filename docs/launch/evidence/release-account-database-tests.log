@@ -1,0 +1,367 @@
+CREATE ROLE
+CREATE ROLE
+CREATE ROLE
+ALTER DEFAULT PRIVILEGES
+CREATE SCHEMA
+CREATE TABLE
+CREATE TYPE
+CREATE TYPE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+GRANT
+GRANT
+BEGIN
+CREATE TABLE
+ALTER TABLE
+REVOKE
+GRANT
+ALTER TABLE
+CREATE FUNCTION
+ALTER FUNCTION
+REVOKE
+GRANT
+CREATE FUNCTION
+ALTER FUNCTION
+REVOKE
+GRANT
+NOTIFY
+CREATE FUNCTION
+ALTER FUNCTION
+REVOKE
+GRANT
+NOTIFY
+COMMIT
+CREATE FUNCTION
+CREATE FUNCTION
+INSERT 0 8
+INSERT 0 3
+INSERT 0 3
+INSERT 0 1
+INSERT 0 5
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:27: NOTICE:  PASS: visitor cannot call claim RPC
+ assert_true 
+-------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:28: NOTICE:  PASS: ordinary user cannot bypass API to call team RPC
+ assert_true 
+-------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:29: NOTICE:  PASS: browser cannot impersonate actor in answer RPC
+ assert_true 
+-------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:31: NOTICE:  PASS: service role has no broad auth.users read grant
+ assert_true 
+-------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:32: NOTICE:  PASS: service role retains audit read and append
+ assert_true 
+-------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:33: NOTICE:  PASS: audit defaults narrowed to append-only service role
+ assert_true 
+-------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:34: NOTICE:  PASS: account RPCs have fixed privileged owner and safe search path
+ assert_true 
+-------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:35: NOTICE:  PASS: all browser roles denied all account RPCs
+ assert_true 
+-------------
+ 
+(1 row)
+
+SET
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:37: NOTICE:  PASS: visitor cannot execute claim with forged actor
+ expect_error 
+--------------
+ 
+(1 row)
+
+RESET
+SET
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:40: NOTICE:  PASS: browser cannot execute privileged team operation
+ expect_error 
+--------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:41: NOTICE:  PASS: browser cannot execute privileged publish operation
+ expect_error 
+--------------
+ 
+(1 row)
+
+RESET
+SET
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:44: NOTICE:  PASS: service role cannot rewrite audit history
+ expect_error 
+--------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:45: NOTICE:  PASS: anonymous claim denied
+ expect_error 
+--------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:46: NOTICE:  PASS: new applicant claims profile
+ assert_true 
+-------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:47: NOTICE:  PASS: pending admin resumes idempotently
+ assert_true 
+-------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:48: NOTICE:  PASS: second claimant cannot seize profile
+ expect_error 
+--------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:49: NOTICE:  PASS: editor cannot invite
+ expect_error 
+--------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:50: NOTICE:  PASS: admin cannot remove another profile member
+ expect_error 
+--------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:51: NOTICE:  PASS: last admin cannot disconnect
+ expect_error 
+--------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:52: NOTICE:  PASS: last admin cannot demote self
+ expect_error 
+--------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:53: NOTICE:  PASS: admin adds existing account with normalized email
+ assert_true 
+-------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:54: NOTICE:  PASS: admin changes staff role
+ assert_true 
+-------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:55: NOTICE:  PASS: responder creates private draft
+ assert_true 
+-------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:56: NOTICE:  PASS: unverified admin can only draft
+ assert_true 
+-------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:57: NOTICE:  PASS: unrelated admin cannot respond
+ expect_error 
+--------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:58: NOTICE:  PASS: ordinary user cannot respond
+ expect_error 
+--------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:59: NOTICE:  PASS: responder cannot approve own draft
+ expect_error 
+--------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:60: NOTICE:  PASS: pending admin cannot approve own draft
+ expect_error 
+--------------
+ 
+(1 row)
+
+UPDATE 2
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:62: NOTICE:  PASS: responder can resume and edit an older private draft
+ assert_true 
+-------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:63: NOTICE:  PASS: verified editor approves draft
+ assert_true 
+-------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:64: NOTICE:  PASS: newly approved old draft has a fresh edit window
+ assert_true 
+-------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:65: NOTICE:  PASS: responder cannot edit after approval
+ expect_error 
+--------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:66: NOTICE:  PASS: cannot publish duplicate official response
+ expect_error 
+--------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:67: NOTICE:  PASS: verified editor publishes directly
+ assert_true 
+-------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:68: NOTICE:  PASS: verified admin can choose a private draft
+ assert_true 
+-------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:69: NOTICE:  PASS: admin revokes responder membership
+ assert_true 
+-------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:70: NOTICE:  PASS: removed member cannot respond
+ expect_error 
+--------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:71: NOTICE:  PASS: editor can disconnect own account
+ assert_true 
+-------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:72: NOTICE:  PASS: staff disconnect preserves verified profile
+ assert_true 
+-------------
+ 
+(1 row)
+
+RESET
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:75: NOTICE:  PASS: approval actor is retained in private audit history
+ assert_true 
+-------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:76: NOTICE:  PASS: audit actor history is private
+ assert_true 
+-------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:77: NOTICE:  PASS: account audit has RLS
+ assert_true 
+-------------
+ 
+(1 row)
+
+BEGIN
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/migrations/20261031060000_account_transitions.sql:11: NOTICE:  relation "politician_account_audit" already exists, skipping
+CREATE TABLE
+ALTER TABLE
+REVOKE
+GRANT
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/migrations/20261031060000_account_transitions.sql:16: NOTICE:  column "published_at" of relation "answers" already exists, skipping
+ALTER TABLE
+CREATE FUNCTION
+ALTER FUNCTION
+REVOKE
+GRANT
+CREATE FUNCTION
+ALTER FUNCTION
+REVOKE
+GRANT
+NOTIFY
+CREATE FUNCTION
+ALTER FUNCTION
+REVOKE
+GRANT
+NOTIFY
+COMMIT
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:80: NOTICE:  PASS: repeat migration preserves audit history
+ assert_true 
+-------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:81: NOTICE:  PASS: repeat migration preserves append-only audit grants
+ assert_true 
+-------------
+ 
+(1 row)
+
+INSERT 0 1
+INSERT 0 6
+SET
+                                                                               claim_politician_profile                                                                               
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ {"resumed": false, "success": true, "politician_id": "10000000-0000-4000-8000-000000000011", "politician_name": "Limit 11", "politician_slug": "limit-11", "verification_tier": "1"}
+ {"resumed": false, "success": true, "politician_id": "10000000-0000-4000-8000-000000000012", "politician_name": "Limit 12", "politician_slug": "limit-12", "verification_tier": "1"}
+ {"resumed": false, "success": true, "politician_id": "10000000-0000-4000-8000-000000000013", "politician_name": "Limit 13", "politician_slug": "limit-13", "verification_tier": "1"}
+ {"resumed": false, "success": true, "politician_id": "10000000-0000-4000-8000-000000000014", "politician_name": "Limit 14", "politician_slug": "limit-14", "verification_tier": "1"}
+ {"resumed": false, "success": true, "politician_id": "10000000-0000-4000-8000-000000000015", "politician_name": "Limit 15", "politician_slug": "limit-15", "verification_tier": "1"}
+(5 rows)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:87: NOTICE:  PASS: sixth concurrent pending claim is refused
+ expect_error 
+--------------
+ 
+(1 row)
+
+psql:/Users/garrettweiss/Library/Mobile Documents/com~apple~CloudDocs/Projects/WhyTho/supabase/tests/account-personas.sql:88: NOTICE:  PASS: pending claim cap does not block resumption
+ assert_true 
+-------------
+ 
+(1 row)
+
+RESET
+PASS: simultaneous claims produce exactly one administrator
+PASS: simultaneous admin disconnects preserve one administrator
+PASS: simultaneous publication produces one official answer
+PASS: publication racing committed membership revocation is denied
+
+Retained local test evidence: /tmp/whytho-account-db.ALXpjU

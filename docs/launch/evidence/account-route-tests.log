@@ -1,0 +1,184 @@
+TAP version 13
+# Subtest: sign-in page and real callback preserve safe local return paths and reject open redirects
+ok 1 - sign-in page and real callback preserve safe local return paths and reject open redirects
+  ---
+  duration_ms: 88.973791
+  type: 'test'
+  ...
+# Subtest: account gates anonymous sessions before querying private records
+ok 2 - account gates anonymous sessions before querying private records
+  ---
+  duration_ms: 18.480042
+  type: 'test'
+  ...
+# Subtest: account reads are bounded and user-scoped, with honest failures
+ok 3 - account reads are bounded and user-scoped, with honest failures
+  ---
+  duration_ms: 17.358625
+  type: 'test'
+  ...
+# Subtest: dashboard role branches preserve claims, verification, draft review and admin-only controls
+ok 4 - dashboard role branches preserve claims, verification, draft review and admin-only controls
+  ---
+  duration_ms: 131.372208
+  type: 'test'
+  ...
+# Subtest: answer route rejects anonymous/nonteam/direct responder requests without writes
+ok 5 - answer route rejects anonymous/nonteam/direct responder requests without writes
+  ---
+  duration_ms: 22.225083
+  type: 'test'
+  ...
+# Subtest: verification reload restores only the current user's completed methods without exposing private codes
+ok 6 - verification reload restores only the current user's completed methods without exposing private codes
+  ---
+  duration_ms: 4.837667
+  type: 'test'
+  ...
+# Subtest: real answer response contract feeds authorized media upload for draft and publishing roles
+ok 7 - real answer response contract feeds authorized media upload for draft and publishing roles
+  ---
+  duration_ms: 36.420791
+  type: 'test'
+  ...
+# Subtest: media denies wrong ownership, published responder changes, AI, and unsupported types before storage
+ok 8 - media denies wrong ownership, published responder changes, AI, and unsupported types before storage
+  ---
+  duration_ms: 21.862041
+  type: 'test'
+  ...
+# Subtest: media delivery never signs an unreadable or unauthorized draft, even with permissive fixture reads
+ok 9 - media delivery never signs an unreadable or unauthorized draft, even with permissive fixture reads
+  ---
+  duration_ms: 11.301834
+  type: 'test'
+  ...
+# Subtest: media delivery signs only authorized matching paths with short expiry and no shared cache
+ok 10 - media delivery signs only authorized matching paths with short expiry and no shared cache
+  ---
+  duration_ms: 8.173167
+  type: 'test'
+  ...
+# Subtest: approval is publishing-role only and changes draft visibility
+ok 11 - approval is publishing-role only and changes draft visibility
+  ---
+  duration_ms: 8.0115
+  type: 'test'
+  ...
+# Subtest: upload uses atomic attachment guard and handles an approval or role change during transfer
+ok 12 - upload uses atomic attachment guard and handles an approval or role change during transfer
+  ---
+  duration_ms: 4.156292
+  type: 'test'
+  ...
+# Subtest: media over the shared hosting limit is refused and delivery failures are private
+ok 13 - media over the shared hosting limit is refused and delivery failures are private
+  ---
+  duration_ms: 8.806666
+  type: 'test'
+  ...
+# Subtest: controlled media URL survives public normalization and rendering while unsafe paths are discarded
+ok 14 - controlled media URL survives public normalization and rendering while unsafe paths are discarded
+  ---
+  duration_ms: 5.268917
+  type: 'test'
+  ...
+# Subtest: answer editing permits publishing roles and only a responder's own pending draft
+ok 15 - answer editing permits publishing roles and only a responder's own pending draft
+  ---
+  duration_ms: 14.536208
+  type: 'test'
+  ...
+# Subtest: answer editing denies published or another responder's draft and preserves the edit window
+ok 16 - answer editing denies published or another responder's draft and preserves the edit window
+  ---
+  duration_ms: 16.673792
+  type: 'test'
+  ...
+# Subtest: answer edit atomically rejects approval during the request and validates malformed payloads
+ok 17 - answer edit atomically rejects approval during the request and validates malformed payloads
+  ---
+  duration_ms: 18.914792
+  type: 'test'
+  ...
+# Subtest: unverified profile teams can edit drafts but cannot edit published official responses
+ok 18 - unverified profile teams can edit drafts but cannot edit published official responses
+  ---
+  duration_ms: 13.959917
+  type: 'test'
+  ...
+# Subtest: only verified publishing roles publish or approve official responses
+ok 19 - only verified publishing roles publish or approve official responses
+  ---
+  duration_ms: 92.982917
+  type: 'test'
+  ...
+# Subtest: verification lookup failures do not publish, approve, or edit answers
+ok 20 - verification lookup failures do not publish, approve, or edit answers
+  ---
+  duration_ms: 8.746666
+  type: 'test'
+  ...
+# Subtest: claim and disconnect require nonanonymous authentication before any privileged client
+ok 21 - claim and disconnect require nonanonymous authentication before any privileged client
+  ---
+  duration_ms: 20.137667
+  type: 'test'
+  ...
+# Subtest: claim forwards the session actor, resumes without repeat welcome, and contains DB errors
+ok 22 - claim forwards the session actor, resumes without repeat welcome, and contains DB errors
+  ---
+  duration_ms: 5.032583
+  type: 'test'
+  ...
+# Subtest: team mutation routes bind target profile and actor, validate roles, and preserve DB refusal
+ok 23 - team mutation routes bind target profile and actor, validate roles, and preserve DB refusal
+  ---
+  duration_ms: 6.524958
+  type: 'test'
+  ...
+# Subtest: team directory exposes other staff email only to admins and fails closed on read errors
+ok 24 - team directory exposes other staff email only to admins and fails closed on read errors
+  ---
+  duration_ms: 20.03725
+  type: 'test'
+  ...
+# Subtest: notification preferences are scoped to session identity and reject malformed requests
+ok 25 - notification preferences are scoped to session identity and reject malformed requests
+  ---
+  duration_ms: 2.50425
+  type: 'test'
+  ...
+# Subtest: answer submission rejects invalid types and unsafe or excessive sources
+ok 26 - answer submission rejects invalid types and unsafe or excessive sources
+  ---
+  duration_ms: 4.192791
+  type: 'test'
+  ...
+# Subtest: new claim throttling fails closed while existing admins can resume
+ok 27 - new claim throttling fails closed while existing admins can resume
+  ---
+  duration_ms: 11.023625
+  type: 'test'
+  ...
+# Subtest: verified admin and editor can deliberately save a private draft
+ok 28 - verified admin and editor can deliberately save a private draft
+  ---
+  duration_ms: 10.356958
+  type: 'test'
+  ...
+# Subtest: platform admin status alone does not grant a politician team voice
+ok 29 - platform admin status alone does not grant a politician team voice
+  ---
+  duration_ms: 9.072208
+  type: 'test'
+  ...
+1..29
+# tests 29
+# suites 0
+# pass 29
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1007.454708

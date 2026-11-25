@@ -1,0 +1,69 @@
+{
+  "checkedAt": "2026-11-23T16:52:03.399Z",
+  "scope": "Publicly readable active questions across all weeks on each canonical profile and its linked records",
+  "method": "Exact normalized text, token-overlap screen, official H.R. 6644 identifiers/titles, and housing vocabulary",
+  "results": [
+    {
+      "official": "[Rep. Robert B. Aderholt, AL-04](https://whytho.us/robert-b-aderholt-alabama) · A000055",
+      "bioguideId": "A000055",
+      "question": "You voted to accept the Senate amendment to H.R. 6644 on June 23, 2026. Which provision of the new housing law do you expect to have the biggest effect on housing costs in Alabama's 4th District?",
+      "profile": "https://whytho.us/robert-b-aderholt-alabama",
+      "identityMembers": 2,
+      "questionCount": 3,
+      "exactCount": 0,
+      "nearWordingCount": 0,
+      "sameBillCount": 0,
+      "housingTopicCount": 0,
+      "matches": []
+    },
+    {
+      "official": "[Rep. Eric Burlison, MO-07](https://whytho.us/eric-burlison-missouri) · B001316",
+      "bioguideId": "B001316",
+      "question": "You voted against accepting the Senate amendment to H.R. 6644 on June 23, 2026. What change, if any, would have made you willing to support the housing bill?",
+      "profile": "https://whytho.us/eric-burlison-missouri",
+      "identityMembers": 2,
+      "questionCount": 3,
+      "exactCount": 0,
+      "nearWordingCount": 0,
+      "sameBillCount": 0,
+      "housingTopicCount": 0,
+      "matches": []
+    },
+    {
+      "official": "[Sen. Elizabeth Warren, Massachusetts](https://whytho.us/elizabeth-warren-massachusetts) · W000817",
+      "bioguideId": "W000817",
+      "question": "You voted to end debate on a motion concerning H.R. 6644 on June 18, 2026. What measure would you use to tell whether the new housing law is making rent more affordable in Massachusetts?",
+      "profile": "https://whytho.us/elizabeth-warren-massachusetts",
+      "identityMembers": 1,
+      "questionCount": 3,
+      "exactCount": 0,
+      "nearWordingCount": 0,
+      "sameBillCount": 0,
+      "housingTopicCount": 1,
+      "matches": [
+        {
+          "url": "https://whytho.us/elizabeth-warren-massachusetts?period=all#question-2fc553b5-abe4-493e-9f76-be0d79f6d21e",
+          "body": "Massachusetts has a significant number of veterans, many of whom face challenges accessing mental health services and affordable housing. What concrete legislative actions have you taken in the Senate to address the veteran suicide crisis and expand supportive housing programs for homeless veterans in Massachusetts and nationally?",
+          "exact": false,
+          "nearWording": false,
+          "sameBill": false,
+          "housingTopic": true,
+          "wordingScore": 0.08
+        }
+      ]
+    },
+    {
+      "official": "[Sen. Tim Scott, South Carolina](https://whytho.us/tim-scott-south-carolina) · S001184",
+      "bioguideId": "S001184",
+      "question": "You voted to end debate on a motion concerning H.R. 6644 on June 18, 2026. What public data should South Carolinians look at to tell whether the new housing law is helping more people buy their first home?",
+      "profile": "https://whytho.us/tim-scott-south-carolina",
+      "identityMembers": 1,
+      "questionCount": 6,
+      "exactCount": 0,
+      "nearWordingCount": 0,
+      "sameBillCount": 0,
+      "housingTopicCount": 0,
+      "matches": []
+    }
+  ]
+}

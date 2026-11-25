@@ -1,0 +1,70 @@
+TAP version 13
+# Subtest: visitor, anonymous and responder cannot initiate politician verification
+ok 1 - visitor, anonymous and responder cannot initiate politician verification
+  ---
+  duration_ms: 103.665667
+  type: 'test'
+  ...
+# Subtest: a generic .gov address and an unreviewed profile do not establish authority
+ok 2 - a generic .gov address and an unreviewed profile do not establish authority
+  ---
+  duration_ms: 5.990667
+  type: 'test'
+  ...
+# Subtest: approved office OTP has a cryptographic six-digit code, expiry and no response disclosure
+ok 3 - approved office OTP has a cryptographic six-digit code, expiry and no response disclosure
+  ---
+  duration_ms: 8.15225
+  type: 'test'
+  ...
+# Subtest: verification rate store and mail delivery fail closed
+ok 4 - verification rate store and mail delivery fail closed
+  ---
+  duration_ms: 13.0525
+  type: 'test'
+  ...
+# Subtest: expired, wrong and exhausted OTPs cannot complete verification
+ok 5 - expired, wrong and exhausted OTPs cannot complete verification
+  ---
+  duration_ms: 8.466833
+  type: 'test'
+  ...
+# Subtest: successful OTP completion clears secret and expiry
+ok 6 - successful OTP completion clears secret and expiry
+  ---
+  duration_ms: 4.031916
+  type: 'test'
+  ...
+# Subtest: meta verification fetches only the reviewed URL, ignores claimant input
+ok 7 - meta verification fetches only the reviewed URL, ignores claimant input
+  ---
+  duration_ms: 4.499209
+  type: 'test'
+  ...
+# Subtest: old claimant-defined verification cannot resume against a reviewed source
+ok 8 - old claimant-defined verification cannot resume against a reviewed source
+  ---
+  duration_ms: 3.492
+  type: 'test'
+  ...
+# Subtest: source review changes invalidate pending and completed email proofs
+ok 9 - source review changes invalidate pending and completed email proofs
+  ---
+  duration_ms: 8.602709
+  type: 'test'
+  ...
+# Subtest: meta proof cannot resume after its reviewed evidence changes
+ok 10 - meta proof cannot resume after its reviewed evidence changes
+  ---
+  duration_ms: 5.890875
+  type: 'test'
+  ...
+1..10
+# tests 10
+# suites 0
+# pass 10
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 504.275791

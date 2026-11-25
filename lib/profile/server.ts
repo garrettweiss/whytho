@@ -200,6 +200,7 @@ export async function getProfileMetadata(slug: string): Promise<ProfileMetadata 
     party: politician.party,
     photo_url: politician.photo_url,
     bio: politician.bio,
+    is_active: politician.is_active,
     is_test: politician.is_test,
   };
 }

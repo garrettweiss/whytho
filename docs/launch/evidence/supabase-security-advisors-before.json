@@ -1,0 +1,647 @@
+{
+  "checked_at": "2026-10-30 America/Los_Angeles",
+  "project_ref": "jjwdxjqsnwieksubkkkf",
+  "mode": "read-only, before launch migrations",
+  "advisors": [
+    {
+      "name": "rls_enabled_no_policy",
+      "title": "RLS Enabled No Policy",
+      "level": "INFO",
+      "count": 4,
+      "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy",
+      "findings": [
+        {
+          "detail": "Table \\`public.chatbot_feedback\\` has RLS enabled, but no policies exist",
+          "metadata": {
+            "schema": "public",
+            "name": "chatbot_feedback",
+            "type": "table"
+          }
+        },
+        {
+          "detail": "Table \\`public.chatbot_forwarded\\` has RLS enabled, but no policies exist",
+          "metadata": {
+            "schema": "public",
+            "name": "chatbot_forwarded",
+            "type": "table"
+          }
+        },
+        {
+          "detail": "Table \\`public.chatbot_knowledge\\` has RLS enabled, but no policies exist",
+          "metadata": {
+            "schema": "public",
+            "name": "chatbot_knowledge",
+            "type": "table"
+          }
+        },
+        {
+          "detail": "Table \\`public.chatbot_question_posts\\` has RLS enabled, but no policies exist",
+          "metadata": {
+            "schema": "public",
+            "name": "chatbot_question_posts",
+            "type": "table"
+          }
+        }
+      ]
+    },
+    {
+      "name": "function_search_path_mutable",
+      "title": "Function Search Path Mutable",
+      "level": "WARN",
+      "count": 11,
+      "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0011_function_search_path_mutable",
+      "findings": [
+        {
+          "detail": "Function \\`public.check_report_threshold\\` has a role mutable search_path",
+          "metadata": {
+            "schema": "public",
+            "name": "check_report_threshold",
+            "type": "function"
+          }
+        },
+        {
+          "detail": "Function \\`public.publish_forwarded_to_knowledge\\` has a role mutable search_path",
+          "metadata": {
+            "schema": "public",
+            "name": "publish_forwarded_to_knowledge",
+            "type": "function"
+          }
+        },
+        {
+          "detail": "Function \\`public.participation_rate_period\\` has a role mutable search_path",
+          "metadata": {
+            "schema": "public",
+            "name": "participation_rate_period",
+            "type": "function"
+          }
+        },
+        {
+          "detail": "Function \\`public.update_updated_at\\` has a role mutable search_path",
+          "metadata": {
+            "schema": "public",
+            "name": "update_updated_at",
+            "type": "function"
+          }
+        },
+        {
+          "detail": "Function \\`public.current_week_number\\` has a role mutable search_path",
+          "metadata": {
+            "schema": "public",
+            "name": "current_week_number",
+            "type": "function"
+          }
+        },
+        {
+          "detail": "Function \\`public.participation_rate\\` has a role mutable search_path",
+          "metadata": {
+            "schema": "public",
+            "name": "participation_rate",
+            "type": "function"
+          }
+        },
+        {
+          "detail": "Function \\`public.generate_slug\\` has a role mutable search_path",
+          "metadata": {
+            "schema": "public",
+            "name": "generate_slug",
+            "type": "function"
+          }
+        },
+        {
+          "detail": "Function \\`public.weekly_reset\\` has a role mutable search_path",
+          "metadata": {
+            "schema": "public",
+            "name": "weekly_reset",
+            "type": "function"
+          }
+        },
+        {
+          "detail": "Function \\`public.handle_new_user\\` has a role mutable search_path",
+          "metadata": {
+            "schema": "public",
+            "name": "handle_new_user",
+            "type": "function"
+          }
+        },
+        {
+          "detail": "Function \\`public.search_politicians\\` has a role mutable search_path",
+          "metadata": {
+            "schema": "public",
+            "name": "search_politicians",
+            "type": "function"
+          }
+        },
+        {
+          "detail": "Function \\`public.update_politician_verification_tier\\` has a role mutable search_path",
+          "metadata": {
+            "schema": "public",
+            "name": "update_politician_verification_tier",
+            "type": "function"
+          }
+        }
+      ]
+    },
+    {
+      "name": "extension_in_public",
+      "title": "Extension in Public",
+      "level": "WARN",
+      "count": 1,
+      "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0014_extension_in_public",
+      "findings": [
+        {
+          "detail": "Extension \\`pg_trgm\\` is installed in the public schema. Move it to another schema.",
+          "metadata": {
+            "schema": "public",
+            "name": "pg_trgm",
+            "type": "extension"
+          }
+        }
+      ]
+    },
+    {
+      "name": "anon_security_definer_function_executable",
+      "title": "Public Can Execute SECURITY DEFINER Function",
+      "level": "WARN",
+      "count": 3,
+      "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0028_anon_security_definer_function_executable",
+      "findings": [
+        {
+          "detail": "Function `public.check_report_threshold()` can be executed by the `anon` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/check_report_threshold`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+          "metadata": {
+            "schema": "public",
+            "name": "check_report_threshold",
+            "language": "plpgsql",
+            "arguments": "",
+            "security_definer": true
+          }
+        },
+        {
+          "detail": "Function `public.handle_new_user()` can be executed by the `anon` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/handle_new_user`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+          "metadata": {
+            "schema": "public",
+            "name": "handle_new_user",
+            "language": "plpgsql",
+            "arguments": "",
+            "security_definer": true
+          }
+        },
+        {
+          "detail": "Function `public.update_politician_verification_tier()` can be executed by the `anon` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/update_politician_verification_tier`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+          "metadata": {
+            "schema": "public",
+            "name": "update_politician_verification_tier",
+            "language": "plpgsql",
+            "arguments": "",
+            "security_definer": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "authenticated_security_definer_function_executable",
+      "title": "Signed-In Users Can Execute SECURITY DEFINER Function",
+      "level": "WARN",
+      "count": 3,
+      "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable",
+      "findings": [
+        {
+          "detail": "Function `public.check_report_threshold()` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/check_report_threshold`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+          "metadata": {
+            "schema": "public",
+            "name": "check_report_threshold",
+            "language": "plpgsql",
+            "arguments": "",
+            "security_definer": true
+          }
+        },
+        {
+          "detail": "Function `public.handle_new_user()` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/handle_new_user`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+          "metadata": {
+            "schema": "public",
+            "name": "handle_new_user",
+            "language": "plpgsql",
+            "arguments": "",
+            "security_definer": true
+          }
+        },
+        {
+          "detail": "Function `public.update_politician_verification_tier()` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/update_politician_verification_tier`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+          "metadata": {
+            "schema": "public",
+            "name": "update_politician_verification_tier",
+            "language": "plpgsql",
+            "arguments": "",
+            "security_definer": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "auth_allow_anonymous_sign_ins",
+      "title": "Anonymous Access Policies",
+      "level": "WARN",
+      "count": 1,
+      "remediation": "Table `cron.job` has policies enforced on roles that allow access to anonymous users. Policies include `{cron_job_policy}`",
+      "findings": [
+        {
+          "detail": "https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0012_auth_allow_anonymous_sign_ins",
+          "metadata": {
+            "schema": "cron",
+            "name": "job",
+            "type": "table"
+          }
+        }
+      ]
+    },
+    {
+      "name": "auth_allow_anonymous_sign_ins",
+      "title": "Anonymous Access Policies",
+      "level": "WARN",
+      "count": 1,
+      "remediation": "Table `cron.job_run_details` has policies enforced on roles that allow access to anonymous users. Policies include `{cron_job_run_details_policy}`",
+      "findings": [
+        {
+          "detail": "https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0012_auth_allow_anonymous_sign_ins",
+          "metadata": {
+            "schema": "cron",
+            "name": "job_run_details",
+            "type": "table"
+          }
+        }
+      ]
+    },
+    {
+      "name": "auth_allow_anonymous_sign_ins",
+      "title": "Anonymous Access Policies",
+      "level": "WARN",
+      "count": 1,
+      "remediation": "Table `public.ai_audit_log` has policies enforced on roles that allow access to anonymous users. Policies include `{ai_audit_service_all}`",
+      "findings": [
+        {
+          "detail": "https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0012_auth_allow_anonymous_sign_ins",
+          "metadata": {
+            "schema": "public",
+            "name": "ai_audit_log",
+            "type": "table"
+          }
+        }
+      ]
+    },
+    {
+      "name": "auth_allow_anonymous_sign_ins",
+      "title": "Anonymous Access Policies",
+      "level": "WARN",
+      "count": 1,
+      "remediation": "Table `public.anon_session_log` has policies enforced on roles that allow access to anonymous users. Policies include `{anon_log_service_only}`",
+      "findings": [
+        {
+          "detail": "https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0012_auth_allow_anonymous_sign_ins",
+          "metadata": {
+            "schema": "public",
+            "name": "anon_session_log",
+            "type": "table"
+          }
+        }
+      ]
+    },
+    {
+      "name": "auth_allow_anonymous_sign_ins",
+      "title": "Anonymous Access Policies",
+      "level": "WARN",
+      "count": 1,
+      "remediation": "Table `public.answer_media` has policies enforced on roles that allow access to anonymous users. Policies include `{answer_media_public_read,answer_media_team_delete}`",
+      "findings": [
+        {
+          "detail": "https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0012_auth_allow_anonymous_sign_ins",
+          "metadata": {
+            "schema": "public",
+            "name": "answer_media",
+            "type": "table"
+          }
+        }
+      ]
+    },
+    {
+      "name": "auth_allow_anonymous_sign_ins",
+      "title": "Anonymous Access Policies",
+      "level": "WARN",
+      "count": 1,
+      "remediation": "Table `public.answers` has policies enforced on roles that allow access to anonymous users. Policies include `{answers_public_read,answers_service_all}`",
+      "findings": [
+        {
+          "detail": "https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0012_auth_allow_anonymous_sign_ins",
+          "metadata": {
+            "schema": "public",
+            "name": "answers",
+            "type": "table"
+          }
+        }
+      ]
+    },
+    {
+      "name": "auth_allow_anonymous_sign_ins",
+      "title": "Anonymous Access Policies",
+      "level": "WARN",
+      "count": 1,
+      "remediation": "Table `public.jack_config` has policies enforced on roles that allow access to anonymous users. Policies include `{\"Admins can manage jack_config\"}`",
+      "findings": [
+        {
+          "detail": "https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0012_auth_allow_anonymous_sign_ins",
+          "metadata": {
+            "schema": "public",
+            "name": "jack_config",
+            "type": "table"
+          }
+        }
+      ]
+    },
+    {
+      "name": "auth_allow_anonymous_sign_ins",
+      "title": "Anonymous Access Policies",
+      "level": "WARN",
+      "count": 1,
+      "remediation": "Table `public.jack_reports` has policies enforced on roles that allow access to anonymous users. Policies include `{\"Admins can manage jack_reports\"}`",
+      "findings": [
+        {
+          "detail": "https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0012_auth_allow_anonymous_sign_ins",
+          "metadata": {
+            "schema": "public",
+            "name": "jack_reports",
+            "type": "table"
+          }
+        }
+      ]
+    },
+    {
+      "name": "auth_allow_anonymous_sign_ins",
+      "title": "Anonymous Access Policies",
+      "level": "WARN",
+      "count": 1,
+      "remediation": "Table `public.politician_aliases` has policies enforced on roles that allow access to anonymous users. Policies include `{aliases_public_read,aliases_service_write}`",
+      "findings": [
+        {
+          "detail": "https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0012_auth_allow_anonymous_sign_ins",
+          "metadata": {
+            "schema": "public",
+            "name": "politician_aliases",
+            "type": "table"
+          }
+        }
+      ]
+    },
+    {
+      "name": "auth_allow_anonymous_sign_ins",
+      "title": "Anonymous Access Policies",
+      "level": "WARN",
+      "count": 1,
+      "remediation": "Table `public.politician_team` has policies enforced on roles that allow access to anonymous users. Policies include `{team_own_read,team_service_all}`",
+      "findings": [
+        {
+          "detail": "https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0012_auth_allow_anonymous_sign_ins",
+          "metadata": {
+            "schema": "public",
+            "name": "politician_team",
+            "type": "table"
+          }
+        }
+      ]
+    },
+    {
+      "name": "auth_allow_anonymous_sign_ins",
+      "title": "Anonymous Access Policies",
+      "level": "WARN",
+      "count": 1,
+      "remediation": "Table `public.politician_verifications` has policies enforced on roles that allow access to anonymous users. Policies include `{own_verifications_read,own_verifications_update,verifications_service_all}`",
+      "findings": [
+        {
+          "detail": "https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0012_auth_allow_anonymous_sign_ins",
+          "metadata": {
+            "schema": "public",
+            "name": "politician_verifications",
+            "type": "table"
+          }
+        }
+      ]
+    },
+    {
+      "name": "auth_allow_anonymous_sign_ins",
+      "title": "Anonymous Access Policies",
+      "level": "WARN",
+      "count": 1,
+      "remediation": "Table `public.politicians` has policies enforced on roles that allow access to anonymous users. Policies include `{politicians_public_read,politicians_service_write}`",
+      "findings": [
+        {
+          "detail": "https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0012_auth_allow_anonymous_sign_ins",
+          "metadata": {
+            "schema": "public",
+            "name": "politicians",
+            "type": "table"
+          }
+        }
+      ]
+    },
+    {
+      "name": "auth_allow_anonymous_sign_ins",
+      "title": "Anonymous Access Policies",
+      "level": "WARN",
+      "count": 1,
+      "remediation": "Table `public.question_reports` has policies enforced on roles that allow access to anonymous users. Policies include `{own_reports_read,reports_service_all}`",
+      "findings": [
+        {
+          "detail": "https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0012_auth_allow_anonymous_sign_ins",
+          "metadata": {
+            "schema": "public",
+            "name": "question_reports",
+            "type": "table"
+          }
+        }
+      ]
+    },
+    {
+      "name": "auth_allow_anonymous_sign_ins",
+      "title": "Anonymous Access Policies",
+      "level": "WARN",
+      "count": 1,
+      "remediation": "Table `public.questions` has policies enforced on roles that allow access to anonymous users. Policies include `{questions_owner_update,questions_public_read,questions_service_all}`",
+      "findings": [
+        {
+          "detail": "https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0012_auth_allow_anonymous_sign_ins",
+          "metadata": {
+            "schema": "public",
+            "name": "questions",
+            "type": "table"
+          }
+        }
+      ]
+    },
+    {
+      "name": "auth_allow_anonymous_sign_ins",
+      "title": "Anonymous Access Policies",
+      "level": "WARN",
+      "count": 1,
+      "remediation": "Table `public.race_candidates` has policies enforced on roles that allow access to anonymous users. Policies include `{race_candidates_public_read}`",
+      "findings": [
+        {
+          "detail": "https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0012_auth_allow_anonymous_sign_ins",
+          "metadata": {
+            "schema": "public",
+            "name": "race_candidates",
+            "type": "table"
+          }
+        }
+      ]
+    },
+    {
+      "name": "auth_allow_anonymous_sign_ins",
+      "title": "Anonymous Access Policies",
+      "level": "WARN",
+      "count": 1,
+      "remediation": "Table `public.races` has policies enforced on roles that allow access to anonymous users. Policies include `{races_public_read}`",
+      "findings": [
+        {
+          "detail": "https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0012_auth_allow_anonymous_sign_ins",
+          "metadata": {
+            "schema": "public",
+            "name": "races",
+            "type": "table"
+          }
+        }
+      ]
+    },
+    {
+      "name": "auth_allow_anonymous_sign_ins",
+      "title": "Anonymous Access Policies",
+      "level": "WARN",
+      "count": 1,
+      "remediation": "Table `public.user_profiles` has policies enforced on roles that allow access to anonymous users. Policies include `{profiles_own_read,profiles_own_update,profiles_service_all}`",
+      "findings": [
+        {
+          "detail": "https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0012_auth_allow_anonymous_sign_ins",
+          "metadata": {
+            "schema": "public",
+            "name": "user_profiles",
+            "type": "table"
+          }
+        }
+      ]
+    },
+    {
+      "name": "auth_allow_anonymous_sign_ins",
+      "title": "Anonymous Access Policies",
+      "level": "WARN",
+      "count": 1,
+      "remediation": "Table `public.votes` has policies enforced on roles that allow access to anonymous users. Policies include `{votes_own_delete,votes_own_read,votes_own_update,votes_service_all}`",
+      "findings": [
+        {
+          "detail": "https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0012_auth_allow_anonymous_sign_ins",
+          "metadata": {
+            "schema": "public",
+            "name": "votes",
+            "type": "table"
+          }
+        }
+      ]
+    },
+    {
+      "name": "auth_allow_anonymous_sign_ins",
+      "title": "Anonymous Access Policies",
+      "level": "WARN",
+      "count": 1,
+      "remediation": "Table `public.weekly_snapshots` has policies enforced on roles that allow access to anonymous users. Policies include `{snapshots_public_read,snapshots_service_all}`",
+      "findings": [
+        {
+          "detail": "https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0012_auth_allow_anonymous_sign_ins",
+          "metadata": {
+            "schema": "public",
+            "name": "weekly_snapshots",
+            "type": "table"
+          }
+        }
+      ]
+    },
+    {
+      "name": "auth_allow_anonymous_sign_ins",
+      "title": "Anonymous Access Policies",
+      "level": "WARN",
+      "count": 1,
+      "remediation": "Table `public.x_credit_log` has policies enforced on roles that allow access to anonymous users. Policies include `{\"Admins can manage x_credit_log\"}`",
+      "findings": [
+        {
+          "detail": "https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0012_auth_allow_anonymous_sign_ins",
+          "metadata": {
+            "schema": "public",
+            "name": "x_credit_log",
+            "type": "table"
+          }
+        }
+      ]
+    },
+    {
+      "name": "auth_allow_anonymous_sign_ins",
+      "title": "Anonymous Access Policies",
+      "level": "WARN",
+      "count": 1,
+      "remediation": "Table `public.x_outreach_log` has policies enforced on roles that allow access to anonymous users. Policies include `{\"Admins can manage x_outreach_log\"}`",
+      "findings": [
+        {
+          "detail": "https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0012_auth_allow_anonymous_sign_ins",
+          "metadata": {
+            "schema": "public",
+            "name": "x_outreach_log",
+            "type": "table"
+          }
+        }
+      ]
+    },
+    {
+      "name": "auth_allow_anonymous_sign_ins",
+      "title": "Anonymous Access Policies",
+      "level": "WARN",
+      "count": 1,
+      "remediation": "Table `public.x_posts` has policies enforced on roles that allow access to anonymous users. Policies include `{\"Admins can manage x_posts\"}`",
+      "findings": [
+        {
+          "detail": "https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0012_auth_allow_anonymous_sign_ins",
+          "metadata": {
+            "schema": "public",
+            "name": "x_posts",
+            "type": "table"
+          }
+        }
+      ]
+    },
+    {
+      "name": "auth_allow_anonymous_sign_ins",
+      "title": "Anonymous Access Policies",
+      "level": "WARN",
+      "count": 1,
+      "remediation": "Table `storage.objects` has policies enforced on roles that allow access to anonymous users. Policies include `{answer_media_auth_delete,answer_media_public_read}`",
+      "findings": [
+        {
+          "detail": "https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0012_auth_allow_anonymous_sign_ins",
+          "metadata": {
+            "schema": "storage",
+            "name": "objects",
+            "type": "table"
+          }
+        }
+      ]
+    },
+    {
+      "name": "auth_leaked_password_protection",
+      "title": "Leaked Password Protection Disabled",
+      "level": "WARN",
+      "count": 1,
+      "remediation": "https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection",
+      "findings": [
+        {
+          "detail": "Supabase Auth prevents the use of compromised passwords by checking against HaveIBeenPwned.org. Enable this feature to enhance security.",
+          "metadata": {
+            "entity": "Auth",
+            "type": "auth"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -33,7 +33,7 @@ function PortraitCard({ person, index }: { person: DirectoryPerson; index: numbe
   const state = stateByCode(person.state ?? "")?.name ?? person.state;
   const initials = person.full_name.split(/\s+/).map(p => p[0]).slice(0, 2).join("");
   return <li className={styles.personItem}>
-    <Link href={`/${person.slug}`} prefetch={false} className={`${styles.person} ${responded ? styles.responded : ""}`} data-person-id={person.id}>
+    <Link href={person.questionCount > 0 ? `/${person.slug}` : `/${person.slug}#ask-question`} prefetch={false} className={`${styles.person} ${responded ? styles.responded : ""}`} data-person-id={person.id}>
       <div className={styles.photo}>
         {/* Native images avoid proxying arbitrary civic-photo hosts through our server. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -44,8 +44,8 @@ function PortraitCard({ person, index }: { person: DirectoryPerson; index: numbe
         <h3>{person.full_name}</h3>
         <p className={styles.place}>{[person.office === "Mayor" ? person.district : null, person.state === "DC" && person.district ? null : state, person.party].filter(Boolean).join(" · ")}</p>
         <div className={styles.record}>{responded ? <Check size={16} aria-hidden="true" /> : <span aria-hidden="true">○</span>}<span>{responded ? "Official response recorded" : person.questionCount > 0 ? "No official response recorded" : "No questions yet"}</span></div>
-        <p className={styles.recordDetail}>{person.questionCount} {person.questionCount === 1 ? "question" : "questions"} in this week’s record</p>
-        <span className={styles.cardAction}>View questions <ArrowRight size={17} aria-hidden="true" /></span>
+        {person.questionCount > 0 && <p className={styles.recordDetail}>{person.questionCount} {person.questionCount === 1 ? "question" : "questions"} in this week’s record</p>}
+        <span className={styles.cardAction}>{person.questionCount > 0 ? "View questions" : "Be the first to ask"} <ArrowRight size={17} aria-hidden="true" /></span>
       </div>
     </Link>
   </li>;

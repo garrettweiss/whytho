@@ -111,6 +111,12 @@
 .loadingRow { height: 100px; background: var(--muted); margin: 20px 0; }
 
 /* The existing composer owns all answer/media state. This wrapper only supplies its dashboard appearance. */
+.respond { margin-top: 12px; }
+.respond summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; gap: 8px; width: fit-content; font-weight: 700; font-size: 14px; text-decoration: underline; text-underline-offset: 4px; }
+.respond summary::before { content: "▶"; font-size: 10px; }
+.respond[open] summary::before { content: "▼"; }
+.methodology { margin-top: 6px; font-size: 13px; }
+.methodology summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; width: fit-content; color: var(--muted-foreground); text-decoration: underline; text-underline-offset: 4px; }
 .composer { min-width: 0; margin-top: 18px; }
 .composer :is(div, button, input, textarea, select) { border-radius: 0; box-shadow: none; }
 .composer :is(input, textarea) { font-size: 16px; }

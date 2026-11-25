@@ -1,0 +1,1023 @@
+check	Set up job	﻿2026-10-31T20:57:29.0373506Z Current runner version: '2.338.2'
+check	Set up job	2026-10-31T20:57:29.0414246Z ##[group]Runner Image Provisioner
+check	Set up job	2026-10-31T20:57:29.0415637Z Hosted Compute Agent
+check	Set up job	2026-10-31T20:57:29.0416855Z Version: 20261021.618
+check	Set up job	2026-10-31T20:57:29.0418300Z Commit: 21505ad2541d5be6135ed84fc33697146cf75b8e
+check	Set up job	2026-10-31T20:57:29.0419605Z Build Date: 2026-10-21T00:45:21Z
+check	Set up job	2026-10-31T20:57:29.0421044Z Worker ID: {8eec9b24-f87a-4f39-b9eb-cf252571008e}
+check	Set up job	2026-10-31T20:57:29.0422180Z Region: centralus
+check	Set up job	2026-10-31T20:57:29.0422842Z Cloud: Azure
+check	Set up job	2026-10-31T20:57:29.0423415Z ##[endgroup]
+check	Set up job	2026-10-31T20:57:29.0425033Z ##[group]Operating System
+check	Set up job	2026-10-31T20:57:29.0425742Z Ubuntu
+check	Set up job	2026-10-31T20:57:29.0426261Z 26.04.1
+check	Set up job	2026-10-31T20:57:29.0426819Z LTS
+check	Set up job	2026-10-31T20:57:29.0427329Z ##[endgroup]
+check	Set up job	2026-10-31T20:57:29.0428296Z ##[group]Runner Image
+check	Set up job	2026-10-31T20:57:29.0429059Z Image: ubuntu-26.04
+check	Set up job	2026-10-31T20:57:29.0429637Z Version: 20261025.179.1
+check	Set up job	2026-10-31T20:57:29.0430791Z Included Software: https://github.com/actions/runner-images/blob/ubuntu26/20261025.179/images/ubuntu/Ubuntu2604-Readme.md
+check	Set up job	2026-10-31T20:57:29.0432486Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu26%2F20261025.179
+check	Set up job	2026-10-31T20:57:29.0433563Z ##[endgroup]
+check	Set up job	2026-10-31T20:57:29.0434791Z ##[group]GITHUB_TOKEN Permissions
+check	Set up job	2026-10-31T20:57:29.0438044Z Contents: read
+check	Set up job	2026-10-31T20:57:29.0438770Z Metadata: read
+check	Set up job	2026-10-31T20:57:29.0439414Z Packages: read
+check	Set up job	2026-10-31T20:57:29.0439982Z ##[endgroup]
+check	Set up job	2026-10-31T20:57:29.0442166Z Secret source: Actions
+check	Set up job	2026-10-31T20:57:29.0443234Z Cache mode: write
+check	Set up job	2026-10-31T20:57:29.0444318Z Prepare workflow directory
+check	Set up job	2026-10-31T20:57:29.0852891Z Prepare all required actions
+check	Set up job	2026-10-31T20:57:29.0933192Z Getting action download info
+check	Set up job	2026-10-31T20:57:29.3435165Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+check	Set up job	2026-10-31T20:57:29.4414448Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+check	Set up job	2026-10-31T20:57:29.6125666Z Complete job name: check
+check	Run actions/checkout@v4	﻿2026-10-31T20:57:29.7091077Z ##[group]Run actions/checkout@v4
+check	Run actions/checkout@v4	2026-10-31T20:57:29.7092008Z with:
+check	Run actions/checkout@v4	2026-10-31T20:57:29.7092490Z   repository: garrettweiss/whytho
+check	Run actions/checkout@v4	2026-10-31T20:57:29.7096263Z   token: ***
+check	Run actions/checkout@v4	2026-10-31T20:57:29.7096708Z   ssh-strict: true
+check	Run actions/checkout@v4	2026-10-31T20:57:29.7097154Z   ssh-user: git
+check	Run actions/checkout@v4	2026-10-31T20:57:29.7097819Z   persist-credentials: true
+check	Run actions/checkout@v4	2026-10-31T20:57:29.7098338Z   clean: true
+check	Run actions/checkout@v4	2026-10-31T20:57:29.7098803Z   sparse-checkout-cone-mode: true
+check	Run actions/checkout@v4	2026-10-31T20:57:29.7099348Z   fetch-depth: 1
+check	Run actions/checkout@v4	2026-10-31T20:57:29.7099785Z   fetch-tags: false
+check	Run actions/checkout@v4	2026-10-31T20:57:29.7100233Z   show-progress: true
+check	Run actions/checkout@v4	2026-10-31T20:57:29.7100688Z   lfs: false
+check	Run actions/checkout@v4	2026-10-31T20:57:29.7101113Z   submodules: false
+check	Run actions/checkout@v4	2026-10-31T20:57:29.7101570Z   set-safe-directory: true
+check	Run actions/checkout@v4	2026-10-31T20:57:29.7102080Z   allow-unsafe-pr-checkout: false
+check	Run actions/checkout@v4	2026-10-31T20:57:29.7102892Z ##[endgroup]
+check	Run actions/checkout@v4	2026-10-31T20:57:29.9801231Z Syncing repository: garrettweiss/whytho
+check	Run actions/checkout@v4	2026-10-31T20:57:29.9805573Z ##[group]Getting Git version info
+check	Run actions/checkout@v4	2026-10-31T20:57:29.9806678Z Working directory is '/home/runner/work/whytho/whytho'
+check	Run actions/checkout@v4	2026-10-31T20:57:29.9808298Z [command]/usr/bin/git version
+check	Run actions/checkout@v4	2026-10-31T20:57:29.9808995Z git version 2.56.0
+check	Run actions/checkout@v4	2026-10-31T20:57:29.9810805Z ##[endgroup]
+check	Run actions/checkout@v4	2026-10-31T20:57:29.9816493Z Temporarily overriding HOME='/home/runner/work/_temp/a339d871-ec99-4761-80e2-c0f650f032bb' before making global git config changes
+check	Run actions/checkout@v4	2026-10-31T20:57:29.9818455Z Adding repository directory to the temporary git global config as a safe directory
+check	Run actions/checkout@v4	2026-10-31T20:57:29.9819711Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/whytho/whytho
+check	Run actions/checkout@v4	2026-10-31T20:57:29.9862514Z Deleting the contents of '/home/runner/work/whytho/whytho'
+check	Run actions/checkout@v4	2026-10-31T20:57:29.9866242Z ##[group]Initializing the repository
+check	Run actions/checkout@v4	2026-10-31T20:57:29.9871293Z [command]/usr/bin/git init /home/runner/work/whytho/whytho
+check	Run actions/checkout@v4	2026-10-31T20:57:29.9991035Z hint: Using 'master' as the name for the initial branch. This default branch name
+check	Run actions/checkout@v4	2026-10-31T20:57:29.9992827Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+check	Run actions/checkout@v4	2026-10-31T20:57:29.9994661Z hint: to use in all of your new repositories, which will suppress this warning,
+check	Run actions/checkout@v4	2026-10-31T20:57:29.9995746Z hint: call:
+check	Run actions/checkout@v4	2026-10-31T20:57:29.9996383Z hint:
+check	Run actions/checkout@v4	2026-10-31T20:57:29.9997261Z hint: 	git config --global init.defaultBranch <name>
+check	Run actions/checkout@v4	2026-10-31T20:57:29.9998526Z hint:
+check	Run actions/checkout@v4	2026-10-31T20:57:29.9999548Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+check	Run actions/checkout@v4	2026-10-31T20:57:30.0000817Z hint: 'development'. The just-created branch can be renamed via this command:
+check	Run actions/checkout@v4	2026-10-31T20:57:30.0002382Z hint:
+check	Run actions/checkout@v4	2026-10-31T20:57:30.0003244Z hint: 	git branch -m <name>
+check	Run actions/checkout@v4	2026-10-31T20:57:30.0004153Z hint:
+check	Run actions/checkout@v4	2026-10-31T20:57:30.0005375Z hint: Disable this message with "git config set advice.defaultBranchName false"
+check	Run actions/checkout@v4	2026-10-31T20:57:30.0017794Z Initialized empty Git repository in /home/runner/work/whytho/whytho/.git/
+check	Run actions/checkout@v4	2026-10-31T20:57:30.0032075Z [command]/usr/bin/git remote add origin https://github.com/garrettweiss/whytho
+check	Run actions/checkout@v4	2026-10-31T20:57:30.0076045Z ##[endgroup]
+check	Run actions/checkout@v4	2026-10-31T20:57:30.0076990Z ##[group]Disabling automatic garbage collection
+check	Run actions/checkout@v4	2026-10-31T20:57:30.0080575Z [command]/usr/bin/git config --local gc.auto 0
+check	Run actions/checkout@v4	2026-10-31T20:57:30.0117322Z ##[endgroup]
+check	Run actions/checkout@v4	2026-10-31T20:57:30.0118982Z ##[group]Setting up auth
+check	Run actions/checkout@v4	2026-10-31T20:57:30.0124381Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+check	Run actions/checkout@v4	2026-10-31T20:57:30.0159501Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+check	Run actions/checkout@v4	2026-10-31T20:57:30.0606382Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+check	Run actions/checkout@v4	2026-10-31T20:57:30.0645831Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+check	Run actions/checkout@v4	2026-10-31T20:57:30.0948792Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+check	Run actions/checkout@v4	2026-10-31T20:57:30.0990702Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+check	Run actions/checkout@v4	2026-10-31T20:57:30.1286341Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+check	Run actions/checkout@v4	2026-10-31T20:57:30.1327136Z ##[endgroup]
+check	Run actions/checkout@v4	2026-10-31T20:57:30.1328812Z ##[group]Fetching the repository
+check	Run actions/checkout@v4	2026-10-31T20:57:30.1339879Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +e33ee8278c0fa0363d955bffbc932512129703d8:refs/remotes/origin/codex/launch-readiness-release
+check	Run actions/checkout@v4	2026-10-31T20:57:30.5728105Z From https://github.com/garrettweiss/whytho
+check	Run actions/checkout@v4	2026-10-31T20:57:30.5730986Z  * [new ref]         e33ee8278c0fa0363d955bffbc932512129703d8 -> origin/codex/launch-readiness-release
+check	Run actions/checkout@v4	2026-10-31T20:57:30.5736850Z ##[endgroup]
+check	Run actions/checkout@v4	2026-10-31T20:57:30.5739095Z ##[group]Determining the checkout info
+check	Run actions/checkout@v4	2026-10-31T20:57:30.5741296Z ##[endgroup]
+check	Run actions/checkout@v4	2026-10-31T20:57:30.5742971Z [command]/usr/bin/git sparse-checkout disable
+check	Run actions/checkout@v4	2026-10-31T20:57:30.5811327Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+check	Run actions/checkout@v4	2026-10-31T20:57:30.5844753Z ##[group]Checking out the ref
+check	Run actions/checkout@v4	2026-10-31T20:57:30.5850123Z [command]/usr/bin/git checkout --progress --force -B codex/launch-readiness-release refs/remotes/origin/codex/launch-readiness-release
+check	Run actions/checkout@v4	2026-10-31T20:57:30.6139272Z Switched to a new branch 'codex/launch-readiness-release'
+check	Run actions/checkout@v4	2026-10-31T20:57:30.6146831Z branch 'codex/launch-readiness-release' set up to track 'origin/codex/launch-readiness-release'.
+check	Run actions/checkout@v4	2026-10-31T20:57:30.6153258Z ##[endgroup]
+check	Run actions/checkout@v4	2026-10-31T20:57:30.6199495Z [command]/usr/bin/git log -1 --format=%H
+check	Run actions/checkout@v4	2026-10-31T20:57:30.6227809Z e33ee8278c0fa0363d955bffbc932512129703d8
+check	Run actions/setup-node@v4	﻿2026-10-31T20:57:30.6661011Z ##[group]Run actions/setup-node@v4
+check	Run actions/setup-node@v4	2026-10-31T20:57:30.6662304Z with:
+check	Run actions/setup-node@v4	2026-10-31T20:57:30.6663201Z   node-version: 22
+check	Run actions/setup-node@v4	2026-10-31T20:57:30.6664171Z   cache: npm
+check	Run actions/setup-node@v4	2026-10-31T20:57:30.6665108Z   always-auth: false
+check	Run actions/setup-node@v4	2026-10-31T20:57:30.6666335Z   check-latest: false
+check	Run actions/setup-node@v4	2026-10-31T20:57:30.6676733Z   token: ***
+check	Run actions/setup-node@v4	2026-10-31T20:57:30.6677795Z ##[endgroup]
+check	Run actions/setup-node@v4	2026-10-31T20:57:30.8272488Z Found in cache @ /opt/hostedtoolcache/node/22.23.4/x64
+check	Run actions/setup-node@v4	2026-10-31T20:57:30.8278310Z (node:2342) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+check	Run actions/setup-node@v4	2026-10-31T20:57:30.8281979Z (Use `node --trace-deprecation ...` to show where the warning was created)
+check	Run actions/setup-node@v4	2026-10-31T20:57:30.8284639Z ##[group]Environment details
+check	Run actions/setup-node@v4	2026-10-31T20:57:31.2220283Z node: v22.23.4
+check	Run actions/setup-node@v4	2026-10-31T20:57:31.2221982Z npm: 10.9.9
+check	Run actions/setup-node@v4	2026-10-31T20:57:31.2223441Z yarn: 1.22.22
+check	Run actions/setup-node@v4	2026-10-31T20:57:31.2226154Z ##[endgroup]
+check	Run actions/setup-node@v4	2026-10-31T20:57:31.2246755Z [command]/opt/hostedtoolcache/node/22.23.4/x64/bin/npm config get cache
+check	Run actions/setup-node@v4	2026-10-31T20:57:31.3448776Z /home/runner/.npm
+check	Run actions/setup-node@v4	2026-10-31T20:57:31.5080413Z npm cache is not found
+check	Install	﻿2026-10-31T20:57:31.5194686Z ##[group]Run npm ci
+check	Install	2026-10-31T20:57:31.5195100Z ^[[36;1mnpm ci^[[0m
+check	Install	2026-10-31T20:57:31.5236521Z shell: /usr/bin/bash -e {0}
+check	Install	2026-10-31T20:57:31.5236921Z ##[endgroup]
+check	Install	2026-10-31T20:57:38.9424696Z npm warn deprecated @opentelemetry/sdk-trace-base@2.12.0: Use @opentelemetry/sdk-trace package
+check	Install	2026-10-31T20:58:11.6588618Z npm warn deprecated eslint@9.39.5: This version is no longer supported. Please see https://eslint.org/version-support for other options.
+check	Install	2026-10-31T20:58:19.7036418Z 
+check	Install	2026-10-31T20:58:19.7039098Z added 667 packages, and audited 668 packages in 48s
+check	Install	2026-10-31T20:58:19.9026122Z 
+check	Install	2026-10-31T20:58:19.9026913Z 217 packages are looking for funding
+check	Install	2026-10-31T20:58:19.9027881Z   run `npm fund` for details
+check	Install	2026-10-31T20:58:19.9028235Z 
+check	Install	2026-10-31T20:58:19.9029039Z 20 vulnerabilities (3 low, 17 moderate)
+check	Install	2026-10-31T20:58:19.9029962Z 
+check	Install	2026-10-31T20:58:19.9030649Z To address issues that do not require attention, run:
+check	Install	2026-10-31T20:58:19.9031504Z   npm audit fix
+check	Install	2026-10-31T20:58:19.9032044Z 
+check	Install	2026-10-31T20:58:19.9032744Z To address all issues (including breaking changes), run:
+check	Install	2026-10-31T20:58:19.9033578Z   npm audit fix --force
+check	Install	2026-10-31T20:58:19.9034082Z 
+check	Install	2026-10-31T20:58:19.9034542Z Run `npm audit` for details.
+check	Type check	﻿2026-10-31T20:58:19.9899506Z ##[group]Run npx tsc --noEmit
+check	Type check	2026-10-31T20:58:19.9900034Z ^[[36;1mnpx tsc --noEmit^[[0m
+check	Type check	2026-10-31T20:58:19.9932933Z shell: /usr/bin/bash -e {0}
+check	Type check	2026-10-31T20:58:19.9933211Z ##[endgroup]
+check	Test	﻿2026-10-31T20:58:32.2370895Z ##[group]Run npm test
+check	Test	2026-10-31T20:58:32.2371198Z ^[[36;1mnpm test^[[0m
+check	Test	2026-10-31T20:58:32.2400287Z shell: /usr/bin/bash -e {0}
+check	Test	2026-10-31T20:58:32.2400564Z ##[endgroup]
+check	Test	2026-10-31T20:58:32.3550584Z 
+check	Test	2026-10-31T20:58:32.3551281Z > whytho@0.1.0 test
+check	Test	2026-10-31T20:58:32.3554562Z > node --import tsx --test lib/directory/*.test.ts lib/profile/*.test.ts lib/leaderboard/*.test.ts lib/elections/*.test.ts lib/photos/*.test.ts lib/ai/evidence.test.ts lib/security/*.test.ts lib/notifications/*.test.ts components/questions/*.test.ts components/auth/*.test.ts components/answers/*.test.ts components/verify/*.test.ts scripts/*integration.test.ts
+check	Test	2026-10-31T20:58:32.3556118Z 
+check	Test	2026-10-31T20:58:32.4176824Z TAP version 13
+check	Test	2026-10-31T20:58:32.8289583Z # Subtest: reads the API's top-level answer ID and explicit publication state
+check	Test	2026-10-31T20:58:32.8309454Z ok 1 - reads the API's top-level answer ID and explicit publication state
+check	Test	2026-10-31T20:58:32.8310701Z   ---
+check	Test	2026-10-31T20:58:32.8318409Z   duration_ms: 1.561248
+check	Test	2026-10-31T20:58:32.8325458Z   type: 'test'
+check	Test	2026-10-31T20:58:32.8338340Z   ...
+check	Test	2026-10-31T20:58:32.8346960Z # Subtest: unknown or malformed success cannot imply a published answer
+check	Test	2026-10-31T20:58:32.8348917Z ok 2 - unknown or malformed success cannot imply a published answer
+check	Test	2026-10-31T20:58:32.8351001Z   ---
+check	Test	2026-10-31T20:58:32.8408789Z   duration_ms: 0.520967
+check	Test	2026-10-31T20:58:32.8434244Z   type: 'test'
+check	Test	2026-10-31T20:58:32.8442599Z   ...
+check	Test	2026-10-31T20:58:32.8808353Z # Subtest: authentication preserves local paths, queries, and question anchors
+check	Test	2026-10-31T20:58:32.8828697Z ok 3 - authentication preserves local paths, queries, and question anchors
+check	Test	2026-10-31T20:58:32.8831818Z   ---
+check	Test	2026-10-31T20:58:32.8832453Z   duration_ms: 1.504953
+check	Test	2026-10-31T20:58:32.8833190Z   type: 'test'
+check	Test	2026-10-31T20:58:32.8833699Z   ...
+check	Test	2026-10-31T20:58:32.8834617Z # Subtest: callback destinations reject external URLs and URL userinfo tricks
+check	Test	2026-10-31T20:58:32.8835883Z ok 4 - callback destinations reject external URLs and URL userinfo tricks
+check	Test	2026-10-31T20:58:32.8836739Z   ---
+check	Test	2026-10-31T20:58:32.8837232Z   duration_ms: 1.226393
+check	Test	2026-10-31T20:58:32.8838043Z   type: 'test'
+check	Test	2026-10-31T20:58:32.8838571Z   ...
+check	Test	2026-10-31T20:58:32.8839512Z # Subtest: normalization cannot turn a local path into a protocol-relative redirect
+check	Test	2026-10-31T20:58:32.8840843Z ok 5 - normalization cannot turn a local path into a protocol-relative redirect
+check	Test	2026-10-31T20:58:32.8841752Z   ---
+check	Test	2026-10-31T20:58:32.8842239Z   duration_ms: 0.389203
+check	Test	2026-10-31T20:58:32.8842792Z   type: 'test'
+check	Test	2026-10-31T20:58:32.8843263Z   ...
+check	Test	2026-10-31T20:58:32.9139348Z # Subtest: only published human direct or team responses receive the official label
+check	Test	2026-10-31T20:58:32.9156874Z ok 6 - only published human direct or team responses receive the official label
+check	Test	2026-10-31T20:58:32.9157982Z   ---
+check	Test	2026-10-31T20:58:32.9158425Z   duration_ms: 1.400079
+check	Test	2026-10-31T20:58:32.9159015Z   type: 'test'
+check	Test	2026-10-31T20:58:32.9159477Z   ...
+check	Test	2026-10-31T20:58:32.9160324Z # Subtest: AI type is authoritative even when the legacy generation flag is false
+check	Test	2026-10-31T20:58:32.9161551Z ok 7 - AI type is authoritative even when the legacy generation flag is false
+check	Test	2026-10-31T20:58:32.9162300Z   ---
+check	Test	2026-10-31T20:58:32.9162741Z   duration_ms: 0.310025
+check	Test	2026-10-31T20:58:32.9163222Z   type: 'test'
+check	Test	2026-10-31T20:58:32.9163631Z   ...
+check	Test	2026-10-31T20:58:32.9164534Z # Subtest: drafts are hidden while already-filtered public answer shapes remain compatible
+check	Test	2026-10-31T20:58:32.9165944Z ok 8 - drafts are hidden while already-filtered public answer shapes remain compatible
+check	Test	2026-10-31T20:58:32.9167496Z   ---
+check	Test	2026-10-31T20:58:32.9168087Z   duration_ms: 0.207225
+check	Test	2026-10-31T20:58:32.9168475Z   type: 'test'
+check	Test	2026-10-31T20:58:32.9168838Z   ...
+check	Test	2026-10-31T20:58:32.9169585Z # Subtest: sources allow only absolute HTTP links and handle mixed legacy source shapes
+check	Test	2026-10-31T20:58:32.9170703Z ok 9 - sources allow only absolute HTTP links and handle mixed legacy source shapes
+check	Test	2026-10-31T20:58:32.9171408Z   ---
+check	Test	2026-10-31T20:58:32.9171744Z   duration_ms: 1.324749
+check	Test	2026-10-31T20:58:32.9172577Z   type: 'test'
+check	Test	2026-10-31T20:58:32.9172913Z   ...
+check	Test	2026-10-31T20:58:32.9173527Z # Subtest: aggregate periods never reopen voting on previous weeks
+check	Test	2026-10-31T20:58:32.9174488Z ok 10 - aggregate periods never reopen voting on previous weeks
+check	Test	2026-10-31T20:58:32.9175068Z   ---
+check	Test	2026-10-31T20:58:32.9175396Z   duration_ms: 0.219828
+check	Test	2026-10-31T20:58:32.9175757Z   type: 'test'
+check	Test	2026-10-31T20:58:32.9176079Z   ...
+check	Test	2026-10-31T20:58:32.9176801Z # Subtest: a successful vote wins over a hydration read that started before it saved
+check	Test	2026-10-31T20:58:32.9178137Z ok 11 - a successful vote wins over a hydration read that started before it saved
+check	Test	2026-10-31T20:58:32.9178890Z   ---
+check	Test	2026-10-31T20:58:32.9179250Z   duration_ms: 0.859789
+check	Test	2026-10-31T20:58:32.9179657Z   type: 'test'
+check	Test	2026-10-31T20:58:32.9180046Z   ...
+check	Test	2026-10-31T20:58:32.9180890Z # Subtest: vote hydration rejects unexpected values and unrelated question IDs
+check	Test	2026-10-31T20:58:32.9182074Z ok 12 - vote hydration rejects unexpected values and unrelated question IDs
+check	Test	2026-10-31T20:58:32.9182830Z   ---
+check	Test	2026-10-31T20:58:32.9183183Z   duration_ms: 0.330803
+check	Test	2026-10-31T20:58:32.9183571Z   type: 'test'
+check	Test	2026-10-31T20:58:32.9183924Z   ...
+check	Test	2026-10-31T20:58:34.0159081Z # Subtest: verification is visible in both form layouts and gates valid questions until success
+check	Test	2026-10-31T20:58:34.0177320Z ok 13 - verification is visible in both form layouts and gates valid questions until success
+check	Test	2026-10-31T20:58:34.0179138Z   ---
+check	Test	2026-10-31T20:58:34.0179795Z   duration_ms: 16.864759
+check	Test	2026-10-31T20:58:34.0180412Z   type: 'test'
+check	Test	2026-10-31T20:58:34.0180966Z   ...
+check	Test	2026-10-31T20:58:34.0182151Z # Subtest: blocked script times out visibly and retry preserves the question while reloading verification
+check	Test	2026-10-31T20:58:34.0184306Z ok 14 - blocked script times out visibly and retry preserves the question while reloading verification
+check	Test	2026-10-31T20:58:34.0185391Z   ---
+check	Test	2026-10-31T20:58:34.0185979Z   duration_ms: 5.294556
+check	Test	2026-10-31T20:58:34.0186581Z   type: 'test'
+check	Test	2026-10-31T20:58:34.0187100Z   ...
+check	Test	2026-10-31T20:58:34.0188425Z # Subtest: a mounted but silent challenge still times out and retries without losing the question
+check	Test	2026-10-31T20:58:34.0190136Z ok 15 - a mounted but silent challenge still times out and retries without losing the question
+check	Test	2026-10-31T20:58:34.0213443Z   ---
+check	Test	2026-10-31T20:58:34.0218310Z   duration_ms: 5.322329
+check	Test	2026-10-31T20:58:34.0218818Z   type: 'test'
+check	Test	2026-10-31T20:58:34.0219197Z   ...
+check	Test	2026-10-31T20:58:34.0220232Z # Subtest: loading watchdog never interrupts an interactive challenge or completed verification
+check	Test	2026-10-31T20:58:34.0222687Z ok 16 - loading watchdog never interrupts an interactive challenge or completed verification
+check	Test	2026-10-31T20:58:34.0223922Z   ---
+check	Test	2026-10-31T20:58:34.0224439Z   duration_ms: 5.868682
+check	Test	2026-10-31T20:58:34.0224934Z   type: 'test'
+check	Test	2026-10-31T20:58:34.0225357Z   ...
+check	Test	2026-10-31T20:58:34.0226287Z # Subtest: expiry, timeout, and widget failures revoke tokens and allow a fresh challenge
+check	Test	2026-10-31T20:58:34.0227811Z ok 17 - expiry, timeout, and widget failures revoke tokens and allow a fresh challenge
+check	Test	2026-10-31T20:58:34.0228702Z   ---
+check	Test	2026-10-31T20:58:34.0229217Z   duration_ms: 13.812968
+check	Test	2026-10-31T20:58:34.0229794Z   type: 'test'
+check	Test	2026-10-31T20:58:34.0230393Z   ...
+check	Test	2026-10-31T20:58:34.0231461Z # Subtest: missing configuration and unsupported browsers fail closed with honest guidance
+check	Test	2026-10-31T20:58:34.0232934Z ok 18 - missing configuration and unsupported browsers fail closed with honest guidance
+check	Test	2026-10-31T20:58:34.0233924Z   ---
+check	Test	2026-10-31T20:58:34.0234393Z   duration_ms: 13.103531
+check	Test	2026-10-31T20:58:34.0234923Z   type: 'test'
+check	Test	2026-10-31T20:58:34.0235426Z   ...
+check	Test	2026-10-31T20:58:34.0236469Z # Subtest: server and transport failures preserve the question and cannot reuse the consumed token
+check	Test	2026-10-31T20:58:34.0238336Z ok 19 - server and transport failures preserve the question and cannot reuse the consumed token
+check	Test	2026-10-31T20:58:34.0239355Z   ---
+check	Test	2026-10-31T20:58:34.0239806Z   duration_ms: 18.935486
+check	Test	2026-10-31T20:58:34.0240424Z   type: 'test'
+check	Test	2026-10-31T20:58:34.0241250Z   ...
+check	Test	2026-10-31T20:58:34.0241998Z # Subtest: a successful question starts another form with a fresh verification
+check	Test	2026-10-31T20:58:34.0243120Z ok 20 - a successful question starts another form with a fresh verification
+check	Test	2026-10-31T20:58:34.0243865Z   ---
+check	Test	2026-10-31T20:58:34.0244274Z   duration_ms: 4.234259
+check	Test	2026-10-31T20:58:34.0244733Z   type: 'test'
+check	Test	2026-10-31T20:58:34.0245135Z   ...
+check	Test	2026-10-31T20:58:34.0246029Z # Subtest: signed-out visitors receive the sign-in path without starting verification
+check	Test	2026-10-31T20:58:34.0247299Z ok 21 - signed-out visitors receive the sign-in path without starting verification
+check	Test	2026-10-31T20:58:34.0248378Z   ---
+check	Test	2026-10-31T20:58:34.0248835Z   duration_ms: 2.406376
+check	Test	2026-10-31T20:58:34.0249310Z   type: 'test'
+check	Test	2026-10-31T20:58:34.0249754Z   ...
+check	Test	2026-10-31T20:58:34.0620076Z # Subtest: existing team members resume completed identity methods without reclaiming
+check	Test	2026-10-31T20:58:34.0621827Z ok 22 - existing team members resume completed identity methods without reclaiming
+check	Test	2026-10-31T20:58:34.0622965Z   ---
+check	Test	2026-10-31T20:58:34.0623533Z   duration_ms: 2.435511
+check	Test	2026-10-31T20:58:34.0624148Z   type: 'test'
+check	Test	2026-10-31T20:58:34.0624697Z   ...
+check	Test	2026-10-31T20:58:34.0625856Z # Subtest: resume data rejects another account, unknown roles, and unrelated verification rows
+check	Test	2026-10-31T20:58:34.0627424Z ok 23 - resume data rejects another account, unknown roles, and unrelated verification rows
+check	Test	2026-10-31T20:58:34.0628815Z   ---
+check	Test	2026-10-31T20:58:34.0629399Z   duration_ms: 0.356342
+check	Test	2026-10-31T20:58:34.0630022Z   type: 'test'
+check	Test	2026-10-31T20:58:34.0630569Z   ...
+check	Test	2026-10-31T20:58:34.0631646Z # Subtest: verified status comes from the stored tier, not method count or serialized secrets
+check	Test	2026-10-31T20:58:34.0633763Z ok 24 - verified status comes from the stored tier, not method count or serialized secrets
+check	Test	2026-10-31T20:58:34.0634776Z   ---
+check	Test	2026-10-31T20:58:34.0635300Z   duration_ms: 0.477135
+check	Test	2026-10-31T20:58:34.0635862Z   type: 'test'
+check	Test	2026-10-31T20:58:34.0636347Z   ...
+check	Test	2026-10-31T20:58:34.0661126Z # Subtest: evidence requires reviewed excerpts and an authentic date
+check	Test	2026-10-31T20:58:34.0662406Z ok 25 - evidence requires reviewed excerpts and an authentic date
+check	Test	2026-10-31T20:58:34.0663236Z   ---
+check	Test	2026-10-31T20:58:34.0663746Z   duration_ms: 1.215326
+check	Test	2026-10-31T20:58:34.0664326Z   type: 'test'
+check	Test	2026-10-31T20:58:34.0664803Z   ...
+check	Test	2026-10-31T20:58:34.0666543Z # Subtest: search distinguishes federal and state offices and combined jurisdictions
+check	Test	2026-10-31T20:58:34.0668236Z ok 26 - search distinguishes federal and state offices and combined jurisdictions
+check	Test	2026-10-31T20:58:34.0669304Z   ---
+check	Test	2026-10-31T20:58:34.0669874Z   duration_ms: 10.20936
+check	Test	2026-10-31T20:58:34.0670474Z   type: 'test'
+check	Test	2026-10-31T20:58:34.0671031Z   ...
+check	Test	2026-10-31T20:58:34.0672075Z # Subtest: people, aliases, names with punctuation and state codes survive interpretation
+check	Test	2026-10-31T20:58:34.0673661Z ok 27 - people, aliases, names with punctuation and state codes survive interpretation
+check	Test	2026-10-31T20:58:34.0674675Z   ---
+check	Test	2026-10-31T20:58:34.0675237Z   duration_ms: 1.467835
+check	Test	2026-10-31T20:58:34.0675887Z   type: 'test'
+check	Test	2026-10-31T20:58:34.0676442Z   ...
+check	Test	2026-10-31T20:58:34.0677564Z # Subtest: validation rejects overlong, control, unknown state and unknown office filters
+check	Test	2026-10-31T20:58:34.0679439Z ok 28 - validation rejects overlong, control, unknown state and unknown office filters
+check	Test	2026-10-31T20:58:34.0680501Z   ---
+check	Test	2026-10-31T20:58:34.0681098Z   duration_ms: 0.892006
+check	Test	2026-10-31T20:58:34.0681701Z   type: 'test'
+check	Test	2026-10-31T20:58:34.0682254Z   ...
+check	Test	2026-10-31T20:58:34.0700810Z # Subtest: cursor round trips names safely and is tied to all active filters
+check	Test	2026-10-31T20:58:34.0728740Z ok 29 - cursor round trips names safely and is tied to all active filters
+check	Test	2026-10-31T20:58:34.0758334Z   ---
+check	Test	2026-10-31T20:58:34.0771152Z   duration_ms: 1.317856
+check	Test	2026-10-31T20:58:34.0771854Z   type: 'test'
+check	Test	2026-10-31T20:58:34.0775915Z   ...
+check	Test	2026-10-31T20:58:34.0777117Z # Subtest: pagination preserves its question cohort across weekly resets and rejects malformed weeks
+check	Test	2026-10-31T20:58:34.0779925Z ok 30 - pagination preserves its question cohort across weekly resets and rejects malformed weeks
+check	Test	2026-10-31T20:58:34.0781117Z   ---
+check	Test	2026-10-31T20:58:34.0781742Z   duration_ms: 0.686815
+check	Test	2026-10-31T20:58:34.0782398Z   type: 'test'
+check	Test	2026-10-31T20:58:34.0782967Z   ...
+check	Test	2026-10-31T20:58:34.0783942Z # Subtest: PostgREST grammar and SQL wildcards are escaped independently
+check	Test	2026-10-31T20:58:34.0785298Z ok 31 - PostgREST grammar and SQL wildcards are escaped independently
+check	Test	2026-10-31T20:58:34.0786245Z   ---
+check	Test	2026-10-31T20:58:34.0786845Z   duration_ms: 0.261395
+check	Test	2026-10-31T20:58:34.0787496Z   type: 'test'
+check	Test	2026-10-31T20:58:34.0788407Z   ...
+check	Test	2026-10-31T20:58:34.0789475Z # Subtest: unknown or partial metrics fail closed instead of claiming no response
+check	Test	2026-10-31T20:58:34.0790976Z ok 32 - unknown or partial metrics fail closed instead of claiming no response
+check	Test	2026-10-31T20:58:34.0791988Z   ---
+check	Test	2026-10-31T20:58:34.0792584Z   duration_ms: 0.441981
+check	Test	2026-10-31T20:58:34.0793204Z   type: 'test'
+check	Test	2026-10-31T20:58:34.0793749Z   ...
+check	Test	2026-10-31T20:58:34.0795039Z # Subtest: portrait presentation keeps every person, preserves group order and leaves source order unchanged
+check	Test	2026-10-31T20:58:34.0796996Z ok 33 - portrait presentation keeps every person, preserves group order and leaves source order unchanged
+check	Test	2026-10-31T20:58:34.0798501Z   ---
+check	Test	2026-10-31T20:58:34.0799112Z   duration_ms: 0.523542
+check	Test	2026-10-31T20:58:34.0799772Z   type: 'test'
+check	Test	2026-10-31T20:58:34.0800343Z   ...
+check	Test	2026-10-31T20:58:34.0801389Z # Subtest: scoped search and clearing preserve route geography and office level
+check	Test	2026-10-31T20:58:34.0802847Z ok 34 - scoped search and clearing preserve route geography and office level
+check	Test	2026-10-31T20:58:34.0804182Z   ---
+check	Test	2026-10-31T20:58:34.0804809Z   duration_ms: 2.718265
+check	Test	2026-10-31T20:58:34.0805496Z   type: 'test'
+check	Test	2026-10-31T20:58:34.0806089Z   ...
+check	Test	2026-10-31T20:58:34.0807221Z # Subtest: region scope retains both state and federal offices without allowing another state
+check	Test	2026-10-31T20:58:34.0809139Z ok 35 - region scope retains both state and federal offices without allowing another state
+check	Test	2026-10-31T20:58:34.0810206Z   ---
+check	Test	2026-10-31T20:58:34.0810828Z   duration_ms: 0.394933
+check	Test	2026-10-31T20:58:34.0811489Z   type: 'test'
+check	Test	2026-10-31T20:58:34.0812139Z   ...
+check	Test	2026-10-31T20:58:34.0813302Z # Subtest: U.S. officials preserves Cabinet, vice president, governors and legacy chamber links
+check	Test	2026-10-31T20:58:34.0814962Z ok 36 - U.S. officials preserves Cabinet, vice president, governors and legacy chamber links
+check	Test	2026-10-31T20:58:34.0815998Z   ---
+check	Test	2026-10-31T20:58:34.0816518Z   duration_ms: 0.577562
+check	Test	2026-10-31T20:58:34.0817084Z   type: 'test'
+check	Test	2026-10-31T20:58:34.0817844Z   ...
+check	Test	2026-10-31T20:58:34.0818816Z # Subtest: scope is validated and cursors cannot cross directory populations
+check	Test	2026-10-31T20:58:34.0820124Z ok 37 - scope is validated and cursors cannot cross directory populations
+check	Test	2026-10-31T20:58:34.0820992Z   ---
+check	Test	2026-10-31T20:58:34.0821513Z   duration_ms: 1.643911
+check	Test	2026-10-31T20:58:34.0822097Z   type: 'test'
+check	Test	2026-10-31T20:58:34.0822603Z   ...
+check	Test	2026-10-31T20:58:34.0823505Z # Subtest: executive search does not mistake vice president for president
+check	Test	2026-10-31T20:58:34.0824735Z ok 38 - executive search does not mistake vice president for president
+check	Test	2026-10-31T20:58:34.0825570Z   ---
+check	Test	2026-10-31T20:58:34.0826074Z   duration_ms: 10.066193
+check	Test	2026-10-31T20:58:34.0826650Z   type: 'test'
+check	Test	2026-10-31T20:58:34.0827173Z   ...
+check	Test	2026-10-31T20:58:34.0828414Z # Subtest: full executive titles resolve as offices, including combined state searches
+check	Test	2026-10-31T20:58:34.0829902Z ok 39 - full executive titles resolve as offices, including combined state searches
+check	Test	2026-10-31T20:58:34.0830848Z   ---
+check	Test	2026-10-31T20:58:34.0831369Z   duration_ms: 1.438009
+check	Test	2026-10-31T20:58:34.0831991Z   type: 'test'
+check	Test	2026-10-31T20:58:34.0832640Z   ...
+check	Test	2026-10-31T20:58:34.4066461Z # Subtest: changing office retains the selected state and election period
+check	Test	2026-10-31T20:58:34.4098971Z ok 40 - changing office retains the selected state and election period
+check	Test	2026-10-31T20:58:34.4107897Z   ---
+check	Test	2026-10-31T20:58:34.4108893Z   duration_ms: 2.260616
+check	Test	2026-10-31T20:58:34.4110070Z   type: 'test'
+check	Test	2026-10-31T20:58:34.4110604Z   ...
+check	Test	2026-10-31T20:58:34.4111704Z # Subtest: page and filter parsing keeps arbitrary user input out of database filters
+check	Test	2026-10-31T20:58:34.4113068Z ok 41 - page and filter parsing keeps arbitrary user input out of database filters
+check	Test	2026-10-31T20:58:34.4113882Z   ---
+check	Test	2026-10-31T20:58:34.4114315Z   duration_ms: 0.267136
+check	Test	2026-10-31T20:58:34.4114823Z   type: 'test'
+check	Test	2026-10-31T20:58:34.4115234Z   ...
+check	Test	2026-10-31T20:58:34.4116089Z # Subtest: election dates stay date-only and respect real calendar dates
+check	Test	2026-10-31T20:58:34.4117192Z ok 42 - election dates stay date-only and respect real calendar dates
+check	Test	2026-10-31T20:58:34.4118269Z   ---
+check	Test	2026-10-31T20:58:34.4118731Z   duration_ms: 18.349858
+check	Test	2026-10-31T20:58:34.4119224Z   type: 'test'
+check	Test	2026-10-31T20:58:34.4119640Z   ...
+check	Test	2026-10-31T20:58:34.4120491Z # Subtest: day boundaries use the U.S. Eastern calendar rather than the server timezone
+check	Test	2026-10-31T20:58:34.4121745Z ok 43 - day boundaries use the U.S. Eastern calendar rather than the server timezone
+check	Test	2026-10-31T20:58:34.4149967Z   ---
+check	Test	2026-10-31T20:58:34.4188366Z   duration_ms: 0.731438
+check	Test	2026-10-31T20:58:34.4208136Z   type: 'test'
+check	Test	2026-10-31T20:58:34.4208782Z   ...
+check	Test	2026-10-31T20:58:34.4209662Z # Subtest: a past date does not establish election completion or a winner
+check	Test	2026-10-31T20:58:34.4210989Z ok 44 - a past date does not establish election completion or a winner
+check	Test	2026-10-31T20:58:34.4211814Z   ---
+check	Test	2026-10-31T20:58:34.4212286Z   duration_ms: 0.441309
+check	Test	2026-10-31T20:58:34.4212905Z   type: 'test'
+check	Test	2026-10-31T20:58:34.4213427Z   ...
+check	Test	2026-10-31T20:58:34.4214388Z # Subtest: exact aggregate counts are not limited by the returned candidate row limit
+check	Test	2026-10-31T20:58:34.4216414Z ok 45 - exact aggregate counts are not limited by the returned candidate row limit
+check	Test	2026-10-31T20:58:34.4217166Z   ---
+check	Test	2026-10-31T20:58:34.4217497Z   duration_ms: 0.304235
+check	Test	2026-10-31T20:58:34.4218070Z   type: 'test'
+check	Test	2026-10-31T20:58:34.4218413Z   ...
+check	Test	2026-10-31T20:58:34.4219170Z # Subtest: missing or malformed counts are failures, never fabricated empty results
+check	Test	2026-10-31T20:58:34.4220318Z ok 46 - missing or malformed counts are failures, never fabricated empty results
+check	Test	2026-10-31T20:58:34.4220993Z   ---
+check	Test	2026-10-31T20:58:34.4221317Z   duration_ms: 0.618618
+check	Test	2026-10-31T20:58:34.4221699Z   type: 'test'
+check	Test	2026-10-31T20:58:34.4222073Z   ...
+check	Test	2026-10-31T20:58:34.4419536Z # Subtest: ranking counts distinct qualifying questions and only matching published official answers
+check	Test	2026-10-31T20:58:34.4431048Z ok 47 - ranking counts distinct qualifying questions and only matching published official answers
+check	Test	2026-10-31T20:58:34.4432209Z   ---
+check	Test	2026-10-31T20:58:34.4432714Z   duration_ms: 2.504468
+check	Test	2026-10-31T20:58:34.4433206Z   type: 'test'
+check	Test	2026-10-31T20:58:34.4433627Z   ...
+check	Test	2026-10-31T20:58:34.4434537Z # Subtest: eligibility excludes low-vote, removed, other-week, inactive and test records
+check	Test	2026-10-31T20:58:34.4435889Z ok 48 - eligibility excludes low-vote, removed, other-week, inactive and test records
+check	Test	2026-10-31T20:58:34.4436761Z   ---
+check	Test	2026-10-31T20:58:34.4437206Z   duration_ms: 1.090023
+check	Test	2026-10-31T20:58:34.4437953Z   type: 'test'
+check	Test	2026-10-31T20:58:34.4438397Z   ...
+check	Test	2026-10-31T20:58:34.4439212Z # Subtest: equal rates share competition rank and volume only changes display order
+check	Test	2026-10-31T20:58:34.4440418Z ok 49 - equal rates share competition rank and volume only changes display order
+check	Test	2026-10-31T20:58:34.4441218Z   ---
+check	Test	2026-10-31T20:58:34.4441629Z   duration_ms: 0.698767
+check	Test	2026-10-31T20:58:34.4442091Z   type: 'test'
+check	Test	2026-10-31T20:58:34.4442502Z   ...
+check	Test	2026-10-31T20:58:34.4443365Z # Subtest: all-zero rates share a rank without creating a false most-responsive ordering
+check	Test	2026-10-31T20:58:34.4444644Z ok 50 - all-zero rates share a rank without creating a false most-responsive ordering
+check	Test	2026-10-31T20:58:34.4445468Z   ---
+check	Test	2026-10-31T20:58:34.4445910Z   duration_ms: 12.212519
+check	Test	2026-10-31T20:58:34.4446409Z   type: 'test'
+check	Test	2026-10-31T20:58:34.4446831Z   ...
+check	Test	2026-10-31T20:58:34.4447919Z # Subtest: complete paging includes eligible politicians beyond the first 1,000
+check	Test	2026-10-31T20:58:34.4449775Z ok 51 - complete paging includes eligible politicians beyond the first 1,000
+check	Test	2026-10-31T20:58:34.4450619Z   ---
+check	Test	2026-10-31T20:58:34.4451069Z   duration_ms: 5.223042
+check	Test	2026-10-31T20:58:34.4451589Z   type: 'test'
+check	Test	2026-10-31T20:58:34.4452040Z   ...
+check	Test	2026-10-31T20:58:34.4453086Z # Subtest: paging proves the end of an exact full page and rejects incomplete or non-advancing scans
+check	Test	2026-10-31T20:58:34.4454002Z ok 52 - paging proves the end of an exact full page and rejects incomplete or non-advancing scans
+check	Test	2026-10-31T20:58:34.4454442Z   ---
+check	Test	2026-10-31T20:58:34.4454637Z   duration_ms: 1.175512
+check	Test	2026-10-31T20:58:34.4454878Z   type: 'test'
+check	Test	2026-10-31T20:58:34.4455071Z   ...
+check	Test	2026-10-31T20:58:34.4488779Z # Subtest: display pagination does not alter ranks or accept unbounded page values
+check	Test	2026-10-31T20:58:34.4491496Z ok 53 - display pagination does not alter ranks or accept unbounded page values
+check	Test	2026-10-31T20:58:34.4492549Z   ---
+check	Test	2026-10-31T20:58:34.4493018Z   duration_ms: 0.340311
+check	Test	2026-10-31T20:58:34.4493507Z   type: 'test'
+check	Test	2026-10-31T20:58:34.4493925Z   ...
+check	Test	2026-10-31T20:58:34.5528808Z # Subtest: a new human question queues only for a verified opted-in team member after debounce
+check	Test	2026-10-31T20:58:34.5558831Z ok 54 - a new human question queues only for a verified opted-in team member after debounce
+check	Test	2026-10-31T20:58:34.5591877Z   ---
+check	Test	2026-10-31T20:58:34.5605894Z   duration_ms: 1.492951
+check	Test	2026-10-31T20:58:34.5613669Z   type: 'test'
+check	Test	2026-10-31T20:58:34.5614337Z   ...
+check	Test	2026-10-31T20:58:34.5615355Z # Subtest: seeded and imported questions never masquerade as new constituent demand
+check	Test	2026-10-31T20:58:34.5617087Z ok 55 - seeded and imported questions never masquerade as new constituent demand
+check	Test	2026-10-31T20:58:34.5618765Z   ---
+check	Test	2026-10-31T20:58:34.5619368Z   duration_ms: 0.217584
+check	Test	2026-10-31T20:58:34.5619996Z   type: 'test'
+check	Test	2026-10-31T20:58:34.5620556Z   ...
+check	Test	2026-10-31T20:58:34.5621479Z # Subtest: hidden, archived and already answered questions are suppressed
+check	Test	2026-10-31T20:58:34.5622831Z ok 56 - hidden, archived and already answered questions are suppressed
+check	Test	2026-10-31T20:58:34.5623749Z   ---
+check	Test	2026-10-31T20:58:34.5624315Z   duration_ms: 0.184152
+check	Test	2026-10-31T20:58:34.5624949Z   type: 'test'
+check	Test	2026-10-31T20:58:34.5625542Z   ...
+check	Test	2026-10-31T20:58:34.5626637Z # Subtest: pending or removed staff, unrelated teams and unverified profiles cannot receive
+check	Test	2026-10-31T20:58:34.5628527Z ok 57 - pending or removed staff, unrelated teams and unverified profiles cannot receive
+check	Test	2026-10-31T20:58:34.5629606Z   ---
+check	Test	2026-10-31T20:58:34.5630213Z   duration_ms: 0.187448
+check	Test	2026-10-31T20:58:34.5630851Z   type: 'test'
+check	Test	2026-10-31T20:58:34.5631441Z   ...
+check	Test	2026-10-31T20:58:34.5632563Z # Subtest: missing, future, obsolete, revoked and suppressed consent all fail closed
+check	Test	2026-10-31T20:58:34.5634065Z ok 58 - missing, future, obsolete, revoked and suppressed consent all fail closed
+check	Test	2026-10-31T20:58:34.5635076Z   ---
+check	Test	2026-10-31T20:58:34.5635664Z   duration_ms: 0.202085
+check	Test	2026-10-31T20:58:34.5636302Z   type: 'test'
+check	Test	2026-10-31T20:58:34.5666008Z   ...
+check	Test	2026-10-31T20:58:34.5667213Z # Subtest: daily batching and the 24-hour contact cap combine without dropping the event
+check	Test	2026-10-31T20:58:34.5668986Z ok 59 - daily batching and the 24-hour contact cap combine without dropping the event
+check	Test	2026-10-31T20:58:34.5669965Z   ---
+check	Test	2026-10-31T20:58:34.5670498Z   duration_ms: 0.212625
+check	Test	2026-10-31T20:58:34.5671068Z   type: 'test'
+check	Test	2026-10-31T20:58:34.5671577Z   ...
+check	Test	2026-10-31T20:58:34.5672358Z # Subtest: already delivered events cannot send again
+check	Test	2026-10-31T20:58:34.5673350Z ok 60 - already delivered events cannot send again
+check	Test	2026-10-31T20:58:34.5674106Z   ---
+check	Test	2026-10-31T20:58:34.5674640Z   duration_ms: 0.147584
+check	Test	2026-10-31T20:58:34.5675228Z   type: 'test'
+check	Test	2026-10-31T20:58:34.5675752Z   ...
+check	Test	2026-10-31T20:58:34.5676433Z # Subtest: malformed ids and clocks fail closed
+check	Test	2026-10-31T20:58:34.5677336Z ok 61 - malformed ids and clocks fail closed
+check	Test	2026-10-31T20:58:34.5678308Z   ---
+check	Test	2026-10-31T20:58:34.5678827Z   duration_ms: 0.151791
+check	Test	2026-10-31T20:58:34.5679406Z   type: 'test'
+check	Test	2026-10-31T20:58:34.5680297Z   ...
+check	Test	2026-10-31T20:58:34.5681599Z # Subtest: provider acceptance ends retries; ambiguous sends retain the same key within its retention window
+check	Test	2026-10-31T20:58:34.5683631Z ok 62 - provider acceptance ends retries; ambiguous sends retain the same key within its retention window
+check	Test	2026-10-31T20:58:34.5684873Z   ---
+check	Test	2026-10-31T20:58:34.5685480Z   duration_ms: 0.333148
+check	Test	2026-10-31T20:58:34.5686125Z   type: 'test'
+check	Test	2026-10-31T20:58:34.5686747Z   ...
+check	Test	2026-10-31T20:58:34.5688006Z # Subtest: legacy outreach defaults to preview and rejects every live override
+check	Test	2026-10-31T20:58:34.5689501Z ok 63 - legacy outreach defaults to preview and rejects every live override
+check	Test	2026-10-31T20:58:34.5690565Z   ---
+check	Test	2026-10-31T20:58:34.5691204Z   duration_ms: 0.909668
+check	Test	2026-10-31T20:58:34.5691828Z   type: 'test'
+check	Test	2026-10-31T20:58:34.5692411Z   ...
+check	Test	2026-10-31T20:58:35.1626045Z # Subtest: portrait encoding produces bounded JPEG without embedded metadata
+check	Test	2026-10-31T20:58:35.1640749Z ok 64 - portrait encoding produces bounded JPEG without embedded metadata
+check	Test	2026-10-31T20:58:35.1641785Z   ---
+check	Test	2026-10-31T20:58:35.1642356Z   duration_ms: 112.044222
+check	Test	2026-10-31T20:58:35.1643066Z   type: 'test'
+check	Test	2026-10-31T20:58:35.1643669Z   ...
+check	Test	2026-10-31T20:58:35.1789215Z # Subtest: rejects tiny images, active formats, invalid bytes and oversized files
+check	Test	2026-10-31T20:58:35.1801006Z ok 65 - rejects tiny images, active formats, invalid bytes and oversized files
+check	Test	2026-10-31T20:58:35.1803585Z   ---
+check	Test	2026-10-31T20:58:35.1815644Z   duration_ms: 7.528122
+check	Test	2026-10-31T20:58:35.1816946Z   type: 'test'
+check	Test	2026-10-31T20:58:35.1817858Z   ...
+check	Test	2026-10-31T20:58:35.1819314Z # Subtest: profile validation rejects unsafe URLs, prototype keys and malformed payloads
+check	Test	2026-10-31T20:58:35.1822251Z ok 66 - profile validation rejects unsafe URLs, prototype keys and malformed payloads
+check	Test	2026-10-31T20:58:35.1823586Z   ---
+check	Test	2026-10-31T20:58:35.1824415Z   duration_ms: 7.646923
+check	Test	2026-10-31T20:58:35.1825293Z   type: 'test'
+check	Test	2026-10-31T20:58:35.1826127Z   ...
+check	Test	2026-10-31T20:58:35.1827415Z # Subtest: photo rights require exact identity, reviewed rights and source binding
+check	Test	2026-10-31T20:58:35.1829240Z ok 67 - photo rights require exact identity, reviewed rights and source binding
+check	Test	2026-10-31T20:58:35.1830506Z   ---
+check	Test	2026-10-31T20:58:35.1831390Z   duration_ms: 2.763979
+check	Test	2026-10-31T20:58:35.1832212Z   type: 'test'
+check	Test	2026-10-31T20:58:35.1833005Z   ...
+check	Test	2026-10-31T20:58:35.2189340Z # Subtest: archives accept real ISO weeks and reject partial, invalid and future weeks
+check	Test	2026-10-31T20:58:35.2191014Z ok 68 - archives accept real ISO weeks and reject partial, invalid and future weeks
+check	Test	2026-10-31T20:58:35.2227970Z   ---
+check	Test	2026-10-31T20:58:35.2228572Z   duration_ms: 2.202157
+check	Test	2026-10-31T20:58:35.2258442Z   type: 'test'
+check	Test	2026-10-31T20:58:35.2260639Z   ...
+check	Test	2026-10-31T20:58:35.2270671Z # Subtest: rolling scopes are exactly 28 days and 365 days, with no date cutoff for week/all
+check	Test	2026-10-31T20:58:35.2272444Z ok 69 - rolling scopes are exactly 28 days and 365 days, with no date cutoff for week/all
+check	Test	2026-10-31T20:58:35.2273443Z   ---
+check	Test	2026-10-31T20:58:35.2273968Z   duration_ms: 0.552525
+check	Test	2026-10-31T20:58:35.2274517Z   type: 'test'
+check	Test	2026-10-31T20:58:35.2274988Z   ...
+check	Test	2026-10-31T20:58:35.2275963Z # Subtest: response rates use exact qualifying totals independently of visible list limits
+check	Test	2026-10-31T20:58:35.2277372Z ok 70 - response rates use exact qualifying totals independently of visible list limits
+check	Test	2026-10-31T20:58:35.2278550Z   ---
+check	Test	2026-10-31T20:58:35.2279021Z   duration_ms: 0.395825
+check	Test	2026-10-31T20:58:35.2279538Z   type: 'test'
+check	Test	2026-10-31T20:58:35.2281421Z   ...
+check	Test	2026-10-31T20:58:35.2282265Z # Subtest: only published direct and team responses count as official
+check	Test	2026-10-31T20:58:35.2283563Z ok 71 - only published direct and team responses count as official
+check	Test	2026-10-31T20:58:35.2284279Z   ---
+check	Test	2026-10-31T20:58:35.2284664Z   duration_ms: 0.303483
+check	Test	2026-10-31T20:58:35.2285110Z   type: 'test'
+check	Test	2026-10-31T20:58:35.2285476Z   ...
+check	Test	2026-10-31T20:58:35.2286335Z # Subtest: public answer mapping drops draft bodies, private fields and unsafe media
+check	Test	2026-10-31T20:58:35.2288324Z ok 72 - public answer mapping drops draft bodies, private fields and unsafe media
+check	Test	2026-10-31T20:58:35.2289132Z   ---
+check	Test	2026-10-31T20:58:35.2289514Z   duration_ms: 0.944603
+check	Test	2026-10-31T20:58:35.2289960Z   type: 'test'
+check	Test	2026-10-31T20:58:35.2290316Z   ...
+check	Test	2026-10-31T20:58:35.2291125Z # Subtest: public AI analysis stays distinct and its sources retain safe citations
+check	Test	2026-10-31T20:58:35.2292341Z ok 73 - public AI analysis stays distinct and its sources retain safe citations
+check	Test	2026-10-31T20:58:35.2293077Z   ---
+check	Test	2026-10-31T20:58:35.2293427Z   duration_ms: 1.263124
+check	Test	2026-10-31T20:58:35.2293842Z   type: 'test'
+check	Test	2026-10-31T20:58:35.2294187Z   ...
+check	Test	2026-10-31T20:58:35.2295162Z # Subtest: web URLs and embedded JSON-LD cannot introduce active script URLs or closing script tags
+check	Test	2026-10-31T20:58:35.2296669Z ok 74 - web URLs and embedded JSON-LD cannot introduce active script URLs or closing script tags
+check	Test	2026-10-31T20:58:35.2297553Z   ---
+check	Test	2026-10-31T20:58:35.2298240Z   duration_ms: 0.552315
+check	Test	2026-10-31T20:58:35.2298690Z   type: 'test'
+check	Test	2026-10-31T20:58:35.2299063Z   ...
+check	Test	2026-10-31T20:58:35.2299939Z # Subtest: invalid or missing aggregate responses fail rather than becoming a zero rate
+check	Test	2026-10-31T20:58:35.2301250Z ok 75 - invalid or missing aggregate responses fail rather than becoming a zero rate
+check	Test	2026-10-31T20:58:35.2302035Z   ---
+check	Test	2026-10-31T20:58:35.2302391Z   duration_ms: 0.388512
+check	Test	2026-10-31T20:58:35.2302820Z   type: 'test'
+check	Test	2026-10-31T20:58:35.2303176Z   ...
+check	Test	2026-10-31T20:58:35.2304036Z # Subtest: vote writes and removals require an active question in the actual current week
+check	Test	2026-10-31T20:58:35.2305349Z ok 76 - vote writes and removals require an active question in the actual current week
+check	Test	2026-10-31T20:58:35.2306441Z   ---
+check	Test	2026-10-31T20:58:35.2306799Z   duration_ms: 0.529482
+check	Test	2026-10-31T20:58:35.2307216Z   type: 'test'
+check	Test	2026-10-31T20:58:35.2307800Z   ...
+check	Test	2026-10-31T20:58:35.8432560Z # Subtest: patched AI SDK and Anthropic provider stream plain text with validated tool schema
+check	Test	2026-10-31T20:58:35.8434578Z ok 77 - patched AI SDK and Anthropic provider stream plain text with validated tool schema
+check	Test	2026-10-31T20:58:35.8435740Z   ---
+check	Test	2026-10-31T20:58:35.8436318Z   duration_ms: 114.876198
+check	Test	2026-10-31T20:58:35.8436960Z   type: 'test'
+check	Test	2026-10-31T20:58:35.8437519Z   ...
+check	Test	2026-10-31T20:58:35.9064266Z # Subtest: untrusted chat roles, tool results and excessive context are rejected
+check	Test	2026-10-31T20:58:35.9085024Z ok 78 - untrusted chat roles, tool results and excessive context are rejected
+check	Test	2026-10-31T20:58:35.9093809Z   ---
+check	Test	2026-10-31T20:58:35.9094454Z   duration_ms: 2.719758
+check	Test	2026-10-31T20:58:35.9095080Z   type: 'test'
+check	Test	2026-10-31T20:58:35.9095626Z   ...
+check	Test	2026-10-31T20:58:35.9096670Z # Subtest: verification URLs reject internal hosts, literals, credentials and protocols
+check	Test	2026-10-31T20:58:35.9098530Z ok 79 - verification URLs reject internal hosts, literals, credentials and protocols
+check	Test	2026-10-31T20:58:35.9099524Z   ---
+check	Test	2026-10-31T20:58:35.9100051Z   duration_ms: 7.561624
+check	Test	2026-10-31T20:58:35.9100646Z   type: 'test'
+check	Test	2026-10-31T20:58:35.9101181Z   ...
+check	Test	2026-10-31T20:58:35.9101884Z # Subtest: DNS pinning accepts only public IPv4
+check	Test	2026-10-31T20:58:35.9108536Z ok 80 - DNS pinning accepts only public IPv4
+check	Test	2026-10-31T20:58:35.9109420Z   ---
+check	Test	2026-10-31T20:58:35.9109984Z   duration_ms: 0.52266
+check	Test	2026-10-31T20:58:35.9110574Z   type: 'test'
+check	Test	2026-10-31T20:58:35.9111089Z   ...
+check	Test	2026-10-31T20:58:35.9111945Z # Subtest: government email is bound to the reviewed office domain
+check	Test	2026-10-31T20:58:35.9113092Z ok 81 - government email is bound to the reviewed office domain
+check	Test	2026-10-31T20:58:35.9113898Z   ---
+check	Test	2026-10-31T20:58:35.9114414Z   duration_ms: 0.422163
+check	Test	2026-10-31T20:58:35.9114982Z   type: 'test'
+check	Test	2026-10-31T20:58:35.9115522Z   ...
+check	Test	2026-10-31T20:58:35.9116517Z # Subtest: only a real verification meta tag in head is accepted
+check	Test	2026-10-31T20:58:35.9118089Z ok 82 - only a real verification meta tag in head is accepted
+check	Test	2026-10-31T20:58:35.9118973Z   ---
+check	Test	2026-10-31T20:58:35.9119504Z   duration_ms: 1.592446
+check	Test	2026-10-31T20:58:35.9120109Z   type: 'test'
+check	Test	2026-10-31T20:58:35.9121295Z   ...
+check	Test	2026-10-31T20:58:35.9122411Z # Subtest: cross-origin browser mutations are blocked while same-origin and server calls work
+check	Test	2026-10-31T20:58:35.9124040Z ok 83 - cross-origin browser mutations are blocked while same-origin and server calls work
+check	Test	2026-10-31T20:58:35.9125048Z   ---
+check	Test	2026-10-31T20:58:35.9125576Z   duration_ms: 34.785054
+check	Test	2026-10-31T20:58:35.9126167Z   type: 'test'
+check	Test	2026-10-31T20:58:35.9126693Z   ...
+check	Test	2026-10-31T20:58:35.9127879Z # Subtest: error telemetry omits identity, URLs, civic choices and breadcrumbs
+check	Test	2026-10-31T20:58:35.9129323Z ok 84 - error telemetry omits identity, URLs, civic choices and breadcrumbs
+check	Test	2026-10-31T20:58:35.9130206Z   ---
+check	Test	2026-10-31T20:58:35.9130734Z   duration_ms: 32.918768
+check	Test	2026-10-31T20:58:35.9131323Z   type: 'test'
+check	Test	2026-10-31T20:58:35.9131837Z   ...
+check	Test	2026-10-31T20:58:35.9132530Z # Subtest: chunked JSON is bounded before parsing
+check	Test	2026-10-31T20:58:35.9133443Z ok 85 - chunked JSON is bounded before parsing
+check	Test	2026-10-31T20:58:35.9134140Z   ---
+check	Test	2026-10-31T20:58:35.9134666Z   duration_ms: 20.558037
+check	Test	2026-10-31T20:58:35.9135253Z   type: 'test'
+check	Test	2026-10-31T20:58:35.9135758Z   ...
+check	Test	2026-10-31T20:58:36.3050676Z # Subtest: verification deadline includes DNS and late DNS cannot open a connection
+check	Test	2026-10-31T20:58:36.3067400Z ok 86 - verification deadline includes DNS and late DNS cannot open a connection
+check	Test	2026-10-31T20:58:36.3068769Z   ---
+check	Test	2026-10-31T20:58:36.3069340Z   duration_ms: 101.296869
+check	Test	2026-10-31T20:58:36.3069935Z   type: 'test'
+check	Test	2026-10-31T20:58:36.3070443Z   ...
+check	Test	2026-10-31T20:58:36.3071525Z # Subtest: a continuously trickling verification body is aborted at the total deadline
+check	Test	2026-10-31T20:58:36.3073055Z ok 87 - a continuously trickling verification body is aborted at the total deadline
+check	Test	2026-10-31T20:58:36.3074632Z   ---
+check	Test	2026-10-31T20:58:36.3078542Z   duration_ms: 26.984625
+check	Test	2026-10-31T20:58:36.3079183Z   type: 'test'
+check	Test	2026-10-31T20:58:36.3079705Z   ...
+check	Test	2026-10-31T20:58:36.3080782Z # Subtest: completed HTML clears the deadline and redirects are refused without another request
+check	Test	2026-10-31T20:58:36.3082405Z ok 88 - completed HTML clears the deadline and redirects are refused without another request
+check	Test	2026-10-31T20:58:36.3083418Z   ---
+check	Test	2026-10-31T20:58:36.3083944Z   duration_ms: 46.373041
+check	Test	2026-10-31T20:58:36.3084562Z   type: 'test'
+check	Test	2026-10-31T20:58:36.3085093Z   ...
+check	Test	2026-10-31T20:58:36.8913634Z # Subtest: missing or malformed reviewed evidence never invokes generation
+check	Test	2026-10-31T20:58:36.8934176Z ok 89 - missing or malformed reviewed evidence never invokes generation
+check	Test	2026-10-31T20:58:36.8940629Z   ---
+check	Test	2026-10-31T20:58:36.8941337Z   duration_ms: 175.498205
+check	Test	2026-10-31T20:58:36.8941973Z   type: 'test'
+check	Test	2026-10-31T20:58:36.8942514Z   ...
+check	Test	2026-10-31T20:58:36.8943543Z # Subtest: zero-source prose and model-invented URLs cannot become analysis
+check	Test	2026-10-31T20:58:36.8945022Z ok 90 - zero-source prose and model-invented URLs cannot become analysis
+check	Test	2026-10-31T20:58:36.8945936Z   ---
+check	Test	2026-10-31T20:58:36.8946510Z   duration_ms: 150.971481
+check	Test	2026-10-31T20:58:36.8947145Z   type: 'test'
+check	Test	2026-10-31T20:58:36.8947998Z   ...
+check	Test	2026-10-31T20:58:36.8949188Z # Subtest: analysis citations are canonical reviewed sources and confidence reflects unique sources
+check	Test	2026-10-31T20:58:36.8950847Z ok 91 - analysis citations are canonical reviewed sources and confidence reflects unique sources
+check	Test	2026-10-31T20:58:36.8951889Z   ---
+check	Test	2026-10-31T20:58:36.8952436Z   duration_ms: 52.260906
+check	Test	2026-10-31T20:58:36.8953043Z   type: 'test'
+check	Test	2026-10-31T20:58:36.8953584Z   ...
+check	Test	2026-10-31T20:58:37.4064595Z # Subtest: visitor and anonymous sessions cannot upload
+check	Test	2026-10-31T20:58:37.4066015Z ok 92 - visitor and anonymous sessions cannot upload
+check	Test	2026-10-31T20:58:37.4067026Z   ---
+check	Test	2026-10-31T20:58:37.4067828Z   duration_ms: 438.432484
+check	Test	2026-10-31T20:58:37.4068492Z   type: 'test'
+check	Test	2026-10-31T20:58:37.4068993Z   ...
+check	Test	2026-10-31T20:58:37.7239285Z # Subtest: ordinary user, editor, responder, removed member and self-claimed admin cannot upload
+check	Test	2026-10-31T20:58:37.7268790Z ok 93 - ordinary user, editor, responder, removed member and self-claimed admin cannot upload
+check	Test	2026-10-31T20:58:37.7298095Z   ---
+check	Test	2026-10-31T20:58:37.7321814Z   duration_ms: 284.809067
+check	Test	2026-10-31T20:58:37.7348089Z   type: 'test'
+check	Test	2026-10-31T20:58:37.7377974Z   ...
+check	Test	2026-10-31T20:58:37.8599323Z # Subtest: rights refusal and missing credit block publication before upload
+check	Test	2026-10-31T20:58:37.8648869Z ok 94 - rights refusal and missing credit block publication before upload
+check	Test	2026-10-31T20:58:37.8698503Z   ---
+check	Test	2026-10-31T20:58:37.8728373Z   duration_ms: 168.31981
+check	Test	2026-10-31T20:58:37.8755964Z   type: 'test'
+check	Test	2026-10-31T20:58:37.8808482Z   ...
+check	Test	2026-10-31T20:58:38.0749210Z # Subtest: invalid bytes and quota failure leave storage untouched
+check	Test	2026-10-31T20:58:38.0832840Z ok 95 - invalid bytes and quota failure leave storage untouched
+check	Test	2026-10-31T20:58:38.0880859Z   ---
+check	Test	2026-10-31T20:58:38.0902010Z   duration_ms: 196.772578
+check	Test	2026-10-31T20:58:38.0902854Z   type: 'test'
+check	Test	2026-10-31T20:58:38.0903423Z   ...
+check	Test	2026-10-31T20:58:38.2925261Z # Subtest: storage failure and revoked-at-publication actor never report success
+check	Test	2026-10-31T20:58:38.2958572Z ok 96 - storage failure and revoked-at-publication actor never report success
+check	Test	2026-10-31T20:58:38.2990470Z   ---
+check	Test	2026-10-31T20:58:38.3015155Z   duration_ms: 233.373171
+check	Test	2026-10-31T20:58:38.3024150Z   type: 'test'
+check	Test	2026-10-31T20:58:38.3024834Z   ...
+check	Test	2026-10-31T20:58:38.4482862Z # Subtest: verified admin upload reencodes, versions, records permission and refreshes views
+check	Test	2026-10-31T20:58:38.4484892Z ok 97 - verified admin upload reencodes, versions, records permission and refreshes views
+check	Test	2026-10-31T20:58:38.4486265Z   ---
+check	Test	2026-10-31T20:58:38.4486856Z   duration_ms: 123.697044
+check	Test	2026-10-31T20:58:38.4487472Z   type: 'test'
+check	Test	2026-10-31T20:58:38.4488279Z   ...
+check	Test	2026-10-31T20:58:38.4490585Z # Subtest: profile rejects malformed or unsafe fields and uses the atomic verified-admin RPC
+check	Test	2026-10-31T20:58:38.4492054Z ok 98 - profile rejects malformed or unsafe fields and uses the atomic verified-admin RPC
+check	Test	2026-10-31T20:58:38.4493026Z   ---
+check	Test	2026-10-31T20:58:38.4493592Z   duration_ms: 73.70527
+check	Test	2026-10-31T20:58:38.4494240Z   type: 'test'
+check	Test	2026-10-31T20:58:38.4494870Z   ...
+check	Test	2026-10-31T20:58:39.6373338Z # Subtest: sign-in page and real callback preserve safe local return paths and reject open redirects
+check	Test	2026-10-31T20:58:39.6375246Z ok 99 - sign-in page and real callback preserve safe local return paths and reject open redirects
+check	Test	2026-10-31T20:58:39.6376331Z   ---
+check	Test	2026-10-31T20:58:39.6376885Z   duration_ms: 345.56063
+check	Test	2026-10-31T20:58:39.6377495Z   type: 'test'
+check	Test	2026-10-31T20:58:39.6378316Z   ...
+check	Test	2026-10-31T20:58:39.6379277Z # Subtest: account gates anonymous sessions before querying private records
+check	Test	2026-10-31T20:58:39.6380648Z ok 100 - account gates anonymous sessions before querying private records
+check	Test	2026-10-31T20:58:39.6381615Z   ---
+check	Test	2026-10-31T20:58:39.6382163Z   duration_ms: 126.158413
+check	Test	2026-10-31T20:58:39.6382779Z   type: 'test'
+check	Test	2026-10-31T20:58:39.6383302Z   ...
+check	Test	2026-10-31T20:58:39.6384209Z # Subtest: account reads are bounded and user-scoped, with honest failures
+check	Test	2026-10-31T20:58:39.6394358Z ok 101 - account reads are bounded and user-scoped, with honest failures
+check	Test	2026-10-31T20:58:39.6395351Z   ---
+check	Test	2026-10-31T20:58:39.6395906Z   duration_ms: 59.751112
+check	Test	2026-10-31T20:58:39.6396506Z   type: 'test'
+check	Test	2026-10-31T20:58:39.6397054Z   ...
+check	Test	2026-10-31T20:58:39.6398485Z # Subtest: dashboard role branches preserve claims, verification, draft review and admin-only controls
+check	Test	2026-10-31T20:58:39.6400295Z ok 102 - dashboard role branches preserve claims, verification, draft review and admin-only controls
+check	Test	2026-10-31T20:58:39.6401408Z   ---
+check	Test	2026-10-31T20:58:39.6401951Z   duration_ms: 683.459381
+check	Test	2026-10-31T20:58:39.6402562Z   type: 'test'
+check	Test	2026-10-31T20:58:39.6403094Z   ...
+check	Test	2026-10-31T20:58:39.6404218Z # Subtest: answer route rejects anonymous/nonteam/direct responder requests without writes
+check	Test	2026-10-31T20:58:39.6405816Z ok 103 - answer route rejects anonymous/nonteam/direct responder requests without writes
+check	Test	2026-10-31T20:58:39.6406860Z   ---
+check	Test	2026-10-31T20:58:39.6407405Z   duration_ms: 91.452098
+check	Test	2026-10-31T20:58:39.6408272Z   type: 'test'
+check	Test	2026-10-31T20:58:39.6409240Z   ...
+check	Test	2026-10-31T20:58:39.6410493Z # Subtest: verification reload restores only the current user's completed methods without exposing private codes
+check	Test	2026-10-31T20:58:39.6412445Z ok 104 - verification reload restores only the current user's completed methods without exposing private codes
+check	Test	2026-10-31T20:58:39.6413629Z   ---
+check	Test	2026-10-31T20:58:39.6414169Z   duration_ms: 22.155371
+check	Test	2026-10-31T20:58:39.6414769Z   type: 'test'
+check	Test	2026-10-31T20:58:39.6415297Z   ...
+check	Test	2026-10-31T20:58:39.6416448Z # Subtest: real answer response contract feeds authorized media upload for draft and publishing roles
+check	Test	2026-10-31T20:58:39.6418444Z ok 105 - real answer response contract feeds authorized media upload for draft and publishing roles
+check	Test	2026-10-31T20:58:39.6419597Z   ---
+check	Test	2026-10-31T20:58:39.6420136Z   duration_ms: 128.696717
+check	Test	2026-10-31T20:58:39.6420744Z   type: 'test'
+check	Test	2026-10-31T20:58:39.6421277Z   ...
+check	Test	2026-10-31T20:58:39.6422502Z # Subtest: media denies wrong ownership, published responder changes, AI, and unsupported types before storage
+check	Test	2026-10-31T20:58:39.6424631Z ok 106 - media denies wrong ownership, published responder changes, AI, and unsupported types before storage
+check	Test	2026-10-31T20:58:39.6425906Z   ---
+check	Test	2026-10-31T20:58:39.6426560Z   duration_ms: 52.663886
+check	Test	2026-10-31T20:58:39.6427234Z   type: 'test'
+check	Test	2026-10-31T20:58:39.6428068Z   ...
+check	Test	2026-10-31T20:58:39.6429397Z # Subtest: media delivery never signs an unreadable or unauthorized draft, even with permissive fixture reads
+check	Test	2026-10-31T20:58:39.6431309Z ok 107 - media delivery never signs an unreadable or unauthorized draft, even with permissive fixture reads
+check	Test	2026-10-31T20:58:39.6432518Z   ---
+check	Test	2026-10-31T20:58:39.6433106Z   duration_ms: 23.946906
+check	Test	2026-10-31T20:58:39.6434125Z   type: 'test'
+check	Test	2026-10-31T20:58:39.6434721Z   ...
+check	Test	2026-10-31T20:58:39.6435914Z # Subtest: media delivery signs only authorized matching paths with short expiry and no shared cache
+check	Test	2026-10-31T20:58:39.6437936Z ok 108 - media delivery signs only authorized matching paths with short expiry and no shared cache
+check	Test	2026-10-31T20:58:39.6439111Z   ---
+check	Test	2026-10-31T20:58:39.6439705Z   duration_ms: 22.670438
+check	Test	2026-10-31T20:58:39.6440363Z   type: 'test'
+check	Test	2026-10-31T20:58:39.6440938Z   ...
+check	Test	2026-10-31T20:58:39.6441914Z # Subtest: approval is publishing-role only and changes draft visibility
+check	Test	2026-10-31T20:58:39.6443295Z ok 109 - approval is publishing-role only and changes draft visibility
+check	Test	2026-10-31T20:58:39.6444276Z   ---
+check	Test	2026-10-31T20:58:39.6444872Z   duration_ms: 20.663132
+check	Test	2026-10-31T20:58:39.6445544Z   type: 'test'
+check	Test	2026-10-31T20:58:39.6446152Z   ...
+check	Test	2026-10-31T20:58:39.6447463Z # Subtest: upload uses atomic attachment guard and handles an approval or role change during transfer
+check	Test	2026-10-31T20:58:39.6449553Z ok 110 - upload uses atomic attachment guard and handles an approval or role change during transfer
+check	Test	2026-10-31T20:58:39.6450741Z   ---
+check	Test	2026-10-31T20:58:39.6451330Z   duration_ms: 7.730047
+check	Test	2026-10-31T20:58:39.6451891Z   type: 'test'
+check	Test	2026-10-31T20:58:39.6452370Z   ...
+check	Test	2026-10-31T20:58:39.6453408Z # Subtest: media over the shared hosting limit is refused and delivery failures are private
+check	Test	2026-10-31T20:58:39.6454909Z ok 111 - media over the shared hosting limit is refused and delivery failures are private
+check	Test	2026-10-31T20:58:39.6455863Z   ---
+check	Test	2026-10-31T20:58:39.6456356Z   duration_ms: 25.437322
+check	Test	2026-10-31T20:58:39.6456914Z   type: 'test'
+check	Test	2026-10-31T20:58:39.6457398Z   ...
+check	Test	2026-10-31T20:58:39.6458858Z # Subtest: controlled media URL survives public normalization and rendering while unsafe paths are discarded
+check	Test	2026-10-31T20:58:39.6460690Z ok 112 - controlled media URL survives public normalization and rendering while unsafe paths are discarded
+check	Test	2026-10-31T20:58:39.6461782Z   ---
+check	Test	2026-10-31T20:58:39.6462340Z   duration_ms: 17.439669
+check	Test	2026-10-31T20:58:39.6462910Z   type: 'test'
+check	Test	2026-10-31T20:58:39.6463385Z   ...
+check	Test	2026-10-31T20:58:39.6464424Z # Subtest: answer editing permits publishing roles and only a responder's own pending draft
+check	Test	2026-10-31T20:58:39.6477008Z ok 113 - answer editing permits publishing roles and only a responder's own pending draft
+check	Test	2026-10-31T20:58:39.6478602Z   ---
+check	Test	2026-10-31T20:58:39.6479109Z   duration_ms: 24.281537
+check	Test	2026-10-31T20:58:39.6479621Z   type: 'test'
+check	Test	2026-10-31T20:58:39.6480110Z   ...
+check	Test	2026-10-31T20:58:39.6481337Z # Subtest: answer editing denies published or another responder's draft and preserves the edit window
+check	Test	2026-10-31T20:58:39.6482908Z ok 114 - answer editing denies published or another responder's draft and preserves the edit window
+check	Test	2026-10-31T20:58:39.6483829Z   ---
+check	Test	2026-10-31T20:58:39.6484209Z   duration_ms: 35.273229
+check	Test	2026-10-31T20:58:39.6484654Z   type: 'test'
+check	Test	2026-10-31T20:58:39.6485026Z   ...
+check	Test	2026-10-31T20:58:39.6486047Z # Subtest: answer edit atomically rejects approval during the request and validates malformed payloads
+check	Test	2026-10-31T20:58:39.6488675Z ok 115 - answer edit atomically rejects approval during the request and validates malformed payloads
+check	Test	2026-10-31T20:58:39.6489574Z   ---
+check	Test	2026-10-31T20:58:39.6489877Z   duration_ms: 36.522405
+check	Test	2026-10-31T20:58:39.6490222Z   type: 'test'
+check	Test	2026-10-31T20:58:39.6490501Z   ...
+check	Test	2026-10-31T20:58:39.6491367Z # Subtest: unverified profile teams can edit drafts but cannot edit published official responses
+check	Test	2026-10-31T20:58:39.6492715Z ok 116 - unverified profile teams can edit drafts but cannot edit published official responses
+check	Test	2026-10-31T20:58:39.6493488Z   ---
+check	Test	2026-10-31T20:58:39.6493791Z   duration_ms: 33.54432
+check	Test	2026-10-31T20:58:39.6494161Z   type: 'test'
+check	Test	2026-10-31T20:58:39.6494460Z   ...
+check	Test	2026-10-31T20:58:39.6495203Z # Subtest: only verified publishing roles publish or approve official responses
+check	Test	2026-10-31T20:58:39.6496340Z ok 117 - only verified publishing roles publish or approve official responses
+check	Test	2026-10-31T20:58:39.6497002Z   ---
+check	Test	2026-10-31T20:58:39.6526643Z   duration_ms: 230.593349
+check	Test	2026-10-31T20:58:39.6527109Z   type: 'test'
+check	Test	2026-10-31T20:58:39.6527475Z   ...
+check	Test	2026-10-31T20:58:39.6528506Z # Subtest: verification lookup failures do not publish, approve, or edit answers
+check	Test	2026-10-31T20:58:39.6529693Z ok 118 - verification lookup failures do not publish, approve, or edit answers
+check	Test	2026-10-31T20:58:39.6530414Z   ---
+check	Test	2026-10-31T20:58:39.6530753Z   duration_ms: 26.163384
+check	Test	2026-10-31T20:58:39.6531155Z   type: 'test'
+check	Test	2026-10-31T20:58:39.6531491Z   ...
+check	Test	2026-10-31T20:58:39.6532387Z # Subtest: claim and disconnect require nonanonymous authentication before any privileged client
+check	Test	2026-10-31T20:58:39.6533815Z ok 119 - claim and disconnect require nonanonymous authentication before any privileged client
+check	Test	2026-10-31T20:58:39.6534637Z   ---
+check	Test	2026-10-31T20:58:39.6534965Z   duration_ms: 48.007384
+check	Test	2026-10-31T20:58:39.6535355Z   type: 'test'
+check	Test	2026-10-31T20:58:39.6535726Z   ...
+check	Test	2026-10-31T20:58:39.6536649Z # Subtest: claim forwards the session actor, resumes without repeat welcome, and contains DB errors
+check	Test	2026-10-31T20:58:39.6538321Z ok 120 - claim forwards the session actor, resumes without repeat welcome, and contains DB errors
+check	Test	2026-10-31T20:58:39.6539180Z   ---
+check	Test	2026-10-31T20:58:39.6539557Z   duration_ms: 7.79619
+check	Test	2026-10-31T20:58:39.6539905Z   type: 'test'
+check	Test	2026-10-31T20:58:39.6540201Z   ...
+check	Test	2026-10-31T20:58:39.6541075Z # Subtest: team mutation routes bind target profile and actor, validate roles, and preserve DB refusal
+check	Test	2026-10-31T20:58:39.6542491Z ok 121 - team mutation routes bind target profile and actor, validate roles, and preserve DB refusal
+check	Test	2026-10-31T20:58:39.6543296Z   ---
+check	Test	2026-10-31T20:58:39.6543606Z   duration_ms: 11.686642
+check	Test	2026-10-31T20:58:39.6543997Z   type: 'test'
+check	Test	2026-10-31T20:58:39.6544319Z   ...
+check	Test	2026-10-31T20:58:39.6545217Z # Subtest: team directory exposes other staff email only to admins and fails closed on read errors
+check	Test	2026-10-31T20:58:39.6546593Z ok 122 - team directory exposes other staff email only to admins and fails closed on read errors
+check	Test	2026-10-31T20:58:39.6547440Z   ---
+check	Test	2026-10-31T20:58:39.6548044Z   duration_ms: 47.922807
+check	Test	2026-10-31T20:58:39.6548409Z   type: 'test'
+check	Test	2026-10-31T20:58:39.6548738Z   ...
+check	Test	2026-10-31T20:58:39.6549661Z # Subtest: notification preferences are scoped to session identity and reject malformed requests
+check	Test	2026-10-31T20:58:39.6551086Z ok 123 - notification preferences are scoped to session identity and reject malformed requests
+check	Test	2026-10-31T20:58:39.6552161Z   ---
+check	Test	2026-10-31T20:58:39.6552497Z   duration_ms: 12.368186
+check	Test	2026-10-31T20:58:39.6552885Z   type: 'test'
+check	Test	2026-10-31T20:58:39.6553215Z   ...
+check	Test	2026-10-31T20:58:39.6553993Z # Subtest: answer submission rejects invalid types and unsafe or excessive sources
+check	Test	2026-10-31T20:58:39.6555191Z ok 124 - answer submission rejects invalid types and unsafe or excessive sources
+check	Test	2026-10-31T20:58:39.6555923Z   ---
+check	Test	2026-10-31T20:58:39.6556276Z   duration_ms: 11.212581
+check	Test	2026-10-31T20:58:39.6556716Z   type: 'test'
+check	Test	2026-10-31T20:58:39.6557086Z   ...
+check	Test	2026-10-31T20:58:39.6558196Z # Subtest: new claim throttling fails closed while existing admins can resume
+check	Test	2026-10-31T20:58:39.6559335Z ok 125 - new claim throttling fails closed while existing admins can resume
+check	Test	2026-10-31T20:58:39.6560043Z   ---
+check	Test	2026-10-31T20:58:39.6560398Z   duration_ms: 19.577326
+check	Test	2026-10-31T20:58:39.6560817Z   type: 'test'
+check	Test	2026-10-31T20:58:39.6561171Z   ...
+check	Test	2026-10-31T20:58:39.6561934Z # Subtest: verified admin and editor can deliberately save a private draft
+check	Test	2026-10-31T20:58:39.6563092Z ok 126 - verified admin and editor can deliberately save a private draft
+check	Test	2026-10-31T20:58:39.6563794Z   ---
+check	Test	2026-10-31T20:58:39.6564158Z   duration_ms: 29.835142
+check	Test	2026-10-31T20:58:39.6564600Z   type: 'test'
+check	Test	2026-10-31T20:58:39.6564948Z   ...
+check	Test	2026-10-31T20:58:39.6565690Z # Subtest: platform admin status alone does not grant a politician team voice
+check	Test	2026-10-31T20:58:39.6566876Z ok 127 - platform admin status alone does not grant a politician team voice
+check	Test	2026-10-31T20:58:39.6567910Z   ---
+check	Test	2026-10-31T20:58:39.6568319Z   duration_ms: 18.14628
+check	Test	2026-10-31T20:58:39.6569078Z   type: 'test'
+check	Test	2026-10-31T20:58:39.6569476Z   ...
+check	Test	2026-10-31T20:58:39.6981721Z # Subtest: visitor, anonymous and responder cannot initiate politician verification
+check	Test	2026-10-31T20:58:39.6983024Z ok 128 - visitor, anonymous and responder cannot initiate politician verification
+check	Test	2026-10-31T20:58:39.6983754Z   ---
+check	Test	2026-10-31T20:58:39.6984098Z   duration_ms: 451.485078
+check	Test	2026-10-31T20:58:39.6984540Z   type: 'test'
+check	Test	2026-10-31T20:58:39.6984870Z   ...
+check	Test	2026-10-31T20:58:39.6985655Z # Subtest: a generic .gov address and an unreviewed profile do not establish authority
+check	Test	2026-10-31T20:58:39.6986860Z ok 129 - a generic .gov address and an unreviewed profile do not establish authority
+check	Test	2026-10-31T20:58:39.6987829Z   ---
+check	Test	2026-10-31T20:58:39.6988190Z   duration_ms: 38.796979
+check	Test	2026-10-31T20:58:39.6988598Z   type: 'test'
+check	Test	2026-10-31T20:58:39.6988920Z   ...
+check	Test	2026-10-31T20:58:39.6989819Z # Subtest: approved office OTP has a cryptographic six-digit code, expiry and no response disclosure
+check	Test	2026-10-31T20:58:39.6991272Z ok 130 - approved office OTP has a cryptographic six-digit code, expiry and no response disclosure
+check	Test	2026-10-31T20:58:39.6992109Z   ---
+check	Test	2026-10-31T20:58:39.6992444Z   duration_ms: 33.948576
+check	Test	2026-10-31T20:58:39.6992831Z   type: 'test'
+check	Test	2026-10-31T20:58:39.6993158Z   ...
+check	Test	2026-10-31T20:58:39.6993766Z # Subtest: verification rate store and mail delivery fail closed
+check	Test	2026-10-31T20:58:39.6994407Z ok 131 - verification rate store and mail delivery fail closed
+check	Test	2026-10-31T20:58:39.6994795Z   ---
+check	Test	2026-10-31T20:58:39.6995021Z   duration_ms: 62.017928
+check	Test	2026-10-31T20:58:39.6995283Z   type: 'test'
+check	Test	2026-10-31T20:58:39.6995501Z   ...
+check	Test	2026-10-31T20:58:39.6995938Z # Subtest: expired, wrong and exhausted OTPs cannot complete verification
+check	Test	2026-10-31T20:58:39.6996616Z ok 132 - expired, wrong and exhausted OTPs cannot complete verification
+check	Test	2026-10-31T20:58:39.6997038Z   ---
+check	Test	2026-10-31T20:58:39.6997271Z   duration_ms: 29.991996
+check	Test	2026-10-31T20:58:39.6997530Z   type: 'test'
+check	Test	2026-10-31T20:58:39.6997994Z   ...
+check	Test	2026-10-31T20:58:39.6998404Z # Subtest: successful OTP completion clears secret and expiry
+check	Test	2026-10-31T20:58:39.6999001Z ok 133 - successful OTP completion clears secret and expiry
+check	Test	2026-10-31T20:58:39.6999389Z   ---
+check	Test	2026-10-31T20:58:39.6999621Z   duration_ms: 18.495037
+check	Test	2026-10-31T20:58:39.6999885Z   type: 'test'
+check	Test	2026-10-31T20:58:39.7000102Z   ...
+check	Test	2026-10-31T20:58:39.7000598Z # Subtest: meta verification fetches only the reviewed URL, ignores claimant input
+check	Test	2026-10-31T20:58:39.7001740Z ok 134 - meta verification fetches only the reviewed URL, ignores claimant input
+check	Test	2026-10-31T20:58:39.7002199Z   ---
+check	Test	2026-10-31T20:58:39.7002420Z   duration_ms: 15.493016
+check	Test	2026-10-31T20:58:39.7002671Z   type: 'test'
+check	Test	2026-10-31T20:58:39.7002881Z   ...
+check	Test	2026-10-31T20:58:39.7003381Z # Subtest: old claimant-defined verification cannot resume against a reviewed source
+check	Test	2026-10-31T20:58:39.7004159Z ok 135 - old claimant-defined verification cannot resume against a reviewed source
+check	Test	2026-10-31T20:58:39.7004633Z   ---
+check	Test	2026-10-31T20:58:39.7004857Z   duration_ms: 22.54431
+check	Test	2026-10-31T20:58:39.7005114Z   type: 'test'
+check	Test	2026-10-31T20:58:39.7005326Z   ...
+check	Test	2026-10-31T20:58:39.7005840Z # Subtest: source review changes invalidate pending and completed email proofs
+check	Test	2026-10-31T20:58:39.7006635Z ok 136 - source review changes invalidate pending and completed email proofs
+check	Test	2026-10-31T20:58:39.7007119Z   ---
+check	Test	2026-10-31T20:58:39.7007365Z   duration_ms: 65.106935
+check	Test	2026-10-31T20:58:39.7008092Z   type: 'test'
+check	Test	2026-10-31T20:58:39.7008482Z   ...
+check	Test	2026-10-31T20:58:39.7008990Z # Subtest: meta proof cannot resume after its reviewed evidence changes
+check	Test	2026-10-31T20:58:39.7009700Z ok 137 - meta proof cannot resume after its reviewed evidence changes
+check	Test	2026-10-31T20:58:39.7010169Z   ---
+check	Test	2026-10-31T20:58:39.7010419Z   duration_ms: 37.535125
+check	Test	2026-10-31T20:58:39.7010700Z   type: 'test'
+check	Test	2026-10-31T20:58:39.7010939Z   ...
+check	Test	2026-10-31T20:58:39.7011156Z 1..137
+check	Test	2026-10-31T20:58:39.7011397Z # tests 137
+check	Test	2026-10-31T20:58:39.7011614Z # suites 0
+check	Test	2026-10-31T20:58:39.7011841Z # pass 137
+check	Test	2026-10-31T20:58:39.7012075Z # fail 0
+check	Test	2026-10-31T20:58:39.7012533Z # cancelled 0
+check	Test	2026-10-31T20:58:39.7012805Z # skipped 0
+check	Test	2026-10-31T20:58:39.7013038Z # todo 0
+check	Test	2026-10-31T20:58:39.7013298Z # duration_ms 7308.727328
+check	Lint	﻿2026-10-31T20:58:39.7146092Z ##[group]Run npm run lint
+check	Lint	2026-10-31T20:58:39.7146402Z ^[[36;1mnpm run lint^[[0m
+check	Lint	2026-10-31T20:58:39.7176201Z shell: /usr/bin/bash -e {0}
+check	Lint	2026-10-31T20:58:39.7176463Z ##[endgroup]
+check	Lint	2026-10-31T20:58:39.8261104Z 
+check	Lint	2026-10-31T20:58:39.8261680Z > whytho@0.1.0 lint
+check	Lint	2026-10-31T20:58:39.8262123Z > eslint .
+check	Lint	2026-10-31T20:58:39.8262295Z 
+check	Post Run actions/setup-node@v4	﻿2026-10-31T20:58:44.8637884Z Post job cleanup.
+check	Post Run actions/setup-node@v4	2026-10-31T20:58:44.9896005Z (node:3107) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+check	Post Run actions/setup-node@v4	2026-10-31T20:58:44.9897719Z (Use `node --trace-deprecation ...` to show where the warning was created)
+check	Post Run actions/setup-node@v4	2026-10-31T20:58:45.0105451Z [command]/usr/bin/tar --posix -cf cache.tzst --exclude cache.tzst -P -C /home/runner/work/whytho/whytho --files-from manifest.txt --use-compress-program zstdmt
+check	Post Run actions/setup-node@v4	2026-10-31T20:58:45.6891974Z (node:3107) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+check	Post Run actions/setup-node@v4	2026-10-31T20:58:46.6757231Z Sent 134217728 of 251372571 (53.4%), 127.9 MBs/sec
+check	Post Run actions/setup-node@v4	2026-10-31T20:58:46.9056388Z Sent 251372571 of 251372571 (100.0%), 194.7 MBs/sec
+check	Post Run actions/setup-node@v4	2026-10-31T20:58:47.1024008Z Cache saved with the key: node-cache-Linux-x64-npm-10d03429aa06e628272690b08ca28c5909a3e0d756e1a693dfa49de8ee48a116
+check	Post Run actions/checkout@v4	﻿2026-10-31T20:58:47.1201902Z Post job cleanup.
+check	Post Run actions/checkout@v4	2026-10-31T20:58:47.2085624Z [command]/usr/bin/git version
+check	Post Run actions/checkout@v4	2026-10-31T20:58:47.2125787Z git version 2.56.0
+check	Post Run actions/checkout@v4	2026-10-31T20:58:47.2163158Z Temporarily overriding HOME='/home/runner/work/_temp/527dba9a-bb25-42dc-baf5-8506162727d5' before making global git config changes
+check	Post Run actions/checkout@v4	2026-10-31T20:58:47.2164262Z Adding repository directory to the temporary git global config as a safe directory
+check	Post Run actions/checkout@v4	2026-10-31T20:58:47.2168636Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/whytho/whytho
+check	Post Run actions/checkout@v4	2026-10-31T20:58:47.2206657Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+check	Post Run actions/checkout@v4	2026-10-31T20:58:47.2241557Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+check	Post Run actions/checkout@v4	2026-10-31T20:58:47.2522809Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+check	Post Run actions/checkout@v4	2026-10-31T20:58:47.2548437Z http.https://github.com/.extraheader
+check	Post Run actions/checkout@v4	2026-10-31T20:58:47.2560504Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+check	Post Run actions/checkout@v4	2026-10-31T20:58:47.2593971Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+check	Post Run actions/checkout@v4	2026-10-31T20:58:47.2867515Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+check	Post Run actions/checkout@v4	2026-10-31T20:58:47.2902796Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+check	Complete job	﻿2026-10-31T20:58:47.3331900Z Cleaning up orphan processes
+check	Complete job	2026-10-31T20:58:47.3858156Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-node@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

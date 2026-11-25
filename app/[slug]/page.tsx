@@ -25,7 +25,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const politician = await getProfileMetadata((await params).slug);
   if (!politician) return { title: "Politician not found | WhyTho" };
   const title = `${politician.full_name} | WhyTho`;
-  const description = `Ask ${politician.full_name} a question. Support the questions you want answered and read published official responses and clearly labeled AI analysis.`;
+  const description = politician.is_active
+    ? `Ask ${politician.full_name} a question. Support the questions you want answered and read published official responses and clearly labeled AI analysis.`
+    : `Read the public question and response record for ${politician.full_name}.`;
   const images = politician.photo_url ? [politician.photo_url] : [];
   return {
     title, description,
@@ -80,7 +82,7 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
   const baseUrl = safeWebUrl(process.env.NEXT_PUBLIC_SITE_URL) ?? "https://whytho.us/";
   const jsonLd = {
     "@context": "https://schema.org", "@type": "Person", name: politician.full_name,
-    jobTitle: politician.office ?? undefined, url: new URL(`/${politician.slug}`, baseUrl).href,
+    jobTitle: politician.is_active ? politician.office ?? undefined : undefined, url: new URL(`/${politician.slug}`, baseUrl).href,
     image: politician.photo_url ?? undefined, description: politician.bio ?? undefined,
     sameAs: links.map((link) => link.href),
   };
@@ -96,7 +98,7 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
           <Link href="/#find-politician">← Find a politician</Link>
           <span>{politician.is_test ? "Test profile" : "The public record"}</span>
         </div>
-        <OwnerBanner politicianId={politician.id} />
+        {politician.is_active && <OwnerBanner politicianId={politician.id} />}
         {isHistoricalView && <div className={styles.notice}><p>Archive for the week of {weekStart}. Asking and voting are closed for this week.</p><Link href={`/${politician.slug}`}>Return to this week →</Link></div>}
 
         <section className={styles.hero} aria-labelledby="politician-name">
@@ -108,10 +110,10 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
             <p className={styles.office}>{isCandidate ? "Candidate for " : ""}{[office, ...officeLocation].filter(Boolean).join(" · ")}</p>
             <h1 id="politician-name">{politician.full_name}</h1>
             <p className={styles.identityLine}>{politician.party && <span>{politician.party}</span>}{!politician.is_active && <span>Inactive profile</span>}</p>
-            <p className={styles.verification}>{tierLabel}</p>
-            {politician.is_candidate && politician.candidate_election_year && <p className={styles.candidate}>{politician.candidate_status === "lost" ? "Candidate in" : politician.candidate_status === "withdrew" ? "Withdrew from" : politician.candidate_status === "won" ? "Won in" : "Running in"} {politician.candidate_election_year}{politician.candidate_office ? ` · ${politician.candidate_office}` : ""}{politician.incumbent_challenge === "I" ? " · Incumbent" : ""}</p>}
+            {politician.is_active && <p className={styles.verification}>{tierLabel}</p>}
+            {politician.is_candidate && politician.candidate_election_year && <p className={styles.candidate}>{politician.candidate_status === "lost" ? "Candidate in" : politician.candidate_status === "withdrew" ? "Withdrew from" : politician.candidate_status === "won" ? "Won in" : politician.is_active ? "Running in" : "Candidate in"} {politician.candidate_election_year}{politician.candidate_office ? ` · ${politician.candidate_office}` : ""}{politician.is_active && politician.incumbent_challenge === "I" ? " · Incumbent" : ""}</p>}
             <div className={styles.identityActions}>
-              {currentWeekView ? <AskQuestionLink /> : <Link className={styles.primaryAction} href={`/${politician.slug}#ask-question`}>Ask this week <span aria-hidden="true">↗</span></Link>}
+              {politician.is_active && (currentWeekView ? <AskQuestionLink /> : <Link className={styles.primaryAction} href={`/${politician.slug}#ask-question`}>Ask this week <span aria-hidden="true">↓</span></Link>)}
               <a className={styles.secondaryAction} href="#profile-questions">Read the questions ↓</a>
             </div>
             {politician.bio && <details className={styles.about}><summary>About {politician.full_name}</summary><p>{politician.bio}</p></details>}
@@ -135,17 +137,18 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
         <QuestionAnchorNotice slug={politician.slug} displayedIds={latestQuestion ? [latestQuestion.id] : questions.map((question) => question.id)} />
         <div className={styles.mainLayout}>
           <section className={styles.questions} id="profile-questions" tabIndex={-1} aria-labelledby="questions-heading">
-            <h2 id="questions-heading" className={styles.sectionTitle}>What do you want to know?</h2>
+            <h2 id="questions-heading" className={styles.sectionTitle}>What people are asking</h2>
             <p className={styles.sectionIntro}>{isHistoricalView ? `Questions from the week of ${weekStart}.` : period === "week" ? "Support the questions you want answered. Every vote helps set the agenda." : "Explore the record. Voting is open only for questions from the current week."}</p>
             {!isHistoricalView && <PeriodTabs slug={politician.slug} activePeriod={period} sort={sort} />}
             {matchingQuestions > questions.length && <p className={styles.sectionIntro}>Showing {questions.length} of {matchingQuestions.toLocaleString("en-US")} {sort === "unanswered" ? "unanswered " : ""}questions, {sort === "newest" ? "newest first" : "ranked by net votes"}. The response record covers the full period.</p>}
             <QuestionList questions={questions} latestQuestion={latestQuestion} memberIds={data.memberIds} politicianId={politician.id} politicianSlug={politician.slug} politicianName={politician.full_name} profileVerified={politician.verification_tier === "2" || politician.verification_tier === "3"} weekNumber={viewingWeekNumber} currentWeekNumber={currentWeekNumber} isHistorical={isHistoricalView} period={period} appearance="face" profileSort={sort} />
           </section>
           <aside className={styles.sidebar} aria-label="Ask and explore">
-            {currentWeekView ? <AskQuestionForm politicianId={politician.id} politicianName={politician.full_name} appearance="face" /> : <p className={styles.notice}>New questions go into the current week. <Link href={`/${politician.slug}#ask-question`}>Ask this week →</Link></p>}
-            <div className={styles.help}><h2>A good question gets specific.</h2><ol><li>Ask about a decision, a commitment, or an issue they can act on.</li><li>Keep it clear and respectful.</li><li>Check the questions here first. Add your vote if someone has already asked.</li></ol></div>
+            {politician.is_active ? <><div className={styles.askSlot}>{currentWeekView ? <AskQuestionForm politicianId={politician.id} politicianName={politician.full_name} appearance="face" /> : <p className={styles.notice}>New questions go into the current week. <Link href={`/${politician.slug}#ask-question`}>Ask this week →</Link></p>}</div>
+              <div className={styles.help}><h2>A good question gets specific.</h2><ol><li>Ask about a decision, a commitment, or an issue they can act on.</li><li>Keep it clear and respectful.</li><li>Check the questions here first. Add your vote if someone has already asked.</li></ol></div>
+            </> : <p className={styles.notice}>This profile is archived. New questions are closed.</p>}
             {data.archiveWeeks.length > 0 && <details className={styles.archive}><summary>Previous weeks</summary><nav aria-label="Weekly archive">{data.archiveWeeks.map((archiveWeek) => <Link key={archiveWeek} href={`/${politician.slug}?week=${archiveWeek}#profile-questions`} aria-current={isHistoricalView && viewingWeekNumber === archiveWeek ? "page" : undefined}>{formatWeekStart(archiveWeek)} <span aria-hidden="true">↗</span></Link>)}</nav></details>}
-            {politician.verification_tier === "0" && <p className={styles.notice}>Part of {politician.full_name}’s team? <Link href={`/verify?prefill=${politician.id}`}>Claim this profile →</Link></p>}
+            {politician.is_active && politician.verification_tier === "0" && <p className={styles.notice}>Part of {politician.full_name}’s team? <Link href={`/verify?prefill=${politician.id}`}>Claim this profile →</Link></p>}
           </aside>
         </div>
         <footer className={styles.footer}><Link href="/#find-politician">Find another politician</Link><Link href="/how-it-works">How WhyTho works</Link><Link href="/faq">Questions about WhyTho</Link></footer>

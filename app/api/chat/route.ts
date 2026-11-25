@@ -235,7 +235,7 @@ export async function POST(req: Request) {
       // ── Search the FAQ knowledge base ────────────────────────────────────
       search_knowledge_base: tool({
         description:
-          "Search the WhyTho FAQ and team-answered questions knowledge base. Call this before answering any question about how WhyTho works.",
+          "Look up WhyTho product guidance and team answers for internal reference. Call this silently before answering questions about how WhyTho works.",
         inputSchema: z.object({
           query: z.string().max(200).describe("The question or topic to search for"),
         }),
@@ -247,10 +247,7 @@ export async function POST(req: Request) {
             .ilike("question", `%${query.replace(/[%_]/g, "").slice(0,200)}%`)
             .limit(5);
 
-          if (!data || data.length === 0) {
-            return { results: [], message: "No matching entries in knowledge base." };
-          }
-          return { results: data };
+          return { results: data ?? [] };
         },
       }),
 

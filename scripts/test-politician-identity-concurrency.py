@@ -58,3 +58,12 @@ a,b = race(f"BEGIN; SET ROLE service_role; SELECT public.test_link('{source}','{
 expect(a.returncode == b.returncode == 0 and target in b.stdout, 'atomic publisher shares identity lock order without deadlock', (a,b))
 r = query(f"SELECT q.politician_id='{target}' AND x.politician_id='{source}' FROM public.x_posts x JOIN public.questions q ON q.id=x.whytho_question_id WHERE x.id='{post}'")
 expect(r.stdout.strip() == 't', 'concurrent X publication preserves original collection owner', (r,))
+
+politician = '10000000-0000-4000-8000-000000000015'
+sql = f"SET ROLE service_role; INSERT INTO public.questions(politician_id,submitted_by) VALUES('{politician}','{actor}')"
+with concurrent.futures.ThreadPoolExecutor(max_workers=8) as pool:
+    results = list(pool.map(query, [sql] * 8))
+expect(sum(result.returncode == 0 for result in results) == 5,
+       'only five of eight concurrent questions for one politician are accepted', results)
+expect(all(result.returncode == 0 or 'Question submission limit reached' in result.stderr for result in results),
+       'concurrent quota rejects return the expected error', results)

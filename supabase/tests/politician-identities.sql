@@ -100,8 +100,50 @@ SELECT public.assert_true('20000000-0000-4000-8000-000000000002'::uuid=ANY(publi
 SELECT public.assert_true(public.identity_directory_counts(ARRAY['10000000-0000-4000-8000-000000000001'::uuid],202648)->0->>'questions'='3' AND public.identity_directory_counts(ARRAY['10000000-0000-4000-8000-000000000001'::uuid],202648)->0->>'replies'='0','directory counts preserve original answer ownership');
 SELECT public.assert_true(public.identity_profile_summary('10000000-0000-4000-8000-000000000001','week',202640)->'history'->0->>'week_number'='202647','archive history remains latest eight weeks for historical selected week');
 RESET ROLE;
+
+\ir ../migrations/20261124034421_per_politician_question_limit.sql
+-- The alias question from the fixture is just over a day old and must not count.
+UPDATE public.questions SET created_at = now() - interval '25 hours'
+WHERE id = '20000000-0000-4000-8000-000000000002';
+SELECT public.assert_true(
+  NOT has_function_privilege('anon','public.enforce_question_submission_limit()','EXECUTE')
+  AND NOT has_function_privilege('authenticated','public.enforce_question_submission_limit()','EXECUTE'),
+  'quota trigger remains unavailable to browser roles'
+);
+
 SET ROLE service_role;
-SELECT public.expect_error($$INSERT INTO public.questions(politician_id,submitted_by) VALUES('10000000-0000-4000-8000-000000000002','00000000-0000-4000-8000-000000000001')$$,'P0001','new canonical question quota counts original alias history');
+INSERT INTO public.questions(politician_id,submitted_by,is_seeded)
+VALUES ('10000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000001',true);
+-- Two fixture questions from today (one direct, one via the alias) plus three more make five.
+INSERT INTO public.questions(politician_id,submitted_by)
+SELECT '10000000-0000-4000-8000-000000000002','00000000-0000-4000-8000-000000000001'
+FROM generate_series(1,3);
+SELECT public.assert_true(
+  (SELECT count(*) FROM public.questions q JOIN public.politicians p ON p.id=q.politician_id
+    WHERE q.submitted_by='00000000-0000-4000-8000-000000000001' AND NOT q.is_seeded
+      AND q.created_at > now() - interval '24 hours'
+      AND coalesce(p.canonical_politician_id,p.id)='10000000-0000-4000-8000-000000000001')=5,
+  'fifth question today is accepted because the day-old alias question no longer counts'
+);
+SELECT public.expect_error(
+  $$INSERT INTO public.questions(politician_id,submitted_by)
+    VALUES('10000000-0000-4000-8000-000000000002','00000000-0000-4000-8000-000000000001')$$,
+  'P0001','sixth question within 24 hours is blocked through an alias'
+);
+-- Aging one of today's questions past the window frees exactly one slot.
+UPDATE public.questions SET created_at = now() - interval '24 hours 1 minute'
+WHERE id = '20000000-0000-4000-8000-000000000001';
+INSERT INTO public.questions(politician_id,submitted_by)
+VALUES ('10000000-0000-4000-8000-000000000002','00000000-0000-4000-8000-000000000001');
+SELECT public.expect_error(
+  $$INSERT INTO public.questions(politician_id,submitted_by)
+    VALUES('10000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000001')$$,
+  'P0001','quota refills only as questions age past 24 hours'
+);
+-- A different politician has its own daily allowance.
+INSERT INTO public.questions(politician_id,submitted_by)
+SELECT '10000000-0000-4000-8000-000000000003','00000000-0000-4000-8000-000000000001'
+FROM generate_series(1,5);
 RESET ROLE;
 
 -- An already-collected source uses one canonical question, while X attribution stays original.
