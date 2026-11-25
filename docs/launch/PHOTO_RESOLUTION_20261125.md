@@ -59,6 +59,10 @@ Two pipeline fixes surfaced during the legislator import: 23 legacy rows store a
 | Cabinet and statewide officers | 45 | 29 | 16 (14 no Wikidata match, 2 too small) |
 | Mayors | 50 | 28 | 22 (15 no Wikidata match, 7 too small) |
 
+## State terms research and the operator decision
+
+A same-day check of all 50 legislature websites (`evidence/photos/state-photo-terms-20261125.md`) found only Florida and North Carolina stating a public-domain basis for member photos. California, Oklahoma, Massachusetts and Georgia assert copyright or require permission on their own sites, which contradicts the Commons templates behind 195 of the day's imports. A logged reversal was prepared and dry-run (`scripts/revert-portrait-imports.ts`, `evidence/photos/revert-preview-20261125.json`). **Garrett decided to keep the 195 on the recorded Commons basis.** Each image's basis, template and source remain recorded per profile, so any single image can be reverted later with the same tool.
+
 ## What remains and why
 
 1. **5,180 state legislators, 15 mayors, 14 executives, 13 governors with no Wikidata match.** Wikidata has no item for the person, no image on it, or a name that does not agree with ours. There is no licensed bulk source for these. Paths: the verified-office upload flow that already exists; outreach asking offices to upload (outbound, gated by the external-communication rule); or periodic re-runs of the builders, since Wikidata coverage grows.
