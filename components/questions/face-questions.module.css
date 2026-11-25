@@ -60,7 +60,7 @@
   .askCols { grid-template-columns: 1fr; }
   .starters { padding-left: 0; border-left: 0; padding-top: 14px; border-top: 1px solid light-dark(#b1b3ba, #45474d); }
 }
-.askHint { margin: 0; color: light-dark(#565a62, #bfc0c6); font-size: 14px; line-height: 1.7; }
+.askHint { margin: 0; color: light-dark(#565a62, #bfc0c6); font-size: 14px; line-height: 1.7; max-width: 62ch; text-wrap: pretty; }
 .submitButton { display: inline-flex; justify-content: space-between; align-items: center; gap: 24px; width: fit-content; min-height: 48px; padding: 12px 18px; border: 1px solid light-dark(#151619, #f6f5f1); background: light-dark(#151619, #f6f5f1); color: var(--editorial-paper); font-family: inherit; font-size: 14px; font-weight: 750; line-height: 1.4; cursor: pointer; text-decoration: none; }
 .submitButton:hover:not(:disabled) { background: light-dark(#33363c, #dcdedb); border-color: light-dark(#33363c, #dcdedb); }
 .submitButton:disabled { background: light-dark(#e8e9ec, #3e4047); color: light-dark(#565a62, #c5c6cc); border-color: light-dark(#8b8e96, #5e6067); cursor: not-allowed; }
