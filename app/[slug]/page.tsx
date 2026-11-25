@@ -121,7 +121,7 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
 
           <div className={styles.askSlot}>
             {!politician.is_active ? <p className={styles.notice}>This profile is archived. New questions are closed.</p>
-              : currentWeekView ? <AskQuestionForm politicianId={politician.id} politicianName={politician.full_name} appearance="face" samples={data.sampleQuestions} />
+              : currentWeekView ? <AskQuestionForm politicianId={politician.id} politicianName={politician.full_name} appearance="face" />
               : <p className={styles.notice}>New questions go into the current week. <Link href={`/${politician.slug}#ask-question`}>Ask this week →</Link></p>}
           </div>
         </section>
