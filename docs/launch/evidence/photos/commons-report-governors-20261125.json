@@ -1,0 +1,838 @@
+{
+  "summary": {
+    "checked_at": "2026-11-25T20:43:15.572Z",
+    "scope": "governors",
+    "note": "identifier-keyed Wikidata match (Bioguide P1157 or verified X username P2002); Commons extmetadata license; no database or storage change",
+    "profiles": 98,
+    "counts": {
+      "no_wikidata_image": 37,
+      "no_stable_identifier": 29,
+      "manifest": 25,
+      "ambiguous_identifier": 2,
+      "license_unresolved": 3,
+      "source_too_small": 2
+    },
+    "licenses": {
+      "CC-BY-SA-4.0": 9,
+      "US-federal-official-duty": 7,
+      "CC-BY-4.0": 2,
+      "CC-BY-SA-3.0": 3,
+      "CC-BY-2.0": 2,
+      "CC-BY-SA-2.0": 1,
+      "US-state-public-record": 1
+    },
+    "unresolved": {
+      "public domain claim without a recognised US government basis (public domain)": 3
+    },
+    "manifest": "docs/launch/evidence/photos/commons-manifest-governors-20261125.json"
+  },
+  "rows": [
+    {
+      "politician_id": "004023d3-4790-4969-bc46-b734676f3841",
+      "slug": "tate-reeves-mississippi",
+      "office": "Governor",
+      "key": "P2002:TateReeves",
+      "status": "no_wikidata_image"
+    },
+    {
+      "politician_id": "006b34a4-7ac0-4a0b-a6b3-2d79ee203916",
+      "slug": "kim-reynolds-ia-governor",
+      "office": "Governor",
+      "status": "no_stable_identifier"
+    },
+    {
+      "politician_id": "02433a2b-d4ca-4c6d-8bd7-80c7577560f4",
+      "slug": "patrick-morrisey-west-virginia",
+      "office": "Governor",
+      "key": "P2002:PatrickMorrisey",
+      "status": "no_wikidata_image"
+    },
+    {
+      "politician_id": "04c54e12-8867-4da9-8a3d-42300f010cc1",
+      "slug": "sarah-huckabee-sanders-arkansas",
+      "office": "Governor",
+      "key": "P2002:SarahHuckSanders",
+      "status": "no_wikidata_image"
+    },
+    {
+      "politician_id": "0849fe44-1143-4fd7-8023-90e2dbd39529",
+      "slug": "joe-lombardo-nv",
+      "office": "Governor",
+      "key": "P2002:GovLombardo",
+      "status": "no_wikidata_image"
+    },
+    {
+      "politician_id": "09bbb9ad-a0fd-4c7c-9e86-aca055ef1082",
+      "slug": "ron-desantis-fl",
+      "office": "Governor",
+      "key": "P2002:GovRonDeSantis",
+      "status": "no_wikidata_image"
+    },
+    {
+      "politician_id": "0c67d15c-d23c-4302-85ee-6ab2b12ffa00",
+      "slug": "laura-kelly-ks",
+      "office": "Governor",
+      "key": "P2002:GovernorLauraKelly",
+      "status": "no_wikidata_image"
+    },
+    {
+      "politician_id": "0d70d307-d4e7-47b8-a50e-20a754a83371",
+      "slug": "kathy-hochul-ny",
+      "office": "Governor",
+      "key": "P2002:GovKathyHochul",
+      "status": "manifest",
+      "wikidata": "http://www.wikidata.org/entity/Q45956",
+      "file": "File:Kathy Hochul, November 2017.jpeg",
+      "width": 1500,
+      "height": 2100,
+      "license": "CC-BY-SA-4.0"
+    },
+    {
+      "politician_id": "0e874384-e188-4016-b197-7c6cae53d7bb",
+      "slug": "tate-reeves-ms",
+      "office": "Governor",
+      "key": "P2002:TateReeves",
+      "status": "no_wikidata_image"
+    },
+    {
+      "politician_id": "0eb80c3e-f211-4da9-a6b3-02f9eaf7b0db",
+      "slug": "dan-mckee-ri-governor",
+      "office": "Governor",
+      "status": "no_stable_identifier"
+    },
+    {
+      "politician_id": "0f5acded-bf04-4dde-b139-e4a19a85dfc1",
+      "slug": "maura-healey-ma-governor",
+      "office": "Governor",
+      "status": "no_stable_identifier"
+    },
+    {
+      "politician_id": "0fee523c-b559-4a8c-b325-c7d07880f229",
+      "slug": "maura-healey-massachusetts",
+      "office": "Governor",
+      "key": "P2002:MassGovernor",
+      "status": "ambiguous_identifier",
+      "wikidata": "http://www.wikidata.org/entity/Q887117"
+    },
+    {
+      "politician_id": "10904e74-2383-43ed-8a59-72099624da7b",
+      "slug": "tina-kotek-or",
+      "office": "Governor",
+      "key": "P2002:TinaKotek",
+      "status": "no_wikidata_image"
+    },
+    {
+      "politician_id": "15c80803-9703-4fa5-ad88-f4d3481ad65d",
+      "slug": "brian-kemp-ga",
+      "office": "Governor",
+      "key": "P2002:BrianKempGA",
+      "status": "license_unresolved",
+      "wikidata": "http://www.wikidata.org/entity/Q4964973",
+      "file": "File:Brian Kemp portrait, 2024 (cropped) (cropped).jpg",
+      "width": 541,
+      "height": 685,
+      "detail": "public domain claim without a recognised US government basis (public domain)"
+    },
+    {
+      "politician_id": "1c51bb70-241d-4c59-b493-b39fe1fa281e",
+      "slug": "ned-lamont-connecticut",
+      "office": "Governor",
+      "key": "P2002:GovNedLamont",
+      "status": "manifest",
+      "wikidata": "http://www.wikidata.org/entity/Q1973878",
+      "file": "File:Governor Ned Lamont of Connecticut, official portrait.jpg",
+      "width": 1453,
+      "height": 1990,
+      "license": "CC-BY-SA-4.0"
+    },
+    {
+      "politician_id": "1d162bdb-408e-4455-8ea8-398e1f3a740c",
+      "slug": "maura-healey-ma",
+      "office": "Governor",
+      "key": "P2002:MassGovernor",
+      "status": "ambiguous_identifier",
+      "wikidata": "http://www.wikidata.org/entity/Q887117"
+    },
+    {
+      "politician_id": "1f3e8711-5fb7-478e-bf0c-9d145d11b127",
+      "slug": "michelle-lujan-grisham-nm-governor",
+      "office": "Governor",
+      "status": "no_stable_identifier"
+    },
+    {
+      "politician_id": "25059ccc-0a21-4427-af44-8257ac88eddd",
+      "slug": "janet-mills-maine",
+      "office": "Governor",
+      "key": "P2002:GovJanetMills",
+      "status": "manifest",
+      "wikidata": "http://www.wikidata.org/entity/Q6153618",
+      "file": "File:Maine congressional delegation meets with Gov Janet Mills (cropped).jpg",
+      "width": 746,
+      "height": 965,
+      "license": "US-federal-official-duty"
+    },
+    {
+      "politician_id": "2674f09d-e6ef-4742-b214-07b65306bdb0",
+      "slug": "bill-lee-tn",
+      "office": "Governor",
+      "key": "P2002:BillLeeTN",
+      "status": "manifest",
+      "wikidata": "http://www.wikidata.org/entity/Q58321685",
+      "file": "File:Hob Nob on the State Line with Tennessee Governor Bill Lee, Bristol (cropped).2.jpg",
+      "width": 1248,
+      "height": 1657,
+      "license": "CC-BY-4.0"
+    },
+    {
+      "politician_id": "26c10335-ed70-4faa-9c73-822a495050a4",
+      "slug": "henry-mcmaster-sc-governor",
+      "office": "Governor",
+      "status": "no_stable_identifier"
+    },
+    {
+      "politician_id": "28090034-37bd-4b84-bb48-3bbd60697abb",
+      "slug": "tony-evers-wi",
+      "office": "Governor",
+      "key": "P2002:GovEvers",
+      "status": "no_wikidata_image"
+    },
+    {
+      "politician_id": "28c74eff-ffaf-4c65-b804-a3c9dbf38e79",
+      "slug": "ned-lamont-ct-governor",
+      "office": "Governor",
+      "status": "no_stable_identifier"
+    },
+    {
+      "politician_id": "2f60a979-55ba-4a7c-8eff-6c72706dd0d5",
+      "slug": "joe-lombardo-nevada",
+      "office": "Governor",
+      "key": "P2002:GovLombardo",
+      "status": "no_wikidata_image"
+    },
+    {
+      "politician_id": "2ffbbc76-1690-488a-8886-d58fe720b19a",
+      "slug": "michelle-lujan-grisham-nm",
+      "office": "Governor",
+      "key": "P2002:GovMLG",
+      "status": "manifest",
+      "wikidata": "http://www.wikidata.org/entity/Q3917203",
+      "file": "File:Michelle Lujan Grisham official photo.jpg",
+      "width": 2832,
+      "height": 4256,
+      "license": "US-federal-official-duty"
+    },
+    {
+      "politician_id": "30f9d3e8-64dd-47b9-b715-5f7947c88d2e",
+      "slug": "tim-walz-mn",
+      "office": "Governor",
+      "key": "P2002:GovTimWalz",
+      "status": "manifest",
+      "wikidata": "http://www.wikidata.org/entity/Q2434360",
+      "file": "File:Tim Walz by Gage Skidmore.jpg",
+      "width": 1884,
+      "height": 2300,
+      "license": "CC-BY-SA-3.0"
+    },
+    {
+      "politician_id": "33b82fce-b116-4e04-83ef-c9c18dba33cc",
+      "slug": "janet-mills-me-governor",
+      "office": "Governor",
+      "status": "no_stable_identifier"
+    },
+    {
+      "politician_id": "39a5a993-f21a-4b31-9b11-1087c48b2e2e",
+      "slug": "sarah-huckabee-sanders-ar-governor",
+      "office": "Governor",
+      "status": "no_stable_identifier"
+    },
+    {
+      "politician_id": "3b1a46cc-381b-45c9-9778-e8a3b478b44b",
+      "slug": "sarah-huckabee-sanders-ar",
+      "office": "Governor",
+      "key": "P2002:SarahHuckSanders",
+      "status": "no_wikidata_image"
+    },
+    {
+      "politician_id": "3c78dcb0-f850-4a74-a4ec-d2575b9a85bd",
+      "slug": "kelly-ayotte-new-hampshire",
+      "office": "Governor",
+      "status": "no_stable_identifier"
+    },
+    {
+      "politician_id": "3cfd5455-eeb1-46fb-954c-a5723c600d80",
+      "slug": "greg-gianforte-montana",
+      "office": "Governor",
+      "key": "P2002:GovGianforte",
+      "status": "no_wikidata_image"
+    },
+    {
+      "politician_id": "3e5fb22e-2fd7-4e89-b54b-508702a35766",
+      "slug": "josh-shapiro-pa",
+      "office": "Governor",
+      "key": "P2002:GovernorShapiro",
+      "status": "manifest",
+      "wikidata": "http://www.wikidata.org/entity/Q6289368",
+      "file": "File:Josh Shapiro 2022 (cropped).jpg",
+      "width": 1596,
+      "height": 2129,
+      "license": "CC-BY-2.0"
+    },
+    {
+      "politician_id": "3ec082a2-2dd9-4f8c-8f23-3fb994930852",
+      "slug": "laura-kelly-kansas",
+      "office": "Governor",
+      "key": "P2002:GovernorLauraKelly",
+      "status": "no_wikidata_image"
+    },
+    {
+      "politician_id": "43162f8b-377e-483e-aa53-1b818c259a5f",
+      "slug": "mike-kehoe-missouri",
+      "office": "Governor",
+      "status": "no_stable_identifier"
+    },
+    {
+      "politician_id": "43199e48-d1d3-4ec1-8e8f-68adb5fc3713",
+      "slug": "tony-evers-wi-governor",
+      "office": "Governor",
+      "status": "no_stable_identifier"
+    },
+    {
+      "politician_id": "45f9e25f-75b9-4748-ae63-a9062cf7c9c1",
+      "slug": "kim-reynolds-iowa",
+      "office": "Governor",
+      "key": "P2002:KimReynoldsIA",
+      "status": "source_too_small",
+      "wikidata": "http://www.wikidata.org/entity/Q6409269",
+      "file": "File:Kim Reynolds - Official Portrait - 83rd GA.jpg",
+      "width": 300,
+      "height": 420
+    },
+    {
+      "politician_id": "47378c61-623b-469a-aa73-1f4c4f1098be",
+      "slug": "josh-green-hi-governor",
+      "office": "Governor",
+      "status": "no_stable_identifier"
+    },
+    {
+      "politician_id": "47fb01c9-4ac4-4fd6-8530-7a433c955dca",
+      "slug": "jb-pritzker-illinois",
+      "office": "Governor",
+      "key": "P2002:GovPritzker",
+      "status": "no_wikidata_image"
+    },
+    {
+      "politician_id": "48135d43-ac2e-413e-bfad-08a0e15fe56e",
+      "slug": "mike-dewine-oh",
+      "office": "Governor",
+      "key": "P2002:GovMikeDeWine",
+      "status": "no_wikidata_image"
+    },
+    {
+      "politician_id": "4b386df6-66b0-4d50-9e07-87a499fc4611",
+      "slug": "tim-walz-mn-governor",
+      "office": "Governor",
+      "status": "no_stable_identifier"
+    },
+    {
+      "politician_id": "4df22bc2-dec5-41cc-981f-7ef3af5bd5a4",
+      "slug": "jim-pillen-ne",
+      "office": "Governor",
+      "key": "P2002:GovPillen",
+      "status": "no_wikidata_image"
+    },
+    {
+      "politician_id": "4e83c020-b411-4c19-8643-a44ac124f849",
+      "slug": "kevin-stitt-ok-governor",
+      "office": "Governor",
+      "status": "no_stable_identifier"
+    },
+    {
+      "politician_id": "50bb7c25-ae98-4d22-9685-01f7a2c0d06e",
+      "slug": "henry-mcmaster-sc",
+      "office": "Governor",
+      "key": "P2002:HenryMcMaster",
+      "status": "no_wikidata_image"
+    },
+    {
+      "politician_id": "56390f64-364d-4e17-96f7-9f901f4e0061",
+      "slug": "josh-stein-north-carolina",
+      "office": "Governor",
+      "key": "P2002:GovJoshStein",
+      "status": "no_wikidata_image"
+    },
+    {
+      "politician_id": "583044ea-b4db-4eba-a378-79cd77b9f014",
+      "slug": "ned-lamont-ct",
+      "office": "Governor",
+      "key": "P2002:GovNedLamont",
+      "status": "manifest",
+      "wikidata": "http://www.wikidata.org/entity/Q1973878",
+      "file": "File:Governor Ned Lamont of Connecticut, official portrait.jpg",
+      "width": 1453,
+      "height": 1990,
+      "license": "CC-BY-SA-4.0"
+    },
+    {
+      "politician_id": "5ba208e7-b830-43bb-a825-69ceafe52de5",
+      "slug": "mikie-sherrill-new-jersey",
+      "office": "Governor",
+      "key": "P2002:MikieSherrill",
+      "status": "license_unresolved",
+      "wikidata": "http://www.wikidata.org/entity/Q47087146",
+      "file": "File:Governor of New Jersey Rebecca Michelle \"Mikie\" Sherrill.jpg",
+      "width": 2400,
+      "height": 3000,
+      "detail": "public domain claim without a recognised US government basis (public domain)"
+    },
+    {
+      "politician_id": "5d46f631-3d27-49ff-843c-8cd68cd5baa9",
+      "slug": "mike-dunleavy-ak-governor",
+      "office": "Governor",
+      "status": "no_stable_identifier"
+    },
+    {
+      "politician_id": "5e75899a-11fb-4277-82af-a898712ce897",
+      "slug": "tony-evers-wisconsin",
+      "office": "Governor",
+      "key": "P2002:GovEvers",
+      "status": "no_wikidata_image"
+    },
+    {
+      "politician_id": "61cf306c-0ca5-4ce5-8f92-41121fb4ec19",
+      "slug": "bob-ferguson-washington",
+      "office": "Governor",
+      "status": "no_stable_identifier"
+    },
+    {
+      "politician_id": "64cd1868-1428-403f-a32f-e9c8be553b4e",
+      "slug": "mark-gordon-wyoming",
+      "office": "Governor",
+      "key": "P2002:GovernorGordon",
+      "status": "no_wikidata_image"
+    },
+    {
+      "politician_id": "64cf6a1b-6f9b-4af9-80e9-a3a9c3a79fe1",
+      "slug": "dan-mckee-rhode-island",
+      "office": "Governor",
+      "status": "no_stable_identifier"
+    },
+    {
+      "politician_id": "6723a1be-d841-4f5d-9691-be00eac15300",
+      "slug": "greg-abbott-tx",
+      "office": "Governor",
+      "key": "P2002:GregAbbott_TX",
+      "status": "license_unresolved",
+      "wikidata": "http://www.wikidata.org/entity/Q5605224",
+      "file": "File:Greg Abbott at NASA 2024 (cropped).jpg",
+      "width": 1801,
+      "height": 2559,
+      "detail": "public domain claim without a recognised US government basis (public domain)"
+    },
+    {
+      "politician_id": "67e3dfa4-00e4-48e5-8656-676b25d2fff7",
+      "slug": "kelly-armstrong-north-dakota",
+      "office": "Governor",
+      "status": "no_stable_identifier"
+    },
+    {
+      "politician_id": "67f5d578-c920-47dd-83f4-a62332e23b53",
+      "slug": "dan-mckee-ri",
+      "office": "Governor",
+      "status": "no_stable_identifier"
+    },
+    {
+      "politician_id": "7026036a-171a-47ca-81d0-ee57aa66a00e",
+      "slug": "mike-dunleavy-alaska",
+      "office": "Governor",
+      "key": "P2002:GovDunleavy",
+      "status": "manifest",
+      "wikidata": "http://www.wikidata.org/entity/Q16209663",
+      "file": "File:Governor Mike J. Dunleavy - Official Portrait (3x4 cropped).jpg",
+      "width": 4768,
+      "height": 6357,
+      "license": "CC-BY-SA-4.0"
+    },
+    {
+      "politician_id": "72d02867-1183-4113-9f44-8c1177a6e95d",
+      "slug": "wes-moore-maryland",
+      "office": "Governor",
+      "key": "P2002:GovWesMoore",
+      "status": "no_wikidata_image"
+    },
+    {
+      "politician_id": "7363119d-ea2f-447b-98f1-bbff12abca20",
+      "slug": "jim-pillen-nebraska",
+      "office": "Governor",
+      "key": "P2002:GovPillen",
+      "status": "no_wikidata_image"
+    },
+    {
+      "politician_id": "77ae71dc-d078-4399-a779-f763cc42a296",
+      "slug": "jeff-landry-louisiana",
+      "office": "Governor",
+      "key": "P2002:JeffLandryLA",
+      "status": "no_wikidata_image"
+    },
+    {
+      "politician_id": "7913f0c7-9633-42f9-840a-c3b1bf512973",
+      "slug": "andy-beshear-kentucky",
+      "office": "Governor",
+      "key": "P2002:GovAndyBeshear",
+      "status": "manifest",
+      "wikidata": "http://www.wikidata.org/entity/Q21572825",
+      "file": "File:Kentucky Air Guard supports governor's inauguration (1) (cropped).jpg",
+      "width": 1034,
+      "height": 1288,
+      "license": "US-federal-official-duty"
+    },
+    {
+      "politician_id": "79e96711-f24f-44eb-b930-cf93390b6914",
+      "slug": "tina-kotek-oregon",
+      "office": "Governor",
+      "key": "P2002:TinaKotek",
+      "status": "no_wikidata_image"
+    },
+    {
+      "politician_id": "7eee2f5b-54ba-498a-93c1-75191e27b86c",
+      "slug": "gretchen-whitmer-mi",
+      "office": "Governor",
+      "key": "P2002:GovWhitmer",
+      "status": "manifest",
+      "wikidata": "http://www.wikidata.org/entity/Q5607720",
+      "file": "File:2025 Gretchen Whitmer (cropped).jpg",
+      "width": 655,
+      "height": 873,
+      "license": "US-federal-official-duty"
+    },
+    {
+      "politician_id": "7fbe4c68-1cb6-4b89-b8c5-c7d3abc4501d",
+      "slug": "katie-hobbs-az",
+      "office": "Governor",
+      "key": "P2002:GovernorHobbs",
+      "status": "manifest",
+      "wikidata": "http://www.wikidata.org/entity/Q16226012",
+      "file": "File:Katie Hobbs in 2025.jpg",
+      "width": 1685,
+      "height": 2167,
+      "license": "CC-BY-SA-2.0"
+    },
+    {
+      "politician_id": "82667cc2-e170-4579-9f8b-2480a04a33bf",
+      "slug": "jeff-landry-la",
+      "office": "Governor",
+      "key": "P2002:JeffLandryLA",
+      "status": "no_wikidata_image"
+    },
+    {
+      "politician_id": "82ada9fa-96e8-4cf9-ba1a-90db0bf60211",
+      "slug": "larry-rhoden-south-dakota",
+      "office": "Governor",
+      "status": "no_stable_identifier"
+    },
+    {
+      "politician_id": "85907a53-d5ab-4c5b-9ad2-dc7a8e7691f1",
+      "slug": "laura-kelly-ks-governor",
+      "office": "Governor",
+      "status": "no_stable_identifier"
+    },
+    {
+      "politician_id": "86e3ccd2-5c15-47ee-b812-2727bf6c444f",
+      "slug": "spencer-cox-utah",
+      "office": "Governor",
+      "key": "P2002:SpencerJCox",
+      "status": "manifest",
+      "wikidata": "http://www.wikidata.org/entity/Q16208237",
+      "file": "File:Spencer Cox at the Economic Club of Washington D.C. (53545313288).jpg",
+      "width": 1817,
+      "height": 2422,
+      "license": "CC-BY-2.0"
+    },
+    {
+      "politician_id": "87654a2a-be73-4481-b92a-870afdf3d49b",
+      "slug": "brad-little-id",
+      "office": "Governor",
+      "key": "P2002:GovernorLittle",
+      "status": "no_wikidata_image"
+    },
+    {
+      "politician_id": "88483884-dd8b-40c9-a7c3-60fa1fee7423",
+      "slug": "kim-reynolds-ia",
+      "office": "Governor",
+      "key": "P2002:KimReynoldsIA",
+      "status": "source_too_small",
+      "wikidata": "http://www.wikidata.org/entity/Q6409269",
+      "file": "File:Kim Reynolds - Official Portrait - 83rd GA.jpg",
+      "width": 300,
+      "height": 420
+    },
+    {
+      "politician_id": "88648fff-a93f-4d01-90a0-0578ac53f3cd",
+      "slug": "tim-walz-minnesota",
+      "office": "Governor",
+      "key": "P2002:GovTimWalz",
+      "status": "manifest",
+      "wikidata": "http://www.wikidata.org/entity/Q2434360",
+      "file": "File:Tim Walz by Gage Skidmore.jpg",
+      "width": 1884,
+      "height": 2300,
+      "license": "CC-BY-SA-3.0"
+    },
+    {
+      "politician_id": "90e5d63b-f45f-4f0d-bff5-d08883045343",
+      "slug": "bill-lee-tennessee",
+      "office": "Governor",
+      "key": "P2002:BillLeeTN",
+      "status": "manifest",
+      "wikidata": "http://www.wikidata.org/entity/Q58321685",
+      "file": "File:Hob Nob on the State Line with Tennessee Governor Bill Lee, Bristol (cropped).2.jpg",
+      "width": 1248,
+      "height": 1657,
+      "license": "CC-BY-4.0"
+    },
+    {
+      "politician_id": "99575bac-bbd0-44a7-a835-40a56d8c91c1",
+      "slug": "kevin-stitt-ok",
+      "office": "Governor",
+      "key": "P2002:GovKevinStitt",
+      "status": "no_wikidata_image"
+    },
+    {
+      "politician_id": "9b41f9ec-afa3-4080-8b16-dcf9ed794ccc",
+      "slug": "jared-polis-co-governor",
+      "office": "Governor",
+      "status": "no_stable_identifier"
+    },
+    {
+      "politician_id": "9b537e11-86d9-401a-88c0-6386b654fed5",
+      "slug": "wes-moore-md-governor",
+      "office": "Governor",
+      "status": "no_stable_identifier"
+    },
+    {
+      "politician_id": "9c17b993-a368-460c-9d7b-e1cab4b6643f",
+      "slug": "gavin-newsom-california",
+      "office": "Governor",
+      "key": "P2002:GavinNewsom",
+      "status": "manifest",
+      "wikidata": "http://www.wikidata.org/entity/Q461391",
+      "file": "File:Governor of California Gavin Newsom (cropped 3x4).jpg",
+      "width": 3572,
+      "height": 4767,
+      "license": "US-state-public-record"
+    },
+    {
+      "politician_id": "9d1e13c5-372f-4475-aec7-f41a1e188cb3",
+      "slug": "mike-dunleavy-ak",
+      "office": "Governor",
+      "key": "P2002:GovDunleavy",
+      "status": "manifest",
+      "wikidata": "http://www.wikidata.org/entity/Q16209663",
+      "file": "File:Governor Mike J. Dunleavy - Official Portrait (3x4 cropped).jpg",
+      "width": 4768,
+      "height": 6357,
+      "license": "CC-BY-SA-4.0"
+    },
+    {
+      "politician_id": "a3a31558-36c1-4363-92bf-5440f016f62d",
+      "slug": "tina-kotek-or-governor",
+      "office": "Governor",
+      "status": "no_stable_identifier"
+    },
+    {
+      "politician_id": "a5d974d8-6810-4811-8a90-f8b0bf06dcc5",
+      "slug": "josh-green-hi",
+      "office": "Governor",
+      "key": "P2002:GovJoshGreenMD",
+      "status": "manifest",
+      "wikidata": "http://www.wikidata.org/entity/Q16224583",
+      "file": "File:Josh Green Official Photo 2022 (cropped).jpg",
+      "width": 830,
+      "height": 1037,
+      "license": "CC-BY-SA-4.0"
+    },
+    {
+      "politician_id": "a6324c51-cfa7-410c-91f4-a9141f0ff1f1",
+      "slug": "kay-ivey-al",
+      "office": "Governor",
+      "key": "P2002:GovernorKayIvey",
+      "status": "manifest",
+      "wikidata": "http://www.wikidata.org/entity/Q6380211",
+      "file": "File:Portrait-Governor-Kay-Ivey (cropped 2).jpg",
+      "width": 3970,
+      "height": 5813,
+      "license": "CC-BY-SA-4.0"
+    },
+    {
+      "politician_id": "ab335f4c-5dce-4fef-8974-eab9a643b8d9",
+      "slug": "michelle-lujan-grisham-new-mexico",
+      "office": "Governor",
+      "key": "P2002:GovMLG",
+      "status": "manifest",
+      "wikidata": "http://www.wikidata.org/entity/Q3917203",
+      "file": "File:Michelle Lujan Grisham official photo.jpg",
+      "width": 2832,
+      "height": 4256,
+      "license": "US-federal-official-duty"
+    },
+    {
+      "politician_id": "abe8f24e-af62-4d8b-a929-a661722dac16",
+      "slug": "bob-ferguson-wa",
+      "office": "Governor",
+      "status": "no_stable_identifier"
+    },
+    {
+      "politician_id": "ade545b2-f24d-448c-bb09-5026cfffc983",
+      "slug": "j-b-pritzker-il",
+      "office": "Governor",
+      "key": "P2002:GovPritzker",
+      "status": "no_wikidata_image"
+    },
+    {
+      "politician_id": "b04308ef-78b6-4466-a7b1-61477f0ee990",
+      "slug": "jared-polis-co",
+      "office": "Governor",
+      "key": "P2002:jaredpolis",
+      "status": "no_wikidata_image"
+    },
+    {
+      "politician_id": "b3f08da0-7d2a-49fa-a5c9-e6cd11d1cf86",
+      "slug": "brad-little-id-governor",
+      "office": "Governor",
+      "status": "no_stable_identifier"
+    },
+    {
+      "politician_id": "bb952566-86cf-476b-90cd-a1a69b2c584e",
+      "slug": "mark-gordon-wy-governor",
+      "office": "Governor",
+      "status": "no_stable_identifier"
+    },
+    {
+      "politician_id": "bd58210d-5dde-4c3d-91ae-3f42249ef269",
+      "slug": "wes-moore-md",
+      "office": "Governor",
+      "key": "P2002:GovWesMoore",
+      "status": "no_wikidata_image"
+    },
+    {
+      "politician_id": "bff2b813-36f8-4317-8a27-eb0282adccaf",
+      "slug": "jared-polis-colorado",
+      "office": "Governor",
+      "key": "P2002:jaredpolis",
+      "status": "no_wikidata_image"
+    },
+    {
+      "politician_id": "c3c6ed77-0720-47fb-8e4f-f33dd2167d42",
+      "slug": "phil-scott-vermont",
+      "office": "Governor",
+      "key": "P2002:GovPhilScott",
+      "status": "manifest",
+      "wikidata": "http://www.wikidata.org/entity/Q7185808",
+      "file": "File:Phil Scott.jpg",
+      "width": 661,
+      "height": 828,
+      "license": "CC-BY-SA-3.0"
+    },
+    {
+      "politician_id": "c72ddebc-c099-47dd-a6b9-99383317ae49",
+      "slug": "henry-mcmaster-south-carolina",
+      "office": "Governor",
+      "key": "P2002:HenryMcMaster",
+      "status": "no_wikidata_image"
+    },
+    {
+      "politician_id": "c7588da4-d889-4956-879a-957c69ecc36b",
+      "slug": "andy-beshear-ky",
+      "office": "Governor",
+      "key": "P2002:GovAndyBeshear",
+      "status": "manifest",
+      "wikidata": "http://www.wikidata.org/entity/Q21572825",
+      "file": "File:Kentucky Air Guard supports governor's inauguration (1) (cropped).jpg",
+      "width": 1034,
+      "height": 1288,
+      "license": "US-federal-official-duty"
+    },
+    {
+      "politician_id": "cbb4f13c-bf4f-428f-8a1e-6975f51204de",
+      "slug": "joe-lombardo-nv-governor",
+      "office": "Governor",
+      "status": "no_stable_identifier"
+    },
+    {
+      "politician_id": "cbeff2e2-3976-46d5-b900-dfa79b498698",
+      "slug": "mike-braun-indiana",
+      "office": "Governor",
+      "key": "P2002:GovMikeBraun",
+      "status": "no_wikidata_image"
+    },
+    {
+      "politician_id": "d212ba76-bdf1-4f63-bd0d-cab85a5cbcb9",
+      "slug": "kay-ivey-alabama",
+      "office": "Governor",
+      "key": "P2002:GovernorKayIvey",
+      "status": "manifest",
+      "wikidata": "http://www.wikidata.org/entity/Q6380211",
+      "file": "File:Portrait-Governor-Kay-Ivey (cropped 2).jpg",
+      "width": 3970,
+      "height": 5813,
+      "license": "CC-BY-SA-4.0"
+    },
+    {
+      "politician_id": "defeb3b2-dad5-442c-8abc-112f8fef16e9",
+      "slug": "mark-gordon-wy",
+      "office": "Governor",
+      "key": "P2002:GovernorGordon",
+      "status": "no_wikidata_image"
+    },
+    {
+      "politician_id": "e7baf936-4ba6-498d-8853-aee7210b4f6a",
+      "slug": "abigail-spanberger-virginia",
+      "office": "Governor",
+      "key": "P2002:AbigailSpanberger",
+      "status": "no_wikidata_image"
+    },
+    {
+      "politician_id": "f45eaf72-b6a5-49be-bd1a-abfe96544568",
+      "slug": "matt-meyer-delaware",
+      "office": "Governor",
+      "status": "no_stable_identifier"
+    },
+    {
+      "politician_id": "fa9c511c-501a-4e02-a691-5b5819627c42",
+      "slug": "janet-mills-me",
+      "office": "Governor",
+      "key": "P2002:GovJanetMills",
+      "status": "manifest",
+      "wikidata": "http://www.wikidata.org/entity/Q6153618",
+      "file": "File:Maine congressional delegation meets with Gov Janet Mills (cropped).jpg",
+      "width": 746,
+      "height": 965,
+      "license": "US-federal-official-duty"
+    },
+    {
+      "politician_id": "fba1ae9b-2269-49c8-b29b-0eddfdda87aa",
+      "slug": "kevin-stitt-oklahoma",
+      "office": "Governor",
+      "key": "P2002:GovKevinStitt",
+      "status": "no_wikidata_image"
+    },
+    {
+      "politician_id": "fcf6b72a-b134-41f9-8d30-c641d0b21782",
+      "slug": "josh-green-hawaii",
+      "office": "Governor",
+      "key": "P2002:GovJoshGreenMD",
+      "status": "manifest",
+      "wikidata": "http://www.wikidata.org/entity/Q16224583",
+      "file": "File:Josh Green Official Photo 2022 (cropped).jpg",
+      "width": 830,
+      "height": 1037,
+      "license": "CC-BY-SA-4.0"
+    },
+    {
+      "politician_id": "fef030c1-eae6-46ca-ae1b-1f62f1be5c47",
+      "slug": "brad-little-idaho",
+      "office": "Governor",
+      "key": "P2002:GovernorLittle",
+      "status": "no_wikidata_image"
+    }
+  ]
+}

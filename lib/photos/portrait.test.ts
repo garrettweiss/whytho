@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import sharp from "sharp";
-import { normalizeUploadedPortrait } from "./portrait";
+import { normalizeUploadedPortrait, portraitTarget } from "./portrait";
 import { profileInput } from "./profile-input";
 import { photoRightsManifest, approvedRights } from "./rights";
 const id = "11111111-1111-4111-8111-111111111111";
@@ -9,7 +9,16 @@ test("portrait encoding produces bounded JPEG without embedded metadata", async 
   const input = await sharp({ create: { width: 800, height: 1000, channels: 3, background: "#aabbcc" } }).withMetadata().png().toBuffer();
   const output = await normalizeUploadedPortrait(input);
   const meta = await sharp(output).metadata();
-  assert.equal(meta.width, 400); assert.equal(meta.height, 500); assert.equal(meta.format, "jpeg"); assert.equal(meta.exif, undefined);
+  assert.equal(meta.width, 800); assert.equal(meta.height, 1000); assert.equal(meta.format, "jpeg"); assert.equal(meta.exif, undefined);
+});
+test("portraits are capped at 800x1000 and never enlarged", async () => {
+  assert.deepEqual(portraitTarget(2000, 3000), { width: 800, height: 1000 });
+  assert.deepEqual(portraitTarget(500, 625), { width: 500, height: 625 });
+  assert.deepEqual(portraitTarget(450, 550), { width: 440, height: 550 });
+  assert.deepEqual(portraitTarget(1000, 1250), { width: 800, height: 1000 });
+  const small = await sharp({ create: { width: 500, height: 625, channels: 3, background: "#aabbcc" } }).png().toBuffer();
+  const meta = await sharp(await normalizeUploadedPortrait(small)).metadata();
+  assert.equal(meta.width, 500); assert.equal(meta.height, 625);
 });
 test("rejects tiny images, active formats, invalid bytes and oversized files", async () => {
   await assert.rejects(normalizeUploadedPortrait(await sharp({ create: { width: 40, height: 50, channels: 3, background: "white" } }).png().toBuffer()), /400 pixels/);
