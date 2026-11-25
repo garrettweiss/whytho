@@ -1,19 +1,10 @@
 /**
  * GET  /api/settings/profile  — Return current user's profile fields
- * PATCH /api/settings/profile  — Update city, county, state_code, political_affiliation
+ * PATCH /api/settings/profile  — Update optional city, county and state code
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
-
-const VALID_AFFILIATIONS = [
-  "Democrat",
-  "Republican",
-  "Independent",
-  "Green",
-  "Libertarian",
-  "Other",
-] as const;
 
 export async function GET() {
   const supabase = await createClient();
@@ -27,7 +18,7 @@ export async function GET() {
 
   const { data: profile } = await supabase
     .from("user_profiles")
-    .select("city, county, state_code, political_affiliation")
+    .select("city, county, state_code")
     .eq("id", user.id)
     .maybeSingle();
 
@@ -35,7 +26,6 @@ export async function GET() {
     city: profile?.city ?? null,
     county: profile?.county ?? null,
     state_code: profile?.state_code ?? null,
-    political_affiliation: profile?.political_affiliation ?? null,
   });
 }
 
@@ -53,7 +43,6 @@ export async function PATCH(request: NextRequest) {
     city?: string | null;
     county?: string | null;
     state_code?: string | null;
-    political_affiliation?: string | null;
   };
 
   // Validate state_code
@@ -68,25 +57,11 @@ export async function PATCH(request: NextRequest) {
     );
   }
 
-  // Validate political_affiliation
-  if (
-    body.political_affiliation !== undefined &&
-    body.political_affiliation !== null &&
-    !VALID_AFFILIATIONS.includes(body.political_affiliation as (typeof VALID_AFFILIATIONS)[number])
-  ) {
-    return NextResponse.json(
-      { error: `political_affiliation must be one of: ${VALID_AFFILIATIONS.join(", ")}` },
-      { status: 400 }
-    );
-  }
-
   const update: Record<string, string | null> = {};
 
   if ("city" in body) update.city = body.city ?? null;
   if ("county" in body) update.county = body.county ?? null;
   if ("state_code" in body) update.state_code = body.state_code ?? null;
-  if ("political_affiliation" in body)
-    update.political_affiliation = body.political_affiliation ?? null;
 
   if (Object.keys(update).length === 0) {
     return NextResponse.json({ error: "No valid fields to update" }, { status: 400 });

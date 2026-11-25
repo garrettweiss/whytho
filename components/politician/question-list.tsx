@@ -288,19 +288,12 @@ function QuestionCard({ question, politicianSlug, politicianName, isHistorical, 
     startTransition(async () => {
       try {
         const payload = JSON.stringify({ question_id: question.id, week_number: question.week_number, value: next === 0 ? null : next });
-        let response = await fetch("/api/votes", {
+        const response = await fetch("/api/votes", {
           method: "POST", headers: { "Content-Type": "application/json" }, body: payload,
         });
-        // Anonymous voting still goes through the server's session rate limit.
-        if (response.status === 401) {
-          const anonymousResponse = await fetch("/api/auth/anonymous", { method: "POST" });
-          if (anonymousResponse.ok) {
-            response = await fetch("/api/votes", { method: "POST", headers: { "Content-Type": "application/json" }, body: payload });
-          }
-        }
         if (!response.ok) {
           rollBackVote();
-          setVoteError(response.status === 409 ? "Your vote could not be saved. Refresh and try again." : response.status === 429 ? "Voting is temporarily limited. Try again in a few minutes." : "Your vote was not saved. Please try again.");
+          setVoteError(response.status === 401 ? "Sign in with an account to vote." : response.status === 403 ? "Confirm your age and accept the Terms above before voting." : response.status === 409 ? "Your vote could not be saved. Refresh and try again." : response.status === 429 ? "Voting is temporarily limited. Try again in a few minutes." : "Your vote was not saved. Please try again.");
         } else {
           onVoteSaved(question.id, next, voteIdentity);
           onVoteSuccess();
@@ -437,7 +430,7 @@ export function QuestionList({ questions, latestQuestion, politicianId, memberId
   const votesFailed = voteHydration.identity === voteIdentity && voteHydration.key === currentQuestionIdsKey && voteHydration.status === "error";
   const handleVoteSaved = useCallback((questionId: string, value: VoteValue, originIdentity: string | null) => {
     const identity = currentIdentity.current;
-    // The first anonymous vote creates its identity during the request.
+    // Votes belong to the signed-in account.
     if (originIdentity && originIdentity !== identity) return;
     if (savedVotes.current.identity !== identity) savedVotes.current = { identity, version: 0, writes: {} };
     savedVotes.current.version += 1;

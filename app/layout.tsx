@@ -4,6 +4,9 @@ import { SiteNav } from "@/components/ui/site-nav";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { PostHogProvider } from "@/components/analytics/posthog-provider";
 import { ChatWidget } from "@/components/chatbot/chat-widget";
+import { ParticipationBanner } from "@/components/auth/participation-banner";
+import { ParticipationProvider } from "@/components/auth/participation-provider";
+import { LegalFooter } from "@/components/legal/legal-footer";
 import { THEME_STORAGE_KEY } from "@/lib/theme";
 import "./globals.css";
 
@@ -41,12 +44,16 @@ export default function RootLayout({
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <PostHogProvider>
-          <SiteNav />
-          {children}
-          <footer className="mobile-theme-footer">
-            <ThemeToggle placement="footer" />
-          </footer>
-          <ChatWidget />
+          <ParticipationProvider>
+            <SiteNav />
+            <ParticipationBanner />
+            {children}
+            <footer className="mobile-theme-footer">
+              <ThemeToggle placement="footer" />
+            </footer>
+            <LegalFooter />
+            <ChatWidget />
+          </ParticipationProvider>
         </PostHogProvider>
       </body>
     </html>

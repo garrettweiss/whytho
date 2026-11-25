@@ -19,7 +19,6 @@
   color: var(--foreground);
   font-family: var(--font-face-body), Arial, sans-serif;
   line-height: 1.6;
-
   outline-offset: -4px;
 }
 .surface * { box-sizing: border-box; }

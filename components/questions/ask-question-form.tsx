@@ -4,7 +4,8 @@ import { useEffect, useId, useRef, useState, useTransition, type FormEvent } fro
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { DEFAULT_SCRIPT_ID, Turnstile } from "@marsidev/react-turnstile";
-import { useUser } from "@/lib/auth/use-user";
+import { ParticipationConfirmation } from "@/components/auth/participation-banner";
+import { useParticipation } from "@/components/auth/participation-provider";
 import styles from "./face-questions.module.css";
 
 const MIN = 10;
@@ -40,7 +41,7 @@ interface Props {
 }
 
 export function AskQuestionForm({ politicianId, politicianName, onSubmitted, appearance = "default" }: Props) {
-  const { user, isLoading } = useUser();
+  const { user, isLoading, status: participation, retry, requireConfirmation } = useParticipation();
   const router = useRouter();
   const pathname = usePathname();
   const id = useId();
@@ -50,6 +51,9 @@ export function AskQuestionForm({ politicianId, politicianName, onSubmitted, app
   const [isPending, startTransition] = useTransition();
   const [verification, setVerification] = useState<VerificationState>({ status: SITE_KEY ? "loading" : "unavailable", token: null });
   const [verificationAttempt, setVerificationAttempt] = useState(0);
+  const confirmationRef = useRef<HTMLDivElement>(null);
+  const focusConfirmation = useRef(false);
+  const focusVerification = useRef(false);
   const verificationRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const successRef = useRef<HTMLParagraphElement>(null);
@@ -75,7 +79,18 @@ export function AskQuestionForm({ politicianId, politicianName, onSubmitted, app
   }, [success]);
 
   useEffect(() => {
-    if (isLoading || !user || user.is_anonymous || success || isPending || verification.status !== "loading") return;
+    if (participation === "required" && focusConfirmation.current) {
+      confirmationRef.current?.focus();
+      focusConfirmation.current = false;
+    }
+    if (participation === "accepted" && focusVerification.current) {
+      verificationRef.current?.focus();
+      focusVerification.current = false;
+    }
+  }, [participation]);
+
+  useEffect(() => {
+    if (participation !== "accepted" || isLoading || !user || user.is_anonymous || success || isPending || verification.status !== "loading") return;
     // Wait for a challenge callback, not onWidgetLoad (container mount).
     // This also covers blocked scripts without scriptOptions.onError, which
     // removes the library's onload callback in react-turnstile 1.4.2.
@@ -83,7 +98,7 @@ export function AskQuestionForm({ politicianId, politicianName, onSubmitted, app
       setVerification((current) => current.status === "loading" ? { status: "error", token: null } : current);
     }, VERIFICATION_LOAD_TIMEOUT_MS);
     return () => window.clearTimeout(timeout);
-  }, [isLoading, user, success, isPending, verification.status, verificationAttempt]);
+  }, [participation, isLoading, user, success, isPending, verification.status, verificationAttempt]);
 
   function restartVerification() {
     // Remounting alone cannot retry a script that failed to load: the library
@@ -95,7 +110,7 @@ export function AskQuestionForm({ politicianId, politicianName, onSubmitted, app
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (isPending) return;
+    if (isPending || participation !== "accepted") return;
     setError(null);
     if (!user || user.is_anonymous) {
       setError("Sign in to submit a question.");
@@ -112,8 +127,6 @@ export function AskQuestionForm({ politicianId, politicianName, onSubmitted, app
       return;
     }
 
-    // Tokens are single-use, including when the server rejects the question.
-    setVerification({ status: "loading", token: null });
     startTransition(async () => {
       try {
         const response = await fetch("/api/questions", {
@@ -121,8 +134,13 @@ export function AskQuestionForm({ politicianId, politicianName, onSubmitted, app
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ politician_id: politicianId, body: text.trim(), turnstile_token: token }),
         });
-        const data = (await response.json()) as { error?: string };
+        const data = (await response.json()) as { error?: string; code?: string };
         if (!response.ok) {
+          if (response.status === 403 && data.code === "ASSENT_REQUIRED") {
+            focusConfirmation.current = true;
+            requireConfirmation();
+            return;
+          }
           setError(data.error ?? "Your question was not submitted. Please try again.");
           return;
         }
@@ -133,6 +151,7 @@ export function AskQuestionForm({ politicianId, politicianName, onSubmitted, app
       } catch {
         setError("We could not confirm submission. Check the questions before trying again.");
       } finally {
+        // The server may already have used this token.
         restartVerification();
       }
     });
@@ -184,30 +203,40 @@ export function AskQuestionForm({ politicianId, politicianName, onSubmitted, app
     <label htmlFor={`${id}-question`} className={face ? styles.inputLabel : "block text-sm font-medium"}>Your question</label>
     <textarea ref={textareaRef} id={`${id}-question`} name="question" value={text} onChange={(event) => setText(event.target.value)}
       placeholder="What do you want them to answer? Be specific and respectful." rows={4} minLength={MIN} maxLength={MAX} required disabled={isPending}
-      aria-describedby={`${id}-hint ${id}-count${error ? ` ${id}-error` : ""}`} aria-invalid={!!error}
+      aria-describedby={`${id}-hint ${id}-count${error ? ` ${id}-error` : ""}`} aria-invalid={!!error && !isValid}
       className={face ? styles.textarea : "w-full resize-y rounded-md border bg-background px-3 py-2 text-base placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-60"} />
     <div className={face ? styles.formMeta : "flex flex-wrap justify-between gap-2 text-xs text-muted-foreground"}>
       <p id={`${id}-hint`}>10–500 characters. You can ask each politician up to 5 questions per day.</p>
       <span id={`${id}-count`} aria-label={`${charCount} of ${MAX} characters`}>{charCount}/{MAX}</span>
     </div>
-    <div ref={verificationRef} role="group" tabIndex={-1} aria-label="Security verification" aria-describedby={`${id}-verification-status`} className={showVerification ? "space-y-2" : "sr-only"}>
-      {showVerification && <p className={face ? styles.inputLabel : "text-sm font-medium"}>Security verification</p>}
-      <p id={`${id}-verification-status`} role="status" className={canRetryVerification || verification.status === "unavailable" || verification.status === "unsupported" ? (face ? styles.error : "text-sm text-destructive") : textClass}>{VERIFICATION_MESSAGES[verification.status]}</p>
-      {SITE_KEY && <Turnstile key={verificationAttempt} id={`${id}-turnstile`} siteKey={SITE_KEY}
-        style={verified ? { display: "none" } : undefined}
-        options={{ size: "compact", appearance: "interaction-only", theme: face ? "dark" : "auto", retry: "never", refreshExpired: "manual", refreshTimeout: "manual" }}
-        onBeforeInteractive={() => setVerification({ status: "ready", token: null })}
-        onSuccess={(token) => setVerification({ status: token ? "verified" : "error", token: token || null })}
-        onExpire={() => setVerification({ status: "expired", token: null })}
-        onError={(code) => {
-          console.warn("Question verification failed", code);
-          setVerification({ status: "error", token: null });
-        }}
-        onTimeout={() => setVerification({ status: "error", token: null })}
-        onUnsupported={() => setVerification({ status: "unsupported", token: null })} />}
-      {canRetryVerification && <button type="button" disabled={isPending} onClick={restartVerification} className={face ? styles.textButton : "min-h-11 text-sm underline underline-offset-2"}>Retry verification</button>}
-    </div>
-    {error && <p id={`${id}-error`} role="alert" className={face ? styles.error : "text-sm text-destructive"}>{error}</p>}
-    <button type="submit" disabled={!isValid || isPending || !verified} aria-describedby={`${id}-verification-status`} className={buttonClass}>{isPending ? "Submitting…" : "Submit question"} <span aria-hidden="true">↗</span></button>
+    {participation === "checking" && <p role="status" className={textClass}>Checking your age and Terms confirmation…</p>}
+    {participation === "unavailable" && <div>
+      <p role="alert" className={face ? styles.error : "text-sm text-destructive"}>We couldn’t check your age and Terms confirmation. Your draft is still here.</p>
+      <button type="button" onClick={retry} className={face ? styles.textButton : "min-h-11 text-sm underline"}>Retry confirmation check</button>
+    </div>}
+    {(participation === "required" || participation === "saving") && <div ref={confirmationRef} tabIndex={-1} role="group" aria-label="Age and Terms confirmation">
+      <ParticipationConfirmation forQuestion onConfirm={() => { focusVerification.current = true; }} />
+    </div>}
+    {participation === "accepted" && <>
+      <div ref={verificationRef} role="group" tabIndex={-1} aria-label="Security verification" aria-describedby={`${id}-verification-status`} className={showVerification ? "space-y-2" : "sr-only"}>
+        {showVerification && <p className={face ? styles.inputLabel : "text-sm font-medium"}>Security verification</p>}
+        <p id={`${id}-verification-status`} role="status" className={canRetryVerification || verification.status === "unavailable" || verification.status === "unsupported" ? (face ? styles.error : "text-sm text-destructive") : textClass}>{VERIFICATION_MESSAGES[verification.status]}</p>
+        {SITE_KEY && <Turnstile key={verificationAttempt} id={`${id}-turnstile`} siteKey={SITE_KEY}
+          style={verified ? { display: "none" } : undefined}
+          options={{ size: "compact", appearance: "interaction-only", theme: face ? "dark" : "auto", retry: "never", refreshExpired: "manual", refreshTimeout: "manual" }}
+          onBeforeInteractive={() => setVerification({ status: "ready", token: null })}
+          onSuccess={(token) => setVerification({ status: token ? "verified" : "error", token: token || null })}
+          onExpire={() => setVerification({ status: "expired", token: null })}
+          onError={(code) => {
+            console.warn("Question verification failed", code);
+            setVerification({ status: "error", token: null });
+          }}
+          onTimeout={() => setVerification({ status: "error", token: null })}
+          onUnsupported={() => setVerification({ status: "unsupported", token: null })} />}
+        {canRetryVerification && <button type="button" disabled={isPending} onClick={restartVerification} className={face ? styles.textButton : "min-h-11 text-sm underline underline-offset-2"}>Retry verification</button>}
+      </div>
+      {error && <p id={`${id}-error`} role="alert" className={face ? styles.error : "text-sm text-destructive"}>{error}</p>}
+      <button type="submit" disabled={!isValid || isPending || !verified} aria-describedby={`${id}-verification-status`} className={buttonClass}>{isPending ? "Submitting…" : "Submit question"} <span aria-hidden="true">↗</span></button>
+    </>}
   </form>;
 }

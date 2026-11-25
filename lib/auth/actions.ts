@@ -30,14 +30,7 @@ export async function signInWithMagicLink(
 }
 
 export async function signInAnonymously(): Promise<void> {
-  const supabase = await createClient();
-  const { error } = await supabase.auth.signInAnonymously();
-
-  if (error) {
-    redirect("/sign-in?error=anon_auth_failed");
-  }
-
-  redirect("/");
+  redirect("/sign-in");
 }
 
 export async function signOut(): Promise<void> {

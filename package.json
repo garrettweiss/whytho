@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "test": "node --import tsx --test lib/identity/*.test.ts lib/civic/*.test.ts lib/directory/*.test.ts lib/profile/*.test.ts lib/leaderboard/*.test.ts lib/elections/*.test.ts lib/photos/*.test.ts lib/ai/evidence.test.ts lib/security/*.test.ts lib/notifications/*.test.ts components/profile/*.test.ts components/questions/*.test.ts components/auth/*.test.ts components/answers/*.test.ts components/verify/*.test.ts scripts/*integration.test.ts",
+    "test": "node --import tsx --test lib/auth/*.test.ts lib/identity/*.test.ts lib/civic/*.test.ts lib/directory/*.test.ts lib/profile/*.test.ts lib/leaderboard/*.test.ts lib/elections/*.test.ts lib/photos/*.test.ts lib/ai/evidence.test.ts lib/security/*.test.ts lib/notifications/*.test.ts components/profile/*.test.ts components/questions/*.test.ts components/auth/*.test.ts components/answers/*.test.ts components/verify/*.test.ts scripts/*integration.test.ts",
     "type-check": "tsc --noEmit",
     "test:security:db": "bash scripts/test-launch-security.sh",
     "test:accounts:db": "sh scripts/test-account-database.sh"
