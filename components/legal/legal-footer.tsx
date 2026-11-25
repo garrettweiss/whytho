@@ -1,15 +1,27 @@
 import Link from "next/link";
+import { faceBody } from "@/components/home/fonts";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import styles from "./legal-footer.module.css";
 
-export function LegalFooter() {
+const FOOTER_LINKS = [
+  { href: "/leaderboard", label: "Leaderboard" },
+  { href: "/races", label: "Elections" },
+  { href: "/verify", label: "For politicians" },
+  { href: "/privacy", label: "Privacy" },
+  { href: "/terms", label: "Terms" },
+  { href: "/report", label: "Report a problem" },
+];
+
+/** Single site-wide footer: brand line on the left, site and legal links on one row to the right. */
+export function SiteFooter() {
   return (
-    <footer className="border-t border-[var(--editorial-rule)] bg-[var(--editorial-paper)] text-[var(--editorial-ink)]">
-      <nav aria-label="Legal and support" className="mx-auto flex max-w-7xl flex-wrap gap-x-6 px-4 pb-4 pt-4 text-sm sm:px-8 min-[901px]:pb-20">
-        <Link className="inline-flex min-h-11 items-center underline underline-offset-4" href="/privacy">Privacy notice</Link>
-        <Link className="inline-flex min-h-11 items-center underline underline-offset-4" href="/terms">Terms of use</Link>
-        <Link className="inline-flex min-h-11 items-center underline underline-offset-4" href="/report">Report a problem</Link>
-        <Link className="inline-flex min-h-11 items-center underline underline-offset-4" href="/report#intimate-images">Request intimate-image removal</Link>
-      </nav>
+    <footer className={`${styles.footer} ${faceBody.variable}`}>
+      <div className={styles.inner}>
+        <p className={styles.brand}>whytho? · Questions deserve answers.</p>
+        <nav aria-label="Site and legal links" className={styles.links}>
+          {FOOTER_LINKS.map(link => <Link key={link.href} href={link.href}>{link.label}</Link>)}
+        </nav>
+      </div>
       <div className="mobile-theme-footer">
         <ThemeToggle placement="footer" />
       </div>
