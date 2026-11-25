@@ -4,7 +4,7 @@ import {createServer} from 'node:http';
 import {createRequire} from 'node:module';
 import {spawn} from 'node:child_process';
 import {readFile,writeFile,mkdir,copyFile,symlink,open} from 'node:fs/promises';
-import {join,resolve,dirname} from 'node:path';
+import {join,dirname} from 'node:path';
 import {createHash} from 'node:crypto';
 export async function runLocalSSRBrowser({root,authBase,messages,runtime,roleData}){
  const app=join(root,'next-app'),repo=process.cwd(),appOrigin='http://localhost:55972',proxyOrigin='http://127.0.0.1:55973';

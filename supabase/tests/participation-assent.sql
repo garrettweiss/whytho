@@ -1,0 +1,36 @@
+-- Synthetic-only local acceptance. Retains fixtures. Never target production.
+CREATE FUNCTION pg_temp.expect_denied(statement text) RETURNS void LANGUAGE plpgsql AS $$ BEGIN
+ BEGIN EXECUTE statement; EXCEPTION WHEN insufficient_privilege OR invalid_parameter_value THEN RETURN; END;
+ RAISE EXCEPTION 'Expected denial'; END $$;
+INSERT INTO auth.users(id,email,is_anonymous) VALUES('11111111-1234-4123-8123-111111111111','adult@example.test',false),('22222222-1234-4123-8123-222222222222','legacy@example.test',false),('33333333-1234-4123-8123-333333333333',NULL,true);
+INSERT INTO public.politicians(id,slug,full_name) VALUES('44444444-1234-4123-8123-444444444444','participation-local-test','Synthetic Participation Office');
+INSERT INTO public.questions(id,politician_id,week_number,body) VALUES('55555555-1234-4123-8123-555555555555','44444444-1234-4123-8123-444444444444',public.current_week_number(),'What is the synthetic participation policy?');
+GRANT USAGE ON SCHEMA auth TO authenticated;
+SELECT set_config('request.jwt.claim.sub','33333333-1234-4123-8123-333333333333',false);
+SET ROLE authenticated;
+SELECT pg_temp.expect_denied($$SELECT public.accept_participation_terms('terms-2026-11-23',true)$$);
+RESET ROLE;
+SELECT set_config('request.jwt.claim.sub','22222222-1234-4123-8123-222222222222',false);
+SET ROLE authenticated;
+DO $$ BEGIN IF public.has_current_participation_assent() THEN RAISE EXCEPTION 'Legacy user unexpectedly accepted'; END IF; END $$;
+SELECT pg_temp.expect_denied($$INSERT INTO public.votes(user_id,question_id,week_number,value) VALUES('22222222-1234-4123-8123-222222222222','55555555-1234-4123-8123-555555555555',public.current_week_number(),1)$$);
+SELECT pg_temp.expect_denied($$SELECT public.accept_participation_terms('old',true)$$);
+SELECT pg_temp.expect_denied($$SELECT public.accept_participation_terms('terms-2026-11-23',false)$$);
+RESET ROLE;
+SELECT pg_temp.expect_denied($$SELECT public.claim_politician_profile('22222222-1234-4123-8123-222222222222','44444444-1234-4123-8123-444444444444')$$);
+SELECT set_config('request.jwt.claim.sub','11111111-1234-4123-8123-111111111111',false);
+SET ROLE authenticated;
+SELECT public.accept_participation_terms('terms-2026-11-23',true);
+SELECT public.accept_participation_terms('terms-2026-11-23',true);
+DO $$ BEGIN IF NOT public.has_current_participation_assent() THEN RAISE EXCEPTION 'Accepted user blocked'; END IF; END $$;
+INSERT INTO public.votes(user_id,question_id,week_number,value) VALUES('11111111-1234-4123-8123-111111111111','55555555-1234-4123-8123-555555555555',public.current_week_number(),1);
+UPDATE public.votes SET value=-1 WHERE question_id='55555555-1234-4123-8123-555555555555';
+DO $$ BEGIN IF (SELECT count(*) FROM public.votes WHERE question_id='55555555-1234-4123-8123-555555555555')<>1 THEN RAISE EXCEPTION 'Own vote unavailable'; END IF; END $$;
+RESET ROLE;
+SELECT public.claim_politician_profile('11111111-1234-4123-8123-111111111111','44444444-1234-4123-8123-444444444444');
+SELECT set_config('request.jwt.claim.sub','22222222-1234-4123-8123-222222222222',false);
+SET ROLE authenticated;
+DO $$ BEGIN IF (SELECT count(*) FROM public.votes WHERE question_id='55555555-1234-4123-8123-555555555555')<>0 THEN RAISE EXCEPTION 'Private votes leaked'; END IF; END $$;
+RESET ROLE;
+DO $$ BEGIN IF (SELECT count(*) FROM public.participation_assents WHERE user_id='11111111-1234-4123-8123-111111111111')<>1 THEN RAISE EXCEPTION 'Assent retry duplicated'; END IF; END $$;
+SELECT 'PASS: anonymous and legacy rejected, affirmative current assent idempotent, accepted vote insert/change and claim, other-account vote privacy';

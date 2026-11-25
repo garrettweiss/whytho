@@ -12,7 +12,7 @@ import { PeriodTabs } from "@/components/politician/period-tabs";
 import { ProfileViewTracker } from "@/components/analytics/profile-view-tracker";
 import { PhotoCredit } from "@/components/profile/photo-credit";
 import { ProfilePortrait } from "@/components/profile/profile-portrait";
-import { AskQuestionLink, QuestionAnchorNotice } from "@/components/profile/profile-actions";
+import { QuestionAnchorNotice } from "@/components/profile/profile-actions";
 import { faceBody, faceDisplay } from "@/components/home/fonts";
 import styles from "@/components/profile/profile.module.css";
 
@@ -110,28 +110,29 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
             <p className={styles.office}>{isCandidate ? "Candidate for " : ""}{[office, ...officeLocation].filter(Boolean).join(" · ")}</p>
             <h1 id="politician-name">{politician.full_name}</h1>
             <p className={styles.identityLine}>{politician.party && <span>{politician.party}</span>}{!politician.is_active && <span>Inactive profile</span>}</p>
-            {politician.is_active && <p className={styles.verification}>{tierLabel}</p>}
+            {politician.is_active && <p className={styles.verification}>{tierLabel}{politician.verification_tier === "0" && <>. Part of {politician.full_name}’s team? <Link href={`/verify?prefill=${politician.id}`}>Claim this profile →</Link></>}</p>}
             {politician.is_candidate && politician.candidate_election_year && <p className={styles.candidate}>{politician.candidate_status === "lost" ? "Candidate in" : politician.candidate_status === "withdrew" ? "Withdrew from" : politician.candidate_status === "won" ? "Won in" : politician.is_active ? "Running in" : "Candidate in"} {politician.candidate_election_year}{politician.candidate_office ? ` · ${politician.candidate_office}` : ""}{politician.is_active && politician.incumbent_challenge === "I" ? " · Incumbent" : ""}</p>}
             <div className={styles.identityActions}>
-              {politician.is_active && (currentWeekView ? <AskQuestionLink /> : <Link className={styles.primaryAction} href={`/${politician.slug}#ask-question`}>Ask this week <span aria-hidden="true">↓</span></Link>)}
               <a className={styles.secondaryAction} href="#profile-questions">Read the questions ↓</a>
             </div>
             {politician.bio && <details className={styles.about}><summary>About {politician.full_name}</summary><p>{politician.bio}</p></details>}
             {links.length > 0 && <div className={styles.externalLinks}>{links.map((link) => <a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer">{link.label} ↗</a>)}</div>}
           </div>
 
-          <section className={styles.record} aria-labelledby="response-record">
-            <div><h2 id="response-record">The response record</h2><p className={styles.recordPeriod}>{periodLabel}</p></div>
-            <dl className={styles.facts}>
-              <div><dt>Questions</dt><dd>{data.totalQuestions.toLocaleString("en-US")}</dd></div>
-              <div className={data.officialAnsweredQuestions > 0 ? styles.official : undefined}><dt>Officially answered</dt><dd>{data.officialAnsweredQuestions.toLocaleString("en-US")}</dd></div>
-            </dl>
-            <div className={styles.rate}>
-              <div className={styles.rateValue}>{data.responseRate === null ? "No rate yet" : `${Math.round(data.responseRate)}% answered`}</div>
-              <p>{data.responseRate === null ? "No questions have reached 10 net votes in this period." : `${data.answeredQualifying} of ${data.qualifyingQuestions} questions with 10+ net votes have an official response.`}</p>
-            </div>
-            <details className={styles.methodology}><summary>How this is counted</summary><p>Questions are grouped by when they were submitted. The rate counts questions with at least 10 net votes that have a published response from the politician or their team. Each question counts once. AI analysis and drafts do not count. No response does not establish that a question was seen or declined. Records can take up to five minutes to refresh.</p></details>
-          </section>
+          <div className={styles.askSlot}>
+            {!politician.is_active ? <p className={styles.notice}>This profile is archived. New questions are closed.</p>
+              : currentWeekView ? <AskQuestionForm politicianId={politician.id} politicianName={politician.full_name} appearance="face" />
+              : <p className={styles.notice}>New questions go into the current week. <Link href={`/${politician.slug}#ask-question`}>Ask this week →</Link></p>}
+          </div>
+        </section>
+
+        <section className={styles.recordStrip} aria-labelledby="response-record">
+          <h2 id="response-record" className={styles.stripLabel}>The response record <span>{periodLabel}</span></h2>
+          <p className={styles.stripRate}>{data.responseRate === null ? "No rate yet" : `${Math.round(data.responseRate)}% answered`}</p>
+          <p><strong>{data.totalQuestions.toLocaleString("en-US")}</strong> questions</p>
+          <p className={data.officialAnsweredQuestions > 0 ? styles.official : undefined}><strong>{data.officialAnsweredQuestions.toLocaleString("en-US")}</strong> officially answered</p>
+          <p className={styles.stripNote}>{data.responseRate === null ? "No questions have reached 10 net votes in this period." : `${data.answeredQualifying} of ${data.qualifyingQuestions} questions with 10+ net votes have an official response.`}</p>
+          <details className={styles.methodology}><summary>How this is counted</summary><p>Questions are grouped by when they were submitted. The rate counts questions with at least 10 net votes that have a published response from the politician or their team. Each question counts once. AI analysis and drafts do not count. No response does not establish that a question was seen or declined. Records can take up to five minutes to refresh.</p></details>
         </section>
 
         <QuestionAnchorNotice slug={politician.slug} displayedIds={latestQuestion ? [latestQuestion.id] : questions.map((question) => question.id)} />
@@ -142,14 +143,8 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
             {!isHistoricalView && <PeriodTabs slug={politician.slug} activePeriod={period} sort={sort} />}
             {matchingQuestions > questions.length && <p className={styles.sectionIntro}>Showing {questions.length} of {matchingQuestions.toLocaleString("en-US")} {sort === "unanswered" ? "unanswered " : ""}questions, {sort === "newest" ? "newest first" : "ranked by net votes"}. The response record covers the full period.</p>}
             <QuestionList questions={questions} latestQuestion={latestQuestion} memberIds={data.memberIds} politicianId={politician.id} politicianSlug={politician.slug} politicianName={politician.full_name} profileVerified={politician.verification_tier === "2" || politician.verification_tier === "3"} weekNumber={viewingWeekNumber} currentWeekNumber={currentWeekNumber} isHistorical={isHistoricalView} period={period} appearance="face" profileSort={sort} />
+            {data.archiveWeeks.length > 0 && <details className={styles.archive}><summary>Previous weeks</summary><nav aria-label="Weekly archive">{data.archiveWeeks.map((archiveWeek) => <Link key={archiveWeek} href={`/${politician.slug}?week=${archiveWeek}#profile-questions`} aria-current={isHistoricalView && viewingWeekNumber === archiveWeek ? "page" : undefined}>{formatWeekStart(archiveWeek)} <span aria-hidden="true">→</span></Link>)}</nav></details>}
           </section>
-          <aside className={styles.sidebar} aria-label="Ask and explore">
-            {politician.is_active ? <><div className={styles.askSlot}>{currentWeekView ? <AskQuestionForm politicianId={politician.id} politicianName={politician.full_name} appearance="face" /> : <p className={styles.notice}>New questions go into the current week. <Link href={`/${politician.slug}#ask-question`}>Ask this week →</Link></p>}</div>
-              <div className={styles.help}><h2>A good question gets specific.</h2><ol><li>Ask about a decision, a commitment, or an issue they can act on.</li><li>Keep it clear and respectful.</li><li>Check the questions here first. Add your vote if someone has already asked.</li></ol></div>
-            </> : <p className={styles.notice}>This profile is archived. New questions are closed.</p>}
-            {data.archiveWeeks.length > 0 && <details className={styles.archive}><summary>Previous weeks</summary><nav aria-label="Weekly archive">{data.archiveWeeks.map((archiveWeek) => <Link key={archiveWeek} href={`/${politician.slug}?week=${archiveWeek}#profile-questions`} aria-current={isHistoricalView && viewingWeekNumber === archiveWeek ? "page" : undefined}>{formatWeekStart(archiveWeek)} <span aria-hidden="true">↗</span></Link>)}</nav></details>}
-            {politician.is_active && politician.verification_tier === "0" && <p className={styles.notice}>Part of {politician.full_name}’s team? <Link href={`/verify?prefill=${politician.id}`}>Claim this profile →</Link></p>}
-          </aside>
         </div>
         <footer className={styles.footer}><Link href="/#find-politician">Find another politician</Link><Link href="/how-it-works">How WhyTho works</Link><Link href="/faq">Questions about WhyTho</Link></footer>
       </div>

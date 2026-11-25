@@ -271,8 +271,9 @@ test("dashboard role branches preserve claims, verification, draft review and ad
     assert.equal(f.adminClients(), 1);
     assert.ok(f.logs.filter(log => log.table !== "politician_team").every(log => log.filters.some(([key, value]) => key === "politician_id" && value === POLITICIAN)));
   }
+  // Visiting /dashboard is explicit intent: the citizen view-mode cookie no longer bounces team members to the homepage.
   const citizen = fixture({ role: "admin", cookie: "citizen" });
-  await assert.rejects(markup(citizen, "app/dashboard/page.tsx"), (error: unknown) => error instanceof Redirect && error.location === "/");
+  assert.match(await markup(citizen, "app/dashboard/page.tsx"), /Verified|Self-claimed/);
 });
 
 test("answer route rejects anonymous/nonteam/direct responder requests without writes", async () => {

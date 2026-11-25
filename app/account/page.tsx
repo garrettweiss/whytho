@@ -41,7 +41,7 @@ export default async function AccountPage({ searchParams }: Props) {
       .eq("submitted_by", user.id).order("created_at", { ascending: false }).limit(50),
     supabase.from("votes").select("id, value, week_number, created_at, questions ( id, body, net_upvotes, week_number, politicians ( full_name, slug ) )")
       .eq("user_id", user.id).order("created_at", { ascending: false }).limit(100),
-    supabase.from("user_profiles").select("city, county, state_code, political_affiliation").eq("id", user.id).maybeSingle(),
+    supabase.from("user_profiles").select("city, county, state_code").eq("id", user.id).maybeSingle(),
   ]);
   const questions = questionResult.data ?? [];
   const votes = voteResult.data ?? [];
@@ -90,6 +90,6 @@ export default async function AccountPage({ searchParams }: Props) {
       </div>}
     </section>)}
 
-    {activeTab === "profile" && (profileResult.error ? <AccountReadError tab="profile" /> : <AccountProfileForm initialCity={profile?.city ?? null} initialCounty={profile?.county ?? null} initialStateCode={profile?.state_code ?? null} initialAffiliation={profile?.political_affiliation ?? null} />)}
+    {activeTab === "profile" && (profileResult.error ? <AccountReadError tab="profile" /> : <AccountProfileForm initialCity={profile?.city ?? null} initialCounty={profile?.county ?? null} initialStateCode={profile?.state_code ?? null} />)}
   </PublicPage>;
 }
