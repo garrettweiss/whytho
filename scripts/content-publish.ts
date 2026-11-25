@@ -10,6 +10,8 @@
  *   npx tsx scripts/content-publish.ts --week=2026-W48 --go-live             # post approved items that are due
  *   npx tsx scripts/content-publish.ts --week=2026-W48 --go-live --include-future
  *   npx tsx scripts/content-publish.ts --week=2026-W48 --go-live --only=2026-W48-01   # one item, now
+ *   npx tsx scripts/content-publish.ts --week=2026-W48 --export                        # final text for Buffer or the X composer
+ *   npx tsx scripts/content-publish.ts --week=2026-W48 --mark-published=2026-W48-01 --url=https://x.com/... --by=Garrett
  */
 import * as dotenv from "dotenv";
 dotenv.config({ path: ".env.local", override: true });
@@ -90,6 +92,35 @@ async function main() {
   }
 
   const only = option("only")?.split(",").map((s) => s.trim()).filter(Boolean) ?? [];
+  const markId = option("mark-published");
+  if (markId) {
+    const item = queue.items.find((candidate) => candidate.id === markId);
+    if (!item) throw new Error(`${markId} is not in the queue`);
+    if (item.status === "published") throw new Error(`${markId} is already published`);
+    const url = option("url");
+    if (!url || !/^https:\/\//.test(url)) throw new Error("--url=https://... is required to record a manual post");
+    const text = item.text.replace(/\{as_of\}/g, formatAsOf(now));
+    item.status = "published"; item.error = undefined;
+    item.published = { at: now.toISOString(), url, by: option("by") ?? "Garrett" };
+    fs.appendFileSync(LOG_PATH, JSON.stringify({ at: item.published.at, week: label, id: item.id, channel: item.channel, asset: item.asset, url, text, manual: true }) + "\n");
+    save(queue, label);
+    console.log(`  ✅ recorded ${markId} as published by ${item.published.by}: ${url}`);
+    return;
+  }
+
+  if (flag("export")) {
+    const exportable = queue.items.filter((item) => item.status === "approved" || item.status === "failed");
+    console.log(`→ ${exportable.length} approved items, final text for Buffer or the native composer. Stamp uses the scheduled time.\n`);
+    for (const item of exportable) {
+      const text = item.text.replace(/\{as_of\}/g, formatAsOf(new Date(item.scheduled_at)));
+      console.log(`${item.id} · ${item.channel} · ${item.scheduled_at.replace("T", " ").slice(0, 16)} UTC${item.asset === "WEEK_NOTE" ? " · re-check counts the morning it posts" : ""}`);
+      console.log(text);
+      if (item.channel === "x") console.log(`compose: https://x.com/intent/tweet?text=${encodeURIComponent(text)}`);
+      console.log("");
+    }
+    return;
+  }
+
   const approved = queue.items.filter((item) => item.status === "approved" && (!only.length || only.includes(item.id)));
   const due = approved.filter((item) => INCLUDE_FUTURE || only.length || new Date(item.scheduled_at).getTime() <= now.getTime() + DUE_WINDOW_MS);
   const waiting = approved.length - due.length;

@@ -45,6 +45,10 @@ The third command is a dry run and prints the exact text that would post. `--inc
 - `content/queue/<week>.json` and `.md`: the queue and its review sheet. Statuses: draft, approved, published, skipped, failed.
 - `content/published.jsonl`: append-only log of everything posted, with the final text and permalink.
 
+## Cheap posting route (decided November 25, 2026)
+
+X charges $0.20 per API post that contains a link and the account's credits are depleted; Garrett chose not to top up. Posts go out through Buffer's free plan instead: 3 channels (X, Bluesky, Threads), 10 queued posts per channel, and Buffer carries its own X API access. Sunday after approval, `content:publish --export` prints the final text per item; Esteban loads it into Buffer's queue in the browser pane with Garrett signed in, or Garrett pastes it. A post made outside the API is recorded with `--mark-published=ID --url=... --by=Garrett` so the log and the queue stay complete. The API publishers remain for Bluesky and Threads, which are free, and for X if credits ever return.
+
 ## Credentials
 
 | Channel | Variables | Status |
