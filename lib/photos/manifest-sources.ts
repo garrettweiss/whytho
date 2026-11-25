@@ -48,16 +48,30 @@ const CC: Record<string, License> = {
   "cc by 2.0": "CC-BY-2.0", "cc by 2.5": "CC-BY-2.5", "cc by 3.0": "CC-BY-3.0", "cc by 4.0": "CC-BY-4.0",
   "cc by-sa 2.0": "CC-BY-SA-2.0", "cc by-sa 2.5": "CC-BY-SA-2.5", "cc by-sa 3.0": "CC-BY-SA-3.0", "cc by-sa 4.0": "CC-BY-SA-4.0",
 };
-const FEDERAL_PD = /\bPD[- ]?US[- ]?(Gov|Government|Congress|Senate|House|Military|Army|Navy|Air Force|Marine|Coast Guard|DoD|DOS|DOT|DHS|DOE|DOI|USDA|VA|NIH|NOAA|NASA|NPS|FWS|BLM|EPA|Federal|Fed)\b|\bPD[- ]?USGov|\bPD White House/i;
-const STATE_PD: Array<[RegExp, string]> = [
-  [/\bPD[- ]?(California|CAGov)\b/i, "https://commons.wikimedia.org/wiki/Template:PD-CAGov"],
-  [/\bPD[- ]?(Florida|FLGov)\b/i, "https://commons.wikimedia.org/wiki/Template:PD-FLGov"],
+const FEDERAL_PD = /\bPD[- ]?US[- ]?(Gov|Government|Congress|Senate|House|Military|Army|Navy|Air Force|Air National Guard|National Guard|Marine|Marines|Coast Guard|DoD|DOS|DOT|DHS|DOE|DOI|DOC|HUD|FEMA|USDA|VA|NIH|NOAA|NASA|NPS|FWS|BLM|EPA|Federal|Fed)\b|\bPD[- ]?USGov|\bPD White House|\bPD (VOA|NASA|USDA)\b/i;
+const FEDERAL_TEMPLATE = /^pd-usgov\b|^pd-voa$/i;
+/** State public-record templates whose text documents a statutory or constitutional public-domain basis. */
+const STATE_PD_TEMPLATES: Array<[RegExp, string, string]> = [
+  [/^pd-cagov$|\bPD California\b/i, "California", "PD-CAGov"],
+  [/^pd-flgov$|\bPD Florida\b/i, "Florida", "PD-FLGov"],
+  [/^pd-magov$|\bPD-MAGov\b/i, "Massachusetts", "PD-MAGov"],
+  [/^pd-gagov$|\bPD Georgia \(U\.S\. state\)\b/i, "Georgia", "PD-GAGov"],
+  [/^pd-gahor$/i, "Georgia House of Representatives", "PD-GAHoR"],
+  [/^pd-ncgov-legislator photo$/i, "North Carolina General Assembly", "PD-NCGov-legislator_photo"],
+  [/^pd-ok-lsbpd$/i, "Oklahoma Legislative Service Bureau", "PD-OK-LSBPD"],
 ];
+const DEDICATION_TEMPLATE = /^pd-author(-flickrpdm)?$|^pd-self$|^pd-user(-\w+)?$|^pdmark-owner$|^pd-release$/i;
+const DEDICATION_CATEGORY = /Released into the public domain by the copyright holder|\bPD-author\b|\bPD-self\b|\bPD-author-FlickrPDM\b/i;
+const normalizeTemplate = (value: string) => value.toLowerCase().replace(/\s+/g, " ").replace(/_/g, " ").trim();
 
-/** Map Wikimedia Commons extmetadata to a manifest license, or explain why it is unresolved. */
-export function commonsLicense(meta: CommonsExtMetadata): CommonsLicense {
+/**
+ * Map Wikimedia Commons extmetadata (plus the license templates read from the file's wikitext, when supplied)
+ * to a manifest license, or explain why it is unresolved.
+ */
+export function commonsLicense(meta: CommonsExtMetadata, templates: string[] = []): CommonsLicense {
   const short = stripTags(meta.LicenseShortName?.value).toLowerCase();
   const categories = stripTags(meta.Categories?.value);
+  const tpl = templates.map(normalizeTemplate);
   if (/^cc0\b/.test(short) || /\bCC-Zero\b|\bCC0\b/i.test(categories)) {
     return { license: "CC0-1.0", license_url: "https://creativecommons.org/publicdomain/zero/1.0/", basis: "Commons license tag CC0" };
   }
@@ -68,13 +82,21 @@ export function commonsLicense(meta: CommonsExtMetadata): CommonsLicense {
     const url = /^https:\/\/creativecommons\.org\/licenses\/[a-z-]+\/\d\.\d\/?$/.test(declared) ? declared : canonical;
     return { license: cc, license_url: url, basis: `Commons license tag ${stripTags(meta.LicenseShortName?.value)}` };
   }
-  if (/public domain/.test(short) || meta.License?.value === "pd") {
-    if (FEDERAL_PD.test(categories)) return { license: "US-federal-official-duty", license_url: US_GOV_COPYRIGHT, basis: `Commons public-domain category for a US federal work (${categories.split("|").find(c => FEDERAL_PD.test(c)) ?? "PD US"})` };
-    for (const [pattern, url] of STATE_PD) {
-      const match = categories.split("|").find(c => pattern.test(c));
-      if (match) return { license: "US-state-public-record", license_url: url, basis: `Commons public-domain category ${match} (state public record)` };
+  if (short === "copyrighted free use") {
+    return { license: "copyrighted-free-use", license_url: "https://commons.wikimedia.org/wiki/Template:Copyrighted_free_use", basis: "Commons license tag Copyrighted free use (holder permits any use without conditions)" };
+  }
+  if (/public domain/.test(short) || meta.License?.value === "pd" || short === "pdm-owner") {
+    const federalTemplate = tpl.find(t => FEDERAL_TEMPLATE.test(t));
+    if (federalTemplate || FEDERAL_PD.test(categories)) {
+      return { license: "US-federal-official-duty", license_url: US_GOV_COPYRIGHT, basis: `Commons public-domain ${federalTemplate ? `template {{${federalTemplate}}}` : `category ${categories.split("|").find(c => FEDERAL_PD.test(c)) ?? "PD US"}`} for a US federal work` };
     }
-    return { license: null, reason: `public domain claim without a recognised US government basis (${short || "pd"})` };
+    for (const [pattern, body, template] of STATE_PD_TEMPLATES) {
+      const hit = tpl.find(t => pattern.test(t)) ?? categories.split("|").find(c => pattern.test(c));
+      if (hit) return { license: "US-state-public-record", license_url: `https://commons.wikimedia.org/wiki/Template:${template}`, basis: `Commons template {{${template}}}: ${body} works are public records in the public domain` };
+    }
+    const dedication = tpl.find(t => DEDICATION_TEMPLATE.test(t)) ?? (short === "pdm-owner" ? "pdmark-owner" : undefined) ?? (DEDICATION_CATEGORY.test(categories) ? "PD-author (category)" : undefined);
+    if (dedication) return { license: "public-domain-dedication", license_url: "https://commons.wikimedia.org/wiki/Template:PD-author", basis: `Commons template {{${dedication}}}: copyright holder released the work into the public domain` };
+    return { license: null, reason: `public domain claim without a recognised basis (${tpl.join(", ") || short || "pd"})` };
   }
   return { license: null, reason: short ? `license not accepted: ${short}` : "no license metadata" };
 }

@@ -23,7 +23,7 @@ try { process.loadEnvFile(".env.local"); } catch { /* environment may be injecte
 
 const args = process.argv.slice(2);
 const flag = (name: string) => args.find(a => a.startsWith(`--${name}=`))?.split("=")[1];
-const SCOPE = flag("scope") ?? "all"; // governors | federal | all | legislators (position key only)
+const SCOPE = flag("scope") ?? "all"; // governors | federal | all | legislators | mayors | executives (position key only)
 const KEY = flag("key") ?? "identifier"; // identifier | position
 const LIMIT = Number(flag("limit") ?? Infinity);
 const STAMP = new Date().toISOString().slice(0, 10).replace(/-/g, "");
@@ -34,6 +34,33 @@ const REVIEWER = KEY === "position"
   ? "scripts/build-commons-photo-manifest.ts (Wikidata office-and-state position match, full name, living current holder, unique + Commons extmetadata license, automated check)"
   : "scripts/build-commons-photo-manifest.ts (Wikidata identifier match + Commons extmetadata license, automated check)";
 const LEGISLATOR_OFFICES: Record<string, "lower" | "upper"> = { "State Representative": "lower", "State Senator": "upper", "Senator": "upper" };
+/** Single-holder offices matched by the exact English label of the Wikidata position. State offices take the state name. */
+const STATE_NAMES: Record<string, string> = { AL: "Alabama", AK: "Alaska", AZ: "Arizona", AR: "Arkansas", CA: "California", CO: "Colorado", CT: "Connecticut", DE: "Delaware", FL: "Florida", GA: "Georgia", HI: "Hawaii", ID: "Idaho", IL: "Illinois", IN: "Indiana", IA: "Iowa", KS: "Kansas", KY: "Kentucky", LA: "Louisiana", ME: "Maine", MD: "Maryland", MA: "Massachusetts", MI: "Michigan", MN: "Minnesota", MS: "Mississippi", MO: "Missouri", MT: "Montana", NE: "Nebraska", NV: "Nevada", NH: "New Hampshire", NJ: "New Jersey", NM: "New Mexico", NY: "New York", NC: "North Carolina", ND: "North Dakota", OH: "Ohio", OK: "Oklahoma", OR: "Oregon", PA: "Pennsylvania", RI: "Rhode Island", SC: "South Carolina", SD: "South Dakota", TN: "Tennessee", TX: "Texas", UT: "Utah", VT: "Vermont", VA: "Virginia", WA: "Washington", WV: "West Virginia", WI: "Wisconsin", WY: "Wyoming" };
+const NAMED_OFFICES: Record<string, (state: string | null) => string[] | null> = {
+  "Secretary Of State": state => state && STATE_NAMES[state] ? [`Secretary of State of ${STATE_NAMES[state]}`, `${STATE_NAMES[state]} Secretary of State`] : null,
+  "Secretary of State": state => state === "DC" ? ["United States Secretary of State"] : null,
+  "Secretary of the Treasury": () => ["United States Secretary of the Treasury"],
+  "Secretary of Education": () => ["United States Secretary of Education"],
+  "Secretary of Energy": () => ["United States Secretary of Energy"],
+  "Secretary of Agriculture": () => ["United States Secretary of Agriculture"],
+  "Secretary of Veterans Affairs": () => ["United States Secretary of Veterans Affairs"],
+  "Secretary of Commerce": () => ["United States Secretary of Commerce"],
+  "Secretary of the Interior": () => ["United States Secretary of the Interior"],
+  "Secretary of Health and Human Services": () => ["United States Secretary of Health and Human Services"],
+  "Secretary of Transportation": () => ["United States Secretary of Transportation"],
+  "Secretary of Defense": () => ["United States Secretary of Defense", "United States Secretary of War"],
+  "Secretary of Labor": () => ["United States Secretary of Labor"],
+  "Secretary of Homeland Security": () => ["United States Secretary of Homeland Security"],
+  "Secretary of Housing and Urban Development": () => ["United States Secretary of Housing and Urban Development"],
+  "Attorney General": state => state === "DC" || !state ? ["United States Attorney General"] : state && STATE_NAMES[state] ? [`Attorney General of ${STATE_NAMES[state]}`, `${STATE_NAMES[state]} Attorney General`] : null,
+  "White House Chief of Staff": () => ["White House Chief of Staff"],
+  "EPA Administrator": () => ["Administrator of the Environmental Protection Agency"],
+  "OMB Director": () => ["Director of the Office of Management and Budget"],
+  "CIA Director": () => ["Director of the Central Intelligence Agency"],
+  "Vice President": () => ["Vice President of the United States"],
+  "Treasurer": state => state && STATE_NAMES[state] ? [`Treasurer of ${STATE_NAMES[state]}`, `${STATE_NAMES[state]} State Treasurer`, `${STATE_NAMES[state]} Treasurer`] : null,
+};
+const MAYOR_OFFICE = "Mayor";
 const THUMB_WIDTH = 1200;
 
 const db = createClient<Database>(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false, autoRefreshToken: false } });
@@ -47,6 +74,8 @@ async function people(): Promise<Person[]> {
     if (SCOPE === "governors") query = query.eq("office", "Governor");
     if (SCOPE === "federal") query = query.not("bioguide_id", "is", null);
     if (SCOPE === "legislators") query = query.in("office", Object.keys(LEGISLATOR_OFFICES)).not("openstates_id", "is", null);
+    if (SCOPE === "mayors") query = query.eq("office", MAYOR_OFFICE);
+    if (SCOPE === "executives") query = query.in("office", Object.keys(NAMED_OFFICES));
     const { data, error } = await query; if (error) throw new Error(error.message);
     rows.push(...(data as Person[])); if (data.length < 1000) return rows;
   }
@@ -82,8 +111,8 @@ async function wikidata(property: Key["property"], values: string[]): Promise<Ma
   }
   return hits;
 }
-type Chamber = "governor" | "lower" | "upper";
-type PositionHit = { state: string; chamber: Chamber; item: string; label: string; image: string; district: string | null; start: string | null };
+type Chamber = "governor" | "lower" | "upper" | "mayor" | "named";
+type PositionHit = { state: string; chamber: Chamber; item: string; label: string; image: string; district: string | null; start: string | null; position?: string };
 async function sparql(query: string): Promise<Record<string, { value: string }>[]> {
   for (let attempt = 0; attempt < 3; attempt++) {
     const res = await fetch(`https://query.wikidata.org/sparql?format=json&query=${encodeURIComponent(query)}`, { headers: { "User-Agent": UA, Accept: "application/sparql-results+json" } });
@@ -96,24 +125,50 @@ async function sparql(query: string): Promise<Record<string, { value: string }>[
 /** Living current holders of Governor of <state> or member of a state chamber, with an image. */
 async function positionHolders(chambers: Chamber[], states: string[]): Promise<PositionHit[]> {
   const hits: PositionHit[] = [];
-  const common = `?state wdt:P300 ?iso . ?item p:P39 ?st . ?st ps:P39 ?pos . FILTER NOT EXISTS { ?st pq:P582 ?end } FILTER NOT EXISTS { ?item wdt:P570 ?death } ?item wdt:P18 ?image . OPTIONAL { ?st pq:P580 ?start } OPTIONAL { ?st pq:P768 ?district } SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }`;
+  const common = `?state wdt:P300 ?iso . ?item wdt:P31 wd:Q5 . ?item p:P39 ?st . ?st ps:P39 ?pos . FILTER NOT EXISTS { ?st pq:P582 ?end } FILTER NOT EXISTS { ?item wdt:P570 ?death } ?item wdt:P18 ?image . OPTIONAL { ?st pq:P580 ?start } OPTIONAL { ?st pq:P768 ?district } SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }`;
   for (let i = 0; i < states.length; i += 10) {
     const isoValues = states.slice(i, i + 10).map(code => JSON.stringify(`US-${code}`)).join(" ");
-    for (const chamber of chambers) {
+    for (const chamber of chambers.filter(c => c !== "named" && c !== "mayor")) {
       const position = chamber === "governor" ? `?pos wdt:P31 wd:Q889821 ; wdt:P1001 ?state .`
         : chamber === "lower" ? `?pos wdt:P279 wd:Q106079967 ; wdt:P1001 ?state .`
         : `?pos wdt:P31 wd:Q4164871 ; wdt:P1001 ?state ; rdfs:label ?posLabel . FILTER(LANG(?posLabel) = "en" && CONTAINS(?posLabel, "Senate") && STRSTARTS(?posLabel, "member of the"))`;
-      const rows = await sparql(`SELECT ?iso ?item ?itemLabel ?image ?start ?districtLabel WHERE { VALUES ?iso { ${isoValues} } ${position} ${common} }`);
+      const rows = await sparql(`SELECT ?iso ?item ?itemLabel ?image ?start ?districtLabel ?cityLabel WHERE { VALUES ?iso { ${isoValues} } ${position} ${common} }`);
       for (const b of rows) hits.push({ state: b.iso!.value.replace(/^US-/, ""), chamber, item: b.item!.value.split("/").pop()!, label: b.itemLabel?.value ?? "", image: b.image!.value, district: b.districtLabel?.value ?? null, start: b.start?.value ?? null });
       await new Promise(r => setTimeout(r, 800));
     }
   }
   return hits;
 }
+/** Living current mayors of the named cities: bind the city by label and state first, then its mayoral position. */
+async function mayorHolders(cities: { city: string; state: string }[]): Promise<PositionHit[]> {
+  const hits: PositionHit[] = [];
+  const unique = [...new Map(cities.map(c => [`${c.city}|${c.state}`, c])).values()];
+  for (let i = 0; i < unique.length; i += 8) {
+    const values = unique.slice(i, i + 8).map(c => `(${JSON.stringify(c.city)}@en ${JSON.stringify(`US-${c.state}`)})`).join(" ");
+    const rows = await sparql(`SELECT ?iso ?cityLabel ?item ?itemLabel ?image ?start WHERE { VALUES (?cityLabel ?iso) { ${values} } ?city rdfs:label ?cityLabel ; wdt:P17 wd:Q30 ; wdt:P131* ?state . ?state wdt:P300 ?iso . ?pos wdt:P1001 ?city ; wdt:P279* wd:Q30185 . ?item wdt:P31 wd:Q5 ; p:P39 ?st . ?st ps:P39 ?pos . FILTER NOT EXISTS { ?st pq:P582 ?end } FILTER NOT EXISTS { ?item wdt:P570 ?death } ?item wdt:P18 ?image . OPTIONAL { ?st pq:P580 ?start } SERVICE wikibase:label { bd:serviceParam wikibase:language "en". } }`);
+    for (const b of rows) hits.push({ state: b.iso!.value.replace(/^US-/, ""), chamber: "mayor", item: b.item!.value.split("/").pop()!, label: b.itemLabel?.value ?? "", image: b.image!.value, district: b.cityLabel?.value ?? null, start: b.start?.value ?? null });
+    await new Promise(r => setTimeout(r, 1000));
+  }
+  return hits;
+}
+/** Living human current holders of single-holder offices, looked up by the exact English position label. */
+async function namedHolders(labels: string[]): Promise<PositionHit[]> {
+  const hits: PositionHit[] = [];
+  for (let i = 0; i < labels.length; i += 40) {
+    const values = labels.slice(i, i + 40).map(l => `${JSON.stringify(l)}@en`).join(" ");
+    const rows = await sparql(`SELECT ?label ?item ?itemLabel ?image ?start WHERE { VALUES ?label { ${values} } ?pos rdfs:label ?label . ?item wdt:P31 wd:Q5 . ?item p:P39 ?st . ?st ps:P39 ?pos . FILTER NOT EXISTS { ?st pq:P582 ?end } FILTER NOT EXISTS { ?item wdt:P570 ?death } ?item wdt:P18 ?image . OPTIONAL { ?st pq:P580 ?start } SERVICE wikibase:label { bd:serviceParam wikibase:language "en". } }`);
+    for (const b of rows) hits.push({ state: "", chamber: "named", item: b.item!.value.split("/").pop()!, label: b.itemLabel?.value ?? "", image: b.image!.value, district: null, start: b.start?.value ?? null, position: b.label!.value });
+    await new Promise(r => setTimeout(r, 800));
+  }
+  return hits;
+}
 function chamberFor(p: Person): Chamber | null {
   if (p.office === "Governor") return "governor";
+  if (p.office === MAYOR_OFFICE) return "mayor";
+  if (NAMED_OFFICES[p.office ?? ""]) return "named";
   return LEGISLATOR_OFFICES[p.office ?? ""] ?? null;
 }
+const cityKey = (value: string | null) => (value ?? "").toLowerCase().replace(/^(city of|town of|city and county of)\s+/, "").replace(/[^a-z]/g, "");
 type ImageInfo = { title: string; url: string; thumburl?: string; width: number; height: number; mime: string; extmetadata: CommonsExtMetadata };
 async function commons(titles: string[]): Promise<Map<string, ImageInfo>> {
   const out = new Map<string, ImageInfo>();
@@ -134,6 +189,24 @@ async function commons(titles: string[]): Promise<Map<string, ImageInfo>> {
   return out;
 }
 
+/** License templates from the wikitext of each file, used only when extmetadata alone cannot resolve a public-domain claim. */
+async function commonsTemplates(titles: string[]): Promise<Map<string, string[]>> {
+  const out = new Map<string, string[]>();
+  for (let i = 0; i < titles.length; i += 50) {
+    const params = new URLSearchParams({ action: "query", prop: "revisions", rvprop: "content", rvslots: "main", titles: titles.slice(i, i + 50).join("|"), format: "json", redirects: "1" });
+    const res = await fetch(`https://commons.wikimedia.org/w/api.php?${params}`, { headers: { "User-Agent": UA } });
+    if (!res.ok) throw new Error(`Commons API ${res.status}`);
+    const body = await res.json() as { query?: { normalized?: { from: string; to: string }[]; redirects?: { from: string; to: string }[]; pages: Record<string, { title: string; revisions?: { slots: { main: { "*": string } } }[] }> } };
+    const alias = new Map<string, string>();
+    for (const n of [...(body.query?.normalized ?? []), ...(body.query?.redirects ?? [])]) alias.set(n.to, alias.get(n.from) ?? n.from);
+    for (const page of Object.values(body.query?.pages ?? {})) {
+      const text = page.revisions?.[0]?.slots.main["*"] ?? "";
+      out.set(alias.get(page.title) ?? page.title, [...new Set([...text.matchAll(/\{\{\s*(PD[^|}\n]*|PDM[^|}\n]*|Copyrighted free use[^|}\n]*)/gi)].map(m => m[1]!.trim()))]);
+    }
+    await new Promise(r => setTimeout(r, 300));
+  }
+  return out;
+}
 type Row = { politician_id: string; slug: string; office: string | null; key?: string; status: string; wikidata?: string; file?: string; license?: string; width?: number; height?: number; detail?: string };
 async function main() {
   const rows = (await people()).filter(p => !SKIP.has(p.id)).slice(0, LIMIT);
@@ -142,15 +215,19 @@ async function main() {
     const states = [...new Set(rows.map(p => p.state).filter((s): s is string => !!s && /^[A-Z]{2}$/.test(s)))].sort();
     const chambers = [...new Set(rows.map(chamberFor).filter((c): c is Chamber => !!c))];
     console.log(JSON.stringify({ scope: SCOPE, key: KEY, profiles: rows.length, states: states.length, chambers }));
-    const holders = await positionHolders(chambers, states);
-    console.log(JSON.stringify({ wikidata_living_current_holders_with_image: holders.length }));
+    const namedLabels = [...new Set(rows.filter(p => chamberFor(p) === "named").flatMap(p => NAMED_OFFICES[p.office!]!(p.state) ?? []))];
+    const mayorCities = rows.filter(p => chamberFor(p) === "mayor" && p.district && p.state).map(p => ({ city: p.district!, state: p.state! }));
+    const holders = [...await positionHolders(chambers, states), ...(mayorCities.length ? await mayorHolders(mayorCities) : []), ...(namedLabels.length ? await namedHolders(namedLabels) : [])];
+    console.log(JSON.stringify({ wikidata_living_current_holders_with_image: holders.length, named_position_labels: namedLabels.length }));
     const matches = new Map<string, PositionHit[]>();
     for (const p of rows) {
       const chamber = chamberFor(p);
-      if (!chamber || !p.state) continue;
-      const pool = holders.filter(h => h.state === p.state && h.chamber === chamber && (chamber === "governor" ? surnameMatches(p.full_name, h.label) && fullNameMatches(p.full_name, h.label) : fullNameMatches(p.full_name, h.label)));
+      if (!chamber || (!p.state && chamber !== "named")) continue;
+      const labels = chamber === "named" ? new Set(NAMED_OFFICES[p.office!]!(p.state) ?? []) : null;
+      const pool = holders.filter(h => h.chamber === chamber && (chamber === "named" ? labels!.has(h.position ?? "") : h.state === p.state) && fullNameMatches(p.full_name, h.label));
       const ours = districtKey(p.district);
-      const consistent = pool.filter(h => { const theirs = districtKey(h.district); return !ours || !theirs || ours === theirs; });
+      // Mayors must sit in the same city; legislators must agree on district when both sides record one.
+      const consistent = chamber === "mayor" ? pool.filter(h => cityKey(h.district) === cityKey(p.district)) : pool.filter(h => { const theirs = districtKey(h.district); return !ours || !theirs || ours === theirs; });
       const distinct = [...new Map(consistent.map(h => [h.item, h])).values()];
       matches.set(p.id, distinct);
     }
@@ -168,7 +245,7 @@ async function main() {
       row.wikidata = hit.item;
       const title = commonsTitleFromFilePath(hit.image); if (!title) { row.status = "bad_image_url"; continue; }
       row.file = title;
-      candidates.push({ p, hit: { item: hit.item, label: hit.label, image: hit.image }, title, identity: `office-and-state match: ${p.state} ${chamberFor(p)}; Wikidata living current holder ${hit.item} "${hit.label}"${hit.start ? ` since ${hit.start.slice(0, 10)}` : ""}${hit.district ? `, ${hit.district}` : ""}; first and last name match; unique on both sides` });
+      candidates.push({ p, hit: { item: hit.item, label: hit.label, image: hit.image }, title, identity: `office-and-state match: ${chamberFor(p) === "named" ? hit.position : `${p.state} ${chamberFor(p)}`}; Wikidata living current holder ${hit.item} "${hit.label}"${hit.start ? ` since ${hit.start.slice(0, 10)}` : ""}${hit.district ? `, ${hit.district}` : ""}; first and last name match; unique on both sides` });
     }
   } else {
   const keyed = rows.map(p => ({ p, key: keyFor(p) }));
@@ -189,6 +266,8 @@ async function main() {
   }
   }
   const infos = await commons([...new Set(candidates.map(c => c.title))]);
+  const needTemplates = [...infos.entries()].filter(([, info]) => !commonsLicense(info.extmetadata).license && (/public domain/i.test(info.extmetadata.LicenseShortName?.value ?? "") || info.extmetadata.License?.value === "pd")).map(([title]) => title);
+  const templates = needTemplates.length ? await commonsTemplates(needTemplates) : new Map<string, string[]>();
   const checkedAt = new Date().toISOString(); const manifest: PhotoRights[] = [];
   for (const { p, title, identity } of candidates) {
     const row = report.find(r => r.politician_id === p.id)!; const info = infos.get(title);
@@ -196,7 +275,7 @@ async function main() {
     row.width = info.width; row.height = info.height;
     if (!/^image\/(jpeg|png|webp)$/.test(info.mime)) { row.status = "unsupported_format"; row.detail = info.mime; continue; }
     if (info.width < PORTRAIT_MIN_WIDTH || info.height < PORTRAIT_MIN_HEIGHT) { row.status = "source_too_small"; continue; }
-    const license = commonsLicense(info.extmetadata);
+    const license = commonsLicense(info.extmetadata, templates.get(title) ?? []);
     if (!license.license) { row.status = "license_unresolved"; row.detail = license.reason; continue; }
     row.license = license.license;
     const source_url = (info.width > THUMB_WIDTH && info.thumburl ? info.thumburl : info.url).replace(/^http:/, "https:");

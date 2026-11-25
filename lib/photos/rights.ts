@@ -13,6 +13,10 @@ export const photoRightsManifest = z.array(z.object({
     "US-federal-official-duty",
     // State law places these governments' works in the public domain (California Government Code 6250 et seq.; Florida Constitution Art. I s. 24).
     "US-state-public-record",
+    // Copyright holder released the work into the public domain (PD-author, PD-self, Public Domain Mark applied by the owner).
+    "public-domain-dedication",
+    // Commons "Copyrighted free use": the holder permits any use, including modification, without conditions.
+    "copyrighted-free-use",
     // Portrait the Member's office supplied to Congress for public distribution; photographer not identified. Import only on operator decision.
     "congress-member-supplied",
     // Portrait as published in the GPO Congressional Pictorial Directory / Member Guide; photographer not identified. Import only on operator decision.

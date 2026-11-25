@@ -1,6 +1,6 @@
 # Portrait resolution pass, November 25, 2026
 
-**Outcome: 557 live portraits replaced with licensed images at up to 800x1000 (492 members of Congress, 65 governor profiles). Nothing was deleted; every prior object and URL is retained and logged.** Zero import errors. Caches revalidated. A further 1,051 state legislators and 37 members of Congress have ready manifests that wait on an operator decision.
+**Outcome: 2,214 live portraits replaced with licensed images at up to 800x1000 over the course of the day: 529 members of Congress, 81 governor profiles, 1,547 state legislators, 29 cabinet and statewide officers, 28 mayors. Nothing was deleted; every prior object and URL is retained and logged.** Zero import errors across seven apply runs. Caches revalidated after each. Garrett reviewed the 37 held members side by side before approving them and approved the position-keyed legislator class.
 
 ## Why the photos were grainy
 
@@ -41,23 +41,30 @@ Judgement calls, stated plainly:
 3. Congress.gov's own legal page could not be read by automation (bot check). The federal-work rule relies on usa.gov/government-copyright, which also warns that federal sites may carry third-party material. That warning is why held classes exist.
 4. Identity: identifier-keyed matches are exact. Position-keyed matches require state, chamber, first and last name, a living current holder, uniqueness on both sides, and agreeing districts when both sides record one. Duplicate WhyTho profiles of one governor share one match.
 
+## Pass 2 (same day): template-based licenses, mayors, executives
+
+The first pass left 529 legislators and 17 governors whose Commons files were tagged "public domain" without a category the mapper recognised. Reading each file's wikitext showed the actual templates: `PD-NCGov-legislator photo` (94), `PD-GAHoR` (92), `PD-OK-LSBPD` (87), `PD-MAGov` (15), `PD-GAGov` (12), author releases (`PD-author`, `PD-author-FlickrPDM`, `PD-self`, `PDMark-owner`, about 125), federal military templates (`PD-USGov-Military-National Guard` and similar, about 33), and `Copyrighted free use` (72). The mapper now reads templates when metadata alone cannot decide, and accepts those bases as `US-state-public-record`, `public-domain-dedication`, `copyrighted-free-use` or `US-federal-official-duty`. Still refused: `PD-US` (pre-1930 expiry, implausible for a living official), `PD-because`, `GFDL 1.2`, `Copyrighted free use-link`.
+
+Mayors are matched by binding the city (name plus state) first and then its mayoral position; executives by the exact English label of the single-holder office (for example "United States Secretary of the Treasury", "Secretary of State of Colorado"), humans only, living, full name agreeing.
+
+Two pipeline fixes surfaced during the legislator import: 23 legacy rows store an empty string rather than NULL in `photo_url`, so the "unchanged since preview" guard took the wrong branch; and one download threw an empty error. Both were retried successfully after the guard was corrected. The 24 orphaned objects from the first attempts remain in the bucket, unreferenced, per the pipeline's retention rule.
+
 ## Coverage after this pass
 
-| Group | Profiles | Replaced today | Ready, held for decision | No licensed source found |
-|---|---:|---:|---:|---:|
-| Members of Congress | 539 | 492 | 37 (`federal-held-remaining-20261125.json`: 22 GPO directory, 15 member-supplied) | 10 (too small everywhere, or label-less Wikidata items) |
-| Governor profiles | 98 (about 50 people, duplicates included) | 65 | 0 | 33 (13 no Wikidata match, 17 unresolved public-domain claims, 3 too small) |
-| State legislators (OpenStates-linked) | 7,117 | 0 | 1,051 (`commons-manifest-legislators-position-20261125.json`) | 6,066 (5,180 no Wikidata match, 529 unresolved license, 350 too small, 7 other) |
-| Mayors, cabinet, statewide officers | about 110 | 0 | 0 | not attempted |
+| Group | Profiles | Replaced today | No licensed source found |
+|---|---:|---:|---:|
+| Members of Congress | 539 | 529 | 10 (too small everywhere, or label-less Wikidata items) |
+| Governor profiles | 98 (about 50 people, duplicates included) | 81 | 17 (13 no Wikidata match, 3 too small, 1 unresolved) |
+| State legislators (OpenStates-linked) | 7,117 | 1,547 | 5,570 (5,180 no Wikidata match, 350 too small, 33 unresolved license, 7 other) |
+| Cabinet and statewide officers | 45 | 29 | 16 (14 no Wikidata match, 2 too small) |
+| Mayors | 50 | 28 | 22 (15 no Wikidata match, 7 too small) |
 
-## Solutions for the remaining photos
+## What remains and why
 
-1. **Members of Congress, 37 held.** One decision: whether a portrait the Member's office supplied to Congress for public distribution is an acceptable basis for WhyTho. If yes, run `photo-pipeline.ts --rights-manifest=docs/launch/evidence/photos/federal-held-remaining-20261125.json --apply --concurrency=2 --revalidate`. If no, they keep the placeholder path (verified office upload).
-2. **State legislators, 1,051 ready.** One decision: whether the position-keyed match (office, state, full name, living current holder, unique, district-consistent) is an acceptable identity check. It is structured, not name-only, but it is still name-based. If yes, apply the manifest; spot-check a sample first. Expected false-match rate is low but not zero; every import is versioned and reversible per profile.
-3. **State legislators, 529 unresolved licenses.** 434 are Commons "public domain" files without a recognised category (mostly state legislature templates and author self-releases). Extending `commonsLicense` with per-state public-record templates and `PD-self` would recover a large share. This is a rules change, not a new source.
-4. **State legislators, 5,180 with no Wikidata match.** Wikidata has no item or no image. The only lawful upgrade paths are the verified-office upload flow that already exists, or outreach asking offices to upload (outbound, gated by the external-communication rule). Their current small image or the initials placeholder remains.
-5. **Governors, 33.** Mostly duplicate profiles whose canonical twin was covered, plus unresolved public-domain claims. Covered by item 3 and by identity deduplication.
-6. **Mayors and cabinet, about 110.** Small enough for the position-keyed builder once mayor and cabinet positions are added to its chamber map, or for manual upload.
+1. **5,180 state legislators, 15 mayors, 14 executives, 13 governors with no Wikidata match.** Wikidata has no item for the person, no image on it, or a name that does not agree with ours. There is no licensed bulk source for these. Paths: the verified-office upload flow that already exists; outreach asking offices to upload (outbound, gated by the external-communication rule); or periodic re-runs of the builders, since Wikidata coverage grows.
+2. **About 370 too small.** A Commons image exists but is below 400x500. Same paths as above.
+3. **33 unresolved licenses.** `PD-US`, `PD-because`, GFDL-only and similar. Deliberately refused.
+4. **Duplicate governor profiles.** Covered by the identity deduplication work, not by photos.
 
 Do not upscale. Inventing facial detail for real politicians on an accountability site is not a quality repair.
 
@@ -71,4 +78,4 @@ npx tsx scripts/photo-pipeline.ts --rights-manifest=<manifest> --dry-run
 npx tsx scripts/photo-pipeline.ts --rights-manifest=<manifest> --apply --concurrency=2 --revalidate
 ```
 
-Evidence: `docs/launch/evidence/photos/` holds every manifest, report, apply log and the held lists. Storage concurrency stays at 2 per the runbook.
+Evidence: `docs/launch/evidence/photos/` holds every manifest, report, apply log and the held lists; `pass2/` holds the second pass. Storage concurrency stays at 2 per the runbook. Re-running a builder with `--skip-manifest=<every applied manifest>` yields only new matches.

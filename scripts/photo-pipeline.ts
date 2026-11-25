@@ -46,7 +46,8 @@ async function publish(p:Person,permission:PhotoRights){
   const {error:uploadError}=await db.storage.from(BUCKET).upload(objectPath,bytes,{contentType:"image/jpeg",upsert:false,cacheControl:"31536000"});if(uploadError)throw new Error(uploadError.message);
   const url=db.storage.from(BUCKET).getPublicUrl(objectPath).data.publicUrl;
   let query=db.from("politicians").update({photo_url:url,photo_source_url:permission.source_url,photo_credit:permission.creator,photo_rights_basis:`${permission.license}: ${permission.license_url}; ${permission.source_page}; ${permission.changes}`}).eq("id",p.id);
-  query=p.photo_url?query.eq("photo_url",p.photo_url):query.is("photo_url",null);
+  // Some legacy rows hold an empty string rather than NULL; only a true NULL takes the IS NULL guard.
+  query=p.photo_url===null?query.is("photo_url",null):query.eq("photo_url",p.photo_url);
   const {data,error}=await query.select("id");if(error)throw new Error(error.message);
   console.log(JSON.stringify({politician_id:p.id,status:data.length?"published":"changed_since_preview",new_url:url,old_url:p.photo_url,license:permission.license,reviewer:permission.reviewed_by}));
 }

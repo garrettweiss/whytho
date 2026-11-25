@@ -35,11 +35,20 @@ test("Commons licenses map only to accepted bases", () => {
   const state = commonsLicense({ LicenseShortName: { value: "Public domain" }, License: { value: "pd" }, Categories: { value: "Personality rights warning|PD California" } });
   assert.equal(state.license, "US-state-public-record");
   assert.equal(commonsLicense({ LicenseShortName: { value: "Public domain" }, License: { value: "pd" }, Categories: { value: "PD-old-70|Portraits" } }).license, null);
+  assert.equal(commonsLicense({ LicenseShortName: { value: "Public domain" }, License: { value: "pd" } }, ["PD-NCGov-legislator photo"]).license, "US-state-public-record");
+  assert.equal(commonsLicense({ LicenseShortName: { value: "Public domain" }, License: { value: "pd" } }, ["PD-OK-LSBPD"]).license, "US-state-public-record");
+  assert.equal(commonsLicense({ LicenseShortName: { value: "Public domain" }, License: { value: "pd" } }, ["PD-USGov-Military-National Guard"]).license, "US-federal-official-duty");
+  assert.equal(commonsLicense({ LicenseShortName: { value: "Public domain" }, License: { value: "pd" } }, ["PD-author-FlickrPDM"]).license, "public-domain-dedication");
+  assert.equal(commonsLicense({ LicenseShortName: { value: "PDM-owner" } }).license, "public-domain-dedication");
+  assert.equal(commonsLicense({ LicenseShortName: { value: "Copyrighted free use" } }).license, "copyrighted-free-use");
+  assert.equal(commonsLicense({ LicenseShortName: { value: "Copyrighted free use-link" } }).license, null);
+  assert.equal(commonsLicense({ LicenseShortName: { value: "Public domain" }, License: { value: "pd" } }, ["PD-US"]).license, null);
+  assert.equal(commonsLicense({ LicenseShortName: { value: "Public domain" }, License: { value: "pd" } }, ["PD-because"]).license, null);
   assert.equal(commonsLicense({ LicenseShortName: { value: "GFDL" } }).license, null);
   assert.equal(commonsLicense({ LicenseShortName: { value: "CC BY-NC 4.0" } }).license, null);
   assert.equal(commonsLicense({}).license, null);
   // Every accepted value must be a manifest license.
-  for (const value of ["CC-BY-SA-3.0", "CC-BY-4.0", "CC0-1.0", "US-federal-official-duty", "US-state-public-record"]) {
+  for (const value of ["CC-BY-SA-3.0", "CC-BY-4.0", "CC0-1.0", "US-federal-official-duty", "US-state-public-record", "public-domain-dedication", "copyrighted-free-use"]) {
     assert.ok(photoRightsManifest.element.shape.license.options.includes(value as never));
   }
 });
