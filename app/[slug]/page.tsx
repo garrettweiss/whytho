@@ -128,11 +128,13 @@ export default async function PoliticianProfilePage({ params, searchParams }: Pr
 
         <section className={styles.recordStrip} aria-labelledby="response-record">
           <h2 id="response-record" className={styles.stripLabel}>The response record <span>{periodLabel}</span></h2>
-          <p className={styles.stripRate}>{data.responseRate === null ? "No rate yet" : `${Math.round(data.responseRate)}% answered`}</p>
-          <p><strong>{data.totalQuestions.toLocaleString("en-US")}</strong> questions</p>
-          <p className={data.officialAnsweredQuestions > 0 ? styles.official : undefined}><strong>{data.officialAnsweredQuestions.toLocaleString("en-US")}</strong> officially answered</p>
-          <p className={styles.stripNote}>{data.responseRate === null ? "No questions have reached 10 net votes in this period." : `${data.answeredQualifying} of ${data.qualifyingQuestions} questions with 10+ net votes have an official response.`}</p>
+          <p className={styles.stat}><strong>{data.responseRate === null ? "No rate yet" : `${Math.round(data.responseRate)}%`}</strong><span>Response rate</span></p>
+          <p className={styles.stat}><strong>{data.totalQuestions.toLocaleString("en-US")}</strong><span>Questions</span></p>
+          <p className={`${styles.stat} ${data.officialAnsweredQuestions > 0 ? styles.official : ""}`}><strong>{data.officialAnsweredQuestions.toLocaleString("en-US")}</strong><span>Officially answered</span></p>
+          <div className={styles.stripFoot}>
+          <p>{data.responseRate === null ? "No questions have reached 10 net votes in this period." : `${data.answeredQualifying} of ${data.qualifyingQuestions} questions with 10+ net votes have an official response.`}</p>
           <details className={styles.methodology}><summary>How this is counted</summary><p>Questions are grouped by when they were submitted. The rate counts questions with at least 10 net votes that have a published response from the politician or their team. Each question counts once. AI analysis and drafts do not count. No response does not establish that a question was seen or declined. Records can take up to five minutes to refresh.</p></details>
+          </div>
         </section>
 
         <QuestionAnchorNotice slug={politician.slug} displayedIds={latestQuestion ? [latestQuestion.id] : questions.map((question) => question.id)} />

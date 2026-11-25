@@ -172,7 +172,7 @@ export function AskQuestionForm({ politicianId, politicianName, onSubmitted, app
   if (!user || user.is_anonymous) {
     return <section id="ask-question" className={rootClass} aria-labelledby={`${id}-title`}>
       <h2 id={`${id}-title`} className={titleClass}>Ask {politicianName}</h2>
-      <p className={textClass}>Ask about a decision, a vote, or an issue {politicianName} can act on. People vote to bring it to the top.</p>
+      <p className={textClass}>Ask about a decision, a vote, or an issue {politicianName} can act on. People upvote the questions they want answered.</p>
       <Link href={signInHref} className={buttonClass}>Sign in to ask</Link>
     </section>;
   }
