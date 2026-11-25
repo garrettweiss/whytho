@@ -38,11 +38,9 @@ interface Props {
   politicianName: string;
   onSubmitted?: () => void;
   appearance?: "default" | "face";
-  /** Politician-specific sample questions offered as editable drafts. Falls back to generic topic starters. */
-  samples?: { id: string; body: string }[];
 }
 
-export function AskQuestionForm({ politicianId, politicianName, onSubmitted, appearance = "default", samples = [] }: Props) {
+export function AskQuestionForm({ politicianId, politicianName, onSubmitted, appearance = "default" }: Props) {
   const { user, isLoading, status: participation, retry, requireConfirmation } = useParticipation();
   const router = useRouter();
   const pathname = usePathname();
@@ -187,16 +185,15 @@ export function AskQuestionForm({ politicianId, politicianName, onSubmitted, app
     </section>;
   }
 
-  const sampleList = <aside className={face ? styles.samples : "space-y-2 text-sm text-muted-foreground"} aria-label="Sample questions">
-    <p className={face ? styles.samplesLabel : undefined}>{samples.length > 0 ? "Try one:" : "Start from a topic:"}</p>
-    {samples.length > 0
-      ? samples.map(({ id: sampleId, body }) => (
-        <button key={sampleId} type="button" className={face ? styles.sampleButton : "block text-left underline underline-offset-2"} disabled={isPending || hasDraft} onClick={() => applyDraft(body)}>{body}</button>
-      ))
-      : QUESTION_STARTERS.map(({ topic, body }) => (
-        <button key={topic} type="button" className={face ? styles.sampleButton : "block text-left underline underline-offset-2"} disabled={isPending || hasDraft} onClick={() => applyDraft(body)}>{topic}</button>
+  const sampleList = <aside className={face ? styles.starters : "space-y-2 text-sm text-muted-foreground"} aria-label="Question starters">
+    <p className={face ? styles.startersLabel : undefined}>Question starters</p>
+    <p>Choose a topic to start a draft you can edit.</p>
+    <div className={face ? styles.starterChips : "flex flex-wrap gap-2"}>
+      {QUESTION_STARTERS.map(({ topic, body }) => (
+        <button key={topic} type="button" className={face ? styles.starterChip : "min-h-11 rounded-md border px-3"} disabled={isPending || hasDraft} onClick={() => applyDraft(body)}>{topic}</button>
       ))}
-    {hasDraft && <p>Clear your draft to use a sample.</p>}
+    </div>
+    {hasDraft && <p>Clear your draft to choose another starter.</p>}
   </aside>;
 
   return <form id="ask-question" className={`${rootClass} ${face ? styles.askWide : ""}`} onSubmit={handleSubmit} aria-labelledby={`${id}-title`} aria-busy={isPending}>

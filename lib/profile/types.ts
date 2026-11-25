@@ -63,8 +63,6 @@ export type PublicProfileData = {
   responseRate: number | null;
   archiveWeeks: number[];
   questionLimit: number;
-  /** Seeded questions offered as editable drafts in the ask box. */
-  sampleQuestions: { id: string; body: string }[];
 };
 
 export type ProfileView = Pick<PublicProfileData,

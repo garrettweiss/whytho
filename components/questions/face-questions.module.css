@@ -49,14 +49,16 @@
 .askTitle { margin: 0; font-family: var(--font-face-display), Impact, sans-serif; font-weight: 400; font-size: clamp(26px, 2.6vw, 34px); line-height: 1.05; text-transform: uppercase; letter-spacing: .5px; overflow-wrap: anywhere; }
 .askCols { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 24px; }
 .askMain { display: grid; gap: 14px; min-width: 0; }
-.samples { display: grid; gap: 4px; align-content: start; min-width: 0; padding-left: 24px; border-left: 1px solid light-dark(#b1b3ba, #45474d); font-size: 13px; color: light-dark(#565a62, #bfc0c6); }
-.samples p { margin: 0; }
-.samplesLabel { padding-bottom: 4px; }
-.sampleButton { text-align: left; background: transparent; border: 0; padding: 8px 0; font-family: inherit; font-size: 13px; line-height: 1.5; color: light-dark(#151619, #f6f5f1); cursor: pointer; text-decoration: underline; text-underline-offset: 4px; overflow-wrap: anywhere; }
-.sampleButton:disabled { color: light-dark(#8b8e96, #7c7e85); cursor: not-allowed; text-decoration: none; }
+.starters { display: grid; gap: 10px; align-content: start; min-width: 0; padding-left: 24px; border-left: 1px solid light-dark(#b1b3ba, #45474d); font-size: 13px; color: light-dark(#565a62, #bfc0c6); }
+.starters p { margin: 0; }
+.startersLabel { font-size: 14px; font-weight: 700; color: light-dark(#151619, #f6f5f1); }
+.starterChips { display: flex; flex-wrap: wrap; gap: 8px; }
+.starterChip { min-height: 44px; padding: 8px 14px; background: transparent; border: 1px solid light-dark(#767982, #777980); border-radius: 999px; font-family: inherit; font-size: 14px; color: light-dark(#151619, #f6f5f1); cursor: pointer; }
+.starterChip:hover:not(:disabled) { border-color: light-dark(#151619, #f6f5f1); }
+.starterChip:disabled { color: light-dark(#8b8e96, #7c7e85); border-color: light-dark(#c5c6cc, #45474d); cursor: not-allowed; }
 @media (max-width: 760px) {
   .askCols { grid-template-columns: 1fr; }
-  .samples { padding-left: 0; border-left: 0; padding-top: 14px; border-top: 1px solid light-dark(#b1b3ba, #45474d); }
+  .starters { padding-left: 0; border-left: 0; padding-top: 14px; border-top: 1px solid light-dark(#b1b3ba, #45474d); }
 }
 .askHint { margin: 0; color: light-dark(#565a62, #bfc0c6); font-size: 14px; line-height: 1.7; }
 .submitButton { display: inline-flex; justify-content: space-between; align-items: center; gap: 24px; width: fit-content; min-height: 48px; padding: 12px 18px; border: 1px solid light-dark(#151619, #f6f5f1); background: light-dark(#151619, #f6f5f1); color: var(--editorial-paper); font-family: inherit; font-size: 14px; font-weight: 750; line-height: 1.4; cursor: pointer; text-decoration: none; }
